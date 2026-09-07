@@ -1,0 +1,44 @@
+/* Shared Elancer colors. Dark mode changes surfaces, not the brand identity. */
+:root {
+    --el-page: #f6f5ef;
+    --el-surface: #fffefa;
+    --el-surface-soft: #eef1e8;
+    --el-text: #202d23;
+    --el-muted: #626f60;
+    --el-subtle: #63755d;
+    --el-border: #dce2d5;
+    --el-border-strong: #a3b59d;
+    --el-accent: #315c3d;
+    --el-link-hover: #17763d;
+    --el-soft: #e5eddf;
+    --el-brand: #57d278;
+    --el-brand-hover: #83e49d;
+    --el-on-brand: #122b19;
+    --el-inverse: #0a130e;
+    --el-inverse-text: #f0f7ef;
+    --el-inverse-muted: #a6bdad;
+    --el-inverse-soft: #ceeeda;
+    --el-inverse-border: #2c4936;
+    --el-hero-glow: #1b5932;
+    --el-hero-mid: #0d2518;
+    --el-hero-dark: #080e0a;
+    --el-mint: #e0f9e7;
+    --el-mint-mid: #9ce5b3;
+    --el-shadow: 0 12px 32px rgb(27 46 30 / 6%);
+    --el-art-blend: multiply;
+}
+.dark {
+    --el-page: #0e1812;
+    --el-surface: #16241b;
+    --el-surface-soft: #111e16;
+    --el-text: #edf4e9;
+    --el-muted: #b2c3b4;
+    --el-subtle: #a3b69f;
+    --el-border: #2b4031;
+    --el-border-strong: #47634b;
+    --el-accent: #9be3af;
+    --el-link-hover: #c4f4d1;
+    --el-soft: #243b2a;
+    --el-shadow: 0 12px 32px rgb(0 0 0 / 15%);
+    --el-art-blend: normal;
+}

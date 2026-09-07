@@ -8,6 +8,9 @@ import {
     Sparkles,
 } from 'lucide-react';
 import ElancerWordmark from '@/components/elancer-wordmark';
+import HomeMarketplace from '@/components/home/home-marketplace';
+import HomePaths from '@/components/home/home-paths';
+import HomeThemeToggle from '@/components/home/home-theme-toggle';
 import HoverFooter from '@/components/hover-footer';
 import Hero from '@/components/ui/animated-shader-hero';
 import { dashboard, login, register } from '@/routes';
@@ -59,10 +62,14 @@ export default function Welcome() {
                                 className="elancer-main-nav"
                                 aria-label="Main navigation"
                             >
-                                <a href="#why-elancer">Why Elancer</a>
+                                <a href="#categories">Explore categories</a>
+                                <a href="#featured-freelancers">
+                                    Meet the talent
+                                </a>
                                 <a href="#how-it-works">How it works</a>
                             </nav>
                             <div className="elancer-account-nav">
+                                <HomeThemeToggle />
                                 {!auth.user && (
                                     <Link href={login()}>Log in</Link>
                                 )}
@@ -169,6 +176,9 @@ export default function Welcome() {
                             </div>
                         </div>
                     </section>
+
+                    <HomeMarketplace />
+                    <HomePaths destination={destination} />
 
                     <section
                         id="how-it-works"

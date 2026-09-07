@@ -1,7 +1,9 @@
 @import 'tailwindcss';
 
 @import 'tw-animate-css';
+@import './elancer-theme.css';
 @import './elancer-home.css';
+@import './elancer-discovery.css';
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';

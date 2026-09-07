@@ -35,10 +35,12 @@ export default function HoverFooter({
                         <h2>Explore</h2>
                         <ul>
                             <li>
-                                <a href="#why-elancer">Why Elancer</a>
+                                <a href="#categories">Explore categories</a>
                             </li>
                             <li>
-                                <a href="#how-it-works">How it works</a>
+                                <a href="#featured-freelancers">
+                                    Sample talent
+                                </a>
                             </li>
                             <li>
                                 <a href="#main-content">
@@ -100,7 +102,7 @@ export default function HoverFooter({
                 </div>
             </div>
             <div className="elancer-footer-art">
-                <TextHoverEffect text="elancer" duration={0.2} />
+                <TextHoverEffect text="Elancer" duration={0.2} />
             </div>
         </footer>
     );
