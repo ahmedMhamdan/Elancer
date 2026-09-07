@@ -835,16 +835,29 @@
     color: #173b27;
 }
 :root:not(.dark) .elancer-shader {
-    filter: grayscale(1) invert(1) contrast(1.25) opacity(.48);
+    filter: grayscale(1) invert(1) contrast(1.25) opacity(0.48);
     mix-blend-mode: multiply;
 }
 :root:not(.dark) .elancer-hero-shade {
-    background: linear-gradient(180deg, #e6efdc80 0%, #a8dfab0d 40%, #b4e5b522 65%, #f6f5ef 100%);
+    background: linear-gradient(
+        180deg,
+        #e6efdc80 0%,
+        #a8dfab0d 40%,
+        #b4e5b522 65%,
+        #f6f5ef 100%
+    );
 }
 :root:not(.dark) .elancer-headline-accent {
-    background-image: linear-gradient(110deg, #285d38 10%, #287344 45%, #258244 88%);
+    background-image: linear-gradient(
+        110deg,
+        #285d38 10%,
+        #287344 45%,
+        #258244 88%
+    );
 }
-:root:not(.dark) .elancer-hero :is(.elancer-badge, .elancer-nav-cta, .elancer-action-secondary) {
+:root:not(.dark)
+    .elancer-hero
+    :is(.elancer-badge, .elancer-nav-cta, .elancer-action-secondary) {
     border-color: #9dbaa0;
     background: #f8fff580;
 }
@@ -854,7 +867,9 @@
 :root:not(.dark) .elancer-hero-bottom {
     border-color: #b9cdb7;
 }
-:root:not(.dark) .elancer-hero :is(.elancer-nav-cta, .elancer-action-secondary):hover {
+:root:not(.dark)
+    .elancer-hero
+    :is(.elancer-nav-cta, .elancer-action-secondary):hover {
     background: #d4e8ce;
 }
 :root:not(.dark) .elancer-main-nav a:hover,
@@ -865,22 +880,28 @@
 .elancer-theme-toggle {
     position: relative;
     overflow: hidden;
-    transition: background-color 240ms, color 240ms, border-color 240ms, transform 240ms;
+    transition:
+        background-color 240ms,
+        color 240ms,
+        border-color 240ms,
+        transform 240ms;
 }
 .elancer-theme-toggle:active {
-    transform: scale(.9);
+    transform: scale(0.9);
 }
 .elancer-theme-toggle svg {
     position: absolute;
-    transition: transform 440ms cubic-bezier(.22, 1, .36, 1), opacity 260ms;
+    transition:
+        transform 440ms cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 260ms;
 }
 .elancer-theme-toggle .elancer-theme-sun,
-.elancer-theme-toggle[data-dark="true"] .elancer-theme-moon {
-    transform: rotate(-100deg) scale(.3);
+.elancer-theme-toggle[data-dark='true'] .elancer-theme-moon {
+    transform: rotate(-100deg) scale(0.3);
     opacity: 0;
 }
 .elancer-theme-toggle .elancer-theme-moon,
-.elancer-theme-toggle[data-dark="true"] .elancer-theme-sun {
+.elancer-theme-toggle[data-dark='true'] .elancer-theme-sun {
     transform: rotate(0) scale(1);
     opacity: 1;
 }
