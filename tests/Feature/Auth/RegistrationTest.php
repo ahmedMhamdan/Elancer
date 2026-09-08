@@ -36,4 +36,20 @@ class RegistrationTest extends TestCase
         $this->assertAuthenticated();
         $response->assertRedirect(route('dashboard', absolute: false));
     }
+
+    public function test_registration_rejects_mismatched_passwords(): void
+    {
+        $response = $this->post(route('register.store'), [
+            'name' => 'Learner',
+            'email' => 'learner@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'different-password',
+        ]);
+
+        $response->assertSessionHasErrors('password');
+        $this->assertGuest();
+        $this->assertDatabaseMissing('users', [
+            'email' => 'learner@example.com',
+        ]);
+    }
 }
