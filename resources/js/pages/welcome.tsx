@@ -7,13 +7,12 @@ import {
     PenTool,
     Sparkles,
 } from 'lucide-react';
-import ElancerWordmark from '@/components/elancer-wordmark';
+import ElancerSiteHeader from '@/components/elancer-site-header';
 import HomeMarketplace from '@/components/home/home-marketplace';
 import HomePaths from '@/components/home/home-paths';
-import HomeThemeToggle from '@/components/home/home-theme-toggle';
 import HoverFooter from '@/components/hover-footer';
 import Hero from '@/components/ui/animated-shader-hero';
-import { dashboard, login, register } from '@/routes';
+import { dashboard, register } from '@/routes';
 
 export default function Welcome() {
     const { auth } = usePage().props;
@@ -27,65 +26,31 @@ export default function Welcome() {
                     content="Elancer connects independent talent and ambitious ideas. Find your people and make your next great project happen."
                 />
             </Head>
-            <div className="elancer-home">
+            <div className="elancer-home elancer-home-refined">
                 <a href="#main-content" className="elancer-skip-link">
                     Skip to content
                 </a>
+                <ElancerSiteHeader />
                 <main id="main-content">
                     <Hero
-                        trustBadge={{
-                            text: 'A meeting place for talent & possibility',
-                        }}
                         headline={{
                             line1: 'Good people.',
                             line2: 'Extraordinary work.',
                         }}
-                        subtitle="Big ideas deserve the right people. Connect with independent talent and turn your next what-if into something real."
+                        subtitle="Discover designers, developers, and independent specialists. Create a profile to share your skills and introduce your next idea."
                         buttons={{
                             primary: {
                                 text: auth.user
                                     ? 'Go to your workspace'
-                                    : 'Let’s get to work',
+                                    : 'Create your account',
                                 href: destination,
                             },
                             secondary: {
-                                text: 'See how it works',
-                                href: '#how-it-works',
+                                text: 'Explore skills',
+                                href: '#categories',
                             },
                         }}
-                    >
-                        <header className="elancer-header">
-                            <Link href="/" aria-label="Elancer home">
-                                <ElancerWordmark />
-                            </Link>
-                            <nav
-                                className="elancer-main-nav"
-                                aria-label="Main navigation"
-                            >
-                                <a href="#categories">Explore categories</a>
-                                <a href="#featured-freelancers">
-                                    Meet the talent
-                                </a>
-                                <a href="#how-it-works">How it works</a>
-                            </nav>
-                            <div className="elancer-account-nav">
-                                <HomeThemeToggle />
-                                {!auth.user && (
-                                    <Link href={login()}>Log in</Link>
-                                )}
-                                <Link
-                                    href={destination}
-                                    className="elancer-nav-cta"
-                                >
-                                    {auth.user ? 'Workspace' : 'Get started'}{' '}
-                                    <ArrowUpRight
-                                        size={15}
-                                        aria-hidden="true"
-                                    />
-                                </Link>
-                            </div>
-                        </header>
-                    </Hero>
+                    />
 
                     <section
                         id="why-elancer"
@@ -94,8 +59,11 @@ export default function Welcome() {
                     >
                         <div className="elancer-section-topline">
                             <span>
-                                <span className="elancer-small-square" /> BUILT
-                                AROUND YOU
+                                <span
+                                    className="elancer-small-square"
+                                    aria-hidden="true"
+                                />{' '}
+                                Work on your terms
                             </span>
                             <span>Less friction. More making.</span>
                         </div>
@@ -126,7 +94,7 @@ export default function Welcome() {
                             </div>
                             <div className="elancer-intro-copy">
                                 <span className="elancer-eyebrow">
-                                    GOOD WORK IS HUMAN.
+                                    Built around people
                                 </span>
                                 <h2 id="intro-heading">
                                     Make room for
@@ -188,43 +156,43 @@ export default function Welcome() {
                         <div className="elancer-how-header">
                             <div>
                                 <span className="elancer-eyebrow">
-                                    FROM HELLO TO LET’S GO
+                                    Getting started
                                 </span>
                                 <h2 id="how-heading">
-                                    Great things start simply.
+                                    Your first steps on Elancer.
                                 </h2>
                             </div>
                             <Link
                                 href={destination}
                                 className="elancer-text-link"
                             >
-                                Start your story{' '}
+                                Get started{' '}
                                 <ArrowRight size={18} aria-hidden="true" />
                             </Link>
                         </div>
                         <ol className="elancer-steps">
                             <li>
                                 <span className="elancer-step-number">01</span>
-                                <h3>Bring your ambition.</h3>
+                                <h3>Create an account.</h3>
                                 <p>
-                                    Start with an idea you want to build, or a
-                                    skill you’re ready to share.
+                                    Add your name and email, then choose a
+                                    password to create your account.
                                 </p>
                             </li>
                             <li>
                                 <span className="elancer-step-number">02</span>
-                                <h3>Find your people.</h3>
+                                <h3>Verify your email.</h3>
                                 <p>
-                                    Connect around a clear brief, a shared
-                                    vision, and the right expertise.
+                                    Open the verification email and follow the
+                                    link to access your workspace.
                                 </p>
                             </li>
                             <li>
                                 <span className="elancer-step-number">03</span>
-                                <h3>Make something matter.</h3>
+                                <h3>Introduce yourself.</h3>
                                 <p>
-                                    Bring your best work to the table. Create
-                                    something you’re proud to put your name on.
+                                    Add a headline, a short bio, and your
+                                    location to your profile.
                                 </p>
                             </li>
                         </ol>

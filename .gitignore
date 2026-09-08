@@ -29,3 +29,6 @@ yarn-error.log
 /.zed
 docs/progress.md
 .gitignore
+
+# Local design reference
+/DESIGN.md

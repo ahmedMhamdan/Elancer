@@ -1,11 +1,11 @@
 import { Form, Head, Link } from '@inertiajs/react';
-import { Eye, EyeOff, Mail, MoveUpRight } from 'lucide-react';
+import { Eye, EyeOff, Mail } from 'lucide-react';
 import { useState } from 'react';
 import type { ComponentProps } from 'react';
-import ElancerWordmark from '@/components/elancer-wordmark';
+import ElancerSiteHeader from '@/components/elancer-site-header';
 import InputError from '@/components/input-error';
 import { Spinner } from '@/components/ui/spinner';
-import { home, login } from '@/routes';
+import { login } from '@/routes';
 import { store } from '@/routes/register';
 import '../../../css/elancer-registration.css';
 
@@ -69,93 +69,77 @@ function RegistrationField({
 }
 
 export default function Register({ passwordRules }: Props) {
+    const [providerNotice, setProviderNotice] = useState('');
     return (
         <div className="elancer-registration">
             <Head title="Join Elancer" />
             <a href="#registration-form" className="registration-skip">
                 Skip to registration
             </a>
-            <header className="registration-header">
-                <Link href={home()} aria-label="Elancer home">
-                    <ElancerWordmark />
-                </Link>
-                <p>
-                    Already a member? <Link href={login()}>Log in</Link>
-                </p>
-            </header>
+            <ElancerSiteHeader registration />
 
             <main className="registration-main">
-                <section
-                    className="registration-story"
-                    aria-labelledby="registration-story-title"
-                >
-                    <div className="registration-story-copy">
-                        <h1 id="registration-story-title">
-                            Good work starts with a connection.
-                        </h1>
-                        <p>
-                            A place for independent talent and people with
-                            something to build. Start with your Elancer account.
-                        </p>
-                    </div>
-                    <div className="registration-path">
-                        <h2>Your next steps</h2>
-                        <ol>
-                            <li>
-                                <span
-                                    className="registration-step"
-                                    aria-hidden="true"
-                                >
-                                    1
-                                </span>
-                                <div>
-                                    <strong>Create your account</strong>
-                                    <p>A few details to get started.</p>
-                                </div>
-                            </li>
-                            <li>
-                                <span
-                                    className="registration-step"
-                                    aria-hidden="true"
-                                >
-                                    2
-                                </span>
-                                <div>
-                                    <strong>Verify your email</strong>
-                                    <p>
-                                        Follow the link we send to your inbox.
-                                    </p>
-                                </div>
-                            </li>
-                            <li>
-                                <span
-                                    className="registration-step"
-                                    aria-hidden="true"
-                                >
-                                    3
-                                </span>
-                                <div>
-                                    <strong>Make yourself known</strong>
-                                    <p>Add your story to your profile.</p>
-                                </div>
-                            </li>
-                        </ol>
-                    </div>
-                    <MoveUpRight
-                        className="registration-story-mark"
-                        strokeWidth={0.7}
-                        aria-hidden="true"
-                    />
-                </section>
-
                 <section
                     className="registration-form-panel"
                     aria-labelledby="registration-title"
                 >
                     <div className="registration-form-content">
                         <div className="registration-form-heading">
-                            <h2 id="registration-title">Join Elancer</h2>
-                            <p>Let’s start with the basics.</p>
+                            <h1 id="registration-title">
+                                Make yourself at home.
+                            </h1>
+                            <p>
+                                Create your Elancer account. A place for your
+                                skills, your ideas, and whatever comes next.
+                            </p>
+                        </div>
+                        <div
+                            className="registration-social"
+                            aria-label="Other sign-in methods"
+                        >
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setProviderNotice(
+                                        'Google sign-in is coming soon. You can create an account with email below.',
+                                    )
+                                }
+                            >
+                                <img
+                                    src="/images/google-mark.svg"
+                                    width="20"
+                                    height="20"
+                                    alt=""
+                                />
+                                Continue with Google
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setProviderNotice(
+                                        'GitHub sign-in is coming soon. You can create an account with email below.',
+                                    )
+                                }
+                            >
+                                <img
+                                    className="registration-github-mark"
+                                    src="/images/github-mark.svg"
+                                    width="20"
+                                    height="20"
+                                    alt=""
+                                />
+                                Continue with GitHub
+                            </button>
+                        </div>
+                        <p
+                            className="registration-provider-notice"
+                            role="status"
+                        >
+                            {providerNotice ||
+                                'Google and GitHub sign-in coming soon.'}
+                        </p>
+                        <div className="registration-divider">
+                            <span>or use your email</span>
                         </div>
                         <Form
                             {...store.form()}
@@ -224,7 +208,7 @@ export default function Register({ passwordRules }: Props) {
                                             label="Confirm password"
                                             type="password"
                                             autoComplete="new-password"
-                                            placeholder="Enter your password again"
+                                            placeholder="Repeat your password"
                                             passwordrules={passwordRules}
                                             required
                                             error={errors.password_confirmation}
@@ -253,13 +237,37 @@ export default function Register({ passwordRules }: Props) {
                                 </>
                             )}
                         </Form>
+                        <p className="registration-login-note">
+                            Already have an account?{' '}
+                            <Link href={login()}>Log in</Link>
+                        </p>
                     </div>
                 </section>
+                <aside
+                    className="registration-art"
+                    aria-labelledby="registration-art-title"
+                >
+                    <div className="registration-art-copy">
+                        <h2 id="registration-art-title">
+                            A little space for your next big idea.
+                        </h2>
+                        <p>
+                            For independent minds and people who love what they
+                            do.
+                        </p>
+                    </div>
+                    <img
+                        src="/images/registration-collaboration.png"
+                        alt="Two independent creatives collaborating on a design at a shared table."
+                        width="1536"
+                        height="1024"
+                    />
+                    <div className="registration-art-caption">
+                        <span>Find your people.</span>
+                        <span>Make good work.</span>
+                    </div>
+                </aside>
             </main>
-            <footer className="registration-footer">
-                <span>Independent talent. Shared ambition.</span>
-                <Link href={home()}>Back to Elancer</Link>
-            </footer>
         </div>
     );
 }

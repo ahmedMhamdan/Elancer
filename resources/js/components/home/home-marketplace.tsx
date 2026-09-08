@@ -204,12 +204,10 @@ export default function HomeMarketplace() {
                 <div className="elancer-section-heading">
                     <div>
                         <span className="elancer-eyebrow">
-                            A WORLD OF WHAT YOU CAN DO
+                            Explore by skill
                         </span>
                         <h2 id="categories-heading">
-                            Find the right kind
-                            <br />
-                            of <span>brilliant.</span>
+                            What does your project need?
                         </h2>
                     </div>
                     <p>
@@ -220,7 +218,7 @@ export default function HomeMarketplace() {
                 </div>
                 <div className="elancer-category-grid">
                     {homeCategories.map(
-                        ({ id, icon: Icon, title, description }, index) => (
+                        ({ id, icon: Icon, title, description }) => (
                             <button
                                 key={id}
                                 type="button"
@@ -237,16 +235,13 @@ export default function HomeMarketplace() {
                                             aria-hidden="true"
                                         />
                                     </span>
-                                    <span className="elancer-category-index">
-                                        0{index + 1}
-                                    </span>
                                 </div>
                                 <h3>{title}</h3>
                                 <p>{description}</p>
                                 <span className="elancer-category-bottom">
                                     {category === id
                                         ? 'Selected'
-                                        : 'Explore the possibilities'}
+                                        : 'View sample talent'}
                                     {category === id ? (
                                         <Check size={16} aria-hidden="true" />
                                     ) : (
@@ -274,12 +269,10 @@ export default function HomeMarketplace() {
                 <div className="elancer-section-heading">
                     <div>
                         <span className="elancer-eyebrow">
-                            THE PEOPLE BEHIND THE POSSIBILITIES
+                            A closer look at the work
                         </span>
                         <h2 id="talent-heading">
-                            Independent minds.
-                            <br />
-                            <span>Remarkable potential.</span>
+                            Meet the skills behind the work.
                         </h2>
                     </div>
                     <div className="elancer-talent-heading-note">
@@ -297,7 +290,7 @@ export default function HomeMarketplace() {
                 <div className="elancer-talent-filter">
                     <span role="status" aria-live="polite">
                         {selected
-                            ? `${selected.title} · ${visible.length} sample profile`
+                            ? `${selected.title}: ${visible.length} sample ${visible.length === 1 ? 'profile' : 'profiles'}`
                             : `Showing ${visible.length} sample profiles`}
                     </span>
                     {category && (

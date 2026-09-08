@@ -1,0 +1,82 @@
+/* Resizable navigation adapted from the supplied component. */
+.elancer-resizable-navbar[data-compact='false'] {
+    background: var(--el-surface);
+}
+.elancer-resizable-navbar {
+    color: var(--el-text);
+}
+.elancer-resizable-body {
+    background: var(--el-surface);
+    border: 1px solid transparent;
+}
+.elancer-resizable-body[data-compact='true'] {
+    border-color: var(--el-border);
+    background: color-mix(in srgb, var(--el-surface) 94%, transparent);
+    backdrop-filter: blur(12px);
+}
+.elancer-resizable-logo .elancer-wordmark {
+    font-size: 28px;
+}
+.elancer-resizable-link {
+    color: var(--el-muted);
+}
+.elancer-resizable-link:hover {
+    color: var(--el-text);
+}
+.elancer-navbar-button-primary {
+    background: var(--el-text);
+    color: var(--el-surface);
+}
+.elancer-navbar-button-primary:hover {
+    background: var(--el-accent);
+}
+.elancer-navbar-button-secondary {
+    color: var(--el-text);
+    background: transparent;
+}
+.elancer-navbar-button-secondary:hover {
+    background: var(--el-soft);
+}
+.elancer-resizable-menu {
+    background: var(--el-surface);
+    border: 1px solid var(--el-border);
+}
+.elancer-resizable-navbar .elancer-theme-toggle {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    border: 0;
+    border-radius: 50%;
+    color: var(--el-muted);
+    background: transparent;
+}
+.elancer-resizable-navbar .elancer-theme-toggle:hover {
+    background: var(--el-soft);
+}
+.elancer-resizable-navbar :is(a, button) {
+    touch-action: manipulation;
+}
+.elancer-resizable-navbar :is(a, button):focus-visible {
+    outline: 3px solid var(--el-accent);
+    outline-offset: 3px;
+}
+.elancer-home section[id],
+.registration-form {
+    scroll-margin-top: 108px;
+}
+.elancer-home .elancer-skip-link {
+    z-index: 60;
+}
+@media (max-width: 420px) {
+    .elancer-resizable-logo .elancer-wordmark {
+        font-size: 25px;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .elancer-resizable-navbar * {
+        transition: none !important;
+        animation: none !important;
+    }
+}

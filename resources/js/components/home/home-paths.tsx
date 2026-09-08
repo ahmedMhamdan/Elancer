@@ -11,12 +11,10 @@ export default function HomePaths({ destination }: { destination: string }) {
             <div className="elancer-section-heading">
                 <div>
                     <span className="elancer-eyebrow">
-                        TWO PATHS. ENDLESS POSSIBILITIES.
+                        One account, two ways to work
                     </span>
                     <h2 id="paths-heading">
-                        Whichever side of the idea
-                        <br />
-                        you’re on, <span>you belong.</span>
+                        Bring a project. Share your skills.
                     </h2>
                 </div>
                 <p>
@@ -28,7 +26,7 @@ export default function HomePaths({ destination }: { destination: string }) {
             <div className="elancer-paths-grid">
                 <article className="elancer-path-card">
                     <div className="elancer-path-top">
-                        <span>FOR CLIENTS</span>
+                        <span>For clients</span>
                         <BriefcaseBusiness
                             size={25}
                             strokeWidth={1.5}
@@ -71,7 +69,7 @@ export default function HomePaths({ destination }: { destination: string }) {
                 </article>
                 <article className="elancer-path-card elancer-path-independent">
                     <div className="elancer-path-top">
-                        <span>FOR FREELANCERS</span>
+                        <span>For freelancers</span>
                         <Sparkles
                             size={25}
                             strokeWidth={1.5}

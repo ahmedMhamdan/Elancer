@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { ArrowDown, ArrowUpRight, Sparkles } from 'lucide-react';
+import { ArrowDown, Sparkles } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
@@ -163,7 +163,7 @@ export function useShaderBackground() {
 
 function HeroAction({ action, primary }: { action: HeroButton; primary?: boolean }) {
     const className = cn('elancer-action', primary ? 'elancer-action-primary' : 'elancer-action-secondary');
-    const content = <>{action.text}{primary ? <ArrowUpRight size={18} aria-hidden="true" /> : <ArrowDown size={16} aria-hidden="true" />}</>;
+    const content = action.text;
 
     if (action.href?.startsWith('#')) {
         return <a href={action.href} className={className} onClick={action.onClick}>{content}</a>;
@@ -209,7 +209,6 @@ export default function Hero({ trustBadge, headline, subtitle, buttons, classNam
             <div className="elancer-hero-bottom">
                 <span>A little ambition goes a long way.</span>
                 <a href="#why-elancer">Discover a different way to work <ArrowDown size={14} aria-hidden="true" /></a>
-                <span className="elancer-hero-index">01 — THE POSSIBILITIES</span>
             </div>
         </section>
     );
