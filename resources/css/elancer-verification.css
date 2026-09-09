@@ -1,0 +1,206 @@
+/* A single envelope reveal connects the verification action to the inbox. */
+.verification-main {
+    display: grid;
+    grid-template-columns: minmax(0, 450px) minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(48px, 8vw, 120px);
+    width: min(1180px, calc(100% - 96px));
+    min-height: calc(100svh - 76px);
+    margin-inline: auto;
+    padding-block: 64px;
+}
+.verification-copy,
+.verification-art {
+    min-width: 0;
+}
+.verification-progress {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 32px;
+    color: var(--el-muted);
+    font-size: 12px;
+}
+.verification-progress span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.verification-progress [aria-current] {
+    color: var(--el-accent);
+    font-weight: 600;
+}
+.verification-progress .verification-progress-line {
+    width: 28px;
+    height: 1px;
+    background: var(--el-border-strong);
+}
+.verification-copy h1 {
+    font-size: clamp(38px, 4vw, 54px);
+    font-weight: 500;
+    letter-spacing: -0.05em;
+    line-height: 1.08;
+    text-wrap: balance;
+}
+.verification-intro {
+    max-width: 38ch;
+    margin-top: 20px;
+    color: var(--el-muted);
+    font-size: 16px;
+    line-height: 1.7;
+}
+.verification-recipient {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 28px;
+    padding: 18px 20px;
+    border: 1px solid var(--el-border);
+    border-radius: 10px;
+    background: var(--el-page);
+}
+.verification-recipient > svg {
+    flex-shrink: 0;
+    color: var(--el-accent);
+}
+.verification-recipient > div {
+    min-width: 0;
+}
+.verification-recipient p {
+    margin-bottom: 4px;
+    color: var(--el-muted);
+    font-size: 12px;
+}
+.verification-recipient strong {
+    font-size: 15px;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+.verification-instructions {
+    margin-top: 18px;
+    color: var(--el-muted);
+    font-size: 14px;
+    line-height: 1.75;
+}
+.verification-form {
+    margin-top: 26px;
+}
+.verification-feedback {
+    min-height: 42px;
+    padding-top: 12px;
+    color: var(--el-accent);
+    font-size: 13px;
+    line-height: 1.5;
+}
+.verification-feedback p {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+.verification-feedback svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+.verification-logout {
+    color: var(--el-muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+.verification-logout button {
+    min-height: 44px;
+    padding-inline: 4px;
+    color: var(--el-text);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+.verification-logout button:hover {
+    color: var(--el-link-hover);
+}
+.verification-art {
+    padding: 24px 28px 28px;
+    border-radius: 24px;
+    background: var(--el-page);
+}
+.verification-envelope {
+    display: block;
+    width: 100%;
+    max-width: 440px;
+    height: auto;
+    margin-inline: auto;
+}
+.verification-art-caption {
+    margin-top: 12px;
+    text-align: center;
+}
+.verification-art-caption h2 {
+    font-size: clamp(20px, 2vw, 25px);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.3;
+    text-wrap: balance;
+}
+.verification-art-caption p {
+    margin-top: 12px;
+    color: var(--el-muted);
+    font-size: 14px;
+    line-height: 1.75;
+}
+.verification-help {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 32px;
+    padding-top: 22px;
+    border-top: 1px solid var(--el-border);
+}
+.verification-help > svg {
+    flex-shrink: 0;
+    color: var(--el-accent);
+}
+.verification-help h3 {
+    font-size: 13px;
+    font-weight: 600;
+}
+.verification-help p {
+    margin-top: 6px;
+    color: var(--el-muted);
+    font-size: 13px;
+    line-height: 1.7;
+}
+.elancer-verification button:active:not(:disabled) {
+    opacity: 0.85;
+}
+@media (max-width: 900px) {
+    .verification-main {
+        width: min(720px, calc(100% - 48px));
+        gap: 32px;
+    }
+    .verification-art {
+        padding-inline: 18px;
+    }
+}
+@media (max-width: 700px) {
+    .verification-main {
+        grid-template-columns: minmax(0, 1fr);
+        width: min(450px, calc(100% - 40px));
+        padding-block: 40px;
+        gap: 36px;
+    }
+    .verification-progress {
+        margin-bottom: 24px;
+    }
+    .verification-envelope {
+        max-width: 280px;
+    }
+    .verification-art {
+        padding-top: 12px;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .elancer-verification *,
+    .elancer-verification *::before,
+    .elancer-verification *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+}
