@@ -18,7 +18,7 @@ type MobileNavMenuProps = NavbarProps & { isOpen: boolean; onClose: () => void; 
 export function Navbar({ children, className }: NavbarProps) {
     const { scrollY } = useScroll();
     const [visible, setVisible] = useState(false);
-    useMotionValueEvent(scrollY, 'change', (latest) => setVisible(latest > 100));
+    useMotionValueEvent(scrollY, 'change', (latest) => setVisible((current) => current ? latest > 72 : latest > 100));
     return (
         <header data-compact={visible} className={cn('elancer-resizable-navbar sticky inset-x-0 top-0 z-40 w-full py-1', className)}>
             {React.Children.map(children, (child) => React.isValidElement(child) ? React.cloneElement(child as React.ReactElement<{ visible?: boolean }>, { visible }) : child)}
@@ -30,8 +30,10 @@ export function NavBody({ children, className, visible }: NavBodyProps) {
     const reduceMotion = useReducedMotion();
     return (
         <motion.div
-            animate={{ maxWidth: visible ? 1000 : 1280, y: visible ? 4 : 0, boxShadow: visible ? '0 4px 24px rgb(20 40 24 / 10%)' : '0 0 0 rgb(20 40 24 / 0%)' }}
-            transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 200, damping: 40 }}
+            initial={false}
+            style={{ maxWidth: 1280 }}
+            animate={{ maxWidth: visible ? 1000 : 1280, y: visible ? 4 : 0 }}
+            transition={reduceMotion ? { duration: 0 } : { duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             data-compact={visible}
             className={cn('elancer-resizable-body relative mx-auto hidden w-[calc(100%-2rem)] items-center justify-between gap-6 rounded-full px-6 py-3 lg:flex', className)}
         >{children}</motion.div>
@@ -57,9 +59,9 @@ export function NavItems({ items, className, onItemClick }: NavItemsProps) {
 export function MobileNav({ children, className, visible }: NavBodyProps) {
     const reduceMotion = useReducedMotion();
     return (
-        <motion.div data-mobile-navbar data-compact={visible}
-            animate={{ y: visible ? 4 : 0, boxShadow: visible ? '0 4px 24px rgb(20 40 24 / 10%)' : '0 0 0 rgb(20 40 24 / 0%)' }}
-            transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 200, damping: 40 }}
+        <motion.div initial={false} data-mobile-navbar data-compact={visible}
+            animate={{ y: visible ? 4 : 0, width: visible ? 'calc(100% - 2rem)' : 'calc(100% - 1rem)' }}
+            transition={reduceMotion ? { duration: 0 } : { duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             className={cn('elancer-resizable-body relative mx-auto flex w-[calc(100%-1rem)] flex-col rounded-[28px] px-4 py-2 lg:hidden', className)}
         >{children}</motion.div>
     );

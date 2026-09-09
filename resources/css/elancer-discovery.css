@@ -1099,3 +1099,27 @@
         bottom: 24px;
     }
 }
+
+/* Let the page grow with the new talent row instead of jumping in one frame. */
+.elancer-talent-reveal {
+    overflow: clip;
+    overflow-clip-margin: 5px;
+}
+.elancer-talent-reveal .elancer-talent-grid {
+    position: relative;
+}
+.elancer-talent-reveal-item {
+    display: grid;
+    min-width: 0;
+}
+.elancer-talent-section {
+    overflow-anchor: none;
+}
+.elancer-talents-chevron {
+    transition: transform 250ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+    .elancer-talents-chevron {
+        transition: none;
+    }
+}

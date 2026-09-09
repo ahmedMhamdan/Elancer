@@ -1,9 +1,8 @@
 import { Form, Head, Link } from '@inertiajs/react';
-import { Eye, EyeOff, Mail } from 'lucide-react';
-import { useState } from 'react';
-import type { ComponentProps } from 'react';
+import { Mail } from 'lucide-react';
 import ElancerSiteHeader from '@/components/elancer-site-header';
-import InputError from '@/components/input-error';
+import AuthField from '@/components/auth-field';
+import AuthSocial from '@/components/auth-social';
 import { Spinner } from '@/components/ui/spinner';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
@@ -13,63 +12,7 @@ type Props = {
     passwordRules: string;
 };
 
-type FieldProps = ComponentProps<'input'> & {
-    id: string;
-    label: string;
-    error?: string;
-};
-
-// Each password field owns its visibility state independently.
-function RegistrationField({
-    id,
-    label,
-    error,
-    type = 'text',
-    ...props
-}: FieldProps) {
-    const [visible, setVisible] = useState(false);
-    const isPassword = type === 'password';
-
-    return (
-        <div className="registration-field">
-            <label htmlFor={id}>{label}</label>
-            <div className="registration-input-wrap">
-                <input
-                    {...props}
-                    id={id}
-                    type={isPassword && visible ? 'text' : type}
-                    className={
-                        isPassword
-                            ? 'registration-input registration-input-password'
-                            : 'registration-input'
-                    }
-                    aria-invalid={Boolean(error)}
-                    aria-describedby={error ? `${id}-error` : undefined}
-                />
-                {isPassword && (
-                    <button
-                        type="button"
-                        className="registration-reveal"
-                        onClick={() => setVisible((current) => !current)}
-                        aria-label={`${visible ? 'Hide' : 'Show'} ${label.toLowerCase()}`}
-                        aria-pressed={visible}
-                        aria-controls={id}
-                    >
-                        {visible ? (
-                            <EyeOff size={18} aria-hidden="true" />
-                        ) : (
-                            <Eye size={18} aria-hidden="true" />
-                        )}
-                    </button>
-                )}
-            </div>
-            <InputError id={`${id}-error`} message={error} aria-live="polite" />
-        </div>
-    );
-}
-
 export default function Register({ passwordRules }: Props) {
-    const [providerNotice, setProviderNotice] = useState('');
     return (
         <div className="elancer-registration">
             <Head title="Join Elancer" />
@@ -92,54 +35,6 @@ export default function Register({ passwordRules }: Props) {
                                 Create your Elancer account. A place for your
                                 skills, your ideas, and whatever comes next.
                             </p>
-                        </div>
-                        <div
-                            className="registration-social"
-                            aria-label="Other sign-in methods"
-                        >
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    setProviderNotice(
-                                        'Google sign-in is coming soon. You can create an account with email below.',
-                                    )
-                                }
-                            >
-                                <img
-                                    src="/images/google-mark.svg"
-                                    width="20"
-                                    height="20"
-                                    alt=""
-                                />
-                                Continue with Google
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    setProviderNotice(
-                                        'GitHub sign-in is coming soon. You can create an account with email below.',
-                                    )
-                                }
-                            >
-                                <img
-                                    className="registration-github-mark"
-                                    src="/images/github-mark.svg"
-                                    width="20"
-                                    height="20"
-                                    alt=""
-                                />
-                                Continue with GitHub
-                            </button>
-                        </div>
-                        <p
-                            className="registration-provider-notice"
-                            role="status"
-                        >
-                            {providerNotice ||
-                                'Google and GitHub sign-in coming soon.'}
-                        </p>
-                        <div className="registration-divider">
-                            <span>or use your email</span>
                         </div>
                         <Form
                             {...store.form()}
@@ -170,7 +65,7 @@ export default function Register({ passwordRules }: Props) {
                                         <legend className="sr-only">
                                             Account details
                                         </legend>
-                                        <RegistrationField
+                                        <AuthField
                                             id="name"
                                             name="name"
                                             label="Full name"
@@ -180,7 +75,7 @@ export default function Register({ passwordRules }: Props) {
                                             required
                                             error={errors.name}
                                         />
-                                        <RegistrationField
+                                        <AuthField
                                             id="email"
                                             name="email"
                                             label="Email address"
@@ -191,7 +86,7 @@ export default function Register({ passwordRules }: Props) {
                                             required
                                             error={errors.email}
                                         />
-                                        <RegistrationField
+                                        <AuthField
                                             id="password"
                                             name="password"
                                             label="Password"
@@ -202,7 +97,7 @@ export default function Register({ passwordRules }: Props) {
                                             required
                                             error={errors.password}
                                         />
-                                        <RegistrationField
+                                        <AuthField
                                             id="password_confirmation"
                                             name="password_confirmation"
                                             label="Confirm password"
@@ -237,6 +132,7 @@ export default function Register({ passwordRules }: Props) {
                                 </>
                             )}
                         </Form>
+                        <AuthSocial />
                         <p className="registration-login-note">
                             Already have an account?{' '}
                             <Link href={login()}>Log in</Link>

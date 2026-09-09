@@ -1,5 +1,6 @@
-import { usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { useCallback, useState } from 'react';
+import ExploreSkillsMenu from '@/components/explore-skills-menu';
 import HomeThemeToggle from '@/components/home/home-theme-toggle';
 import {
     MobileNav,
@@ -10,25 +11,22 @@ import {
     NavbarButton,
     NavbarLogo,
     NavBody,
-    NavItems,
 } from '@/components/ui/resizable-navbar';
-import { dashboard, home, login, register } from '@/routes';
+import { dashboard, home, login, logout, register } from '@/routes';
 import '../../css/elancer-site-header.css';
 
 export default function ElancerSiteHeader({
     registration = false,
+    loginPage = false,
 }: {
     registration?: boolean;
+    loginPage?: boolean;
 }) {
     const { auth } = usePage().props;
     const [isOpen, setIsOpen] = useState(false);
     const closeMenu = useCallback(() => setIsOpen(false), []);
     const destination = auth.user ? dashboard().url : register().url;
     const items = [
-        {
-            name: 'Explore skills',
-            link: `${registration ? home().url : ''}#categories`,
-        },
         {
             name: 'Talent showcase',
             link: `${registration ? home().url : ''}#featured-freelancers`,
@@ -42,12 +40,39 @@ export default function ElancerSiteHeader({
         <Navbar>
             <NavBody>
                 <NavbarLogo />
-                <NavItems items={items} />
+                <nav
+                    aria-label="Main navigation"
+                    className="elancer-desktop-links"
+                >
+                    <ExploreSkillsMenu />
+                    {items.map((item) => (
+                        <a
+                            key={item.name}
+                            href={item.link}
+                            className="elancer-resizable-link elancer-top-link"
+                        >
+                            {item.name}
+                        </a>
+                    ))}
+                </nav>
                 <div className="flex shrink-0 items-center gap-2">
                     <HomeThemeToggle />
+                    {auth.user && (
+                        <Link
+                            href={logout()}
+                            as="button"
+                            onClick={() => router.flushAll()}
+                            className="elancer-navbar-button elancer-navbar-button-secondary elancer-logout"
+                        >
+                            Log out
+                        </Link>
+                    )}
                     {!auth.user && (
-                        <NavbarButton href={login().url} variant="secondary">
-                            Log in
+                        <NavbarButton
+                            href={loginPage ? register().url : login().url}
+                            variant="secondary"
+                        >
+                            {loginPage ? 'Join Elancer' : 'Log in'}
                         </NavbarButton>
                     )}
                     {!registration && (
@@ -80,6 +105,7 @@ export default function ElancerSiteHeader({
                         aria-label="Mobile navigation"
                         className="flex flex-col"
                     >
+                        <ExploreSkillsMenu mobile onNavigate={closeMenu} />
                         {items.map((item) => (
                             <a
                                 key={item.link}
@@ -93,13 +119,23 @@ export default function ElancerSiteHeader({
                     </nav>
                     <div className="mt-2 flex items-center justify-between border-t border-[var(--el-border)] pt-4">
                         <HomeThemeToggle />
+                        {auth.user && (
+                            <Link
+                                href={logout()}
+                                as="button"
+                                onClick={() => router.flushAll()}
+                                className="elancer-navbar-button elancer-navbar-button-secondary elancer-logout"
+                            >
+                                Log out
+                            </Link>
+                        )}
                         {!auth.user && (
                             <NavbarButton
-                                href={login().url}
+                                href={loginPage ? register().url : login().url}
                                 variant="secondary"
                                 onClick={closeMenu}
                             >
-                                Log in
+                                {loginPage ? 'Join Elancer' : 'Log in'}
                             </NavbarButton>
                         )}
                         {!registration && (

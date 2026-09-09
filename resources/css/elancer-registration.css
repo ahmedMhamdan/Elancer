@@ -329,3 +329,44 @@
 .dark .registration-github-mark {
     filter: none;
 }
+
+.login-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 13px;
+}
+.login-options label {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 44px;
+    cursor: pointer;
+}
+.login-options input {
+    width: 17px;
+    height: 17px;
+    accent-color: var(--el-accent);
+}
+.login-options a {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+.login-status {
+    padding: 14px;
+    margin-bottom: 20px;
+    border: 1px solid var(--el-border);
+    border-radius: 8px;
+    font-size: 14px;
+}
+.login-passkey {
+    margin-top: 16px;
+}
+.login-passkey button {
+    min-height: 48px;
+    border-color: var(--el-border-strong);
+    background: var(--el-surface);
+    color: var(--el-text);
+}

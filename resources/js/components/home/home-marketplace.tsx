@@ -6,7 +6,8 @@ import {
     Plus,
     SlidersHorizontal,
 } from 'lucide-react';
-import { useState } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { useEffect, useRef, useState } from 'react';
 import {
     Dialog,
     DialogContent,
@@ -183,6 +184,19 @@ function FreelancerCard({ freelancer }: { freelancer: SampleFreelancer }) {
 export default function HomeMarketplace() {
     const [category, setCategory] = useState<CategoryId | null>(null);
     const [showAll, setShowAll] = useState(false);
+    const reducedMotion = useReducedMotion();
+    const gridRef = useRef<HTMLDivElement>(null);
+    const [gridHeight, setGridHeight] = useState<number>();
+
+    useEffect(() => {
+        const grid = gridRef.current;
+        if (!grid) return;
+        const observer = new ResizeObserver(([entry]) => {
+            setGridHeight(entry.contentRect.height);
+        });
+        observer.observe(grid);
+        return () => observer.disconnect();
+    }, []);
     const selected = homeCategories.find((item) => item.id === category);
     const matching = category
         ? sampleFreelancers.filter((person) => person.category === category)
@@ -300,17 +314,61 @@ export default function HomeMarketplace() {
                         </button>
                     )}
                 </div>
-                <div className="elancer-talent-grid">
-                    {visible.map((person) => (
-                        <FreelancerCard key={person.id} freelancer={person} />
-                    ))}
-                </div>
+                <motion.div
+                    className="elancer-talent-reveal"
+                    initial={false}
+                    animate={{
+                        height: reducedMotion ? 'auto' : (gridHeight ?? 'auto'),
+                    }}
+                    transition={{
+                        duration: reducedMotion ? 0 : 0.48,
+                        ease: [0.22, 1, 0.36, 1],
+                    }}
+                >
+                    <div
+                        ref={gridRef}
+                        id="elancer-talent-results"
+                        className="elancer-talent-grid"
+                    >
+                        <AnimatePresence initial={false} mode="popLayout">
+                            {visible.map((person, index) => (
+                                <motion.div
+                                    key={person.id}
+                                    className="elancer-talent-reveal-item"
+                                    layout={reducedMotion ? false : 'position'}
+                                    initial={{
+                                        opacity: 0,
+                                        y: reducedMotion ? 0 : 20,
+                                    }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{
+                                        opacity: 0,
+                                        y: reducedMotion ? 0 : 8,
+                                        transition: {
+                                            duration: reducedMotion ? 0 : 0.15,
+                                        },
+                                    }}
+                                    transition={{
+                                        duration: reducedMotion ? 0 : 0.32,
+                                        delay: reducedMotion
+                                            ? 0
+                                            : Math.max(0, index - 3) * 0.06,
+                                        ease: [0.22, 1, 0.36, 1],
+                                    }}
+                                >
+                                    <FreelancerCard freelancer={person} />
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
+                    </div>
+                </motion.div>
                 {!category && (
                     <div className="elancer-talents-more">
                         <button
                             type="button"
                             className="elancer-outline-button"
                             aria-expanded={showAll}
+                            aria-controls="elancer-talent-results"
                             onClick={() => setShowAll((current) => !current)}
                         >
                             {showAll
@@ -318,7 +376,11 @@ export default function HomeMarketplace() {
                                 : 'Meet more sample talent'}
                             <ArrowDown
                                 size={16}
-                                className={showAll ? 'rotate-180' : ''}
+                                className={
+                                    showAll
+                                        ? 'elancer-talents-chevron rotate-180'
+                                        : 'elancer-talents-chevron'
+                                }
                                 aria-hidden="true"
                             />
                         </button>
