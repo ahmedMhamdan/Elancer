@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import { ArrowUpRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/breadcrumbs';
+import NotificationDropdown from '@/components/notification-dropdown';
 import ThemeToggle from '@/components/theme-toggle';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { home } from '@/routes';
@@ -30,6 +31,7 @@ export function AppSidebarHeader({
                     />
                 </Link>
                 <ThemeToggle />
+                <NotificationDropdown />
             </div>
         </header>
     );

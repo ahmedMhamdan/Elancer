@@ -1,0 +1,408 @@
+/* Screenshot-led onboarding layout composed with TailAdmin form components. */
+.onboarding-page {
+    min-height: 100dvh;
+    background: var(--el-surface);
+    color: var(--el-text);
+}
+.onboarding-header {
+    min-height: 96px;
+    padding: 24px clamp(24px, 4vw, 72px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    border-bottom: 1px solid var(--el-border);
+}
+.onboarding-preview-label {
+    color: var(--el-muted);
+    font-size: 13px;
+}
+.onboarding-main {
+    width: min(1120px, calc(100% - 64px));
+    margin: 0 auto;
+    padding: 44px 0 32px;
+}
+.onboarding-progress {
+    color: var(--el-muted);
+    font-size: 14px;
+}
+.onboarding-progress progress {
+    display: block;
+    width: 100%;
+    height: 5px;
+    margin-top: 20px;
+    border: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--el-border);
+}
+.onboarding-progress progress::-webkit-progress-bar {
+    background: var(--el-border);
+}
+.onboarding-progress progress::-webkit-progress-value {
+    background: var(--el-accent);
+    border-radius: 8px;
+}
+.onboarding-progress progress::-moz-progress-bar {
+    background: var(--el-accent);
+}
+.onboarding-heading {
+    margin: 36px 0 44px;
+}
+.onboarding-heading h1,
+.onboarding-finish h1 {
+    font-size: clamp(28px, 3vw, 40px);
+    line-height: 1.2;
+    font-weight: 500;
+    letter-spacing: -1px;
+}
+.onboarding-heading h1:focus,
+.onboarding-finish h1:focus {
+    outline: none;
+}
+.onboarding-heading p {
+    margin-top: 18px;
+    max-width: 780px;
+    color: var(--el-muted);
+    font-size: 17px;
+    line-height: 1.7;
+}
+.onboarding-role-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    max-width: 850px;
+    margin: 56px auto 72px;
+}
+.onboarding-role-card {
+    align-items: flex-start;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    padding: 32px;
+    border: 1px solid var(--el-border-strong);
+    border-radius: 16px;
+}
+.onboarding-role-card:hover,
+.onboarding-role-card.is-selected {
+    background: var(--el-soft);
+    border-color: var(--el-accent);
+}
+.onboarding-role-card:focus-within {
+    outline: 2px solid var(--el-accent);
+    outline-offset: 4px;
+}
+.onboarding-role-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 280px;
+}
+.onboarding-role-copy svg {
+    width: 32px;
+    height: 32px;
+    color: var(--el-accent);
+    stroke-width: 1.5;
+    margin-bottom: 12px;
+}
+.onboarding-role-copy strong {
+    font-size: 25px;
+    font-weight: 500;
+    color: var(--el-text);
+}
+.onboarding-role-copy > span {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.65;
+    color: var(--el-muted);
+}
+.onboarding-details {
+    max-width: 760px;
+    display: grid;
+    gap: 24px;
+}
+.onboarding-field {
+    min-width: 0;
+}
+.onboarding-field label {
+    margin-bottom: 10px;
+}
+.onboarding-field input {
+    min-height: 50px;
+}
+.onboarding-field textarea {
+    resize: vertical;
+    min-height: 140px;
+}
+.onboarding-field input[aria-invalid='true'],
+.onboarding-field textarea[aria-invalid='true'] {
+    border-color: var(--destructive);
+}
+.onboarding-field input:focus-visible,
+.onboarding-field textarea:focus-visible {
+    outline: 2px solid var(--el-accent);
+    outline-offset: 2px;
+}
+.onboarding-hint {
+    margin-top: 10px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--el-muted);
+}
+.onboarding-location-layout {
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: 64px;
+    padding: 12px 0 64px;
+}
+.onboarding-photo {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+}
+.onboarding-avatar {
+    display: grid;
+    place-items: center;
+    width: 112px;
+    height: 112px;
+    border-radius: 50%;
+    background: var(--el-soft);
+    color: var(--el-accent);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+.onboarding-avatar > svg {
+    width: 52px;
+    height: 52px;
+    stroke-width: 1.3;
+}
+.onboarding-avatar > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.onboarding-photo-upload {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 8px 18px;
+    border: 1px solid var(--el-accent);
+    border-radius: 24px;
+    cursor: pointer;
+    color: var(--el-accent);
+    margin-top: 12px;
+}
+.onboarding-file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    clip-path: inset(50%);
+    overflow: hidden;
+}
+.onboarding-photo:has(.onboarding-file-input:focus-visible)
+    .onboarding-photo-upload {
+    outline: 2px solid var(--el-accent);
+    outline-offset: 4px;
+}
+.onboarding-location-fields {
+    display: grid;
+    gap: 28px;
+    align-content: start;
+    max-width: 700px;
+}
+.onboarding-location-note {
+    border-top: 1px solid var(--el-border);
+    padding-top: 24px;
+    color: var(--el-muted);
+    line-height: 1.7;
+    font-size: 15px;
+}
+.onboarding-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: center;
+    margin-top: 56px;
+    padding: 28px 0 12px;
+    border-top: 1px solid var(--el-border);
+}
+.onboarding-footer > button {
+    border-radius: 28px;
+    padding-inline: 26px;
+}
+.onboarding-text-button {
+    color: var(--el-accent);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    text-underline-offset: 4px;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+}
+.onboarding-text-button:hover {
+    text-decoration: underline;
+}
+.onboarding-text-button:focus-visible,
+.onboarding-link-button:focus-visible {
+    outline: 2px solid var(--el-accent);
+    outline-offset: 4px;
+    border-radius: 4px;
+}
+.onboarding-review {
+    border: 1px solid var(--el-border);
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 900px;
+    overflow-wrap: anywhere;
+}
+.onboarding-review-person {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--el-border);
+    flex-wrap: wrap;
+}
+.onboarding-review-person h2 {
+    font-size: 28px;
+    font-weight: 500;
+    margin: 8px 0;
+}
+.onboarding-review-person p {
+    color: var(--el-muted);
+}
+.onboarding-review-person > button {
+    margin-inline-start: auto;
+}
+.onboarding-role-badge {
+    font-size: 13px;
+    color: var(--el-accent);
+    background: var(--el-soft);
+    padding: 5px 10px;
+    border-radius: 20px;
+}
+.onboarding-review-body {
+    padding-top: 28px;
+}
+.onboarding-review-body h3 {
+    font-size: 22px;
+    font-weight: 500;
+    margin-bottom: 16px;
+}
+.onboarding-review-body > p {
+    line-height: 1.8;
+    color: var(--el-muted);
+}
+.onboarding-review-body > button {
+    margin-top: 20px;
+}
+.onboarding-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 24px;
+}
+.onboarding-skills li {
+    background: var(--el-soft);
+    color: var(--el-accent);
+    padding: 6px 12px;
+    border-radius: 24px;
+    font-size: 14px;
+}
+.onboarding-finish {
+    text-align: center;
+    max-width: 680px;
+    margin: 80px auto;
+}
+.onboarding-finish p {
+    margin: 24px 0 32px;
+    color: var(--el-muted);
+    line-height: 1.8;
+}
+.onboarding-finish-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--el-soft);
+    color: var(--el-accent);
+    margin-bottom: 28px;
+}
+.onboarding-link-button {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    background: var(--el-accent);
+    color: var(--el-surface);
+    font-weight: 500;
+}
+@media (max-width: 700px) {
+    .onboarding-header {
+        min-height: 80px;
+        padding: 20px;
+    }
+    .onboarding-preview-label {
+        max-width: 120px;
+        font-size: 11px;
+    }
+    .onboarding-main {
+        width: calc(100% - 40px);
+        padding-top: 28px;
+    }
+    .onboarding-heading {
+        margin: 28px 0 32px;
+    }
+    .onboarding-heading p {
+        font-size: 16px;
+    }
+    .onboarding-role-grid {
+        grid-template-columns: 1fr;
+        margin: 32px 0;
+        gap: 16px;
+    }
+    .onboarding-role-card {
+        padding: 24px;
+    }
+    .onboarding-role-copy {
+        gap: 12px;
+    }
+    .onboarding-role-copy svg {
+        margin-bottom: 4px;
+    }
+    .onboarding-location-layout {
+        grid-template-columns: 1fr;
+        gap: 32px;
+        padding-bottom: 12px;
+    }
+    .onboarding-review {
+        padding: 24px;
+    }
+    .onboarding-review-person {
+        align-items: flex-start;
+        gap: 20px;
+    }
+    .onboarding-review-person > button {
+        margin-inline-start: 0;
+    }
+    .onboarding-footer {
+        margin-top: 32px;
+        gap: 12px;
+    }
+    .onboarding-footer > button {
+        padding-inline: 18px;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .onboarding-page * {
+        transition: none !important;
+        animation: none !important;
+    }
+}

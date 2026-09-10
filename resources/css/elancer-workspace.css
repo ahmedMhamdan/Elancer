@@ -540,3 +540,12 @@
         transition: none !important;
     }
 }
+
+/* TailAdmin notification panel, adapted to Elancer tokens and narrow screens. */
+.workspace-notification-panel {
+    inset-inline-end: 0;
+    margin-top: 17px;
+    width: min(361px, calc(100vw - 32px));
+    max-height: calc(100dvh - 112px);
+    overflow-y: auto;
+}

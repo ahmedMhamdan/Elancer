@@ -23,7 +23,7 @@ class UpdateProfileRequest extends FormRequest
         return [
             'headline' => ['sometimes', 'nullable', 'string', 'max:120'],
             'bio' => ['sometimes', 'nullable', 'string', 'max:5000'],
-            'location' => ['sometimes', 'nullable', 'string', 'max:120'],
+            'location' => ['sometimes', 'nullable', 'string', 'max:255'],
             // These fields are controlled by the server, including when submitted as null.
             'user_id' => ['missing'],
             'published_at' => ['missing'],

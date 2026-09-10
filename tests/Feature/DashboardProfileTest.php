@@ -14,7 +14,7 @@ class DashboardProfileTest extends TestCase
 
     public function test_dashboard_sends_null_without_creating_a_profile(): void
     {
-        $this->actingAs(User::factory()->create())->get(route('dashboard'))
+        $this->actingAs(User::factory()->create(['onboarding_completed_at' => now()]))->get(route('dashboard'))
             ->assertInertia(fn (Assert $page) => $page->component('dashboard')->where('profile', null));
 
         $this->assertDatabaseCount('profiles', 0);
@@ -22,12 +22,12 @@ class DashboardProfileTest extends TestCase
 
     public function test_dashboard_sends_existing_profile_fields(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['onboarding_completed_at' => now()]);
         $user->profile()->create(['headline' => 'Developer', 'bio' => 'Hello', 'location' => 'Hebron']);
 
         $this->actingAs($user)->get(route('dashboard'))
             ->assertInertia(fn (Assert $page) => $page->component('dashboard')
-                ->has('profile', 4)
+                ->has('profile', 8)
                 ->where('profile.headline', 'Developer')
                 ->where('profile.bio', 'Hello')
                 ->where('profile.location', 'Hebron')
@@ -36,8 +36,8 @@ class DashboardProfileTest extends TestCase
 
     public function test_save_creates_then_updates_only_the_signed_in_users_profile(): void
     {
-        $user = User::factory()->create();
-        $otherProfile = User::factory()->create()->profile()->create(['headline' => 'Other owner']);
+        $user = User::factory()->create(['onboarding_completed_at' => now()]);
+        $otherProfile = User::factory()->create(['onboarding_completed_at' => now()])->profile()->create(['headline' => 'Other owner']);
         $data = ['headline' => 'Developer', 'bio' => 'Hello', 'location' => 'Hebron'];
 
         $this->actingAs($user)->patch(route('dashboard.profile.update'), $data)
@@ -61,12 +61,12 @@ class DashboardProfileTest extends TestCase
 
     public function test_invalid_or_server_controlled_fields_are_rejected(): void
     {
-        $this->actingAs(User::factory()->create())
+        $this->actingAs(User::factory()->create(['onboarding_completed_at' => now()]))
             ->from(route('dashboard'))
             ->patch(route('dashboard.profile.update'), [
                 'headline' => str_repeat('a', 121),
                 'bio' => str_repeat('a', 5001),
-                'location' => str_repeat('a', 121),
+                'location' => str_repeat('a', 256),
                 'user_id' => 99,
                 'published_at' => null,
             ])->assertSessionHasErrors(['headline', 'bio', 'location', 'user_id', 'published_at']);
@@ -88,7 +88,7 @@ class DashboardProfileTest extends TestCase
 
     public function test_inactive_users_cannot_create_or_update_profiles(): void
     {
-        $user = User::factory()->create(['status' => AccountStatus::Suspended]);
+        $user = User::factory()->create(['status' => AccountStatus::Suspended, 'onboarding_completed_at' => now()]);
 
         $this->actingAs($user)->patch(route('dashboard.profile.update'), ['headline' => 'Blocked'])
             ->assertForbidden();

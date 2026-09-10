@@ -108,7 +108,7 @@ class ProfileUpdateRequestTest extends TestCase
     {
         yield 'long headline' => ['headline', str_repeat('a', 121)];
         yield 'long bio' => ['bio', str_repeat('a', 5001)];
-        yield 'long location' => ['location', str_repeat('a', 121)];
+        yield 'long location' => ['location', str_repeat('a', 256)];
         yield 'array headline' => ['headline', ['invalid']];
         yield 'numeric bio' => ['bio', 123];
         yield 'boolean location' => ['location', true];

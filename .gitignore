@@ -27,10 +27,12 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
-docs/progress.md
+# Local project progress and working documentation
+/docs/
 .gitignore
 
 # Local design reference
 /DESIGN.md
 # plan
 /002-elancer-portfolio-capstone.md
+/AGENTS.md

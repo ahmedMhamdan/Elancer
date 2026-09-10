@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Enums\AccountStatus;
+use App\Enums\WorkspaceRole;
+use Carbon\CarbonImmutable;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -22,6 +24,8 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property string $name
  * @property string $email
  * @property Carbon|null $email_verified_at
+ * @property CarbonImmutable|null $onboarding_completed_at
+ * @property WorkspaceRole|null $workspace_role
  * @property AccountStatus $status
  * @property string $locale
  * @property bool $is_admin
@@ -60,8 +64,10 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
     {
         return [
             'status' => AccountStatus::class,
+            'workspace_role' => WorkspaceRole::class,
             'is_admin' => 'boolean',
             'email_verified_at' => 'datetime',
+            'onboarding_completed_at' => 'immutable_datetime',
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
         ];

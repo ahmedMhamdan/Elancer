@@ -1,4 +1,4 @@
-import { useForm } from '@inertiajs/react';
+import { useForm, usePage } from '@inertiajs/react';
 import { CheckCircle2, ChevronDown, Circle, LoaderCircle } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
 import { useState } from 'react';
@@ -44,7 +44,7 @@ const fields: {
         label: 'Location',
         description: 'Let people know where you are based.',
         placeholder: 'e.g. Hebron, Palestine',
-        limit: 120,
+        limit: 255,
     },
 ];
 
@@ -53,6 +53,23 @@ export default function ProfileForm({
 }: {
     profile: MarketplaceProfile | null;
 }) {
+    const { auth } = usePage().props;
+    const visibleFields =
+        auth.user.workspace_role === 'client'
+            ? fields
+                  .filter((field) => field.key !== 'headline')
+                  .map((field) =>
+                      field.key === 'bio'
+                          ? {
+                                ...field,
+                                description:
+                                    'Introduce yourself and the work you have in mind.',
+                                placeholder:
+                                    'Tell freelancers about yourself or your company.',
+                            }
+                          : field,
+                  )
+            : fields;
     const [expanded, setExpanded] = useState<Field | null>(null);
     const reducedMotion = useReducedMotion();
     const form = useForm<ProfileFields>({
@@ -66,7 +83,7 @@ export default function ProfileForm({
             preserveScroll: true,
             onSuccess: () => form.setDefaults(),
             onError: (errors) => {
-                const firstError = fields.find(({ key }) => errors[key]);
+                const firstError = visibleFields.find(({ key }) => errors[key]);
                 if (firstError) setExpanded(firstError.key);
             },
         });
@@ -84,7 +101,7 @@ export default function ProfileForm({
             >
                 <form onSubmit={submit}>
                     <div className="profile-accordion">
-                        {fields.map((field) => {
+                        {visibleFields.map((field) => {
                             const open = expanded === field.key;
                             const complete = Boolean(
                                 profile?.[field.key]?.trim(),

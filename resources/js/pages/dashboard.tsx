@@ -15,6 +15,10 @@ export type MarketplaceProfile = {
     bio: string | null;
     location: string | null;
     published_at: string | null;
+    country: string | null;
+    city: string | null;
+    company: string | null;
+    skills: string[] | null;
 };
 
 export default function Dashboard({
@@ -22,14 +26,17 @@ export default function Dashboard({
 }: {
     profile: MarketplaceProfile | null;
 }) {
-    const { auth } = usePage().props;
+    const page = usePage();
+    const { auth } = page.props;
     const name = auth.user.name;
+    const isClient = auth.user.workspace_role === 'client';
+    const total = isClient ? 2 : 3;
     const completed = [
-        profile?.headline,
+        ...(isClient ? [] : [profile?.headline]),
         profile?.bio,
         profile?.location,
     ].filter((value) => value?.trim()).length;
-    const percent = Math.round((completed / 3) * 100);
+    const percent = Math.round((completed / total) * 100);
     const initials = name
         .trim()
         .split(/\s+/)
@@ -47,7 +54,7 @@ export default function Dashboard({
                         <h1>Dashboard</h1>
                         <p>
                             Welcome back, {name.trim().split(/\s+/)[0]}. Manage
-                            your Elancer profile.
+                            your {isClient ? 'client' : 'freelancer'} profile.
                         </p>
                     </div>
                 </div>
@@ -63,7 +70,7 @@ export default function Dashboard({
                             <p>Profile essentials</p>
                             <strong>
                                 {completed}
-                                <span> / 3 complete</span>
+                                <span> / {total} complete</span>
                             </strong>
                         </div>
                         <span className="workspace-metric-note">
@@ -112,7 +119,15 @@ export default function Dashboard({
                                     className="profile-summary-avatar"
                                     aria-hidden="true"
                                 >
-                                    {initials}
+                                    {auth.user.avatar ? (
+                                        <img
+                                            src={auth.user.avatar}
+                                            alt=""
+                                            className="h-full w-full rounded-full object-cover"
+                                        />
+                                    ) : (
+                                        initials
+                                    )}
                                 </div>
                                 <div>
                                     <h3>{name}</h3>
@@ -123,9 +138,12 @@ export default function Dashboard({
                             </div>
                             <dl className="profile-summary-details">
                                 <div>
-                                    <dt>Headline</dt>
+                                    <dt>{isClient ? 'Company' : 'Headline'}</dt>
                                     <dd>
-                                        {profile?.headline || 'Not added yet'}
+                                        {(isClient
+                                            ? profile?.company
+                                            : profile?.headline) ||
+                                            'Not added yet'}
                                     </dd>
                                 </div>
                                 <div>
@@ -146,6 +164,15 @@ export default function Dashboard({
                                             'Add a short introduction to help clients get to know you.'}
                                     </dd>
                                 </div>
+                                {!isClient &&
+                                    Boolean(profile?.skills?.length) && (
+                                        <div>
+                                            <dt>Skills</dt>
+                                            <dd>
+                                                {profile?.skills?.join(', ')}
+                                            </dd>
+                                        </div>
+                                    )}
                             </dl>
                             <div className="profile-summary-progress">
                                 <div>
@@ -154,7 +181,7 @@ export default function Dashboard({
                                 </div>
                                 <progress
                                     value={completed}
-                                    max={3}
+                                    max={total}
                                     aria-label="Saved profile essentials"
                                 />
                             </div>

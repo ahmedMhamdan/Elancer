@@ -24,3 +24,28 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+## Notification dropdown adaptation (2026-09-10)
+
+Source files in the TailAdmin free React dashboard (main, retrieved 2026-09-10):
+- src/components/header/NotificationDropdown.tsx
+- src/components/ui/dropdown/Dropdown.tsx
+
+Local files: resources/js/components/notification-dropdown.tsx and
+resources/js/components/tailadmin-dropdown.tsx. Adaptations preserve the demo SVGs
+and dropdown composition, use Elancer theme tokens, add accessible focus/dismissal
+and viewport sizing, and replace fictional demo notifications with an empty state.
+The MIT license above applies to these adaptations.
+## Onboarding form components (2026-09-10)
+
+The files under resources/js/components/tailadmin/ adapt these source files from
+https://github.com/TailAdmin/free-react-tailwind-admin-dashboard (main, retrieved 2026-09-10):
+- src/components/form/input/InputField.tsx
+- src/components/form/input/TextArea.tsx
+- src/components/form/input/Radio.tsx
+- src/components/form/Label.tsx
+- src/components/ui/button/Button.tsx
+
+The demo component structure is retained. Adaptations use Elancer semantic colors,
+forward native form attributes, add keyboard focus treatment and button types,
+and remove redundant upstream type unions. The MIT license above applies.
