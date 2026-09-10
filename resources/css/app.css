@@ -4,6 +4,7 @@
 @import './elancer-theme.css';
 @import './elancer-home.css';
 @import './elancer-discovery.css';
+@import './elancer-workspace.css';
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';

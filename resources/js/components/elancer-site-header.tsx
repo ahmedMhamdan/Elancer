@@ -1,7 +1,7 @@
 import { Link, router, usePage } from '@inertiajs/react';
 import { useCallback, useState } from 'react';
 import ExploreSkillsMenu from '@/components/explore-skills-menu';
-import HomeThemeToggle from '@/components/home/home-theme-toggle';
+import ThemeToggle from '@/components/theme-toggle';
 import {
     MobileNav,
     MobileNavHeader,
@@ -56,7 +56,7 @@ export default function ElancerSiteHeader({
                     ))}
                 </nav>
                 <div className="flex shrink-0 items-center gap-2">
-                    <HomeThemeToggle />
+                    <ThemeToggle />
                     {auth.user && (
                         <Link
                             href={logout()}
@@ -118,7 +118,7 @@ export default function ElancerSiteHeader({
                         ))}
                     </nav>
                     <div className="mt-2 flex items-center justify-between border-t border-[var(--el-border)] pt-4">
-                        <HomeThemeToggle />
+                        <ThemeToggle />
                         {auth.user && (
                             <Link
                                 href={logout()}

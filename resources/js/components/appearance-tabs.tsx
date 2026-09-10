@@ -1,43 +1,45 @@
-import type { LucideIcon } from 'lucide-react';
-import { Monitor, Moon, Sun } from 'lucide-react';
 import type { HTMLAttributes } from 'react';
-import type { Appearance } from '@/hooks/use-appearance';
+import ThemeIcon from '@/components/theme-icon';
 import { useAppearance } from '@/hooks/use-appearance';
+import type { Appearance } from '@/hooks/use-appearance';
 import { cn } from '@/lib/utils';
 
+const modes: { value: Appearance; label: string }[] = [
+    { value: 'light', label: 'Light' },
+    { value: 'dark', label: 'Dark' },
+    { value: 'system', label: 'System' },
+];
+
 export default function AppearanceToggleTab({
-    className = '',
+    className,
     ...props
 }: HTMLAttributes<HTMLDivElement>) {
     const { appearance, updateAppearance } = useAppearance();
-
-    const tabs: { value: Appearance; icon: LucideIcon; label: string }[] = [
-        { value: 'light', icon: Sun, label: 'Light' },
-        { value: 'dark', icon: Moon, label: 'Dark' },
-        { value: 'system', icon: Monitor, label: 'System' },
-    ];
-
     return (
         <div
+            role="group"
+            aria-label="Color theme"
             className={cn(
-                'inline-flex gap-1 rounded-lg bg-neutral-100 p-1 dark:bg-neutral-800',
+                'border-border bg-muted inline-flex flex-wrap gap-1 rounded-xl border p-1',
                 className,
             )}
             {...props}
         >
-            {tabs.map(({ value, icon: Icon, label }) => (
+            {modes.map(({ value, label }) => (
                 <button
+                    type="button"
                     key={value}
+                    aria-pressed={appearance === value}
                     onClick={() => updateAppearance(value)}
                     className={cn(
-                        'flex items-center rounded-md px-3.5 py-1.5 transition-colors',
+                        'focus-visible:outline-ring flex min-h-11 items-center gap-2 rounded-lg px-4 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2',
                         appearance === value
-                            ? 'bg-white shadow-xs dark:bg-neutral-700 dark:text-neutral-100'
-                            : 'text-neutral-500 hover:bg-neutral-200/60 hover:text-black dark:text-neutral-400 dark:hover:bg-neutral-700/60',
+                            ? 'bg-background text-foreground shadow-xs'
+                            : 'text-muted-foreground hover:bg-background',
                     )}
                 >
-                    <Icon className="-ml-1 h-4 w-4" />
-                    <span className="ml-1.5 text-sm">{label}</span>
+                    <ThemeIcon mode={value} />
+                    {label}
                 </button>
             ))}
         </div>

@@ -4,8 +4,11 @@ namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
+use App\Models\User;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -29,6 +32,18 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        VerifyEmail::toMailUsing(fn (User $user, string $url): MailMessage => (new MailMessage)
+            ->subject('Verify your email — Elancer')
+            ->view([
+                'html' => 'mail.verify-email',
+                'text' => 'mail.verify-email-text',
+            ], [
+                'recipientName' => $user->name,
+                'verificationUrl' => $url,
+                'expiresInMinutes' => config('auth.verification.expire', 60),
+                'homeUrl' => route('home'),
+            ]));
+
         $this->configureActions();
         $this->configureViews();
         $this->configureRateLimiting();

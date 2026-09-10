@@ -1,17 +1,35 @@
+import { Link } from '@inertiajs/react';
+import { ArrowUpRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/breadcrumbs';
+import ThemeToggle from '@/components/theme-toggle';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
+import { home } from '@/routes';
+import type { BreadcrumbItem } from '@/types';
 
 export function AppSidebarHeader({
     breadcrumbs = [],
 }: {
-    breadcrumbs?: BreadcrumbItemType[];
+    breadcrumbs?: BreadcrumbItem[];
 }) {
     return (
-        <header className="border-sidebar-border/50 flex h-16 shrink-0 items-center gap-2 border-b px-6 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-4">
-            <div className="flex items-center gap-2">
-                <SidebarTrigger className="-ml-1" />
+        <header className="workspace-header">
+            <div className="flex min-w-0 items-center gap-3">
+                <SidebarTrigger className="border-border size-11 rounded-full border" />
                 <Breadcrumbs breadcrumbs={breadcrumbs} />
+            </div>
+            <div className="flex shrink-0 items-center gap-3">
+                <Link
+                    href={home()}
+                    className="workspace-site-link hidden sm:inline-flex"
+                >
+                    Explore Elancer{' '}
+                    <ArrowUpRight
+                        size={16}
+                        strokeWidth={1.75}
+                        aria-hidden="true"
+                    />
+                </Link>
+                <ThemeToggle />
             </div>
         </header>
     );
