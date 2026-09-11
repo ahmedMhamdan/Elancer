@@ -17,6 +17,7 @@ void createInertiaApp({
             case name === 'auth/register':
             case name === 'auth/login':
             case name === 'auth/verify-email':
+            case name === 'auth/two-factor-challenge':
                 return null;
             case name.startsWith('auth/'):
                 return AuthLayout;
