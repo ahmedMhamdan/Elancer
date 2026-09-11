@@ -6,9 +6,7 @@ export const copy = {
         deleted: 'Deleted',
         create: 'Create category',
         edit: 'Edit',
-        name_en: 'English name',
-        name_ar: 'Arabic name',
-        slug: 'Slug',
+        categoryname: 'Category name',
         actions: 'Actions',
         remove: 'Delete',
         restore: 'Restore',
@@ -23,7 +21,7 @@ export const copy = {
         of: 'of',
         total: 'categories',
         back: 'Back to categories',
-        hint: 'Use lowercase English letters and numbers separated by hyphens. Deleted categories keep their slug.',
+        hint: 'Enter the category name in English or Arabic.',
         confirm:
             'Delete this category? You can restore it from the Deleted list.',
         error: 'The request failed. Please try again.',
@@ -45,9 +43,7 @@ export const copy = {
         deleted: 'المحذوفة',
         create: 'إنشاء تصنيف',
         edit: 'تعديل',
-        name_en: 'الاسم بالإنجليزية',
-        name_ar: 'الاسم بالعربية',
-        slug: 'الرابط المختصر',
+        categoryname: 'اسم التصنيف',
         actions: 'الإجراءات',
         remove: 'حذف',
         restore: 'استعادة',
@@ -62,7 +58,7 @@ export const copy = {
         of: 'من',
         total: 'تصنيف',
         back: 'العودة إلى التصنيفات',
-        hint: 'استخدم أحرفاً إنجليزية صغيرة وأرقاماً تفصلها شرطات. تحتفظ التصنيفات المحذوفة بروابطها.',
+        hint: 'أدخل اسم التصنيف بالعربية أو الإنجليزية.',
         confirm: 'حذف هذا التصنيف؟ يمكنك استعادته من قائمة المحذوفات.',
         error: 'تعذر تنفيذ الطلب. حاول مجدداً.',
         invalid: 'راجع الحقول المحددة.',
@@ -79,7 +75,6 @@ export const copy = {
 };
 export type Category = {
     id: number;
-    name_en: string;
-    name_ar: string;
+    categoryname: string;
     slug: string;
 };

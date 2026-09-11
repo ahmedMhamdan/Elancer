@@ -1,6 +1,6 @@
 // Adapted from TailAdmin src/components/form/form-elements/DefaultInputs.tsx.
 // Retains ComponentCard > space-y-6 > Label/Input composition; adds Inertia
-// validation, bilingual fields and accessible error associations. MIT: THIRD_PARTY_NOTICES.md.
+// validation, a single name in either language and accessible error associations. MIT: THIRD_PARTY_NOTICES.md.
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import ComponentCard from '@/components/component-card';
@@ -17,9 +17,7 @@ export default function CategoryForm({
     const ar = usePage().props.auth.user.locale === 'ar';
     const t = copy[ar ? 'ar' : 'en'];
     const form = useForm({
-        name_en: category?.name_en ?? '',
-        name_ar: category?.name_ar ?? '',
-        slug: category?.slug ?? '',
+        categoryname: category?.categoryname ?? '',
     });
     useEffect(() => {
         if (Object.keys(form.errors).length) {
@@ -81,57 +79,45 @@ export default function CategoryForm({
                                 {t.invalid}
                             </p>
                         )}
-                        {(['name_en', 'name_ar', 'slug'] as const).map(
-                            (field) => (
-                                <div key={field}>
-                                    <Label htmlFor={field}>{t[field]}</Label>
-                                    <Input
-                                        id={field}
-                                        name={field}
-                                        required
-                                        maxLength={120}
-                                        dir={
-                                            field === 'name_ar' ? 'rtl' : 'ltr'
-                                        }
-                                        lang={field === 'name_ar' ? 'ar' : 'en'}
-                                        value={form.data[field]}
-                                        onChange={(event) =>
-                                            form.setData(
-                                                field,
-                                                event.target.value,
-                                            )
-                                        }
-                                        error={Boolean(form.errors[field])}
-                                        style={
-                                            form.errors[field]
-                                                ? {
-                                                      borderColor:
-                                                          'var(--el-error)',
-                                                  }
-                                                : undefined
-                                        }
-                                        aria-invalid={Boolean(
-                                            form.errors[field],
-                                        )}
-                                        aria-describedby={`${field}-error${field === 'slug' ? ' slug-hint' : ''}`}
-                                    />
-                                    {field === 'slug' && (
-                                        <p
-                                            id="slug-hint"
-                                            className="text-muted-foreground mt-2 text-sm"
-                                        >
-                                            {t.hint}
-                                        </p>
-                                    )}
-                                    <p
-                                        id={`${field}-error`}
-                                        className="mt-2 text-sm text-[var(--el-error)]"
-                                    >
-                                        {form.errors[field]}
-                                    </p>
-                                </div>
-                            ),
-                        )}
+                        <div>
+                            <Label htmlFor="categoryname">
+                                {t.categoryname}
+                            </Label>
+                            <Input
+                                id="categoryname"
+                                name="categoryname"
+                                required
+                                maxLength={120}
+                                dir="auto"
+                                value={form.data.categoryname}
+                                onChange={(event) =>
+                                    form.setData(
+                                        'categoryname',
+                                        event.target.value,
+                                    )
+                                }
+                                error={Boolean(form.errors.categoryname)}
+                                style={
+                                    form.errors.categoryname
+                                        ? { borderColor: 'var(--el-error)' }
+                                        : undefined
+                                }
+                                aria-invalid={Boolean(form.errors.categoryname)}
+                                aria-describedby="categoryname-hint categoryname-error"
+                            />
+                            <p
+                                id="categoryname-hint"
+                                className="text-muted-foreground mt-2 text-sm"
+                            >
+                                {t.hint}
+                            </p>
+                            <p
+                                id="categoryname-error"
+                                className="mt-2 text-sm text-[var(--el-error)]"
+                            >
+                                {form.errors.categoryname}
+                            </p>
+                        </div>
                         <div className="flex flex-wrap items-center gap-4">
                             <Button type="submit" disabled={form.processing}>
                                 {form.processing ? t.saving : title}

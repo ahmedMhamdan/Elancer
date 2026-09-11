@@ -1,6 +1,6 @@
 // Adapted from TailAdmin src/components/tables/BasicTables/BasicTableOne.tsx.
 // Keeps bordered container, semantic table/header/body and mapped rows.
-// Replaces orders with bilingual categories, Elancer tokens and Inertia actions.
+// Replaces orders with single-name categories, Elancer tokens and Inertia actions.
 // See THIRD_PARTY_NOTICES.md (MIT).
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
@@ -120,24 +120,10 @@ export default function Categories({ categories, status, notice }: Props) {
                                 <TableRow key={category.id}>
                                     <TableCell className="px-4 py-4 text-start">
                                         <span
-                                            lang="en"
-                                            dir="ltr"
+                                            dir="auto"
                                             className="block font-medium wrap-anywhere"
                                         >
-                                            {category.name_en}
-                                        </span>
-                                        <span
-                                            lang="ar"
-                                            dir="rtl"
-                                            className="mt-1 block text-start wrap-anywhere"
-                                        >
-                                            {category.name_ar}
-                                        </span>
-                                        <span
-                                            dir="ltr"
-                                            className="text-muted-foreground mt-2 block text-sm wrap-anywhere"
-                                        >
-                                            {category.slug}
+                                            {category.categoryname}
                                         </span>
                                     </TableCell>
                                     <TableCell className="px-4 py-4">
@@ -146,7 +132,7 @@ export default function Categories({ categories, status, notice }: Props) {
                                                 <Link
                                                     href={`/admin/categories/${category.id}/edit`}
                                                     className={linkClass}
-                                                    aria-label={`${t.edit}: ${ar ? category.name_ar : category.name_en}`}
+                                                    aria-label={`${t.edit}: ${category.categoryname}`}
                                                 >
                                                     {t.edit}
                                                 </Link>
@@ -156,7 +142,7 @@ export default function Categories({ categories, status, notice }: Props) {
                                                 variant="outline"
                                                 disabled={busy}
                                                 onClick={() => act(category)}
-                                                aria-label={`${status === 'active' ? t.remove : t.restore}: ${ar ? category.name_ar : category.name_en}`}
+                                                aria-label={`${status === 'active' ? t.remove : t.restore}: ${category.categoryname}`}
                                             >
                                                 {status === 'active'
                                                     ? t.remove

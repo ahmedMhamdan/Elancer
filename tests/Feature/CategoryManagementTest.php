@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\User;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Inertia\Testing\AssertableInertia as Assert;
 use Laravel\Fortify\Events\ValidTwoFactorAuthenticationCodeProvided;
 use Tests\TestCase;
@@ -37,39 +38,43 @@ class CategoryManagementTest extends TestCase
     /** @return array<string, string> */
     private function data(): array
     {
-        return ['name_en' => 'Web development', 'name_ar' => 'تطوير الويب', 'slug' => 'web-development'];
+        return ['categoryname' => 'Web development'];
     }
 
-    public function test_lifecycle_and_bilingual_persistence(): void
+    public function test_lifecycle_with_one_name_and_server_owned_slug(): void
     {
         $this->signInAdmin();
         $this->get('/admin/categories/create')->assertOk();
-        $this->post('/admin/categories', $this->data() + ['deleted_at' => now(), 'id' => 900])
+        $this->post('/admin/categories', $this->data() + ['slug' => 'injected', 'deleted_at' => now(), 'id' => 900])
             ->assertSessionHasNoErrors()->assertRedirect('/admin/categories');
         $category = Category::firstOrFail();
-        $this->assertSame('تطوير الويب', $category->name_ar);
+        $this->assertSame('Web development', $category->categoryname);
+        $this->assertSame('web-development', $category->slug);
         $this->assertFalse($category->trashed());
         $this->assertNotSame(900, $category->id);
         $this->get("/admin/categories/{$category->id}/edit")->assertOk();
-        $this->put("/admin/categories/{$category->id}", array_replace($this->data(), ['name_en' => 'Development']))
+        $this->put("/admin/categories/{$category->id}", ['categoryname' => 'تطوير الويب', 'slug' => 'changed'])
             ->assertSessionHasNoErrors();
-        $this->assertSame('Development', $category->fresh()->name_en);
+        $this->assertSame('تطوير الويب', $category->fresh()->categoryname);
+        $this->assertSame('web-development', $category->fresh()->slug);
         $this->delete("/admin/categories/{$category->id}")->assertRedirect('/admin/categories');
         $this->assertSoftDeleted($category);
         $this->get('/admin/categories')->assertInertia(fn (Assert $page) => $page->has('categories.data', 0));
         $this->get('/admin/categories?status=deleted')->assertInertia(fn (Assert $page) => $page->has('categories.data', 1));
         $this->get("/admin/categories/{$category->id}/edit")->assertNotFound();
         $this->put("/admin/categories/{$category->id}", $this->data())->assertNotFound();
-        $this->post('/admin/categories', $this->data())->assertSessionHasErrors('slug');
+        $this->post('/admin/categories', $this->data())->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('categories', ['slug' => 'web-development-2']);
         $this->post("/admin/categories/{$category->id}/restore")->assertRedirect('/admin/categories?status=deleted');
         $this->assertFalse($category->fresh()->trashed());
+        $this->assertSame('web-development', $category->fresh()->slug);
         $this->post("/admin/categories/{$category->id}/restore")->assertForbidden();
     }
 
     public function test_all_endpoints_reject_non_admins_and_restricted_accounts(): void
     {
         $category = Category::create($this->data());
-        $deleted = Category::create(array_replace($this->data(), ['slug' => 'deleted']));
+        $deleted = Category::create(['categoryname' => 'Deleted category']);
         $deleted->delete();
         foreach ([
             User::factory()->create(),
@@ -115,28 +120,41 @@ class CategoryManagementTest extends TestCase
         $this->post('/admin/categories', $this->data())->assertForbidden();
     }
 
-    public function test_invalid_values_and_duplicate_slugs_are_rejected(): void
+    public function test_invalid_names_are_rejected_and_old_fields_are_not_a_name(): void
     {
         $this->signInAdmin();
-        $this->post('/admin/categories', [])->assertSessionHasErrors(['name_en', 'name_ar', 'slug']);
-        foreach (['Uppercase', 'two words', 'two--hyphens', '-start', 'end-', 'عربي', str_repeat('a', 121)] as $slug) {
-            $this->post('/admin/categories', array_replace($this->data(), ['slug' => $slug]))->assertSessionHasErrors('slug');
+        foreach ([null, '', '   ', ['invalid'], str_repeat('a', 121)] as $name) {
+            $this->post('/admin/categories', ['categoryname' => $name])->assertSessionHasErrors('categoryname');
         }
-        $this->post('/admin/categories', array_replace($this->data(), ['name_en' => str_repeat('a', 121), 'name_ar' => ['invalid']]))->assertSessionHasErrors(['name_en', 'name_ar']);
-        $category = Category::create($this->data());
-        $this->put("/admin/categories/{$category->id}", $this->data())->assertSessionHasNoErrors();
-        $other = Category::create(array_replace($this->data(), ['slug' => 'other']));
-        $this->put("/admin/categories/{$other->id}", $this->data())->assertSessionHasErrors('slug');
-        $this->assertSame('other', $other->fresh()->slug);
+        $this->post('/admin/categories', ['name_en' => 'Old field', 'name_ar' => 'قديم', 'slug' => 'old'])->assertSessionHasErrors('categoryname');
+        $this->assertDatabaseCount('categories', 0);
+    }
+
+    public function test_automatic_slugs_support_arabic_duplicates_and_empty_slug_bases(): void
+    {
+        $this->signInAdmin();
+        foreach ([
+            ['تطوير الويب', 'تطوير-الويب'],
+            ['تطوير الويب', 'تطوير-الويب-2'],
+            ['Web & Design', 'web-design'],
+            ['Web / Design', 'web-design-2'],
+            ['!!!', 'category'],
+            ['???', 'category-2'],
+            [str_repeat('a', 120), str_repeat('a', 100)],
+            [str_repeat('a', 120), str_repeat('a', 100).'-2'],
+        ] as [$name, $slug]) {
+            $this->post('/admin/categories', ['categoryname' => $name])->assertSessionHasNoErrors();
+            $this->assertDatabaseHas('categories', ['categoryname' => $name, 'slug' => $slug]);
+        }
     }
 
     public function test_pagination_filters_and_missing_records(): void
     {
         $this->signInAdmin();
         for ($i = 0; $i < 12; $i++) {
-            Category::create(array_replace($this->data(), ['slug' => "category-{$i}"]));
+            Category::create(['categoryname' => "Category {$i}"]);
         }
-        $this->get('/admin/categories')->assertInertia(fn (Assert $page) => $page->has('categories.data', 10)->where('categories.total', 12));
+        $this->get('/admin/categories')->assertInertia(fn (Assert $page) => $page->has('categories.data', 10)->where('categories.total', 12)->missing('categories.data.0.legacy_name_ar'));
         $this->get('/admin/categories?page=2')->assertInertia(fn (Assert $page) => $page->has('categories.data', 2));
         $this->get('/admin/categories?status=unknown')->assertSessionHasErrors('status');
         $this->get('/admin/categories?page=-1')->assertSessionHasErrors('page');
@@ -144,13 +162,37 @@ class CategoryManagementTest extends TestCase
         $this->delete('/admin/categories/999')->assertNotFound();
     }
 
-    public function test_database_reserves_deleted_slugs_even_when_validation_is_bypassed(): void
+    public function test_database_still_rejects_a_reserved_slug(): void
     {
         $category = Category::create($this->data());
         $category->delete();
 
         $this->expectException(UniqueConstraintViolationException::class);
-        Category::create($this->data());
+        DB::table('categories')->insert([
+            'categoryname' => 'Other', 'slug' => $category->slug,
+        ]);
+    }
+
+    public function test_migration_preserves_legacy_names_deleted_rows_and_slugs(): void
+    {
+        $migration = require database_path('migrations/2026_09_11_200000_use_single_category_name.php');
+        $migration->down();
+        $id = DB::table('categories')->insertGetId([
+            'name_en' => 'Design', 'name_ar' => 'تصميم', 'slug' => 'design', 'deleted_at' => now(),
+        ]);
+        $migration->up();
+        $category = Category::withTrashed()->findOrFail($id);
+        $this->assertSame('Design', $category->categoryname);
+        $this->assertSame('design', $category->slug);
+        $this->assertTrue($category->trashed());
+        $this->assertSame('تصميم', $category->getAttribute('legacy_name_ar'));
+        $this->assertArrayNotHasKey('legacy_name_ar', $category->toArray());
+
+        $new = Category::create(['categoryname' => 'كتابة']);
+        $migration->down();
+        $this->assertDatabaseHas('categories', ['id' => $new->id, 'name_en' => 'كتابة', 'name_ar' => 'كتابة']);
+        $migration->up();
+        $this->assertSame('كتابة', $new->fresh()->categoryname);
     }
 
     public function test_arabic_validation_and_another_users_session_proof(): void
@@ -158,7 +200,7 @@ class CategoryManagementTest extends TestCase
         $user = $this->signInAdmin();
         $user->forceFill(['locale' => 'ar'])->save();
         $this->post('/admin/categories', [])->assertSessionHasErrors([
-            'name_en' => 'هذا الحقل مطلوب.',
+            'categoryname' => 'هذا الحقل مطلوب.',
         ]);
 
         $other = $this->admin();

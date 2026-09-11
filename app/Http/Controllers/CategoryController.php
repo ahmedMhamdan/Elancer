@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\CreateCategory;
 use App\Http\Requests\SaveCategoryRequest;
 use App\Models\Category;
-use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -38,9 +37,9 @@ class CategoryController extends Controller
         return Inertia::render('admin/categories/form', ['category' => null]);
     }
 
-    public function store(SaveCategoryRequest $request): RedirectResponse
+    public function store(SaveCategoryRequest $request, CreateCategory $createCategory): RedirectResponse
     {
-        $this->save(new Category, $request);
+        $createCategory($request->validated('categoryname'));
 
         return to_route('admin.categories.index')->with('category_notice', 'created');
     }
@@ -54,7 +53,7 @@ class CategoryController extends Controller
 
     public function update(SaveCategoryRequest $request, Category $category): RedirectResponse
     {
-        $this->save($category, $request);
+        $category->update($request->validated());
 
         return to_route('admin.categories.index')->with('category_notice', 'updated');
     }
@@ -73,15 +72,5 @@ class CategoryController extends Controller
         $category->restore();
 
         return to_route('admin.categories.index', ['status' => 'deleted'])->with('category_notice', 'restored');
-    }
-
-    private function save(Category $category, SaveCategoryRequest $request): void
-    {
-        try {
-            $category->fill($request->validated())->save();
-        } catch (UniqueConstraintViolationException) {
-            // The database also protects concurrent requests after validation.
-            throw ValidationException::withMessages(['slug' => $request->messages()['slug.unique']]);
-        }
     }
 }
