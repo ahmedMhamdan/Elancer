@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdministratorController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MarketplaceProfileController;
@@ -7,6 +8,7 @@ use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ProfilePhotoController;
 use App\Http\Middleware\EnsureCategoryAdministrator;
 use App\Http\Middleware\EnsureOnboardingIsComplete;
+use App\Http\Middleware\EnsureSuperAdministrator;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
@@ -32,4 +34,11 @@ Route::middleware(['auth', 'verified', EnsureCategoryAdministrator::class])
         Route::put('{category}', [CategoryController::class, 'update'])->name('update');
         Route::delete('{category}', [CategoryController::class, 'destroy'])->name('destroy');
         Route::post('{category}/restore', [CategoryController::class, 'restore'])->withTrashed()->name('restore');
+    });
+
+Route::middleware(['auth', 'verified', EnsureSuperAdministrator::class])
+    ->prefix('admin/administrators')->name('admin.administrators.')->group(function () {
+        Route::get('/', [AdministratorController::class, 'index'])->name('index');
+        Route::get('{user}/edit', [AdministratorController::class, 'edit'])->name('edit');
+        Route::put('{user}', [AdministratorController::class, 'update'])->middleware('throttle:20,1')->name('update');
     });

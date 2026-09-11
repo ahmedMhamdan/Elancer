@@ -12,7 +12,7 @@ class EnsureCategoryAdministrator
     public function handle(Request $request, Closure $next): Response
     {
         $user = $request->user();
-        abort_unless($user && $user->is_admin && $user->canParticipateInMarketplace(), 403);
+        abort_unless($user && $user->isAdministrator() && $user->canParticipateInMarketplace(), 403);
 
         $configured = $user->two_factor_secret !== null && $user->two_factor_confirmed_at !== null;
         // Fortify's successful challenge records both user and secret fingerprint.

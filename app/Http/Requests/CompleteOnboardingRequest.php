@@ -47,6 +47,7 @@ class CompleteOnboardingRequest extends FormRequest
             'photo_path' => ['missing'],
             'status' => ['missing'],
             'is_admin' => ['missing'],
+            'is_super_admin' => ['missing'],
         ];
     }
 }

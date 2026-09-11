@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -50,6 +51,12 @@ class ProfileController extends Controller
     public function destroy(ProfileDeleteRequest $request): RedirectResponse
     {
         $user = $request->user();
+
+        if ($user->is_super_admin) {
+            throw ValidationException::withMessages([
+                'password' => 'Super-admin accounts cannot be deleted from account settings.',
+            ]);
+        }
 
         $photoPath = $user->profile()->first()?->photo_path;
         Auth::logout();

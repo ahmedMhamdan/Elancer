@@ -28,6 +28,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property WorkspaceRole|null $workspace_role
  * @property AccountStatus $status
  * @property string $locale
+ * @property bool $is_super_admin
  * @property bool $is_admin
  * @property string $password
  * @property string|null $two_factor_secret
@@ -53,6 +54,7 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
         'status' => 'active',
         'locale' => 'en',
         'is_admin' => false,
+        'is_super_admin' => false,
     ];
 
     /**
@@ -66,6 +68,7 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
             'status' => AccountStatus::class,
             'workspace_role' => WorkspaceRole::class,
             'is_admin' => 'boolean',
+            'is_super_admin' => 'boolean',
             'email_verified_at' => 'datetime',
             'onboarding_completed_at' => 'immutable_datetime',
             'password' => 'hashed',
@@ -79,6 +82,11 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
     public function profile(): HasOne
     {
         return $this->hasOne(Profile::class);
+    }
+
+    public function isAdministrator(): bool
+    {
+        return $this->is_admin || $this->is_super_admin;
     }
 
     public function canParticipateInMarketplace(): bool

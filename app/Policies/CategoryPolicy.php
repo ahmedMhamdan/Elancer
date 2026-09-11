@@ -9,7 +9,7 @@ class CategoryPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->is_admin && $user->canParticipateInMarketplace()
+        return $user->isAdministrator() && $user->canParticipateInMarketplace()
             && $user->two_factor_secret !== null && $user->two_factor_confirmed_at !== null;
     }
 

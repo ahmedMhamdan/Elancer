@@ -67,3 +67,12 @@ wrappers, mapped rows and form composition; replace order data with bilingual
 categories, adapt colors to Elancer tokens, add Inertia pagination/actions,
 validation, RTL, wrapping and native accessibility attributes. Reuse the existing
 TailAdmin Input, Label, Button and ComponentCard adaptations. MIT license above applies.
+
+## Super-admin access management (2026-09-11)
+
+resources/js/pages/admin/administrators/ adapts the previously retrieved and
+inspected TailAdmin BasicTableOne.tsx and DefaultInputs.tsx through the existing
+Elancer category table/form adaptations. It reuses the TailAdmin table, Input,
+Label, TextArea, Button and ComponentCard components. Adaptations add bilingual
+account search, protected role actions and access-change reasons using Elancer
+tokens and Inertia. The MIT license above applies.

@@ -25,7 +25,7 @@ const mainNavItems: NavItem[] = [
 export function AppSidebar() {
     const { auth } = usePage().props;
     const items =
-        auth.user.is_admin === true
+        auth.user.is_admin === true || auth.user.is_super_admin === true
             ? [
                   ...mainNavItems,
                   {
@@ -38,6 +38,20 @@ export function AppSidebar() {
                   },
               ]
             : mainNavItems;
+    const navigation =
+        auth.user.is_super_admin === true
+            ? [
+                  ...items,
+                  {
+                      title:
+                          auth.user.locale === 'ar'
+                              ? 'صلاحيات الإدارة'
+                              : 'Admin access',
+                      href: '/admin/administrators',
+                      icon: UserRound,
+                  },
+              ]
+            : items;
     const { isMobile, setOpenMobile } = useSidebar();
     const closeOnMobile = () => {
         if (isMobile) setOpenMobile(false);
@@ -69,7 +83,7 @@ export function AppSidebar() {
                 </SidebarMenu>
             </SidebarHeader>
             <SidebarContent>
-                <NavMain items={items} />
+                <NavMain items={navigation} />
                 <SidebarMenu className="px-4 group-data-[collapsible=icon]:px-2">
                     <SidebarMenuItem>
                         <SidebarMenuButton asChild tooltip="My profile">
