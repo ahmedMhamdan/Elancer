@@ -28,6 +28,7 @@ SOFTWARE.
 ## Notification dropdown adaptation (2026-09-10)
 
 Source files in the TailAdmin free React dashboard (main, retrieved 2026-09-10):
+
 - src/components/header/NotificationDropdown.tsx
 - src/components/ui/dropdown/Dropdown.tsx
 
@@ -36,10 +37,12 @@ resources/js/components/tailadmin-dropdown.tsx. Adaptations preserve the demo SV
 and dropdown composition, use Elancer theme tokens, add accessible focus/dismissal
 and viewport sizing, and replace fictional demo notifications with an empty state.
 The MIT license above applies to these adaptations.
+
 ## Onboarding form components (2026-09-10)
 
 The files under resources/js/components/tailadmin/ adapt these source files from
 https://github.com/TailAdmin/free-react-tailwind-admin-dashboard (main, retrieved 2026-09-10):
+
 - src/components/form/input/InputField.tsx
 - src/components/form/input/TextArea.tsx
 - src/components/form/input/Radio.tsx
@@ -49,9 +52,11 @@ https://github.com/TailAdmin/free-react-tailwind-admin-dashboard (main, retrieve
 The demo component structure is retained. Adaptations use Elancer semantic colors,
 forward native form attributes, add keyboard focus treatment and button types,
 and remove redundant upstream type unions. The MIT license above applies.
+
 ## Category management (2026-09-10)
 
 Official main source retrieved and inspected on 2026-09-10:
+
 - src/components/tables/BasicTables/BasicTableOne.tsx
 - src/components/ui/table/index.tsx
 - src/components/form/form-elements/DefaultInputs.tsx
