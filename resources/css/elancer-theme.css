@@ -1,6 +1,7 @@
 /* Shared Elancer colors. Dark mode changes surfaces, not the brand identity. */
 :root {
     --el-page: #f6f5ef;
+    --el-error: #b42318;
     --el-surface: #fffefa;
     --el-surface-soft: #eef1e8;
     --el-text: #202d23;
@@ -29,6 +30,7 @@
 }
 .dark {
     --el-page: #0e1812;
+    --el-error: #fda29b;
     --el-surface: #16241b;
     --el-surface-soft: #111e16;
     --el-text: #edf4e9;

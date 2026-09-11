@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { Compass, LayoutGrid, Settings, UserRound } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
@@ -23,6 +23,21 @@ const mainNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+    const { auth } = usePage().props;
+    const items =
+        auth.user.is_admin === true
+            ? [
+                  ...mainNavItems,
+                  {
+                      title:
+                          auth.user.locale === 'ar'
+                              ? 'التصنيفات'
+                              : 'Categories',
+                      href: '/admin/categories',
+                      icon: LayoutGrid,
+                  },
+              ]
+            : mainNavItems;
     const { isMobile, setOpenMobile } = useSidebar();
     const closeOnMobile = () => {
         if (isMobile) setOpenMobile(false);
@@ -54,7 +69,7 @@ export function AppSidebar() {
                 </SidebarMenu>
             </SidebarHeader>
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={items} />
                 <SidebarMenu className="px-4 group-data-[collapsible=icon]:px-2">
                     <SidebarMenuItem>
                         <SidebarMenuButton asChild tooltip="My profile">

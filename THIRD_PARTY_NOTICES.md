@@ -49,3 +49,16 @@ https://github.com/TailAdmin/free-react-tailwind-admin-dashboard (main, retrieve
 The demo component structure is retained. Adaptations use Elancer semantic colors,
 forward native form attributes, add keyboard focus treatment and button types,
 and remove redundant upstream type unions. The MIT license above applies.
+## Category management (2026-09-10)
+
+Official main source retrieved and inspected on 2026-09-10:
+- src/components/tables/BasicTables/BasicTableOne.tsx
+- src/components/ui/table/index.tsx
+- src/components/form/form-elements/DefaultInputs.tsx
+
+Adaptations: resources/js/components/tailadmin/table.tsx and
+resources/js/pages/admin/categories/{index,form}.tsx. Preserve the demo table
+wrappers, mapped rows and form composition; replace order data with bilingual
+categories, adapt colors to Elancer tokens, add Inertia pagination/actions,
+validation, RTL, wrapping and native accessibility attributes. Reuse the existing
+TailAdmin Input, Label, Button and ComponentCard adaptations. MIT license above applies.

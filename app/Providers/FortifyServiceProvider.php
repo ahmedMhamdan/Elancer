@@ -10,12 +10,14 @@ use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Laravel\Fortify\Contracts\VerifyEmailResponse;
+use Laravel\Fortify\Events\ValidTwoFactorAuthenticationCodeProvided;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
 
@@ -45,6 +47,14 @@ class FortifyServiceProvider extends ServiceProvider
                 'expiresInMinutes' => config('auth.verification.expire', 60),
                 'homeUrl' => route('home'),
             ]));
+
+        Event::listen(
+            ValidTwoFactorAuthenticationCodeProvided::class,
+            function (ValidTwoFactorAuthenticationCodeProvided $event): void {
+                request()->session()->put('admin.two_factor_proof',
+                    $event->user->getAuthIdentifier().':'.hash('sha256', (string) $event->user->two_factor_secret));
+            },
+        );
 
         $this->configureActions();
         $this->configureViews();
