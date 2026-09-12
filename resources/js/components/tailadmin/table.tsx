@@ -34,3 +34,21 @@ const TableCell = ({
     );
 };
 export { Table, TableHeader, TableBody, TableRow, TableCell };
+
+// BasicTableOne.tsx overflow wrapper, shared with keyboard scrolling and a label.
+export function TableScroll({
+    children,
+    label,
+    className = '',
+}: Props & { label: string }) {
+    return (
+        <div
+            role="region"
+            aria-label={label}
+            tabIndex={0}
+            className={`dashboard-table-scroll focus-visible:outline-ring max-w-full overflow-x-auto focus-visible:outline-2 focus-visible:-outline-offset-2 ${className}`}
+        >
+            {children}
+        </div>
+    );
+}

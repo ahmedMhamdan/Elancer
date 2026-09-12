@@ -2,11 +2,16 @@
 // Retains semantic wrappers/mapped rows; adds account search and protected role links.
 // Reuses TailAdmin Input, Label and Button. MIT: THIRD_PARTY_NOTICES.md.
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import Pagination, {
+    type PaginationData,
+} from '@/components/tailadmin/pagination';
+import Alert from '@/components/tailadmin/alert';
 import Button from '@/components/tailadmin/button';
 import Input from '@/components/tailadmin/input';
 import Label from '@/components/tailadmin/label';
 import {
     Table,
+    TableScroll,
     TableHeader,
     TableBody,
     TableRow,
@@ -15,13 +20,8 @@ import {
 import { copy, type Account } from './copy';
 
 type Props = {
-    users: {
+    users: PaginationData & {
         data: Account[];
-        current_page: number;
-        last_page: number;
-        total: number;
-        prev_page_url: string | null;
-        next_page_url: string | null;
     };
     search: string;
     notice: boolean | null;
@@ -43,14 +43,7 @@ export default function Administrators({ users, search, notice }: Props) {
                 <h1 className="text-3xl font-semibold">{t.title}</h1>
                 <p className="text-muted-foreground mt-2">{t.intro}</p>
             </div>
-            {notice && (
-                <p
-                    role="status"
-                    className="border-border bg-card rounded-lg border p-4"
-                >
-                    {t.updated}
-                </p>
-            )}
+            {notice && <Alert message={t.updated} />}
             <form
                 onSubmit={(event) => {
                     event.preventDefault();
@@ -75,8 +68,8 @@ export default function Administrators({ users, search, notice }: Props) {
                 </Button>
             </form>
             <div className="border-border bg-card overflow-hidden rounded-xl border">
-                <div className="max-w-full overflow-x-auto">
-                    <Table className="w-full table-fixed">
+                <TableScroll label={t.title}>
+                    <Table className="w-full">
                         <TableHeader className="border-border border-b">
                             <TableRow>
                                 <TableCell
@@ -87,7 +80,7 @@ export default function Administrators({ users, search, notice }: Props) {
                                 </TableCell>
                                 <TableCell
                                     isHeader
-                                    className="text-muted-foreground w-2/5 px-4 py-3 text-start text-sm font-medium"
+                                    className="text-muted-foreground w-px px-4 py-3 text-end text-sm font-medium whitespace-nowrap"
                                 >
                                     {t.access}
                                 </TableCell>
@@ -116,7 +109,7 @@ export default function Administrators({ users, search, notice }: Props) {
                                                 : t.unverified}
                                         </p>
                                     </TableCell>
-                                    <TableCell className="px-4 py-4 text-start">
+                                    <TableCell className="w-px px-4 py-4 text-end whitespace-nowrap">
                                         <p>
                                             {account.is_super_admin
                                                 ? t.superAdmin
@@ -152,28 +145,9 @@ export default function Administrators({ users, search, notice }: Props) {
                             )}
                         </TableBody>
                     </Table>
-                </div>
+                </TableScroll>
             </div>
-            <nav
-                aria-label={ar ? 'ترقيم الصفحات' : 'Pagination'}
-                className="flex flex-wrap items-center justify-between gap-4"
-            >
-                <p className="text-muted-foreground text-sm">
-                    {users.current_page} / {users.last_page} · {users.total}
-                </p>
-                <div className="flex gap-4">
-                    {users.prev_page_url && (
-                        <Link className={link} href={users.prev_page_url}>
-                            {t.previous}
-                        </Link>
-                    )}
-                    {users.next_page_url && (
-                        <Link className={link} href={users.next_page_url}>
-                            {t.next}
-                        </Link>
-                    )}
-                </div>
-            </nav>
+            <Pagination data={users} />
         </div>
     );
 }

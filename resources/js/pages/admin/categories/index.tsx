@@ -4,9 +4,14 @@
 // See THIRD_PARTY_NOTICES.md (MIT).
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
+import Pagination, {
+    type PaginationData,
+} from '@/components/tailadmin/pagination';
+import Alert from '@/components/tailadmin/alert';
 import Button from '@/components/tailadmin/button';
 import {
     Table,
+    TableScroll,
     TableBody,
     TableCell,
     TableHeader,
@@ -15,13 +20,8 @@ import {
 import { copy, type Category } from './copy';
 
 type Props = {
-    categories: {
+    categories: PaginationData & {
         data: Category[];
-        current_page: number;
-        last_page: number;
-        total: number;
-        prev_page_url: string | null;
-        next_page_url: string | null;
     };
     status: 'active' | 'deleted';
     notice:
@@ -85,18 +85,11 @@ export default function Categories({ categories, status, notice }: Props) {
                 </Link>
             </div>
             {notice && (
-                <p
-                    role="status"
-                    className="border-border bg-card rounded-lg border p-4"
-                >
-                    {t[notice === 'deleted' ? 'deletedNotice' : notice]}
-                </p>
+                <Alert
+                    message={t[notice === 'deleted' ? 'deletedNotice' : notice]}
+                />
             )}
-            {error && (
-                <p role="alert" className="text-[var(--el-error)]">
-                    {error}
-                </p>
-            )}
+            {error && <Alert variant="error" message={error} />}
             <nav aria-label={t.title} className="flex gap-2">
                 {(['active', 'deleted'] as const).map((value) => (
                     <Link
@@ -110,8 +103,8 @@ export default function Categories({ categories, status, notice }: Props) {
                 ))}
             </nav>
             <div className="border-border bg-card overflow-hidden rounded-xl border">
-                <div className="max-w-full overflow-x-auto">
-                    <Table className="w-full table-fixed">
+                <TableScroll label={t.title}>
+                    <Table className="w-full">
                         <TableHeader className="border-border border-b">
                             <TableRow>
                                 <TableCell
@@ -122,7 +115,7 @@ export default function Categories({ categories, status, notice }: Props) {
                                 </TableCell>
                                 <TableCell
                                     isHeader
-                                    className="text-muted-foreground w-2/5 px-4 py-3 text-start text-sm font-medium"
+                                    className="text-muted-foreground w-px px-4 py-3 text-end text-sm font-medium whitespace-nowrap"
                                 >
                                     {t.actions}
                                 </TableCell>
@@ -139,8 +132,8 @@ export default function Categories({ categories, status, notice }: Props) {
                                             {category.categoryname}
                                         </span>
                                     </TableCell>
-                                    <TableCell className="px-4 py-4">
-                                        <div className="flex flex-wrap items-center gap-2">
+                                    <TableCell className="w-px px-4 py-4 text-end">
+                                        <div className="flex items-center justify-end gap-2 whitespace-nowrap">
                                             {status === 'active' && (
                                                 <Link
                                                     href={`/admin/categories/${category.id}/edit`}
@@ -152,7 +145,11 @@ export default function Categories({ categories, status, notice }: Props) {
                                             )}
                                             <Button
                                                 size="sm"
-                                                variant="outline"
+                                                variant={
+                                                    status === 'active'
+                                                        ? 'danger-outline'
+                                                        : 'primary'
+                                                }
                                                 disabled={busy}
                                                 onClick={() => act(category)}
                                                 aria-label={`${status === 'active' ? t.remove : t.restore}: ${category.categoryname}`}
@@ -164,9 +161,8 @@ export default function Categories({ categories, status, notice }: Props) {
                                             {status === 'deleted' && (
                                                 <Button
                                                     size="sm"
-                                                    variant="outline"
+                                                    variant="danger"
                                                     disabled={busy}
-                                                    className="text-[var(--el-error)]"
                                                     onClick={() =>
                                                         act(category, true)
                                                     }
@@ -193,35 +189,9 @@ export default function Categories({ categories, status, notice }: Props) {
                             )}
                         </TableBody>
                     </Table>
-                </div>
+                </TableScroll>
             </div>
-            <nav
-                aria-label={ar ? 'ترقيم الصفحات' : 'Pagination'}
-                className="flex flex-wrap items-center justify-between gap-3"
-            >
-                <p className="text-muted-foreground text-sm">
-                    {t.page} {categories.current_page} {t.of}{' '}
-                    {categories.last_page} · {categories.total} {t.total}
-                </p>
-                <div className="flex gap-2">
-                    {categories.prev_page_url && (
-                        <Link
-                            className={linkClass}
-                            href={categories.prev_page_url}
-                        >
-                            {t.previous}
-                        </Link>
-                    )}
-                    {categories.next_page_url && (
-                        <Link
-                            className={linkClass}
-                            href={categories.next_page_url}
-                        >
-                            {t.next}
-                        </Link>
-                    )}
-                </div>
-            </nav>
+            <Pagination data={categories} />
         </div>
     );
 }

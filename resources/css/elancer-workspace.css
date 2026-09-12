@@ -1,4 +1,22 @@
 /* Layout adapted from TailAdmin's free React dashboard; see THIRD_PARTY_NOTICES.md. */
+.dashboard-table-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: var(--input) var(--card);
+}
+.dashboard-table-scroll::-webkit-scrollbar {
+    height: 8px;
+}
+.dashboard-table-scroll::-webkit-scrollbar-track {
+    background: var(--card);
+}
+.dashboard-table-scroll::-webkit-scrollbar-thumb {
+    background: var(--input);
+    border: 2px solid var(--card);
+    border-radius: 999px;
+}
+.dashboard-table-scroll table {
+    min-width: 540px;
+}
 .site-theme-toggle {
     display: inline-grid;
     place-items: center;

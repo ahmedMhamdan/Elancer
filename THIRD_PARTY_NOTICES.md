@@ -89,6 +89,19 @@ for focus trapping, Escape dismissal and focus restoration. Existing shadcn
 sidebar primitives remain in sidebar-legacy.tsx for the unused starter nav kit.
 Framer Motion 13.2.0 shares the version already installed by Motion.
 
+## Dashboard table standards (2026-09-12)
+
+Inspected Ahmed's local free-react-tailwind-admin-dashboard-main source:
+src/components/tables/BasicTables/BasicTableOne.tsx,
+src/components/ui/button/Button.tsx and src/components/ui/alert/Alert.tsx.
+The alert adaptation preserves its bordered variant container and icon/content
+structure, with compact messages, accessible live regions and Lucide icons.
+Tables keep the demo wrappers and rows with end-aligned actions and styled
+horizontal scrolling. Buttons add distinct destructive variants.
+No table pagination component exists in this local free edition; the shared
+server-backed pagination is an Elancer extension using the adapted Button.
+The existing TailAdmin MIT license above applies to these adaptations.
+
 ## Profile and identity forms (2026-09-12)
 
 The expanded profile editor, private identity submission form and super-admin

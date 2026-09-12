@@ -1,14 +1,19 @@
-﻿// Adapts TailAdmin BasicTableOne and DefaultInputs through the existing table,
+// Adapts TailAdmin BasicTableOne and DefaultInputs through the existing table,
 // ComponentCard, TextArea and Button adaptations. MIT: THIRD_PARTY_NOTICES.md.
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import ComponentCard from '@/components/component-card';
 import InputError from '@/components/input-error';
+import Alert from '@/components/tailadmin/alert';
+import Pagination, {
+    type PaginationData,
+} from '@/components/tailadmin/pagination';
 import Button from '@/components/tailadmin/button';
 import Label from '@/components/tailadmin/label';
 import TextArea from '@/components/tailadmin/textarea';
 import {
     Table,
+    TableScroll,
     TableBody,
     TableCell,
     TableHeader,
@@ -24,9 +29,11 @@ type Submission = {
 function Review({
     submission,
     close,
+    onReviewed,
 }: {
     submission: Submission;
     close: () => void;
+    onReviewed: () => void;
 }) {
     const form = useForm({ reason: '' });
     const [error, setError] = useState('');
@@ -42,7 +49,7 @@ function Review({
         form.transform((data) => ({ ...data, status }));
         form.put(`/admin/identity/${submission.id}`, {
             preserveScroll: true,
-            onSuccess: close,
+            onSuccess: onReviewed,
             onHttpException: () => {
                 setError(
                     'The submission could not be reviewed. You cannot review your own identity. Refresh and try again.',
@@ -87,11 +94,7 @@ function Review({
                 />
                 <InputError message={form.errors.reason} />
             </div>
-            {error && (
-                <p role="alert" className="text-destructive">
-                    {error}
-                </p>
-            )}
+            {error && <Alert variant="error" message={error} />}
             <div className="flex flex-wrap gap-3">
                 <Button
                     disabled={form.processing || !form.data.reason.trim()}
@@ -101,7 +104,7 @@ function Review({
                 </Button>
                 <Button
                     disabled={form.processing || !form.data.reason.trim()}
-                    variant="outline"
+                    variant="danger-outline"
                     onClick={() => decide('rejected')}
                 >
                     Request resubmission
@@ -120,12 +123,11 @@ function Review({
 export default function IdentityReviews({
     submissions,
 }: {
-    submissions: {
+    submissions: PaginationData & {
         data: Submission[];
-        prev_page_url: string | null;
-        next_page_url: string | null;
     };
 }) {
+    const [notice, setNotice] = useState('');
     const [selected, setSelected] = useState<Submission | null>(null);
     return (
         <div className="workspace-dashboard space-y-6">
@@ -134,17 +136,25 @@ export default function IdentityReviews({
                 <h1>Identity reviews</h1>
                 <p>Private document review for clients and freelancers.</p>
             </div>
+            {notice && <Alert message={notice} />}
             {selected && (
                 <Review
                     key={selected.id}
                     submission={selected}
+                    onReviewed={() => {
+                        setSelected(null);
+                        setNotice('Identity review saved.');
+                    }}
                     close={() => {
                         setSelected(null);
                         router.reload({ only: ['submissions'] });
                     }}
                 />
             )}
-            <div className="border-border bg-card overflow-x-auto rounded-xl border">
+            <TableScroll
+                label="Identity reviews"
+                className="border-border bg-card rounded-xl border"
+            >
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -152,7 +162,11 @@ export default function IdentityReviews({
                                 <TableCell
                                     key={label}
                                     isHeader
-                                    className="px-5 py-3 text-start"
+                                    className={
+                                        label === 'Review'
+                                            ? 'w-px px-5 py-3 text-end'
+                                            : 'px-5 py-3 text-start'
+                                    }
                                 >
                                     {label}
                                 </TableCell>
@@ -174,7 +188,7 @@ export default function IdentityReviews({
                                 <TableCell className="px-5 py-4">
                                     {row.status}
                                 </TableCell>
-                                <TableCell className="px-5 py-4">
+                                <TableCell className="px-5 py-4 text-end">
                                     {row.status === 'pending' ? (
                                         <Button
                                             size="sm"
@@ -203,27 +217,11 @@ export default function IdentityReviews({
                         )}
                     </TableBody>
                 </Table>
-            </div>
-            <nav aria-label="Pagination" className="flex gap-4">
-                {submissions.prev_page_url && (
-                    <Link
-                        href={submissions.prev_page_url}
-                        onClick={() => setSelected(null)}
-                        className="text-primary min-h-11 py-3 underline"
-                    >
-                        Previous
-                    </Link>
-                )}
-                {submissions.next_page_url && (
-                    <Link
-                        href={submissions.next_page_url}
-                        onClick={() => setSelected(null)}
-                        className="text-primary min-h-11 py-3 underline"
-                    >
-                        Next
-                    </Link>
-                )}
-            </nav>
+            </TableScroll>
+            <Pagination
+                data={submissions}
+                onNavigate={() => setSelected(null)}
+            />
         </div>
     );
 }
