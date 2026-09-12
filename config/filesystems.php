@@ -29,6 +29,12 @@ return [
     */
 
     'disks' => [
+        'identity' => [
+            'driver' => 'local',
+            'root' => storage_path('app/identity-private'),
+            'serve' => false,
+            'throw' => true,
+        ],
 
         'local' => [
             'driver' => 'local',

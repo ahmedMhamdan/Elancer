@@ -1,52 +1,14 @@
-import { useForm, usePage } from '@inertiajs/react';
-import { CheckCircle2, ChevronDown, Circle, LoaderCircle } from 'lucide-react';
-import { motion, useReducedMotion } from 'motion/react';
-import { useState } from 'react';
+// Adapts TailAdmin DefaultInputs form composition using the existing licensed
+// ComponentCard, InputField, TextArea, Label and Button implementations.
+import { Link, useForm, usePage } from '@inertiajs/react';
 import type { FormEvent } from 'react';
 import ComponentCard from '@/components/component-card';
 import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import type { MarketplaceProfile } from '@/pages/dashboard';
-import { update } from '@/routes/dashboard/profile';
-
-type ProfileFields = { headline: string; bio: string; location: string };
-type Field = keyof ProfileFields;
-
-const fields: {
-    key: Field;
-    title: string;
-    label: string;
-    description: string;
-    placeholder: string;
-    limit: number;
-}[] = [
-    {
-        key: 'headline',
-        title: 'Introduce what you do',
-        label: 'Headline',
-        description: 'A clear headline helps people understand your work.',
-        placeholder: 'e.g. Laravel developer for growing businesses',
-        limit: 120,
-    },
-    {
-        key: 'bio',
-        title: 'Tell your story',
-        label: 'Bio',
-        description: 'Share your experience and what you bring to a project.',
-        placeholder: 'Describe your experience and how you help your clients.',
-        limit: 5000,
-    },
-    {
-        key: 'location',
-        title: 'Add your location',
-        label: 'Location',
-        description: 'Let people know where you are based.',
-        placeholder: 'e.g. Hebron, Palestine',
-        limit: 255,
-    },
-];
+import Button from '@/components/tailadmin/button';
+import Input from '@/components/tailadmin/input';
+import Label from '@/components/tailadmin/label';
+import TextArea from '@/components/tailadmin/textarea';
+import type { MarketplaceProfile } from '@/pages/marketplace-profile';
 
 export default function ProfileForm({
     profile,
@@ -54,244 +16,172 @@ export default function ProfileForm({
     profile: MarketplaceProfile | null;
 }) {
     const { auth } = usePage().props;
-    const visibleFields =
-        auth.user.workspace_role === 'client'
-            ? fields
-                  .filter((field) => field.key !== 'headline')
-                  .map((field) =>
-                      field.key === 'bio'
-                          ? {
-                                ...field,
-                                description:
-                                    'Introduce yourself and the work you have in mind.',
-                                placeholder:
-                                    'Tell freelancers about yourself or your company.',
-                            }
-                          : field,
-                  )
-            : fields;
-    const [expanded, setExpanded] = useState<Field | null>(null);
-    const reducedMotion = useReducedMotion();
-    const form = useForm<ProfileFields>({
+    const client = auth.user.workspace_role === 'client';
+    const form = useForm({
         headline: profile?.headline ?? '',
         bio: profile?.bio ?? '',
-        location: profile?.location ?? '',
+        country: profile?.country ?? '',
+        city: profile?.city ?? '',
+        company: profile?.company ?? '',
+        skills: (profile?.skills ?? []).join(', '),
     });
-    const submit = (event: FormEvent<HTMLFormElement>) => {
+    function submit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        form.patch(update.url(), {
+        form.transform((data) => ({
+            ...data,
+            skills: data.skills
+                .split(/[,،]/)
+                .map((skill) => skill.trim())
+                .filter(Boolean),
+        }));
+        form.patch('/my-profile', {
             preserveScroll: true,
             onSuccess: () => form.setDefaults(),
-            onError: (errors) => {
-                const firstError = visibleFields.find(({ key }) => errors[key]);
-                if (firstError) setExpanded(firstError.key);
+            onError: () => {
+                requestAnimationFrame(() =>
+                    document
+                        .querySelector<HTMLElement>('[aria-invalid="true"]')
+                        ?.focus(),
+                );
             },
         });
-    };
-
+    }
+    const field = (
+        key: 'headline' | 'country' | 'city' | 'company' | 'skills',
+        label: string,
+        max: number,
+        hint?: string,
+    ) => (
+        <div>
+            <Label htmlFor={`profile-${key}`}>{label}</Label>
+            <Input
+                id={`profile-${key}`}
+                name={key}
+                value={form.data[key]}
+                maxLength={max}
+                onChange={(e) => form.setData(key, e.target.value)}
+                aria-invalid={!!form.errors[key]}
+                aria-describedby={
+                    form.errors[key] ? `profile-${key}-error` : undefined
+                }
+            />
+            <InputError
+                id={`profile-${key}-error`}
+                message={form.errors[key]}
+            />
+            {hint && (
+                <p className="text-muted-foreground mt-2 text-sm">{hint}</p>
+            )}
+        </div>
+    );
     return (
-        <section
-            id="profile-form"
-            className="profile-editor"
-            aria-label="Edit your profile"
-        >
+        <form id="profile-form" onSubmit={submit} className="space-y-6">
             <ComponentCard
-                title="Complete your profile"
-                desc="Start with the essentials. Click a section to add or edit your details."
+                title="About you"
+                desc="Give people a clear picture of who you are and what you offer."
             >
-                <form onSubmit={submit}>
-                    <div className="profile-accordion">
-                        {visibleFields.map((field) => {
-                            const open = expanded === field.key;
-                            const complete = Boolean(
-                                profile?.[field.key]?.trim(),
-                            );
-                            const error = form.errors[field.key];
-                            return (
-                                <div
-                                    key={field.key}
-                                    className="profile-accordion-item"
-                                    data-open={open}
-                                >
-                                    <h3>
-                                        <button
-                                            id={`${field.key}-trigger`}
-                                            type="button"
-                                            className="profile-accordion-trigger"
-                                            aria-expanded={open}
-                                            aria-controls={`${field.key}-panel`}
-                                            onClick={() =>
-                                                setExpanded(
-                                                    open ? null : field.key,
-                                                )
-                                            }
-                                        >
-                                            {complete ? (
-                                                <CheckCircle2
-                                                    className="workspace-accent"
-                                                    aria-hidden="true"
-                                                />
-                                            ) : (
-                                                <Circle aria-hidden="true" />
-                                            )}
-                                            <span className="profile-accordion-copy">
-                                                <strong>{field.title}</strong>
-                                                <span>{field.description}</span>
-                                            </span>
-                                            <span className="profile-accordion-action">
-                                                {open
-                                                    ? 'Close'
-                                                    : complete
-                                                      ? 'Edit'
-                                                      : 'Add'}
-                                            </span>
-                                            <ChevronDown
-                                                className="profile-accordion-chevron"
-                                                aria-hidden="true"
-                                            />
-                                        </button>
-                                    </h3>
-                                    <motion.div
-                                        id={`${field.key}-panel`}
-                                        role="region"
-                                        aria-labelledby={`${field.key}-trigger`}
-                                        aria-hidden={!open}
-                                        inert={!open}
-                                        initial={false}
-                                        animate={{
-                                            height: open ? 'auto' : 0,
-                                            opacity: open ? 1 : 0,
-                                        }}
-                                        transition={{
-                                            duration: reducedMotion ? 0 : 0.24,
-                                            ease: [0.22, 1, 0.36, 1],
-                                        }}
-                                        className="profile-accordion-panel"
-                                    >
-                                        <div className="profile-accordion-input">
-                                            <Label htmlFor={field.key}>
-                                                {field.label}
-                                            </Label>
-                                            {field.key === 'bio' ? (
-                                                <textarea
-                                                    id={field.key}
-                                                    name={field.key}
-                                                    rows={5}
-                                                    value={form.data[field.key]}
-                                                    onChange={(event) =>
-                                                        form.setData(
-                                                            field.key,
-                                                            event.target.value,
-                                                        )
-                                                    }
-                                                    maxLength={field.limit}
-                                                    placeholder={
-                                                        field.placeholder
-                                                    }
-                                                    aria-invalid={Boolean(
-                                                        error,
-                                                    )}
-                                                    aria-describedby={`${field.key}-hint ${field.key}-error`}
-                                                />
-                                            ) : (
-                                                <Input
-                                                    id={field.key}
-                                                    name={field.key}
-                                                    value={form.data[field.key]}
-                                                    onChange={(event) =>
-                                                        form.setData(
-                                                            field.key,
-                                                            event.target.value,
-                                                        )
-                                                    }
-                                                    maxLength={field.limit}
-                                                    placeholder={
-                                                        field.placeholder
-                                                    }
-                                                    autoComplete={
-                                                        field.key === 'location'
-                                                            ? 'address-level2'
-                                                            : 'off'
-                                                    }
-                                                    aria-invalid={Boolean(
-                                                        error,
-                                                    )}
-                                                    aria-describedby={`${field.key}-hint ${field.key}-error`}
-                                                />
-                                            )}
-                                            <div className="profile-field-meta">
-                                                <p id={`${field.key}-hint`}>
-                                                    {field.key === 'bio'
-                                                        ? 'A short introduction is a great start.'
-                                                        : 'You can update this anytime.'}
-                                                </p>
-                                                <span>
-                                                    {
-                                                        form.data[field.key]
-                                                            .length
-                                                    }{' '}
-                                                    /{' '}
-                                                    {field.limit.toLocaleString()}
-                                                </span>
-                                            </div>
-                                            <InputError
-                                                id={`${field.key}-error`}
-                                                message={error}
-                                            />
-                                        </div>
-                                    </motion.div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                    <div className="profile-editor-footer">
-                        <p>
-                            Changes are saved without publishing your profile.
+                <div className="flex items-center justify-between gap-4">
+                    <div>
+                        <p className="font-medium">{auth.user.name}</p>
+                        <p className="text-muted-foreground text-sm">
+                            {auth.user.email}
                         </p>
-                        <div className="flex flex-wrap items-center gap-3">
-                            <span
-                                role="status"
-                                className="workspace-save-status"
-                            >
-                                {form.recentlySuccessful && (
-                                    <>
-                                        <CheckCircle2
-                                            size={16}
-                                            aria-hidden="true"
-                                        />{' '}
-                                        Saved
-                                    </>
-                                )}
-                            </span>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                className="min-h-11"
-                                disabled={form.processing || !form.isDirty}
-                                onClick={() => {
-                                    form.reset();
-                                    form.clearErrors();
-                                }}
-                            >
-                                Reset
-                            </Button>
-                            <Button
-                                type="submit"
-                                className="min-h-11"
-                                disabled={form.processing}
-                            >
-                                {form.processing && (
-                                    <LoaderCircle
-                                        className="animate-spin motion-reduce:animate-none"
-                                        aria-hidden="true"
-                                    />
-                                )}
-                                {form.processing ? 'Saving...' : 'Save changes'}
-                            </Button>
-                        </div>
                     </div>
-                </form>
+                    <Link
+                        href="/settings/profile"
+                        className="text-primary min-h-11 px-3 py-3 text-sm underline"
+                    >
+                        Edit account
+                    </Link>
+                </div>
+                {client
+                    ? field(
+                          'company',
+                          'Company name',
+                          120,
+                          'Optional — leave blank if you hire as an individual.',
+                      )
+                    : field(
+                          'headline',
+                          'Professional headline',
+                          120,
+                          'A short description of your work and specialty.',
+                      )}
+                <div>
+                    <Label htmlFor="profile-bio">
+                        {client ? 'Your introduction' : 'About me'}
+                    </Label>
+                    <TextArea
+                        id="profile-bio"
+                        name="bio"
+                        rows={6}
+                        maxLength={5000}
+                        value={form.data.bio}
+                        onChange={(value) => form.setData('bio', value)}
+                        aria-invalid={!!form.errors.bio}
+                        aria-describedby="profile-bio-error"
+                    />
+                    <p className="text-muted-foreground mt-2 text-sm">
+                        {form.data.bio.length} / 5,000 characters
+                    </p>
+                    <InputError
+                        id="profile-bio-error"
+                        message={form.errors.bio}
+                    />
+                </div>
             </ComponentCard>
-        </section>
+            {!client && (
+                <ComponentCard
+                    title="Skills and expertise"
+                    desc="Add up to 15 skills that describe your work."
+                >
+                    {field(
+                        'skills',
+                        'Skills',
+                        800,
+                        'Separate skills with commas. Each skill can contain up to 50 characters.',
+                    )}
+                    <InputError
+                        message={
+                            Object.entries(form.errors).find(([key]) =>
+                                key.startsWith('skills.'),
+                            )?.[1]
+                        }
+                    />
+                </ComponentCard>
+            )}
+            <ComponentCard
+                title="Where you are based"
+                desc="Share your city and country. A street address is not needed."
+            >
+                <div className="grid gap-5 sm:grid-cols-2">
+                    {field('country', 'Country', 100)}
+                    {field('city', 'City', 100)}
+                </div>
+            </ComponentCard>
+            <div className="border-border bg-card flex flex-wrap items-center justify-between gap-4 rounded-xl border p-5">
+                <p className="text-muted-foreground text-sm">
+                    Saving updates your draft; it does not publish your profile.
+                </p>
+                <div className="flex items-center gap-3">
+                    <span role="status" className="text-primary text-sm">
+                        {form.recentlySuccessful && 'Changes saved'}
+                    </span>
+                    <Button
+                        variant="outline"
+                        disabled={form.processing || !form.isDirty}
+                        onClick={() => {
+                            form.reset();
+                            form.clearErrors();
+                        }}
+                    >
+                        Reset
+                    </Button>
+                    <Button type="submit" disabled={form.processing}>
+                        {form.processing ? 'Saving…' : 'Save changes'}
+                    </Button>
+                </div>
+            </div>
+        </form>
     );
 }

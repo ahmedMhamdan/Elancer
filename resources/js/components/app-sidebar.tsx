@@ -60,7 +60,7 @@ export function AppSidebar() {
         },
         {
             label: text.profile,
-            href: dashboard().url + '#profile-form',
+            href: '/my-profile',
             icon: <UserRound size={20} />,
         },
         {
@@ -82,6 +82,15 @@ export function AppSidebar() {
                   {
                       label: text.admins,
                       href: '/admin/administrators',
+                      icon: <ShieldCheck size={20} />,
+                  },
+              ]
+            : []),
+        ...(auth.user.is_super_admin === true
+            ? [
+                  {
+                      label: ar ? 'مراجعة الهوية' : 'Identity reviews',
+                      href: '/admin/identity',
                       icon: <ShieldCheck size={20} />,
                   },
               ]

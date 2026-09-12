@@ -1,196 +1,148 @@
-import { Head, usePage } from '@inertiajs/react';
+﻿// Uses the existing TailAdmin ComponentCard and adapted dashboard metric structure.
+import { Head, Link, usePage } from '@inertiajs/react';
 import {
-    CheckCircle2,
-    Globe2,
-    MapPin,
     ShieldCheck,
     UserRound,
+    ArrowUpRight,
+    CheckCircle2,
 } from 'lucide-react';
 import ComponentCard from '@/components/component-card';
-import ProfileForm from '@/components/profile-form';
 import { dashboard } from '@/routes';
-
-export type MarketplaceProfile = {
-    headline: string | null;
-    bio: string | null;
-    location: string | null;
-    published_at: string | null;
-    country: string | null;
-    city: string | null;
-    company: string | null;
-    skills: string[] | null;
-};
+import type { MarketplaceProfile } from './marketplace-profile';
+export type { MarketplaceProfile } from './marketplace-profile';
 
 export default function Dashboard({
     profile,
 }: {
     profile: MarketplaceProfile | null;
 }) {
-    const page = usePage();
-    const { auth } = page.props;
-    const name = auth.user.name;
-    const isClient = auth.user.workspace_role === 'client';
-    const total = isClient ? 2 : 3;
-    const completed = [
-        ...(isClient ? [] : [profile?.headline]),
-        profile?.bio,
-        profile?.location,
-    ].filter((value) => value?.trim()).length;
-    const percent = Math.round((completed / total) * 100);
-    const initials = name
-        .trim()
-        .split(/\s+/)
-        .slice(0, 2)
-        .map((part) => part[0])
-        .join('');
-    const published = Boolean(profile?.published_at);
-
+    const { auth } = usePage().props;
+    const client = auth.user.workspace_role === 'client';
+    const ready =
+        !!profile?.bio &&
+        !!profile?.location &&
+        (client || !!profile?.headline);
+    const tasks = [
+        {
+            title: 'Build your profile',
+            description:
+                'Tell people about your experience, skills and location.',
+            href: '/my-profile',
+            done: ready,
+        },
+        {
+            title: 'Secure your account',
+            description:
+                'Manage your password, passkeys and two-factor authentication.',
+            href: '/settings/security',
+            done: !!auth.user.two_factor_enabled,
+        },
+        {
+            title: 'Check your account details',
+            description: 'Keep your name and email address up to date.',
+            href: '/settings/profile',
+            done: !!auth.user.email_verified_at,
+        },
+    ];
     return (
-        <>
-            <Head title="Your workspace" />
-            <div className="workspace-dashboard workspace-dashboard-clean">
-                <div className="workspace-page-heading">
-                    <div>
-                        <h1>Dashboard</h1>
-                        <p>
-                            Welcome back, {name.trim().split(/\s+/)[0]}. Manage
-                            your {isClient ? 'client' : 'freelancer'} profile.
-                        </p>
-                    </div>
-                </div>
-                <div
-                    className="workspace-summary"
-                    aria-label="Profile overview"
-                >
-                    <section className="workspace-metric">
-                        <span className="workspace-icon">
-                            <UserRound aria-hidden="true" />
-                        </span>
-                        <div>
-                            <p>Profile essentials</p>
-                            <strong>
-                                {completed}
-                                <span> / {total} complete</span>
-                            </strong>
-                        </div>
-                        <span className="workspace-metric-note">
-                            {percent}%
-                        </span>
-                    </section>
-                    <section className="workspace-metric">
-                        <span className="workspace-icon">
-                            <Globe2 aria-hidden="true" />
-                        </span>
-                        <div>
-                            <p>Profile visibility</p>
-                            <strong>{published ? 'Published' : 'Draft'}</strong>
-                        </div>
-                    </section>
-                    <section className="workspace-metric">
-                        <span className="workspace-icon">
-                            <ShieldCheck aria-hidden="true" />
-                        </span>
-                        <div>
-                            <p>Email verification</p>
-                            <strong>
-                                {auth.user.email_verified_at
-                                    ? 'Verified'
-                                    : 'Pending'}
-                            </strong>
-                        </div>
-                        {auth.user.email_verified_at && (
-                            <CheckCircle2
-                                size={19}
-                                className="workspace-accent"
-                                aria-hidden="true"
-                            />
-                        )}
-                    </section>
-                </div>
-                <div className="workspace-columns">
-                    <ProfileForm profile={profile} />
-                    <aside>
-                        <ComponentCard
-                            title="Your profile"
-                            desc="Your latest saved details."
-                        >
-                            <div className="profile-summary-person">
-                                <div
-                                    className="profile-summary-avatar"
-                                    aria-hidden="true"
-                                >
-                                    {auth.user.avatar ? (
-                                        <img
-                                            src={auth.user.avatar}
-                                            alt=""
-                                            className="h-full w-full rounded-full object-cover"
-                                        />
-                                    ) : (
-                                        initials
-                                    )}
-                                </div>
-                                <div>
-                                    <h3>{name}</h3>
-                                    <span className="workspace-badge">
-                                        {published ? 'Published' : 'Draft'}
-                                    </span>
-                                </div>
-                            </div>
-                            <dl className="profile-summary-details">
-                                <div>
-                                    <dt>{isClient ? 'Company' : 'Headline'}</dt>
-                                    <dd>
-                                        {(isClient
-                                            ? profile?.company
-                                            : profile?.headline) ||
-                                            'Not added yet'}
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt>Location</dt>
-                                    <dd className="flex items-start gap-2">
-                                        <MapPin
-                                            size={16}
-                                            className="shrink-0"
-                                            aria-hidden="true"
-                                        />
-                                        {profile?.location || 'Not added yet'}
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt>Bio</dt>
-                                    <dd>
-                                        {profile?.bio ||
-                                            'Add a short introduction to help clients get to know you.'}
-                                    </dd>
-                                </div>
-                                {!isClient &&
-                                    Boolean(profile?.skills?.length) && (
-                                        <div>
-                                            <dt>Skills</dt>
-                                            <dd>
-                                                {profile?.skills?.join(', ')}
-                                            </dd>
-                                        </div>
-                                    )}
-                            </dl>
-                            <div className="profile-summary-progress">
-                                <div>
-                                    <span>Profile completion</span>
-                                    <strong>{percent}%</strong>
-                                </div>
-                                <progress
-                                    value={completed}
-                                    max={total}
-                                    aria-label="Saved profile essentials"
-                                />
-                            </div>
-                        </ComponentCard>
-                    </aside>
-                </div>
+        <div className="workspace-dashboard space-y-6">
+            <Head title="Overview" />
+            <div className="workspace-page-heading">
+                <h1>Overview</h1>
+                <p>
+                    Welcome back, {auth.user.name.split(' ')[0]}. Here is your
+                    workspace at a glance.
+                </p>
             </div>
-        </>
+            <div className="workspace-summary">
+                <section className="workspace-metric">
+                    <span className="workspace-icon">
+                        <UserRound aria-hidden="true" />
+                    </span>
+                    <div>
+                        <p>Your workspace</p>
+                        <strong>{client ? 'Client' : 'Freelancer'}</strong>
+                    </div>
+                </section>
+                <section className="workspace-metric">
+                    <span className="workspace-icon">
+                        <CheckCircle2 aria-hidden="true" />
+                    </span>
+                    <div>
+                        <p>Profile status</p>
+                        <strong>
+                            {profile?.published_at ? 'Published' : 'Draft'}
+                        </strong>
+                    </div>
+                </section>
+                <section className="workspace-metric">
+                    <span className="workspace-icon">
+                        <ShieldCheck aria-hidden="true" />
+                    </span>
+                    <div>
+                        <p>Account security</p>
+                        <strong>
+                            {auth.user.two_factor_enabled
+                                ? '2FA enabled'
+                                : 'Set up 2FA'}
+                        </strong>
+                    </div>
+                </section>
+            </div>
+            <ComponentCard
+                title="Your next steps"
+                desc="Keep your account ready for work."
+            >
+                <div className="divide-border divide-y">
+                    {tasks.map((task) => (
+                        <Link
+                            key={task.href}
+                            href={task.href}
+                            className="hover:bg-muted focus-visible:outline-ring flex min-h-20 items-center justify-between gap-4 rounded-lg px-2 py-5 focus-visible:outline-2"
+                        >
+                            <div>
+                                <h3 className="font-medium">{task.title}</h3>
+                                <p className="text-muted-foreground mt-1 text-sm">
+                                    {task.description}
+                                </p>
+                            </div>
+                            <span className="flex shrink-0 items-center gap-3">
+                                {task.done && (
+                                    <span className="text-primary text-xs">
+                                        Ready
+                                    </span>
+                                )}
+                                <ArrowUpRight size={20} aria-hidden="true" />
+                            </span>
+                        </Link>
+                    ))}
+                </div>
+            </ComponentCard>
+            {(auth.user.is_admin === true ||
+                auth.user.is_super_admin === true) && (
+                <ComponentCard
+                    title="Administration"
+                    desc="Manage your assigned responsibilities."
+                >
+                    <div className="flex flex-wrap gap-4">
+                        <Link
+                            href="/admin/categories"
+                            className="text-primary min-h-11 rounded-lg px-4 py-3 underline"
+                        >
+                            Manage categories
+                        </Link>
+                        {auth.user.is_super_admin === true && (
+                            <Link
+                                href="/admin/administrators"
+                                className="text-primary min-h-11 rounded-lg px-4 py-3 underline"
+                            >
+                                Manage admin access
+                            </Link>
+                        )}
+                    </div>
+                </ComponentCard>
+            )}
+        </div>
     );
 }
-
-Dashboard.layout = { breadcrumbs: [{ title: 'Workspace', href: dashboard() }] };
+Dashboard.layout = { breadcrumbs: [{ title: 'Overview', href: dashboard() }] };

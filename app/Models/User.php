@@ -93,4 +93,11 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
     {
         return $this->status === AccountStatus::Active && $this->hasVerifiedEmail();
     }
+
+    protected static function booted(): void
+    {
+        static::deleting(function (self $user): void {
+            IdentityVerification::where('user_id', $user->id)->first()?->delete();
+        });
+    }
 }

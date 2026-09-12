@@ -549,3 +549,45 @@
     max-height: calc(100dvh - 112px);
     overflow-y: auto;
 }
+
+.workspace-header .site-theme-toggle {
+    border-color: transparent;
+    background: transparent;
+}
+.workspace-header .site-theme-toggle:hover {
+    border-color: var(--el-border-strong);
+    background: var(--el-soft);
+}
+
+/* Compact workspace cards while preserving readable content and touch targets. */
+.workspace-summary {
+    gap: 16px;
+    margin-bottom: 20px;
+}
+.workspace-metric {
+    padding: 16px;
+    gap: 12px;
+    border-radius: 12px;
+}
+.workspace-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+}
+.workspace-icon svg {
+    width: 20px;
+    height: 20px;
+}
+.workspace-metric strong {
+    margin-top: 4px;
+    font-size: 22px;
+}
+.workspace-page-heading {
+    margin-bottom: 20px;
+}
+.workspace-page-heading h1 {
+    font-size: 26px;
+}
+.workspace-columns {
+    gap: 20px;
+}

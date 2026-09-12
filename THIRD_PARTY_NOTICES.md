@@ -88,3 +88,18 @@ account data, and role-aware navigation. Mobile uses the existing Radix Sheet
 for focus trapping, Escape dismissal and focus restoration. Existing shadcn
 sidebar primitives remain in sidebar-legacy.tsx for the unused starter nav kit.
 Framer Motion 13.2.0 shares the version already installed by Motion.
+
+## Profile and identity forms (2026-09-12)
+
+The expanded profile editor, private identity submission form and super-admin
+review screen reuse the previously inspected TailAdmin DefaultInputs,
+BasicTableOne, ComponentCard, InputField, TextArea, Label and Button adaptations.
+Elancer changes add owner-only persistence, private document controls, review
+status, validation and Inertia actions. Existing MIT license above applies.
+
+Identity upload targets adapt the actual TailAdmin
+src/components/form/form-elements/DropZone.tsx retrieved 2026-09-12. Retained
+structure: dashed wrapper, drop surface, icon, instructions and browse affordance.
+Adaptations: compact layout, Lucide file/status icons, native keyboard/drop/file
+handling, JPEG/PNG and 2 MB validation, filename feedback and removal. No nested
+form or extra dropzone dependency. The existing MIT license applies.
