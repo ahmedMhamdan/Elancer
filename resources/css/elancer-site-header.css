@@ -284,3 +284,13 @@
     flex-wrap: wrap;
     gap: 0 12px;
 }
+
+/* Keep the public header toggle quiet at rest; retain its circular hover target. */
+.elancer-resizable-navbar .site-theme-toggle {
+    border-color: transparent;
+    background: transparent;
+}
+.elancer-resizable-navbar .site-theme-toggle:hover {
+    border-color: var(--el-border-strong);
+    background: var(--el-soft);
+}

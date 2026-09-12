@@ -33,6 +33,7 @@ Route::middleware(['auth', 'verified', EnsureCategoryAdministrator::class])
         Route::get('{category}/edit', [CategoryController::class, 'edit'])->name('edit');
         Route::put('{category}', [CategoryController::class, 'update'])->name('update');
         Route::delete('{category}', [CategoryController::class, 'destroy'])->name('destroy');
+        Route::delete('{category}/permanent', [CategoryController::class, 'forceDestroy'])->withTrashed()->name('force-destroy');
         Route::post('{category}/restore', [CategoryController::class, 'restore'])->withTrashed()->name('restore');
     });
 

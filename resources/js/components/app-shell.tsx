@@ -1,25 +1,23 @@
-import { usePage } from '@inertiajs/react';
+﻿import { usePage } from '@inertiajs/react';
 import type { ReactNode } from 'react';
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { Sidebar } from '@/components/ui/sidebar';
 import type { AppVariant } from '@/types';
 
-type Props = {
-    children: ReactNode;
-    variant?: AppVariant;
-};
-
+type Props = { children: ReactNode; variant?: AppVariant };
 export function AppShell({ children, variant = 'sidebar' }: Props) {
-    const isOpen = usePage().props.sidebarOpen;
-
-    if (variant === 'header') {
+    const { auth } = usePage().props;
+    if (variant === 'header')
         return (
             <div className="flex min-h-screen w-full flex-col">{children}</div>
         );
-    }
-
     return (
-        <SidebarProvider defaultOpen={isOpen} className="workspace-shell">
-            {children}
-        </SidebarProvider>
+        <Sidebar dir={auth.user.locale === 'ar' ? 'rtl' : 'ltr'}>
+            <div
+                dir={auth.user.locale === 'ar' ? 'rtl' : 'ltr'}
+                className="workspace-shell flex min-h-dvh w-full"
+            >
+                {children}
+            </div>
+        </Sidebar>
     );
 }

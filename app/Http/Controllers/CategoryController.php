@@ -7,6 +7,7 @@ use App\Http\Requests\SaveCategoryRequest;
 use App\Models\Category;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -72,5 +73,16 @@ class CategoryController extends Controller
         $category->restore();
 
         return to_route('admin.categories.index', ['status' => 'deleted'])->with('category_notice', 'restored');
+    }
+
+    public function forceDestroy(Category $category): RedirectResponse
+    {
+        DB::transaction(function () use ($category): void {
+            $locked = Category::withTrashed()->lockForUpdate()->findOrFail($category->id);
+            Gate::authorize('forceDelete', $locked);
+            $locked->forceDelete();
+        });
+
+        return to_route('admin.categories.index', ['status' => 'deleted'])->with('category_notice', 'permanentlyDeleted');
     }
 }

@@ -76,3 +76,15 @@ Elancer category table/form adaptations. It reuses the TailAdmin table, Input,
 Label, TextArea, Button and ComponentCard components. Adaptations add bilingual
 account search, protected role actions and access-change reasons using Elancer
 tokens and Inertia. The MIT license above applies.
+
+## Supplied animated sidebar (2026-09-12)
+
+resources/js/components/ui/sidebar.tsx and components/app-sidebar.tsx adapt the
+Aceternity Sidebar/SidebarDemo source supplied by Ahmed for this feature. This
+specific sidebar replaces the earlier TailAdmin navigation source choice. Keep
+provider/body/link composition and expanding desktop rail; replace Next.js
+routing and sample content with Inertia routes, Elancer branding, authenticated
+account data, and role-aware navigation. Mobile uses the existing Radix Sheet
+for focus trapping, Escape dismissal and focus restoration. Existing shadcn
+sidebar primitives remain in sidebar-legacy.tsx for the unused starter nav kit.
+Framer Motion 13.2.0 shares the version already installed by Motion.

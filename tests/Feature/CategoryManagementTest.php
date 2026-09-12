@@ -206,4 +206,35 @@ class CategoryManagementTest extends TestCase
         $other = $this->admin();
         $this->actingAs($other)->post('/admin/categories', $this->data())->assertForbidden();
     }
+
+    public function test_permanent_delete_requires_trash_and_removes_the_row(): void
+    {
+        $this->signInAdmin();
+        $category = Category::create($this->data());
+        $this->delete("/admin/categories/{$category->id}/permanent")->assertForbidden();
+        $this->assertDatabaseHas('categories', ['id' => $category->id]);
+        $category->delete();
+        $this->delete("/admin/categories/{$category->id}/permanent")
+            ->assertRedirect('/admin/categories?status=deleted')
+            ->assertSessionHas('category_notice', 'permanentlyDeleted');
+        $this->assertDatabaseMissing('categories', ['id' => $category->id]);
+        $this->post("/admin/categories/{$category->id}/restore")->assertNotFound();
+        $this->delete("/admin/categories/{$category->id}/permanent")->assertNotFound();
+    }
+
+    public function test_permanent_delete_requires_authorized_admin_and_current_two_factor_proof(): void
+    {
+        $category = Category::create($this->data());
+        $category->delete();
+        $url = "/admin/categories/{$category->id}/permanent";
+        $this->delete($url)->assertRedirect('/login');
+        foreach ([User::factory()->create(), $this->admin()->forceFill(['status' => AccountStatus::Suspended]), $this->admin()->forceFill(['status' => AccountStatus::Deactivated])] as $user) {
+            $user->save();
+            $this->signInAdmin($user);
+            $this->delete($url)->assertForbidden();
+        }
+        $this->actingAs($this->admin())->withSession(['admin.two_factor_proof' => null]);
+        $this->delete($url)->assertForbidden();
+        $this->assertSoftDeleted($category);
+    }
 }

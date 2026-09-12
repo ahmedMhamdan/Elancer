@@ -24,21 +24,34 @@ type Props = {
         next_page_url: string | null;
     };
     status: 'active' | 'deleted';
-    notice: 'created' | 'updated' | 'deleted' | 'restored' | null;
+    notice:
+        | 'created'
+        | 'updated'
+        | 'deleted'
+        | 'restored'
+        | 'permanentlyDeleted'
+        | null;
 };
 export default function Categories({ categories, status, notice }: Props) {
     const ar = usePage().props.auth.user.locale === 'ar';
     const t = copy[ar ? 'ar' : 'en'];
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState('');
-    function act(category: Category) {
-        if (status === 'active' && !window.confirm(t.confirm)) return;
+    function act(category: Category, forever = false) {
+        if (busy) return;
+        if (
+            forever &&
+            !window.confirm(`${category.categoryname}: ${t.confirmForever}`)
+        )
+            return;
+        if (!forever && status === 'active' && !window.confirm(t.confirm))
+            return;
         setBusy(true);
         setError('');
         router.visit(
-            `/admin/categories/${category.id}${status === 'deleted' ? '/restore' : ''}`,
+            `/admin/categories/${category.id}${forever ? '/permanent' : status === 'deleted' ? '/restore' : ''}`,
             {
-                method: status === 'deleted' ? 'post' : 'delete',
+                method: !forever && status === 'deleted' ? 'post' : 'delete',
                 preserveScroll: true,
                 onError: () => setError(t.error),
                 onNetworkError: () => {
@@ -148,6 +161,20 @@ export default function Categories({ categories, status, notice }: Props) {
                                                     ? t.remove
                                                     : t.restore}
                                             </Button>
+                                            {status === 'deleted' && (
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    disabled={busy}
+                                                    className="text-[var(--el-error)]"
+                                                    onClick={() =>
+                                                        act(category, true)
+                                                    }
+                                                    aria-label={`${t.forever}: ${category.categoryname}`}
+                                                >
+                                                    {t.forever}
+                                                </Button>
+                                            )}
                                         </div>
                                     </TableCell>
                                 </TableRow>

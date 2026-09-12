@@ -32,4 +32,9 @@ class CategoryPolicy
     {
         return $this->viewAny($user) && $category->trashed();
     }
+
+    public function forceDelete(User $user, Category $category): bool
+    {
+        return $this->viewAny($user) && $category->trashed();
+    }
 }
