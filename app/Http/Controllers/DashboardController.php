@@ -18,6 +18,7 @@ class DashboardController extends Controller
         $profile = $user->profile;
 
         return Inertia::render($request->routeIs('marketplace-profile.edit') ? 'marketplace-profile' : 'dashboard', [
+            'onboardingReady' => $request->routeIs('dashboard') && $request->session()->pull('onboarding_ready', false),
             'identity' => IdentityVerification::where('user_id', $user->id)->first()?->only(['status', 'reason', 'reviewed_at']),
             'profile' => $profile?->only([
                 'headline',

@@ -116,3 +116,15 @@ structure: dashed wrapper, drop surface, icon, instructions and browse affordanc
 Adaptations: compact layout, Lucide file/status icons, native keyboard/drop/file
 handling, JPEG/PNG and 2 MB validation, filename feedback and removal. No nested
 form or extra dropzone dependency. The existing MIT license applies.
+
+## Onboarding photo editor, completion and skills (2026-09-13)
+
+Adapted from Ahmed's local TailAdmin src/components/form/MultiSelect.tsx and
+src/components/ui/modal/index.tsx. The skill picker retains controlled removable
+pills, relative dropdown and option rows; adds authenticated database search and
+keyboard combobox behavior. The modal retains backdrop, rounded panel and close
+control; Radix provides focus management and scroll locking. Completion content
+adapts the supplied screenshot for Elancer's saved draft and existing next steps.
+No crop editor exists in the inspected local source; the canvas crop, zoom and
+rotation editor is an Elancer extension using the adapted modal/buttons.
+The existing TailAdmin MIT license above applies to these adaptations.

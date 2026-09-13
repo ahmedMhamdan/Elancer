@@ -5,6 +5,7 @@ import type React from 'react';
 import type { FC } from 'react';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+    ref?: React.Ref<HTMLInputElement>;
     type?: React.HTMLInputTypeAttribute;
     id?: string;
     name?: string;

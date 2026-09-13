@@ -21,7 +21,7 @@ class SaveProfileRequest extends UpdateProfileRequest
             'city' => ['sometimes', 'nullable', 'string', 'max:100'],
             'company' => ['sometimes', 'nullable', 'string', 'max:120'],
             'skills' => ['sometimes', 'nullable', 'array', 'list', 'max:15'],
-            'skills.*' => ['required', 'string', 'max:50', 'distinct:ignore_case'],
+            'skills.*' => ['required', 'string', 'max:50', 'distinct:ignore_case', 'exists:skills,name'],
             'photo_path' => ['missing'],
         ];
     }

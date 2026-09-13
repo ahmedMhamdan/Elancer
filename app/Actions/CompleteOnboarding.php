@@ -16,13 +16,14 @@ class CompleteOnboarding
     /**
      * @param  array{role: string, name: string, bio: string, country: string, city: string, headline?: string, company?: string|null, skills?: list<string>}  $data
      */
-    public function handle(User $user, array $data, ?UploadedFile $photo): void
+    public function handle(User $user, array $data, ?UploadedFile $photo): bool
     {
         $newPhotoPath = null;
         $oldPhotoPath = null;
+        $completed = false;
 
         try {
-            DB::transaction(function () use ($user, $data, $photo, &$newPhotoPath, &$oldPhotoPath): void {
+            DB::transaction(function () use ($user, $data, $photo, &$newPhotoPath, &$oldPhotoPath, &$completed): void {
                 // Serialize submissions for this account; only the first completion wins.
                 $account = User::query()->lockForUpdate()->findOrFail($user->id);
                 abort_unless($account->canParticipateInMarketplace(), 403);
@@ -54,14 +55,16 @@ class CompleteOnboarding
                 $profile->city = $data['city'];
                 $profile->location = $data['city'].', '.$data['country'];
                 $profile->company = $role === WorkspaceRole::Client ? ($data['company'] ?? null) : null;
-                // User-entered tags; a curated bilingual skills taxonomy is a later slice.
+                // Catalog validation precedes the transaction; persist shared tag associations.
                 $profile->skills = $role === WorkspaceRole::Freelancer ? ($data['skills'] ?? []) : [];
                 $account->profile()->save($profile);
+                $profile->syncSkillTags($profile->skills ?? []);
 
                 $account->name = $data['name'];
                 $account->workspace_role = $role;
                 $account->onboarding_completed_at = now();
                 $account->save();
+                $completed = true;
             });
         } catch (Throwable $exception) {
             if ($newPhotoPath !== null) {
@@ -75,6 +78,8 @@ class CompleteOnboarding
         if ($oldPhotoPath !== null && $oldPhotoPath !== $newPhotoPath) {
             $this->deletePhoto($oldPhotoPath);
         }
+
+        return $completed;
     }
 
     private function deletePhoto(string $path): void

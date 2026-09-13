@@ -2,6 +2,8 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { BriefcaseBusiness, Code2, ImagePlus, UserRound } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
+import SkillSelect from '@/components/skill-select';
+import PhotoEditor from '@/components/photo-editor';
 import ElancerWordmark from '@/components/elancer-wordmark';
 import ThemeToggle from '@/components/theme-toggle';
 import Button from '@/components/tailadmin/button';
@@ -17,7 +19,7 @@ export type OnboardingDraft = {
     name: string;
     headline: string;
     bio: string;
-    skills: string;
+    skills: string[];
     company: string;
     country: string;
     city: string;
@@ -83,7 +85,7 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
         name: auth.user.name,
         headline: '',
         bio: '',
-        skills: '',
+        skills: [],
         company: '',
         country: '',
         city: '',
@@ -93,13 +95,13 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
     const [step, setStep] = useState(0);
     const [photoUrl, setPhotoUrl] = useState<string>();
     const [photoError, setPhotoError] = useState('');
+    const [photoSource, setPhotoSource] = useState<File | null>(null);
+    const [pendingPhoto, setPendingPhoto] = useState<File | null>(null);
+    const [editingPhoto, setEditingPhoto] = useState(false);
     const headingRef = useRef<HTMLHeadingElement>(null);
     const photoInputRef = useRef<HTMLInputElement>(null);
     const isFreelancer = form.data.role === 'freelancer';
-    const skills = form.data.skills
-        .split(',')
-        .map((skill) => skill.trim())
-        .filter(Boolean);
+    const skills = form.data.skills;
     const firstName = form.data.name.trim().split(/\s+/)[0] || 'there';
 
     useEffect(() => {
@@ -123,13 +125,18 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
             if (photoInputRef.current) photoInputRef.current.value = '';
             return;
         }
-        form.setData('photo', file);
+        setPendingPhoto(file);
+        setEditingPhoto(true);
+        if (photoInputRef.current) photoInputRef.current.value = '';
     }
 
     function next(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
         if (step === 0 && !form.data.role) return;
-        const requiredFields: Exclude<keyof OnboardingDraft, 'photo'>[] =
+        const requiredFields: Exclude<
+            keyof OnboardingDraft,
+            'photo' | 'skills'
+        >[] =
             step === 1
                 ? isFreelancer
                     ? ['name', 'headline', 'bio']
@@ -213,6 +220,18 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
 
     return (
         <div className="onboarding-page">
+            {editingPhoto && pendingPhoto && (
+                <PhotoEditor
+                    file={pendingPhoto}
+                    onClose={() => setEditingPhoto(false)}
+                    onApply={(photo) => {
+                        form.setData('photo', photo);
+                        setPhotoSource(pendingPhoto);
+                        setPhotoError('');
+                        setEditingPhoto(false);
+                    }}
+                />
+            )}
             <Head title="Set up your profile" />
             <header className="onboarding-header">
                 <Link href={home()} aria-label="Elancer home">
@@ -361,30 +380,22 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                             <Field
                                                 id="skills"
                                                 label="Your skills *"
-                                                error={form.errors.skills}
                                             >
-                                                <Input
+                                                <SkillSelect
                                                     id="skills"
-                                                    name="skills"
-                                                    required
-                                                    maxLength={764}
-                                                    placeholder="e.g. Laravel, PHP, MySQL"
+                                                    error={form.errors.skills}
                                                     value={form.data.skills}
-                                                    onChange={(event) => {
+                                                    onChange={(skills) => {
                                                         form.setData(
                                                             'skills',
-                                                            event.target.value,
+                                                            skills,
                                                         );
                                                         form.clearErrors(
                                                             'skills',
                                                         );
                                                     }}
-                                                    {...errorProps('skills')}
+                                                    disabled={form.processing}
                                                 />
-                                                <p className="onboarding-hint">
-                                                    Separate skills with commas.
-                                                    Add up to 15.
-                                                </p>
                                             </Field>
                                         </>
                                     ) : (
@@ -499,12 +510,27 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                             <br />
                                             Up to 2 MB
                                         </p>
+                                        {photoUrl && photoSource && (
+                                            <button
+                                                type="button"
+                                                className="onboarding-text-button"
+                                                onClick={() => {
+                                                    setPendingPhoto(
+                                                        photoSource,
+                                                    );
+                                                    setEditingPhoto(true);
+                                                }}
+                                            >
+                                                Edit photo
+                                            </button>
+                                        )}
                                         {photoUrl && (
                                             <button
                                                 type="button"
                                                 className="onboarding-text-button"
                                                 onClick={() => {
                                                     form.setData('photo', null);
+                                                    setPhotoSource(null);
                                                     setPhotoUrl(undefined);
                                                     setPhotoError('');
                                                     if (photoInputRef.current)

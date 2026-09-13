@@ -7,6 +7,7 @@ use App\Http\Controllers\IdentityVerificationController;
 use App\Http\Controllers\MarketplaceProfileController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ProfilePhotoController;
+use App\Http\Controllers\SkillController;
 use App\Http\Middleware\EnsureCategoryAdministrator;
 use App\Http\Middleware\EnsureOnboardingIsComplete;
 use App\Http\Middleware\EnsureSuperAdministrator;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::inertia('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('skills', SkillController::class)->middleware('throttle:120,1')->name('skills.index');
     Route::get('onboarding', OnboardingController::class)->name('onboarding');
     Route::post('onboarding', [OnboardingController::class, 'store'])->middleware('throttle:10,1')->name('onboarding.store');
     Route::get('account/profile-photo', ProfilePhotoController::class)->name('profile.photo');

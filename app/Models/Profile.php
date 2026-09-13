@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -37,6 +38,24 @@ class Profile extends Model
             'published_at' => 'datetime',
             'skills' => 'array',
         ];
+    }
+
+    /** @return BelongsToMany<Skill, $this> */
+    public function skillTags(): BelongsToMany
+    {
+        return $this->belongsToMany(Skill::class, 'profile_skill');
+    }
+
+    /**
+     * @param  list<string>  $names
+     */
+    public function syncSkillTags(array $names): void
+    {
+        $tags = Skill::query()->whereIn('name', $names)->get();
+        $this->skillTags()->sync($tags->modelKeys());
+        // Keep the existing API's ordered string array and rollback compatibility.
+        $this->skills = $names;
+        $this->save();
     }
 
     /**

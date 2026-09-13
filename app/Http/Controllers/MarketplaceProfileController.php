@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\WorkspaceRole;
 use App\Http\Requests\Profiles\SaveProfileRequest;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 
 class MarketplaceProfileController extends Controller
 {
@@ -22,8 +23,14 @@ class MarketplaceProfileController extends Controller
                 array_key_exists('country', $data) ? $data['country'] : $request->user()->profile?->country,
             ]));
         }
-        $profile = $request->user()->profile()->firstOrNew();
-        $profile->forceFill($data)->save();
+        DB::transaction(function () use ($request, $data): void {
+            $account = $request->user()->newQuery()->lockForUpdate()->findOrFail($request->user()->id);
+            $profile = $account->profile()->firstOrNew();
+            $profile->forceFill($data)->save();
+            if (array_key_exists('skills', $data)) {
+                $profile->syncSkillTags($data['skills'] ?? []);
+            }
+        });
 
         return to_route($request->routeIs('marketplace-profile.update') ? 'marketplace-profile.edit' : 'dashboard');
     }

@@ -177,7 +177,16 @@ export default function MarketplaceProfile({
                                         <div>
                                             <dt>Skills</dt>
                                             <dd>
-                                                {profile?.skills?.join(', ')}
+                                                {profile?.skills?.map(
+                                                    (skill) => (
+                                                        <span
+                                                            key={skill}
+                                                            className="bg-primary/10 me-2 mb-2 inline-block rounded-full px-3 py-1 text-sm"
+                                                        >
+                                                            {skill}
+                                                        </span>
+                                                    ),
+                                                )}
                                             </dd>
                                         </div>
                                     )}

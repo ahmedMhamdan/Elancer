@@ -6,6 +6,7 @@ import {
     ArrowUpRight,
     CheckCircle2,
 } from 'lucide-react';
+import OnboardingReady from '@/components/onboarding-ready';
 import ComponentCard from '@/components/component-card';
 import { dashboard } from '@/routes';
 import type { MarketplaceProfile } from './marketplace-profile';
@@ -13,8 +14,10 @@ export type { MarketplaceProfile } from './marketplace-profile';
 
 export default function Dashboard({
     profile,
+    onboardingReady = false,
 }: {
     profile: MarketplaceProfile | null;
+    onboardingReady?: boolean;
 }) {
     const { auth } = usePage().props;
     const client = auth.user.workspace_role === 'client';
@@ -47,6 +50,7 @@ export default function Dashboard({
     return (
         <div className="workspace-dashboard space-y-6">
             <Head title="Overview" />
+            {onboardingReady && <OnboardingReady />}
             <div className="workspace-page-heading">
                 <h1>Overview</h1>
                 <p>

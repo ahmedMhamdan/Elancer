@@ -3,6 +3,7 @@
 import { Link, useForm, usePage } from '@inertiajs/react';
 import type { FormEvent } from 'react';
 import ComponentCard from '@/components/component-card';
+import SkillSelect from '@/components/skill-select';
 import InputError from '@/components/input-error';
 import Button from '@/components/tailadmin/button';
 import Input from '@/components/tailadmin/input';
@@ -23,17 +24,10 @@ export default function ProfileForm({
         country: profile?.country ?? '',
         city: profile?.city ?? '',
         company: profile?.company ?? '',
-        skills: (profile?.skills ?? []).join(', '),
+        skills: profile?.skills ?? [],
     });
     function submit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        form.transform((data) => ({
-            ...data,
-            skills: data.skills
-                .split(/[,،]/)
-                .map((skill) => skill.trim())
-                .filter(Boolean),
-        }));
         form.patch('/my-profile', {
             preserveScroll: true,
             onSuccess: () => form.setDefaults(),
@@ -47,7 +41,7 @@ export default function ProfileForm({
         });
     }
     const field = (
-        key: 'headline' | 'country' | 'city' | 'company' | 'skills',
+        key: 'headline' | 'country' | 'city' | 'company',
         label: string,
         max: number,
         hint?: string,
@@ -135,12 +129,14 @@ export default function ProfileForm({
                     title="Skills and expertise"
                     desc="Add up to 15 skills that describe your work."
                 >
-                    {field(
-                        'skills',
-                        'Skills',
-                        800,
-                        'Separate skills with commas. Each skill can contain up to 50 characters.',
-                    )}
+                    <Label htmlFor="profile-skills">Skills</Label>
+                    <SkillSelect
+                        id="profile-skills"
+                        value={form.data.skills}
+                        onChange={(skills) => form.setData('skills', skills)}
+                        error={form.errors.skills}
+                        disabled={form.processing}
+                    />
                     <InputError
                         message={
                             Object.entries(form.errors).find(([key]) =>

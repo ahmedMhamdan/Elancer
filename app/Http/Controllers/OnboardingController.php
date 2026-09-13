@@ -26,7 +26,7 @@ class OnboardingController extends Controller
                 'name' => $user->name,
                 'headline' => $user->profile->headline ?? '',
                 'bio' => $user->profile->bio ?? '',
-                'skills' => implode(', ', $user->profile->skills ?? []),
+                'skills' => $user->profile->skills ?? [],
                 'company' => $user->profile->company ?? '',
                 'country' => $user->profile->country ?? '',
                 'city' => $user->profile->city ?? '',
@@ -39,9 +39,9 @@ class OnboardingController extends Controller
     {
         /** @var array{role: string, name: string, bio: string, country: string, city: string, headline?: string, company?: string|null, skills?: list<string>} $data */
         $data = $request->safe()->except('photo');
-        $complete->handle($request->user(), $data, $request->file('photo'));
-
-        Inertia::flash('toast', ['type' => 'success', 'message' => __('Your profile is ready. Welcome to your workspace!')]);
+        if ($complete->handle($request->user(), $data, $request->file('photo'))) {
+            $request->session()->flash('onboarding_ready', true);
+        }
 
         return to_route('dashboard');
     }
