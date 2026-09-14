@@ -133,10 +133,9 @@ class ProfileUpdateRequestTest extends TestCase
     }
 
     #[DataProvider('validationLocales')]
-    public function test_validation_messages_follow_the_application_locale(string $locale, string $message): void
+    public function test_validation_messages_follow_the_members_saved_locale(string $locale, string $message): void
     {
-        app()->setLocale($locale);
-        $owner = User::factory()->create();
+        $owner = User::factory()->create(['locale' => $locale]);
         $profile = $owner->profile()->create([]);
 
         $this->actingAs($owner)->patchJson('/_test/profiles/'.$profile->id, [

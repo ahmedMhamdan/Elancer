@@ -33,14 +33,14 @@ class LocaleTest extends TestCase
     public function test_member_preference_wins_and_only_the_current_member_is_updated(): void
     {
         $user = User::factory()->create(['locale' => 'ar']);
-        $other = User::factory()->create();
+        $other = User::factory()->create(['locale' => 'ar']);
         $this->actingAs($user)->withSession(['locale' => 'en'])->get('/')
             ->assertInertia(fn (Assert $page) => $page->where('locale', 'ar'));
         $this->post('/locale', ['locale' => 'en', 'user_id' => $other->id, 'is_admin' => true])
             ->assertSessionHasNoErrors();
         $this->assertSame('en', $user->fresh()->locale);
         $this->assertFalse($user->fresh()->is_admin);
-        $this->assertSame('en', $other->fresh()->locale);
+        $this->assertSame('ar', $other->fresh()->locale);
     }
 
     public function test_unsupported_language_does_not_change_saved_preferences(): void
