@@ -313,4 +313,10 @@ export const arabic: Record<string, string> = {
     'Please enter your new password below': 'أدخل كلمة المرور الجديدة أدناه',
     'Switch to light mode': 'التبديل إلى الوضع الفاتح',
     'Switch to dark mode': 'التبديل إلى الوضع الداكن',
+    'Authenticating...': 'جارٍ التحقق من هويتك...',
+    'Sign in with a passkey': 'تسجيل الدخول بمفتاح مرور',
+    'Your ideas. Your people. Your next chapter.':
+        'أفكارك. فريقك. فصلك القادم.',
+    'A little ambition goes a long way.': 'قليل من الطموح يفتح آفاقًا واسعة.',
+    'Discover a different way to work': 'اكتشف طريقة مختلفة للعمل',
 };

@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 import { Link } from '@inertiajs/react';
 import { ArrowDown, Sparkles } from 'lucide-react';
 import { useEffect, useRef } from 'react';
@@ -175,6 +176,7 @@ function HeroAction({ action, primary }: { action: HeroButton; primary?: boolean
 }
 
 export default function Hero({ trustBadge, headline, subtitle, buttons, className, children }: HeroProps) {
+    const { t } = useTranslation();
     const canvasRef = useShaderBackground();
 
     return (
@@ -203,12 +205,12 @@ export default function Hero({ trustBadge, headline, subtitle, buttons, classNam
                     </div>
                 )}
                 <p className="elancer-hero-note elancer-reveal elancer-delay-3">
-                    Your ideas. Your people. Your next chapter.
+                    {t('Your ideas. Your people. Your next chapter.')}
                 </p>
             </div>
             <div className="elancer-hero-bottom">
-                <span>A little ambition goes a long way.</span>
-                <a href="#why-elancer">Discover a different way to work <ArrowDown size={14} aria-hidden="true" /></a>
+                <span>{t('A little ambition goes a long way.')}</span>
+                <a href="#why-elancer">{t('Discover a different way to work')} <ArrowDown size={14} aria-hidden="true" /></a>
             </div>
         </section>
     );
