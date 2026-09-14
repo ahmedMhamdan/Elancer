@@ -1,4 +1,5 @@
-﻿// Uses the existing TailAdmin ComponentCard and adapted dashboard metric structure.
+import { useTranslation } from '@/hooks/use-translation';
+// Uses the existing TailAdmin ComponentCard and adapted dashboard metric structure.
 import { Head, Link, usePage } from '@inertiajs/react';
 import {
     ShieldCheck,
@@ -19,6 +20,8 @@ export default function Dashboard({
     profile: MarketplaceProfile | null;
     onboardingReady?: boolean;
 }) {
+    const { t } = useTranslation();
+
     const { auth } = usePage().props;
     const client = auth.user.workspace_role === 'client';
     const ready =
@@ -49,10 +52,10 @@ export default function Dashboard({
     ];
     return (
         <div className="workspace-dashboard space-y-6">
-            <Head title="Overview" />
+            <Head title={t('Overview')} />
             {onboardingReady && <OnboardingReady />}
             <div className="workspace-page-heading">
-                <h1>Overview</h1>
+                <h1>{t('Overview')}</h1>
                 <p>
                     Welcome back, {auth.user.name.split(' ')[0]}. Here is your
                     workspace at a glance.
@@ -64,8 +67,10 @@ export default function Dashboard({
                         <UserRound aria-hidden="true" />
                     </span>
                     <div>
-                        <p>Your workspace</p>
-                        <strong>{client ? 'Client' : 'Freelancer'}</strong>
+                        <p>{t('Your workspace')}</p>
+                        <strong>
+                            {client ? t('Client') : t('Freelancer')}
+                        </strong>
                     </div>
                 </section>
                 <section className="workspace-metric">

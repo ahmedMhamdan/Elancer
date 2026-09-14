@@ -1,7 +1,10 @@
+import { useTranslation } from '@/hooks/use-translation';
 import { Link } from '@inertiajs/react';
 import { ArrowUpRight, BriefcaseBusiness, Check, Sparkles } from 'lucide-react';
 
 export default function HomePaths({ destination }: { destination: string }) {
+    const { t } = useTranslation();
+
     return (
         <section
             id="your-next-step"
@@ -11,22 +14,22 @@ export default function HomePaths({ destination }: { destination: string }) {
             <div className="elancer-section-heading">
                 <div>
                     <span className="elancer-eyebrow">
-                        One account, two ways to work
+                        {t('One account, two ways to work')}
                     </span>
                     <h2 id="paths-heading">
-                        Bring a project. Share your skills.
+                        {t('Bring a project. Share your skills.')}
                     </h2>
                 </div>
                 <p>
-                    Find a collaborator. Find your next chapter.
+                    {t('Find a collaborator. Find your next chapter.')}
                     <br />
-                    Make your own way forward.
+                    {t('Make your own way forward.')}
                 </p>
             </div>
             <div className="elancer-paths-grid">
                 <article className="elancer-path-card">
                     <div className="elancer-path-top">
-                        <span>For clients</span>
+                        <span>{t('For clients')}</span>
                         <BriefcaseBusiness
                             size={25}
                             strokeWidth={1.5}
@@ -34,30 +37,31 @@ export default function HomePaths({ destination }: { destination: string }) {
                         />
                     </div>
                     <h3>
-                        You have the vision.
+                        {t('You have the vision.')}
                         <br />
-                        Find your people.
+                        {t('Find your people.')}
                     </h3>
                     <p>
-                        Bring a fresh idea, a tricky challenge, or the next step
-                        for your business. Start with the right collaborator.
+                        {t(
+                            'Bring a fresh idea, a tricky challenge, or the next step for your business. Start with the right collaborator.',
+                        )}
                     </p>
                     <ul>
                         <li>
-                            <Check size={16} aria-hidden="true" /> Shape a clear
-                            project brief
+                            <Check size={16} aria-hidden="true" />{' '}
+                            {t('Shape a clear project brief')}
                         </li>
                         <li>
-                            <Check size={16} aria-hidden="true" /> Explore
-                            complementary skills
+                            <Check size={16} aria-hidden="true" />{' '}
+                            {t('Explore complementary skills')}
                         </li>
                         <li>
-                            <Check size={16} aria-hidden="true" /> Build a
-                            shared direction
+                            <Check size={16} aria-hidden="true" />{' '}
+                            {t('Build a shared direction')}
                         </li>
                     </ul>
                     <Link href={destination} className="elancer-solid-button">
-                        Start as a client{' '}
+                        {t('Start as a client')}{' '}
                         <ArrowUpRight size={17} aria-hidden="true" />
                     </Link>
                     <span
@@ -69,7 +73,7 @@ export default function HomePaths({ destination }: { destination: string }) {
                 </article>
                 <article className="elancer-path-card elancer-path-independent">
                     <div className="elancer-path-top">
-                        <span>For freelancers</span>
+                        <span>{t('For freelancers')}</span>
                         <Sparkles
                             size={25}
                             strokeWidth={1.5}
@@ -77,29 +81,31 @@ export default function HomePaths({ destination }: { destination: string }) {
                         />
                     </div>
                     <h3>
-                        Your skills.
-                        <br />A bigger stage.
+                        {t('Your skills.')}
+                        <br />
+                        {t('A bigger stage.')}
                     </h3>
                     <p>
-                        Do more of the work you love. Give your experience a
-                        home and your next great collaboration a place to begin.
+                        {t(
+                            'Do more of the work you love. Give your experience a home and your next great collaboration a place to begin.',
+                        )}
                     </p>
                     <ul>
                         <li>
-                            <Check size={16} aria-hidden="true" /> Tell your
-                            professional story
+                            <Check size={16} aria-hidden="true" />{' '}
+                            {t('Tell your professional story')}
                         </li>
                         <li>
-                            <Check size={16} aria-hidden="true" /> Put your best
-                            work forward
+                            <Check size={16} aria-hidden="true" />{' '}
+                            {t('Put your best work forward')}
                         </li>
                         <li>
-                            <Check size={16} aria-hidden="true" /> Connect
-                            around meaningful ideas
+                            <Check size={16} aria-hidden="true" />{' '}
+                            {t('Connect around meaningful ideas')}
                         </li>
                     </ul>
                     <Link href={destination} className="elancer-solid-button">
-                        Start as a freelancer{' '}
+                        {t('Start as a freelancer')}{' '}
                         <ArrowUpRight size={17} aria-hidden="true" />
                     </Link>
                     <span
@@ -111,8 +117,9 @@ export default function HomePaths({ destination }: { destination: string }) {
                 </article>
             </div>
             <p className="elancer-paths-note">
-                One account, both possibilities. You can be a client and a
-                freelancer.
+                {t(
+                    'One account, both possibilities. You can be a client and a freelancer.',
+                )}
             </p>
         </section>
     );

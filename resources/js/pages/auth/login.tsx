@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 import { Form, Head, Link } from '@inertiajs/react';
 import AuthField from '@/components/auth-field';
 import AuthSocial from '@/components/auth-social';
@@ -12,11 +13,13 @@ import '../../../css/elancer-registration.css';
 type Props = { status?: string; canResetPassword: boolean };
 
 export default function Login({ status, canResetPassword }: Props) {
+    const { t } = useTranslation();
+
     return (
         <div className="elancer-registration elancer-login">
-            <Head title="Log in to Elancer" />
+            <Head title={t('Log in to Elancer')} />
             <a href="#login-form" className="registration-skip">
-                Skip to login
+                {t('Skip to login')}
             </a>
             <ElancerSiteHeader registration loginPage />
             <main className="registration-main">
@@ -26,10 +29,13 @@ export default function Login({ status, canResetPassword }: Props) {
                 >
                     <div className="registration-form-content">
                         <div className="registration-form-heading">
-                            <h1 id="login-title">Good to have you back.</h1>
+                            <h1 id="login-title">
+                                {t('Good to have you back.')}
+                            </h1>
                             <p>
-                                Log in to your Elancer account and pick up where
-                                you left off.
+                                {t(
+                                    'Log in to your Elancer account and pick up where you left off.',
+                                )}
                             </p>
                         </div>
                         {status && (
@@ -51,12 +57,12 @@ export default function Login({ status, canResetPassword }: Props) {
                                     aria-busy={processing}
                                 >
                                     <legend className="sr-only">
-                                        Login details
+                                        {t('Login details')}
                                     </legend>
                                     <AuthField
                                         id="email"
                                         name="email"
-                                        label="Email address"
+                                        label={t('Email address')}
                                         type="email"
                                         required
                                         autoComplete="email"
@@ -66,11 +72,11 @@ export default function Login({ status, canResetPassword }: Props) {
                                     <AuthField
                                         id="password"
                                         name="password"
-                                        label="Password"
+                                        label={t('Password')}
                                         type="password"
                                         required
                                         autoComplete="current-password"
-                                        placeholder="Enter your password"
+                                        placeholder={t('Enter your password')}
                                         error={errors.password}
                                     />
                                     <div className="login-options">
@@ -80,11 +86,11 @@ export default function Login({ status, canResetPassword }: Props) {
                                                 name="remember"
                                                 value="1"
                                             />
-                                            Remember me
+                                            {t('Remember me')}
                                         </label>
                                         {canResetPassword && (
                                             <Link href={request()}>
-                                                Forgot password?
+                                                {t('Forgot password?')}
                                             </Link>
                                         )}
                                     </div>
@@ -97,8 +103,8 @@ export default function Login({ status, canResetPassword }: Props) {
                                         {processing && <Spinner />}
                                         <span aria-live="polite">
                                             {processing
-                                                ? 'Logging in...'
-                                                : 'Log in'}
+                                                ? t('Logging in...')
+                                                : t('Log in')}
                                         </span>
                                     </button>
                                 </fieldset>
@@ -109,8 +115,10 @@ export default function Login({ status, canResetPassword }: Props) {
                             <PasskeyVerify hideSeparator />
                         </div>
                         <p className="registration-login-note">
-                            New to Elancer?{' '}
-                            <Link href={register()}>Create an account</Link>
+                            {t('New to Elancer?')}{' '}
+                            <Link href={register()}>
+                                {t('Create an account')}
+                            </Link>
                         </p>
                     </div>
                 </section>
@@ -120,22 +128,25 @@ export default function Login({ status, canResetPassword }: Props) {
                 >
                     <div className="registration-art-copy">
                         <h2 id="login-art-title">
-                            Your next chapter starts here.
+                            {t('Your next chapter starts here.')}
                         </h2>
                         <p>
-                            A familiar place for your skills, your people, and
-                            the work you love.
+                            {t(
+                                'A familiar place for your skills, your people, and the work you love.',
+                            )}
                         </p>
                     </div>
                     <img
                         src="/images/login-welcome-back.png"
-                        alt="A creative carrying a portfolio through the open doorway of a sunlit studio."
+                        alt={t(
+                            'A creative carrying a portfolio through the open doorway of a sunlit studio.',
+                        )}
                         width="1536"
                         height="1024"
                     />
                     <div className="registration-art-caption">
-                        <span>Welcome back.</span>
-                        <span>Make good work.</span>
+                        <span>{t('Welcome back.')}</span>
+                        <span>{t('Make good work.')}</span>
                     </div>
                 </aside>
             </main>

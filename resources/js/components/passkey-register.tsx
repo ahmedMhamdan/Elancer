@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 import { usePasskeyRegister } from '@laravel/passkeys/react';
 import { useState } from 'react';
 import InputError from '@/components/input-error';
@@ -10,6 +11,8 @@ type Props = {
 };
 
 export default function PasskeyRegistration({ onSuccess }: Props) {
+    const { t } = useTranslation();
+
     const [name, setName] = useState(() => {
         const ua = navigator.userAgent;
 
@@ -100,7 +103,7 @@ export default function PasskeyRegistration({ onSuccess }: Props) {
                     {isLoading ? 'Registering...' : 'Register passkey'}
                 </Button>
                 <Button type="button" variant="ghost" onClick={handleCancel}>
-                    Cancel
+                    {t('Cancel')}
                 </Button>
             </div>
         </form>

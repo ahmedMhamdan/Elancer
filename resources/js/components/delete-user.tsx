@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 import { Form } from '@inertiajs/react';
 import { useRef } from 'react';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
@@ -17,13 +18,15 @@ import {
 import { Label } from '@/components/ui/label';
 
 export default function DeleteUser() {
+    const { t } = useTranslation();
+
     const passwordInput = useRef<HTMLInputElement>(null);
 
     return (
         <div className="space-y-6">
             <Heading
                 variant="small"
-                title="Delete account"
+                title={t('Delete account')}
                 description="Delete your account and all of its resources"
             />
             <div className="space-y-4 rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-200/10 dark:bg-red-700/10">
@@ -40,7 +43,7 @@ export default function DeleteUser() {
                             variant="destructive"
                             data-test="delete-user-button"
                         >
-                            Delete account
+                            {t('Delete account')}
                         </Button>
                     </DialogTrigger>
                     <DialogContent>
@@ -70,14 +73,14 @@ export default function DeleteUser() {
                                             htmlFor="password"
                                             className="sr-only"
                                         >
-                                            Password
+                                            {t('Password')}
                                         </Label>
 
                                         <PasswordInput
                                             id="password"
                                             name="password"
                                             ref={passwordInput}
-                                            placeholder="Password"
+                                            placeholder={t('Password')}
                                             autoComplete="current-password"
                                         />
 
@@ -92,7 +95,7 @@ export default function DeleteUser() {
                                                     resetAndClearErrors()
                                                 }
                                             >
-                                                Cancel
+                                                {t('Cancel')}
                                             </Button>
                                         </DialogClose>
 
@@ -105,7 +108,7 @@ export default function DeleteUser() {
                                                 type="submit"
                                                 data-test="confirm-delete-user-button"
                                             >
-                                                Delete account
+                                                {t('Delete account')}
                                             </button>
                                         </Button>
                                     </DialogFooter>

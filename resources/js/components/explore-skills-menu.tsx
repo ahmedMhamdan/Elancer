@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 import {
     ArrowRight,
     ChevronDown,
@@ -56,6 +57,8 @@ export default function ExploreSkillsMenu({
     mobile?: boolean;
     onNavigate?: () => void;
 }) {
+    const { t } = useTranslation();
+
     const [open, setOpen] = useState(false);
     const [active, setActive] = useState(0);
     const root = useRef<HTMLDivElement>(null);
@@ -116,7 +119,7 @@ export default function ExploreSkillsMenu({
                 aria-controls={id}
                 onClick={() => setOpen(!open)}
             >
-                Explore skills{' '}
+                {t('Explore skills')}{' '}
                 <ChevronDown
                     size={15}
                     aria-hidden="true"
@@ -148,12 +151,12 @@ export default function ExploreSkillsMenu({
                             <div
                                 className="elancer-explore-categories"
                                 role="group"
-                                aria-label="Skill categories"
+                                aria-label={t('Skill categories')}
                             >
-                                <p>Explore by category</p>
+                                <p>{t('Explore by category')}</p>
                                 {categories.map((item, index) => (
                                     <button
-                                        key={item.name}
+                                        key={t(item.name)}
                                         type="button"
                                         aria-pressed={active === index}
                                         aria-controls={`${id}-content`}
@@ -163,7 +166,7 @@ export default function ExploreSkillsMenu({
                                             size={18}
                                             aria-hidden="true"
                                         />
-                                        <span>{item.name}</span>
+                                        <span>{t(item.name)}</span>
                                         <ChevronRight
                                             size={15}
                                             aria-hidden="true"
@@ -182,18 +185,18 @@ export default function ExploreSkillsMenu({
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ duration: reduced ? 0 : 0.2 }}
                                 >
-                                    <h2>{category.title}</h2>
-                                    <p>{category.description}</p>
+                                    <h2>{t(category.title)}</h2>
+                                    <p>{t(category.description)}</p>
                                     <ul className="elancer-explore-skills">
                                         {category.skills.map((skill) => (
-                                            <li key={skill}>{skill}</li>
+                                            <li key={skill}>{t(skill)}</li>
                                         ))}
                                     </ul>
                                     <a
                                         href={`${home().url}#featured-freelancers`}
                                         onClick={navigate}
                                     >
-                                        Meet sample talent{' '}
+                                        {t('Meet sample talent')}{' '}
                                         <ArrowRight
                                             size={16}
                                             aria-hidden="true"
@@ -207,14 +210,14 @@ export default function ExploreSkillsMenu({
                                 href={`${home().url}#categories`}
                                 onClick={navigate}
                             >
-                                See all skills{' '}
+                                {t('See all skills')}{' '}
                                 <ArrowRight size={16} aria-hidden="true" />
                             </a>
                             <a
                                 href={`${home().url}#how-it-works`}
                                 onClick={navigate}
                             >
-                                How Elancer works
+                                {t('How Elancer works')}
                             </a>
                         </div>
                     </motion.div>

@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 import type { UrlMethodPair } from '@inertiajs/core';
 import { router } from '@inertiajs/react';
 import { usePasskeyVerify } from '@laravel/passkeys/react';
@@ -25,6 +26,8 @@ export default function PasskeyVerify({
     separator,
     hideSeparator = false,
 }: Props = {}) {
+    const { t } = useTranslation();
+
     const { verify, isLoading, error, isSupported } = usePasskeyVerify({
         ...(routes && {
             routes: {
@@ -68,7 +71,7 @@ export default function PasskeyVerify({
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
                         <span className="bg-background text-muted-foreground px-2">
-                            {separator ?? 'Or continue with email'}
+                            {separator ?? t('Or continue with email')}
                         </span>
                     </div>
                 </div>

@@ -1,3 +1,5 @@
+import LanguageToggle from '@/components/language-toggle';
+import { useTranslation } from '@/hooks/use-translation';
 import ElancerWordmark from '@/components/elancer-wordmark';
 import ThemeToggle from '@/components/theme-toggle';
 import '../../../css/elancer-two-factor.css';
@@ -15,48 +17,56 @@ import {
 import PasskeyVerify from '@/components/passkey-verify';
 
 export default function ConfirmPassword() {
+    const { t } = useTranslation();
+
     return (
         <div className="elancer-two-factor">
             <header className="two-factor-header">
                 <Link
                     href="/"
-                    aria-label="Elancer home"
+                    aria-label={t('Elancer home')}
                     className="two-factor-brand"
                 >
                     <ElancerWordmark />
                 </Link>
-                <ThemeToggle />
+                <div className="flex items-center gap-2">
+                    <LanguageToggle />
+                    <ThemeToggle />
+                </div>
             </header>
             <main className="two-factor-main">
                 <div className="two-factor-intro">
-                    <h1>Confirm it’s you.</h1>
+                    <h1>{t('Confirm it’s you.')}</h1>
                     <p>
-                        Enter your password or use a passkey to continue
-                        securely with your Elancer account.
+                        {t(
+                            'Enter your password or use a passkey to continue securely with your Elancer account.',
+                        )}
                     </p>
                 </div>
                 <div className="mt-6 text-start">
-                    <Head title="Confirm password" />
+                    <Head title={t('Confirm password')} />
 
                     <PasskeyVerify
                         routes={{
                             options: confirmOptions(),
                             submit: confirmStore(),
                         }}
-                        label="Confirm with passkey"
-                        loadingLabel="Confirming..."
-                        separator="Or confirm with password"
+                        label={t('Confirm with passkey')}
+                        loadingLabel={t('Confirming...')}
+                        separator={t('Or confirm with password')}
                     />
 
                     <Form {...store.form()} resetOnSuccess={['password']}>
                         {({ processing, errors }) => (
                             <div className="space-y-6">
                                 <div className="grid gap-2">
-                                    <Label htmlFor="password">Password</Label>
+                                    <Label htmlFor="password">
+                                        {t('Password')}
+                                    </Label>
                                     <PasswordInput
                                         id="password"
                                         name="password"
-                                        placeholder="Password"
+                                        placeholder={t('Password')}
                                         autoComplete="current-password"
                                         aria-invalid={!!errors.password}
                                         aria-describedby="confirm-password-error"
@@ -77,7 +87,7 @@ export default function ConfirmPassword() {
                                         data-test="confirm-password-button"
                                     >
                                         {processing && <Spinner />}
-                                        Confirm password
+                                        {t('Confirm password')}
                                     </Button>
                                 </div>
                             </div>
@@ -88,7 +98,7 @@ export default function ConfirmPassword() {
                     href="/dashboard"
                     className="text-primary mt-6 inline-block min-h-11 py-3 underline"
                 >
-                    Back to workspace
+                    {t('Back to workspace')}
                 </Link>
             </main>
         </div>

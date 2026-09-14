@@ -1,3 +1,5 @@
+import { useTranslation } from '@/hooks/use-translation';
+import LanguageToggle from '@/components/language-toggle';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { BriefcaseBusiness, Code2, ImagePlus, UserRound } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -78,6 +80,8 @@ function Field({
 }
 
 export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
+    const { t } = useTranslation();
+
     const page = usePage();
     const { auth } = page.props;
     const form = useForm<OnboardingDraft>({
@@ -234,10 +238,11 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
             )}
             <Head title="Set up your profile" />
             <header className="onboarding-header">
-                <Link href={home()} aria-label="Elancer home">
+                <Link href={home()} aria-label={t('Elancer home')}>
                     <ElancerWordmark />
                 </Link>
                 <div className="flex items-center gap-4">
+                    <LanguageToggle />
                     <ThemeToggle />
                 </div>
             </header>
@@ -621,8 +626,8 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                         <div>
                                             <span className="onboarding-role-badge">
                                                 {isFreelancer
-                                                    ? 'Freelancer'
-                                                    : 'Client'}
+                                                    ? t('Freelancer')
+                                                    : t('Client')}
                                             </span>
                                             <h2>{form.data.name}</h2>
                                             <p>
@@ -652,7 +657,7 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                         {isFreelancer && (
                                             <ul
                                                 className="onboarding-skills"
-                                                aria-label="Skills"
+                                                aria-label={t('Skills')}
                                             >
                                                 {[...new Set(skills)].map(
                                                     (skill) => (
@@ -679,7 +684,7 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                         variant="outline"
                                         onClick={() => setStep(step - 1)}
                                     >
-                                        Back
+                                        {t('Back')}
                                     </Button>
                                 ) : (
                                     <Link
@@ -702,7 +707,7 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                           ? 'Save and continue'
                                           : step === 2
                                             ? 'Review your profile'
-                                            : 'Continue'}
+                                            : t('Continue')}
                                 </Button>
                             </footer>
                         </fieldset>

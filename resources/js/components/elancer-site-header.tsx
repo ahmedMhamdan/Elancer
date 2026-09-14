@@ -1,3 +1,5 @@
+import { useTranslation } from '@/hooks/use-translation';
+import LanguageToggle from '@/components/language-toggle';
 import { Link, router, usePage } from '@inertiajs/react';
 import { useCallback, useState } from 'react';
 import ExploreSkillsMenu from '@/components/explore-skills-menu';
@@ -22,17 +24,19 @@ export default function ElancerSiteHeader({
     registration?: boolean;
     loginPage?: boolean;
 }) {
+    const { t } = useTranslation();
+
     const { auth } = usePage().props;
     const [isOpen, setIsOpen] = useState(false);
     const closeMenu = useCallback(() => setIsOpen(false), []);
     const destination = auth.user ? dashboard().url : register().url;
     const items = [
         {
-            name: 'Talent showcase',
+            name: t('Talent showcase'),
             link: `${registration ? home().url : ''}#featured-freelancers`,
         },
         {
-            name: 'How it works',
+            name: t('How it works'),
             link: `${registration ? home().url : ''}#how-it-works`,
         },
     ];
@@ -41,7 +45,7 @@ export default function ElancerSiteHeader({
             <NavBody>
                 <NavbarLogo />
                 <nav
-                    aria-label="Main navigation"
+                    aria-label={t('Main navigation')}
                     className="elancer-desktop-links"
                 >
                     <ExploreSkillsMenu />
@@ -56,6 +60,7 @@ export default function ElancerSiteHeader({
                     ))}
                 </nav>
                 <div className="flex shrink-0 items-center gap-2">
+                    <LanguageToggle />
                     <ThemeToggle />
                     {auth.user && (
                         <Link
@@ -64,7 +69,7 @@ export default function ElancerSiteHeader({
                             onClick={() => router.flushAll()}
                             className="elancer-navbar-button elancer-navbar-button-secondary elancer-logout"
                         >
-                            Log out
+                            {t('Log out')}
                         </Link>
                     )}
                     {!auth.user && (
@@ -72,12 +77,12 @@ export default function ElancerSiteHeader({
                             href={loginPage ? register().url : login().url}
                             variant="secondary"
                         >
-                            {loginPage ? 'Join Elancer' : 'Log in'}
+                            {loginPage ? t('Join Elancer') : t('Log in')}
                         </NavbarButton>
                     )}
                     {!registration && (
                         <NavbarButton href={destination}>
-                            {auth.user ? 'Workspace' : 'Join Elancer'}
+                            {auth.user ? t('Workspace') : t('Join Elancer')}
                         </NavbarButton>
                     )}
                 </div>
@@ -91,7 +96,7 @@ export default function ElancerSiteHeader({
                                 href={destination}
                                 className="px-4 text-xs"
                             >
-                                {auth.user ? 'Workspace' : 'Join Elancer'}
+                                {auth.user ? t('Workspace') : t('Join Elancer')}
                             </NavbarButton>
                         )}
                         <MobileNavToggle
@@ -102,7 +107,7 @@ export default function ElancerSiteHeader({
                 </MobileNavHeader>
                 <MobileNavMenu isOpen={isOpen} onClose={closeMenu}>
                     <nav
-                        aria-label="Mobile navigation"
+                        aria-label={t('Mobile navigation')}
                         className="flex flex-col"
                     >
                         <ExploreSkillsMenu mobile onNavigate={closeMenu} />
@@ -118,6 +123,7 @@ export default function ElancerSiteHeader({
                         ))}
                     </nav>
                     <div className="mt-2 flex items-center justify-between border-t border-[var(--el-border)] pt-4">
+                        <LanguageToggle />
                         <ThemeToggle />
                         {auth.user && (
                             <Link
@@ -126,7 +132,7 @@ export default function ElancerSiteHeader({
                                 onClick={() => router.flushAll()}
                                 className="elancer-navbar-button elancer-navbar-button-secondary elancer-logout"
                             >
-                                Log out
+                                {t('Log out')}
                             </Link>
                         )}
                         {!auth.user && (
@@ -135,7 +141,7 @@ export default function ElancerSiteHeader({
                                 variant="secondary"
                                 onClick={closeMenu}
                             >
-                                {loginPage ? 'Join Elancer' : 'Log in'}
+                                {loginPage ? t('Join Elancer') : t('Log in')}
                             </NavbarButton>
                         )}
                         {!registration && (
@@ -143,7 +149,9 @@ export default function ElancerSiteHeader({
                                 href={destination}
                                 onClick={closeMenu}
                             >
-                                {auth.user ? 'Workspace' : 'Create account'}
+                                {auth.user
+                                    ? t('Workspace')
+                                    : t('Create account')}
                             </NavbarButton>
                         )}
                     </div>

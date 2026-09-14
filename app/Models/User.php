@@ -7,6 +7,7 @@ use App\Enums\WorkspaceRole;
 use Carbon\CarbonImmutable;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -40,7 +41,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  */
 #[Fillable(['name', 'email', 'password'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
-class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
+class User extends Authenticatable implements HasLocalePreference, MustVerifyEmail, PasskeyUser
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
@@ -82,6 +83,11 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
     public function profile(): HasOne
     {
         return $this->hasOne(Profile::class);
+    }
+
+    public function preferredLocale(): string
+    {
+        return in_array($this->locale, ['en', 'ar'], true) ? $this->locale : 'en';
     }
 
     public function isAdministrator(): bool

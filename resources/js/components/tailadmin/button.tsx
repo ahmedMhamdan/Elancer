@@ -16,7 +16,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const Button: React.FC<ButtonProps> = ({
     children,
-    size = 'md',
+    size = 'sm',
     variant = 'primary',
     startIcon,
     endIcon,
@@ -47,7 +47,7 @@ const Button: React.FC<ButtonProps> = ({
         <button
             {...props}
             type={type}
-            className={`focus-visible:outline-ring inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-lg transition focus-visible:outline-2 focus-visible:outline-offset-4 ${className} ${
+            className={`focus-visible:outline-ring inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-lg transition focus-visible:outline-2 focus-visible:outline-offset-4 sm:min-h-9 ${className} ${
                 sizeClasses[size]
             } ${variantClasses[variant]} ${
                 disabled ? 'cursor-not-allowed opacity-50' : ''

@@ -1,4 +1,5 @@
-import { createInertiaApp } from '@inertiajs/react';
+import '@/../css/elancer-locale.css';
+import { createInertiaApp, router } from '@inertiajs/react';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
@@ -41,6 +42,18 @@ void createInertiaApp({
         color: '#4B5563',
     },
 });
+
+// Keep document language/direction synchronized after Inertia visits as well as reloads.
+const syncDocumentLocale = (locale: unknown) => {
+    document.documentElement.lang = locale === 'ar' ? 'ar' : 'en';
+    document.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr';
+};
+router.on('navigate', (event) =>
+    syncDocumentLocale(event.detail.page.props.locale),
+);
+router.on('success', (event) =>
+    syncDocumentLocale(event.detail.page.props.locale),
+);
 
 // This will set light / dark mode on load...
 initializeTheme();

@@ -1,15 +1,17 @@
+import { useTranslation } from '@/hooks/use-translation';
 import { useState } from 'react';
 
 export default function AuthSocial() {
+    const { t } = useTranslation();
     const [notice, setNotice] = useState('');
     return (
         <>
             <div className="registration-divider">
-                <span>or continue with</span>
+                <span>{t('or continue with')}</span>
             </div>
             <div
                 className="registration-social"
-                aria-label="Other sign-in methods"
+                aria-label={t('Other sign-in methods')}
             >
                 {['Google', 'GitHub'].map((provider) => (
                     <button
@@ -17,7 +19,7 @@ export default function AuthSocial() {
                         type="button"
                         onClick={() =>
                             setNotice(
-                                `${provider} sign-in is coming soon. Please use the email form above.`,
+                                'Social sign-in is coming soon. Please use the email form above.',
                             )
                         }
                     >
@@ -32,12 +34,12 @@ export default function AuthSocial() {
                             height="20"
                             alt=""
                         />
-                        Continue with {provider}
+                        {t('Continue with')} {provider}
                     </button>
                 ))}
             </div>
             <p className="registration-provider-notice" role="status">
-                {notice || 'Google and GitHub sign-in coming soon.'}
+                {t(notice || 'Google and GitHub sign-in coming soon.')}
             </p>
         </>
     );

@@ -1,3 +1,5 @@
+import LanguageToggle from '@/components/language-toggle';
+import { useTranslation } from '@/hooks/use-translation';
 import { Form, Head, Link } from '@inertiajs/react';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { useState } from 'react';
@@ -18,6 +20,8 @@ import { store } from '@/routes/two-factor/login';
 import '../../../css/elancer-two-factor.css';
 
 export default function TwoFactorChallenge() {
+    const { t } = useTranslation();
+
     const [recovery, setRecovery] = useState(false);
     const [code, setCode] = useState('');
     const [requestError, setRequestError] = useState('');
@@ -26,33 +30,42 @@ export default function TwoFactorChallenge() {
 
     return (
         <div className="elancer-two-factor">
-            <Head title="Two-factor authentication" />
+            <Head title={t('Two-factor authentication')} />
             <header className="two-factor-header">
                 <Link
                     href={home()}
-                    aria-label="Elancer home"
+                    aria-label={t('Elancer home')}
                     className="two-factor-brand"
                 >
                     <ElancerWordmark />
                 </Link>
-                <button
-                    type="button"
-                    className="two-factor-theme"
-                    aria-label={`Switch to ${nextTheme} mode`}
-                    onClick={() => updateAppearance(nextTheme)}
-                >
-                    <ThemeIcon mode={nextTheme} />
-                </button>
+                <div className="flex items-center gap-2">
+                    <LanguageToggle />
+                    <button
+                        type="button"
+                        className="two-factor-theme"
+                        aria-label={t(`Switch to ${nextTheme} mode`)}
+                        onClick={() => updateAppearance(nextTheme)}
+                    >
+                        <ThemeIcon mode={nextTheme} />
+                    </button>
+                </div>
             </header>
             <main className="two-factor-main">
                 <div className="two-factor-intro">
                     <h1>
-                        {recovery ? 'Use a recovery code.' : 'One more step.'}
+                        {recovery
+                            ? t('Use a recovery code.')
+                            : t('One more step.')}
                     </h1>
                     <p>
                         {recovery
-                            ? 'Enter one of the recovery codes you saved when you set up two-factor authentication.'
-                            : 'Open your authenticator app and enter the six-digit code for your Elancer account.'}
+                            ? t(
+                                  'Enter one of the recovery codes you saved when you set up two-factor authentication.',
+                              )
+                            : t(
+                                  'Open your authenticator app and enter the six-digit code for your Elancer account.',
+                              )}
                     </p>
                 </div>
                 <Form
@@ -62,12 +75,16 @@ export default function TwoFactorChallenge() {
                     onStart={() => setRequestError('')}
                     onError={() => setCode('')}
                     onNetworkError={() => {
-                        setRequestError('Could not connect. Please try again.');
+                        setRequestError(
+                            t('Could not connect. Please try again.'),
+                        );
                         return false;
                     }}
                     onHttpException={() => {
                         setRequestError(
-                            'We could not verify your code. Please try again.',
+                            t(
+                                'We could not verify your code. Please try again.',
+                            ),
                         );
                         return false;
                     }}
@@ -79,7 +96,7 @@ export default function TwoFactorChallenge() {
                             className="two-factor-fields"
                         >
                             <legend className="sr-only">
-                                Two-factor authentication
+                                {t('Two-factor authentication')}
                             </legend>
                             <div>
                                 <Label
@@ -88,8 +105,8 @@ export default function TwoFactorChallenge() {
                                     }
                                 >
                                     {recovery
-                                        ? 'Recovery code'
-                                        : 'Authentication code'}
+                                        ? t('Recovery code')
+                                        : t('Authentication code')}
                                 </Label>
                                 {recovery ? (
                                     <Input
@@ -97,7 +114,7 @@ export default function TwoFactorChallenge() {
                                         id="recovery_code"
                                         name="recovery_code"
                                         type="text"
-                                        placeholder="Enter recovery code"
+                                        placeholder={t('Enter recovery code')}
                                         autoComplete="off"
                                         autoCapitalize="none"
                                         spellCheck={false}
@@ -164,14 +181,16 @@ export default function TwoFactorChallenge() {
                             >
                                 {processing && <Spinner />}
                                 {processing
-                                    ? 'Verifying…'
-                                    : 'Verify and continue'}
+                                    ? t('Verifying…')
+                                    : t('Verify and continue')}
                             </button>
                             <div className="two-factor-alternative">
                                 <p>
                                     {recovery
-                                        ? 'Have access to your authenticator?'
-                                        : 'Can’t access your authenticator?'}
+                                        ? t(
+                                              'Have access to your authenticator?',
+                                          )
+                                        : t('Can’t access your authenticator?')}
                                 </p>
                                 <button
                                     type="button"
@@ -183,19 +202,19 @@ export default function TwoFactorChallenge() {
                                     }}
                                 >
                                     {recovery
-                                        ? 'Use an authentication code'
-                                        : 'Use a recovery code'}
+                                        ? t('Use an authentication code')
+                                        : t('Use a recovery code')}
                                 </button>
                             </div>
                         </fieldset>
                     )}
                 </Form>
                 <Link href={login()} className="two-factor-back">
-                    Back to log in
+                    {t('Back to log in')}
                 </Link>
             </main>
             <footer className="two-factor-footer">
-                Your account. An extra layer of protection.
+                {t('Your account. An extra layer of protection.')}
             </footer>
         </div>
     );

@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 import IdentityVerification, {
     type IdentityStatus,
 } from '@/components/identity-verification';
@@ -31,6 +32,8 @@ export default function MarketplaceProfile({
     profile: MarketplaceProfile | null;
     identity: IdentityStatus;
 }) {
+    const { t } = useTranslation();
+
     const page = usePage();
     const { auth } = page.props;
     const name = auth.user.name;
@@ -52,11 +55,11 @@ export default function MarketplaceProfile({
 
     return (
         <>
-            <Head title="My profile" />
+            <Head title={t('My profile')} />
             <div className="workspace-dashboard workspace-dashboard-clean">
                 <div className="workspace-page-heading">
                     <div>
-                        <h1>My profile</h1>
+                        <h1>{t('My profile')}</h1>
                         <p>
                             Welcome back, {name.trim().split(/\s+/)[0]}. Manage
                             your {isClient ? 'client' : 'freelancer'} profile.
@@ -146,7 +149,9 @@ export default function MarketplaceProfile({
                             </div>
                             <dl className="profile-summary-details">
                                 <div>
-                                    <dt>{isClient ? 'Company' : 'Headline'}</dt>
+                                    <dt>
+                                        {isClient ? 'Company' : t('Headline')}
+                                    </dt>
                                     <dd>
                                         {(isClient
                                             ? profile?.company
@@ -166,7 +171,7 @@ export default function MarketplaceProfile({
                                     </dd>
                                 </div>
                                 <div>
-                                    <dt>Bio</dt>
+                                    <dt>{t('Bio')}</dt>
                                     <dd>
                                         {profile?.bio ||
                                             'Add a short introduction to help clients get to know you.'}
@@ -175,7 +180,7 @@ export default function MarketplaceProfile({
                                 {!isClient &&
                                     Boolean(profile?.skills?.length) && (
                                         <div>
-                                            <dt>Skills</dt>
+                                            <dt>{t('Skills')}</dt>
                                             <dd>
                                                 {profile?.skills?.map(
                                                     (skill) => (

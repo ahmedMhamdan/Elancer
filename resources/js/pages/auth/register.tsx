@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 import { Form, Head, Link } from '@inertiajs/react';
 import { Mail } from 'lucide-react';
 import ElancerSiteHeader from '@/components/elancer-site-header';
@@ -13,11 +14,13 @@ type Props = {
 };
 
 export default function Register({ passwordRules }: Props) {
+    const { t } = useTranslation();
+
     return (
         <div className="elancer-registration">
-            <Head title="Join Elancer" />
+            <Head title={t('Join Elancer')} />
             <a href="#registration-form" className="registration-skip">
-                Skip to registration
+                {t('Skip to registration')}
             </a>
             <ElancerSiteHeader registration />
 
@@ -29,11 +32,12 @@ export default function Register({ passwordRules }: Props) {
                     <div className="registration-form-content">
                         <div className="registration-form-heading">
                             <h1 id="registration-title">
-                                Make yourself at home.
+                                {t('Make yourself at home.')}
                             </h1>
                             <p>
-                                Create your Elancer account. A place for your
-                                skills, your ideas, and whatever comes next.
+                                {t(
+                                    'Create your Elancer account. A place for your skills, your ideas, and whatever comes next.',
+                                )}
                             </p>
                         </div>
                         <Form
@@ -54,8 +58,9 @@ export default function Register({ passwordRules }: Props) {
                                             className="registration-error-summary"
                                             role="alert"
                                         >
-                                            We couldn’t create your account.
-                                            Check the highlighted fields below.
+                                            {t(
+                                                'We couldn’t create your account. Check the highlighted fields below.',
+                                            )}
                                         </p>
                                     )}
                                     <fieldset
@@ -63,14 +68,14 @@ export default function Register({ passwordRules }: Props) {
                                         aria-busy={processing}
                                     >
                                         <legend className="sr-only">
-                                            Account details
+                                            {t('Account details')}
                                         </legend>
                                         <AuthField
                                             id="name"
                                             name="name"
-                                            label="Full name"
+                                            label={t('Full name')}
                                             autoComplete="name"
-                                            placeholder="Your full name"
+                                            placeholder={t('Your full name')}
                                             maxLength={255}
                                             required
                                             error={errors.name}
@@ -78,7 +83,7 @@ export default function Register({ passwordRules }: Props) {
                                         <AuthField
                                             id="email"
                                             name="email"
-                                            label="Email address"
+                                            label={t('Email address')}
                                             type="email"
                                             autoComplete="email"
                                             placeholder="you@example.com"
@@ -89,10 +94,10 @@ export default function Register({ passwordRules }: Props) {
                                         <AuthField
                                             id="password"
                                             name="password"
-                                            label="Password"
+                                            label={t('Password')}
                                             type="password"
                                             autoComplete="new-password"
-                                            placeholder="Create a password"
+                                            placeholder={t('Create a password')}
                                             passwordrules={passwordRules}
                                             required
                                             error={errors.password}
@@ -100,10 +105,12 @@ export default function Register({ passwordRules }: Props) {
                                         <AuthField
                                             id="password_confirmation"
                                             name="password_confirmation"
-                                            label="Confirm password"
+                                            label={t('Confirm password')}
                                             type="password"
                                             autoComplete="new-password"
-                                            placeholder="Repeat your password"
+                                            placeholder={t(
+                                                'Repeat your password',
+                                            )}
                                             passwordrules={passwordRules}
                                             required
                                             error={errors.password_confirmation}
@@ -117,16 +124,19 @@ export default function Register({ passwordRules }: Props) {
                                             {processing && <Spinner />}
                                             <span aria-live="polite">
                                                 {processing
-                                                    ? 'Creating your account…'
-                                                    : 'Create account'}
+                                                    ? t(
+                                                          'Creating your account…',
+                                                      )
+                                                    : t('Create account')}
                                             </span>
                                         </button>
                                     </fieldset>
                                     <p className="registration-email-note">
                                         <Mail size={18} aria-hidden="true" />
                                         <span>
-                                            We’ll email you a verification link
-                                            after you register.
+                                            {t(
+                                                'We’ll email you a verification link after you register.',
+                                            )}
                                         </span>
                                     </p>
                                 </>
@@ -134,8 +144,8 @@ export default function Register({ passwordRules }: Props) {
                         </Form>
                         <AuthSocial />
                         <p className="registration-login-note">
-                            Already have an account?{' '}
-                            <Link href={login()}>Log in</Link>
+                            {t('Already have an account?')}{' '}
+                            <Link href={login()}>{t('Log in')}</Link>
                         </p>
                     </div>
                 </section>
@@ -145,22 +155,25 @@ export default function Register({ passwordRules }: Props) {
                 >
                     <div className="registration-art-copy">
                         <h2 id="registration-art-title">
-                            A little space for your next big idea.
+                            {t('A little space for your next big idea.')}
                         </h2>
                         <p>
-                            For independent minds and people who love what they
-                            do.
+                            {t(
+                                'For independent minds and people who love what they do.',
+                            )}
                         </p>
                     </div>
                     <img
                         src="/images/registration-collaboration.png"
-                        alt="Two independent creatives collaborating on a design at a shared table."
+                        alt={t(
+                            'Two independent creatives collaborating on a design at a shared table.',
+                        )}
                         width="1536"
                         height="1024"
                     />
                     <div className="registration-art-caption">
-                        <span>Find your people.</span>
-                        <span>Make good work.</span>
+                        <span>{t('Find your people.')}</span>
+                        <span>{t('Make good work.')}</span>
                     </div>
                 </aside>
             </main>

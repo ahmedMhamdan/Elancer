@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 // Adapts TailAdmin BasicTableOne and DefaultInputs through the existing table,
 // ComponentCard, TextArea and Button adaptations. MIT: THIRD_PARTY_NOTICES.md.
 import { Head, router, useForm } from '@inertiajs/react';
@@ -127,6 +128,8 @@ export default function IdentityReviews({
         data: Submission[];
     };
 }) {
+    const { t } = useTranslation();
+
     const [notice, setNotice] = useState('');
     const [selected, setSelected] = useState<Submission | null>(null);
     return (
@@ -158,12 +161,12 @@ export default function IdentityReviews({
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            {['Account', 'Status', 'Review'].map((label) => (
+                            {['Account', 'Status', t('Review')].map((label) => (
                                 <TableCell
                                     key={label}
                                     isHeader
                                     className={
-                                        label === 'Review'
+                                        label === t('Review')
                                             ? 'w-px px-5 py-3 text-end'
                                             : 'px-5 py-3 text-start'
                                     }

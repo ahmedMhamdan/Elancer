@@ -124,9 +124,9 @@
     align-items: center;
     gap: 10px;
     width: 100%;
-    min-height: 52px;
+    min-height: 44px;
     margin-top: 6px;
-    padding: 14px 20px;
+    padding: 10px 16px;
     border-radius: 8px;
     background: var(--el-text);
     color: var(--el-surface);
@@ -277,7 +277,7 @@
     align-items: center;
     gap: 12px;
     width: 100%;
-    min-height: 48px;
+    min-height: 44px;
     padding: 12px 18px;
     border: 1px solid var(--el-border-strong);
     border-radius: 8px;
@@ -365,7 +365,7 @@
     margin-top: 16px;
 }
 .login-passkey button {
-    min-height: 48px;
+    min-height: 44px;
     border-color: var(--el-border-strong);
     background: var(--el-surface);
     color: var(--el-text);

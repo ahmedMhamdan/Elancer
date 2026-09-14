@@ -35,4 +35,15 @@ yarn-error.log
 /DESIGN.md
 # plan
 /002-elancer-portfolio-capstone.md
+/003-elancer-complete-project-plan.md
 /AGENTS.md
+
+# Local AI instructions and context
+/PRODUCT.md
+/CLAUDE.md
+/GEMINI.md
+/.codex/
+/.claude/
+/.agents/
+/.cursor/
+/.junie/

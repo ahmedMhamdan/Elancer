@@ -4,6 +4,7 @@ use App\Http\Controllers\AdministratorController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\IdentityVerificationController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MarketplaceProfileController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ProfilePhotoController;
@@ -14,6 +15,7 @@ use App\Http\Middleware\EnsureSuperAdministrator;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
+Route::post('locale', LocaleController::class)->middleware('throttle:60,1')->name('locale.update');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('skills', SkillController::class)->middleware('throttle:120,1')->name('skills.index');

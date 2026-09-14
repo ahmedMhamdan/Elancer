@@ -1,0 +1,15 @@
+/* Locale layout uses the existing Elancer tokens and typefaces. */
+html[dir='rtl'] .lucide-arrow-right,
+html[dir='rtl'] .lucide-arrow-up-right,
+html[dir='rtl'] .lucide-chevron-right {
+    transform: scaleX(-1);
+}
+html[dir='rtl']
+    :is(.elancer-explore-panel, .registration-form, .onboarding-field) {
+    text-align: start;
+}
+input[type='email'],
+input[autocomplete='one-time-code'] {
+    direction: ltr;
+    text-align: start;
+}

@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 import { Head, Link, usePage } from '@inertiajs/react';
 import {
     ArrowRight,
@@ -15,38 +16,44 @@ import Hero from '@/components/ui/animated-shader-hero';
 import { dashboard, register } from '@/routes';
 
 export default function Welcome() {
+    const { t } = useTranslation();
+
     const { auth } = usePage().props;
     const destination = auth.user ? dashboard().url : register().url;
 
     return (
         <>
-            <Head title="Good people. Great work.">
+            <Head title={t('Good people. Great work.')}>
                 <meta
                     name="description"
-                    content="Elancer connects independent talent and ambitious ideas. Find your people and make your next great project happen."
+                    content={t(
+                        'Elancer connects independent talent and ambitious ideas. Find your people and make your next great project happen.',
+                    )}
                 />
             </Head>
             <div className="elancer-home elancer-home-refined">
                 <a href="#main-content" className="elancer-skip-link">
-                    Skip to content
+                    {t('Skip to content')}
                 </a>
                 <ElancerSiteHeader />
                 <main id="main-content">
                     <Hero
                         headline={{
-                            line1: 'Good people.',
-                            line2: 'Extraordinary work.',
+                            line1: t('Good people.'),
+                            line2: t('Extraordinary work.'),
                         }}
-                        subtitle="Discover designers, developers, and independent specialists. Create a profile to share your skills and introduce your next idea."
+                        subtitle={t(
+                            'Discover designers, developers, and independent specialists. Create a profile to share your skills and introduce your next idea.',
+                        )}
                         buttons={{
                             primary: {
                                 text: auth.user
-                                    ? 'Go to your workspace'
-                                    : 'Create your account',
+                                    ? t('Go to your workspace')
+                                    : t('Create your account'),
                                 href: destination,
                             },
                             secondary: {
-                                text: 'Explore skills',
+                                text: t('Explore skills'),
                                 href: '#categories',
                             },
                         }}
@@ -63,15 +70,17 @@ export default function Welcome() {
                                     className="elancer-small-square"
                                     aria-hidden="true"
                                 />{' '}
-                                Work on your terms
+                                {t('Work on your terms')}
                             </span>
-                            <span>Less friction. More making.</span>
+                            <span>{t('Less friction. More making.')}</span>
                         </div>
                         <div className="elancer-intro-grid">
                             <div className="elancer-illustration-wrap">
                                 <img
                                     src="/images/freelancer-at-work.png"
-                                    alt="Illustration of a freelancer in a green sweater working on a laptop at a sunlit desk."
+                                    alt={t(
+                                        'Illustration of a freelancer in a green sweater working on a laptop at a sunlit desk.',
+                                    )}
                                     width="1536"
                                     height="1024"
                                     loading="lazy"
@@ -87,35 +96,38 @@ export default function Welcome() {
                                         />
                                     </span>
                                     <div>
-                                        <strong>In your element.</strong>
-                                        <span>Doing what you do best.</span>
+                                        <strong>{t('In your element.')}</strong>
+                                        <span>
+                                            {t('Doing what you do best.')}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
                             <div className="elancer-intro-copy">
                                 <span className="elancer-eyebrow">
-                                    Built around people
+                                    {t('Built around people')}
                                 </span>
                                 <h2 id="intro-heading">
-                                    Make room for
+                                    {t('Make room for')}
                                     <br />
-                                    your next <span>big thing.</span>
+                                    {t('your next')}{' '}
+                                    <span>{t('big thing.')}</span>
                                 </h2>
                                 <p>
-                                    A fresh perspective. A missing skill.
-                                    Someone who just gets it. The right
-                                    collaboration can change everything.
+                                    {t(
+                                        'A fresh perspective. A missing skill. Someone who just gets it. The right collaboration can change everything.',
+                                    )}
                                 </p>
                                 <p>
-                                    Whether you’re building a business or a
-                                    career on your own terms, there’s a place
-                                    for you here.
+                                    {t(
+                                        'Whether you’re building a business or a career on your own terms, there’s a place for you here.',
+                                    )}
                                 </p>
                                 <Link
                                     href={destination}
                                     className="elancer-text-link"
                                 >
-                                    Find your starting point{' '}
+                                    {t('Find your starting point')}{' '}
                                     <ArrowUpRight
                                         size={19}
                                         aria-hidden="true"
@@ -123,22 +135,22 @@ export default function Welcome() {
                                 </Link>
                                 <div
                                     className="elancer-disciplines"
-                                    aria-label="Creative disciplines"
+                                    aria-label={t('Creative disciplines')}
                                 >
                                     <span>
                                         <Code2 size={15} aria-hidden="true" />{' '}
-                                        Development
+                                        {t('Development')}
                                     </span>
                                     <span>
                                         <PenTool size={15} aria-hidden="true" />{' '}
-                                        Design
+                                        {t('Design')}
                                     </span>
                                     <span>
                                         <Sparkles
                                             size={15}
                                             aria-hidden="true"
                                         />{' '}
-                                        And your next idea
+                                        {t('And your next idea')}
                                     </span>
                                 </div>
                             </div>
@@ -156,43 +168,46 @@ export default function Welcome() {
                         <div className="elancer-how-header">
                             <div>
                                 <span className="elancer-eyebrow">
-                                    Getting started
+                                    {t('Getting started')}
                                 </span>
                                 <h2 id="how-heading">
-                                    Your first steps on Elancer.
+                                    {t('Your first steps on Elancer.')}
                                 </h2>
                             </div>
                             <Link
                                 href={destination}
                                 className="elancer-text-link"
                             >
-                                Get started{' '}
+                                {t('Get started')}{' '}
                                 <ArrowRight size={18} aria-hidden="true" />
                             </Link>
                         </div>
                         <ol className="elancer-steps">
                             <li>
                                 <span className="elancer-step-number">01</span>
-                                <h3>Create an account.</h3>
+                                <h3>{t('Create an account.')}</h3>
                                 <p>
-                                    Add your name and email, then choose a
-                                    password to create your account.
+                                    {t(
+                                        'Add your name and email, then choose a password to create your account.',
+                                    )}
                                 </p>
                             </li>
                             <li>
                                 <span className="elancer-step-number">02</span>
-                                <h3>Verify your email.</h3>
+                                <h3>{t('Verify your email.')}</h3>
                                 <p>
-                                    Open the verification email and follow the
-                                    link to access your workspace.
+                                    {t(
+                                        'Open the verification email and follow the link to access your workspace.',
+                                    )}
                                 </p>
                             </li>
                             <li>
                                 <span className="elancer-step-number">03</span>
-                                <h3>Introduce yourself.</h3>
+                                <h3>{t('Introduce yourself.')}</h3>
                                 <p>
-                                    Add a headline, a short bio, and your
-                                    location to your profile.
+                                    {t(
+                                        'Add a headline, a short bio, and your location to your profile.',
+                                    )}
                                 </p>
                             </li>
                         </ol>

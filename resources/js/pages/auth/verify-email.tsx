@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 import { Form, Head, Link, router, usePage } from '@inertiajs/react';
 import { Check, Mail, RefreshCw, ShieldCheck } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
@@ -135,15 +136,17 @@ function VerificationEnvelope({ replay }: { replay: number }) {
 }
 
 export default function VerifyEmail({ status }: { status?: string }) {
+    const { t } = useTranslation();
+
     const { auth } = usePage().props;
     const [replay, setReplay] = useState(0);
     const sent = status === 'verification-link-sent';
 
     return (
         <div className="elancer-registration elancer-verification">
-            <Head title="Verify your email" />
+            <Head title={t('Verify your email')} />
             <a href="#verification-content" className="registration-skip">
-                Skip to email verification
+                {t('Skip to email verification')}
             </a>
             <ElancerSiteHeader registration />
 
@@ -158,41 +161,45 @@ export default function VerifyEmail({ status }: { status?: string }) {
                 >
                     <div
                         className="verification-progress"
-                        aria-label="Account created. Email verification is next."
+                        aria-label={t(
+                            'Account created. Email verification is next.',
+                        )}
                     >
                         <span>
-                            <Check size={14} aria-hidden="true" /> Account
-                            created
+                            <Check size={14} aria-hidden="true" />{' '}
+                            {t('Account created')}
                         </span>
                         <span
                             className="verification-progress-line"
                             aria-hidden="true"
                         />
                         <span aria-current="step">
-                            <Mail size={14} aria-hidden="true" /> Verify email
+                            <Mail size={14} aria-hidden="true" />{' '}
+                            {t('Verify email')}
                         </span>
                     </div>
                     <h1 id="verification-title">
-                        Your next chapter.
+                        {t('Your next chapter.')}
                         <br />
-                        One click away.
+                        {t('One click away.')}
                     </h1>
                     <p className="verification-intro">
-                        Check your inbox to verify your email and get started on
-                        Elancer.
+                        {t(
+                            'Check your inbox to verify your email and get started on Elancer.',
+                        )}
                     </p>
 
                     <div className="verification-recipient">
                         <Mail size={21} aria-hidden="true" />
                         <div>
-                            <p>Verification link sent to</p>
+                            <p>{t('Verification link sent to')}</p>
                             <strong>{auth.user.email}</strong>
                         </div>
                     </div>
                     <p className="verification-instructions">
-                        Open the email from Elancer and click the verification
-                        link. You can close this page once your email is
-                        verified.
+                        {t(
+                            'Open the email from Elancer and click the verification link. You can close this page once your email is verified.',
+                        )}
                     </p>
 
                     <Form
@@ -217,8 +224,8 @@ export default function VerifyEmail({ status }: { status?: string }) {
                                         />
                                     )}
                                     {processing
-                                        ? 'Sending verification email…'
-                                        : 'Resend verification email'}
+                                        ? t('Sending verification email…')
+                                        : t('Resend verification email')}
                                 </button>
                                 <div
                                     className="verification-feedback"
@@ -232,8 +239,9 @@ export default function VerifyEmail({ status }: { status?: string }) {
                                                 size={16}
                                                 aria-hidden="true"
                                             />{' '}
-                                            A fresh link is on its way. Check
-                                            your inbox.
+                                            {t(
+                                                'A fresh link is on its way. Check your inbox.',
+                                            )}
                                         </p>
                                     )}
                                 </div>
@@ -254,13 +262,13 @@ export default function VerifyEmail({ status }: { status?: string }) {
                     </Form>
 
                     <p className="verification-logout">
-                        Signed in with the wrong email?{' '}
+                        {t('Signed in with the wrong email?')}{' '}
                         <Link
                             href={logout()}
                             as="button"
                             onClick={() => router.flushAll()}
                         >
-                            Log out
+                            {t('Log out')}
                         </Link>
                     </p>
                 </section>
@@ -272,21 +280,24 @@ export default function VerifyEmail({ status }: { status?: string }) {
                     <VerificationEnvelope replay={replay} />
                     <div className="verification-art-caption">
                         <h2 id="verification-art-title">
-                            A little check. A lot of possibilities.
+                            {t('A little check. A lot of possibilities.')}
                         </h2>
                         <p>
-                            Your skills, your ideas, your next opportunity.
+                            {t(
+                                'Your skills, your ideas, your next opportunity.',
+                            )}
                             <br />
-                            It all starts with a verified email.
+                            {t('It all starts with a verified email.')}
                         </p>
                     </div>
                     <div className="verification-help">
                         <ShieldCheck size={22} aria-hidden="true" />
                         <div>
-                            <h3>Can’t find the email?</h3>
+                            <h3>{t('Can’t find the email?')}</h3>
                             <p>
-                                Check your spam or junk folder. If it’s not
-                                there, wait a minute and request a fresh link.
+                                {t(
+                                    'Check your spam or junk folder. If it’s not there, wait a minute and request a fresh link.',
+                                )}
                             </p>
                         </div>
                     </div>

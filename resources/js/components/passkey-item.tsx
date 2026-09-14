@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 import { KeyRound, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -18,6 +19,8 @@ type Props = {
 };
 
 export default function PasskeyItem({ passkey, onDelete }: Props) {
+    const { t } = useTranslation();
+
     const [isDeleting, setIsDeleting] = useState(false);
 
     const handleDelete = () => {
@@ -76,7 +79,7 @@ export default function PasskeyItem({ passkey, onDelete }: Props) {
                     </DialogDescription>
                     <DialogFooter className="gap-2">
                         <DialogClose asChild>
-                            <Button variant="secondary">Cancel</Button>
+                            <Button variant="secondary">{t('Cancel')}</Button>
                         </DialogClose>
                         <Button
                             variant="destructive"

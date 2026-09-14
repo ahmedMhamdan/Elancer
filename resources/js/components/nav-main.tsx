@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 import { Link } from '@inertiajs/react';
 import {
     SidebarGroup,
@@ -11,12 +12,14 @@ import { useCurrentUrl } from '@/hooks/use-current-url';
 import type { NavItem } from '@/types';
 
 export function NavMain({ items }: { items: NavItem[] }) {
+    const { t } = useTranslation();
+
     const { isCurrentUrl } = useCurrentUrl();
     const { isMobile, setOpenMobile } = useSidebar();
 
     return (
         <SidebarGroup className="px-4 py-0 group-data-[collapsible=icon]:px-2">
-            <SidebarGroupLabel>Workspace</SidebarGroupLabel>
+            <SidebarGroupLabel>{t('Workspace')}</SidebarGroupLabel>
             <SidebarMenu>
                 {items.map((item) => (
                     <SidebarMenuItem key={item.title}>

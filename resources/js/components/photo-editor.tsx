@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 // No crop editor exists in the inspected local TailAdmin source (2026-09-13).
 // Elancer extension using the adapted Modal and Button; browser canvas crops locally.
 import { useEffect, useRef, useState } from 'react';
@@ -16,6 +17,8 @@ export default function PhotoEditor({
     onApply: (photo: File) => void;
     onClose: () => void;
 }) {
+    const { t } = useTranslation();
+
     const canvas = useRef<HTMLCanvasElement>(null);
     const [image, setImage] = useState<HTMLImageElement>();
     const [zoom, setZoom] = useState(1);
@@ -250,7 +253,7 @@ export default function PhotoEditor({
             </div>
             <div className="mt-6 flex justify-end gap-3">
                 <Button variant="outline" disabled={saving} onClick={onClose}>
-                    Cancel
+                    {t('Cancel')}
                 </Button>
                 <Button disabled={!image || saving} onClick={apply}>
                     {saving ? 'Preparing…' : 'Apply photo'}

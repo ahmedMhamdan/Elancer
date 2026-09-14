@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 import {
     ArrowDown,
     ArrowRight,
@@ -116,6 +117,8 @@ function PortfolioPreview({ freelancer }: { freelancer: SampleFreelancer }) {
 }
 
 function FreelancerCard({ freelancer }: { freelancer: SampleFreelancer }) {
+    const { t } = useTranslation();
+
     return (
         <article className="elancer-talent-card">
             <PortfolioPreview freelancer={freelancer} />
@@ -128,7 +131,7 @@ function FreelancerCard({ freelancer }: { freelancer: SampleFreelancer }) {
                         <h3>{freelancer.name}</h3>
                         <p>{freelancer.role}</p>
                     </div>
-                    <span className="elancer-sample-label">Sample</span>
+                    <span className="elancer-sample-label">{t('Sample')}</span>
                 </div>
                 <p className="elancer-talent-intro">{freelancer.intro}</p>
                 <ul
@@ -146,14 +149,14 @@ function FreelancerCard({ freelancer }: { freelancer: SampleFreelancer }) {
                             type="button"
                             aria-label={`View sample profile: ${freelancer.name}`}
                         >
-                            View sample profile{' '}
+                            {t('View sample profile')}{' '}
                             <ArrowUpRight size={16} aria-hidden="true" />
                         </button>
                     </DialogTrigger>
                     <DialogContent className="elancer-profile-dialog">
                         <DialogHeader>
                             <span className="elancer-sample-label">
-                                Fictional sample profile
+                                {t('Fictional sample profile')}
                             </span>
                             <DialogTitle>{freelancer.name}</DialogTitle>
                             <DialogDescription>
@@ -165,14 +168,18 @@ function FreelancerCard({ freelancer }: { freelancer: SampleFreelancer }) {
                             <h3>{freelancer.project}</h3>
                             <p>{freelancer.projectDescription}</p>
                         </div>
-                        <ul className="elancer-skill-tags" aria-label="Skills">
+                        <ul
+                            className="elancer-skill-tags"
+                            aria-label={t('Skills')}
+                        >
                             {freelancer.skills.map((skill) => (
                                 <li key={skill}>{skill}</li>
                             ))}
                         </ul>
                         <p className="elancer-dialog-note">
-                            This profile and portfolio are fictional examples,
-                            not a real person or an offer for hire.
+                            {t(
+                                'This profile and portfolio are fictional examples, not a real person or an offer for hire.',
+                            )}
                         </p>
                     </DialogContent>
                 </Dialog>
@@ -182,6 +189,7 @@ function FreelancerCard({ freelancer }: { freelancer: SampleFreelancer }) {
 }
 
 export default function HomeMarketplace() {
+    const { t, ar } = useTranslation();
     const [category, setCategory] = useState<CategoryId | null>(null);
     const [showAll, setShowAll] = useState(false);
     const reducedMotion = useReducedMotion();
@@ -218,16 +226,16 @@ export default function HomeMarketplace() {
                 <div className="elancer-section-heading">
                     <div>
                         <span className="elancer-eyebrow">
-                            Explore by skill
+                            {t('Explore by skill')}
                         </span>
                         <h2 id="categories-heading">
-                            What does your project need?
+                            {t('What does your project need?')}
                         </h2>
                     </div>
                     <p>
-                        From a first sketch to the final line of code.
+                        {t('From a first sketch to the final line of code.')}
                         <br />
-                        Start with the skill your idea needs.
+                        {t('Start with the skill your idea needs.')}
                     </p>
                 </div>
                 <div className="elancer-category-grid">
@@ -250,12 +258,12 @@ export default function HomeMarketplace() {
                                         />
                                     </span>
                                 </div>
-                                <h3>{title}</h3>
-                                <p>{description}</p>
+                                <h3>{t(title)}</h3>
+                                <p>{t(description)}</p>
                                 <span className="elancer-category-bottom">
                                     {category === id
-                                        ? 'Selected'
-                                        : 'View sample talent'}
+                                        ? t('Selected')
+                                        : t('View sample talent')}
                                     {category === id ? (
                                         <Check size={16} aria-hidden="true" />
                                     ) : (
@@ -270,8 +278,8 @@ export default function HomeMarketplace() {
                     )}
                 </div>
                 <p className="elancer-category-help">
-                    <SlidersHorizontal size={13} aria-hidden="true" /> Select a
-                    category to explore the sample talent below.
+                    <SlidersHorizontal size={13} aria-hidden="true" />{' '}
+                    {t('Select a category to explore the sample talent below.')}
                 </p>
             </section>
 
@@ -283,33 +291,38 @@ export default function HomeMarketplace() {
                 <div className="elancer-section-heading">
                     <div>
                         <span className="elancer-eyebrow">
-                            A closer look at the work
+                            {t('A closer look at the work')}
                         </span>
                         <h2 id="talent-heading">
-                            Meet the skills behind the work.
+                            {t('Meet the skills behind the work.')}
                         </h2>
                     </div>
                     <div className="elancer-talent-heading-note">
                         <span className="elancer-sample-label">
-                            Sample talent showcase
+                            {t('Sample talent showcase')}
                         </span>
                         <p>
-                            Different strengths. A shared love for the craft.
+                            {t(
+                                'Different strengths. A shared love for the craft.',
+                            )}
                             <br />
-                            Explore these fictional profiles and portfolio
-                            concepts.
+                            {t(
+                                'Explore these fictional profiles and portfolio concepts.',
+                            )}
                         </p>
                     </div>
                 </div>
                 <div className="elancer-talent-filter">
                     <span role="status" aria-live="polite">
-                        {selected
-                            ? `${selected.title}: ${visible.length} sample ${visible.length === 1 ? 'profile' : 'profiles'}`
-                            : `Showing ${visible.length} sample profiles`}
+                        {ar
+                            ? `${selected ? t(selected.title) + ': ' : ''}${visible.length} ملفات نموذجية`
+                            : selected
+                              ? `${selected.title}: ${visible.length} sample ${visible.length === 1 ? 'profile' : 'profiles'}`
+                              : `Showing ${visible.length} sample profiles`}
                     </span>
                     {category && (
                         <button type="button" onClick={() => setCategory(null)}>
-                            Show all categories{' '}
+                            {t('Show all categories')}{' '}
                             <ArrowRight size={14} aria-hidden="true" />
                         </button>
                     )}
@@ -372,7 +385,7 @@ export default function HomeMarketplace() {
                             onClick={() => setShowAll((current) => !current)}
                         >
                             {showAll
-                                ? 'Show fewer profiles'
+                                ? t('Show fewer profiles')
                                 : 'Meet more sample talent'}
                             <ArrowDown
                                 size={16}

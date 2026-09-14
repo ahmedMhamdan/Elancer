@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 'use client';
 
 import { Link } from '@inertiajs/react';
@@ -41,11 +42,13 @@ export function NavBody({ children, className, visible }: NavBodyProps) {
 }
 
 export function NavItems({ items, className, onItemClick }: NavItemsProps) {
+    const { t } = useTranslation();
+
     const [hovered, setHovered] = useState<number | null>(null);
     const hoverId = useId();
     const reduceMotion = useReducedMotion();
     return (
-        <nav aria-label="Main navigation" onMouseLeave={() => setHovered(null)} className={cn('relative flex items-center gap-1', className)}>
+        <nav aria-label={t("Main navigation")} onMouseLeave={() => setHovered(null)} className={cn('relative flex items-center gap-1', className)}>
             {items.map((item, index) => (
                 <a key={item.link} href={item.link} onMouseEnter={() => setHovered(index)} onFocus={() => setHovered(index)} onBlur={() => setHovered(null)} onClick={onItemClick} className="elancer-resizable-link relative rounded-full px-4 py-3 text-sm font-medium">
                     {hovered === index && <motion.span layoutId={reduceMotion ? undefined : hoverId} className="absolute inset-0 rounded-full bg-[var(--el-soft)]" aria-hidden="true" transition={{ duration: reduceMotion ? 0 : 0.18 }} />}
@@ -97,15 +100,19 @@ export function MobileNavMenu({ children, className, isOpen, onClose, id = 'elan
 }
 
 export function MobileNavToggle({ isOpen, onClick, controls = 'elancer-mobile-navigation' }: { isOpen: boolean; onClick: () => void; controls?: string }) {
-    return <button type="button" onClick={onClick} aria-label={isOpen ? 'Close navigation' : 'Open navigation'} aria-expanded={isOpen} aria-controls={controls} className="grid size-11 cursor-pointer place-items-center rounded-full hover:bg-[var(--el-soft)]">{isOpen ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}</button>;
+    const { t } = useTranslation();
+
+    return <button type="button" onClick={onClick} aria-label={isOpen ? t("Close navigation") : t("Open navigation")} aria-expanded={isOpen} aria-controls={controls} className="grid size-11 cursor-pointer place-items-center rounded-full hover:bg-[var(--el-soft)]">{isOpen ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}</button>;
 }
 
 export function NavbarLogo() {
-    return <Link href={home()} aria-label="Elancer home" className="elancer-resizable-logo relative shrink-0 py-2"><ElancerWordmark /></Link>;
+    const { t } = useTranslation();
+
+    return <Link href={home()} aria-label={t("Elancer home")} className="elancer-resizable-logo relative shrink-0 py-2"><ElancerWordmark /></Link>;
 }
 
 export function NavbarButton({ href, as: Tag = 'a', children, className, variant = 'primary', ...props }: {
     href?: string; as?: React.ElementType; children: React.ReactNode; className?: string; variant?: 'primary' | 'secondary' | 'dark' | 'gradient';
 } & (React.ComponentPropsWithoutRef<'a'> | React.ComponentPropsWithoutRef<'button'>)) {
-    return <Tag href={href || undefined} className={cn('elancer-navbar-button relative inline-flex min-h-11 cursor-pointer items-center justify-center rounded-full px-5 py-2.5 text-sm font-medium whitespace-nowrap transition-colors', variant === 'secondary' ? 'elancer-navbar-button-secondary' : 'elancer-navbar-button-primary', className)} {...props}>{children}</Tag>;
+    return <Tag href={href || undefined} className={cn('elancer-navbar-button relative inline-flex min-h-11 cursor-pointer items-center justify-center rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors', variant === 'secondary' ? 'elancer-navbar-button-secondary' : 'elancer-navbar-button-primary', className)} {...props}>{children}</Tag>;
 }

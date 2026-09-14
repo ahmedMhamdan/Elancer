@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 import { Form } from '@inertiajs/react';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { Check, Copy, ScanLine } from 'lucide-react';
@@ -145,6 +146,8 @@ function TwoFactorVerificationStep({
     onClose: () => void;
     onBack: () => void;
 }) {
+    const { t } = useTranslation();
+
     const [code, setCode] = useState<string>('');
     const pinInputContainerRef = useRef<HTMLDivElement>(null);
 
@@ -210,7 +213,7 @@ function TwoFactorVerificationStep({
                                 onClick={onBack}
                                 disabled={processing}
                             >
-                                Back
+                                {t('Back')}
                             </Button>
                             <Button
                                 type="submit"
@@ -252,6 +255,8 @@ export default function TwoFactorSetupModal({
     fetchSetupData,
     errors,
 }: Props) {
+    const { t } = useTranslation();
+
     const [showVerificationStep, setShowVerificationStep] =
         useState<boolean>(false);
 
@@ -274,7 +279,7 @@ export default function TwoFactorSetupModal({
                 title: 'Verify authentication code',
                 description:
                     'Enter the 6-digit code from your authenticator app',
-                buttonText: 'Continue',
+                buttonText: t('Continue'),
             };
         }
 
@@ -282,7 +287,7 @@ export default function TwoFactorSetupModal({
             title: 'Enable two-factor authentication',
             description:
                 'To finish enabling two-factor authentication, scan the QR code or enter the setup key in your authenticator app',
-            buttonText: 'Continue',
+            buttonText: t('Continue'),
         };
     }, [twoFactorEnabled, showVerificationStep]);
 

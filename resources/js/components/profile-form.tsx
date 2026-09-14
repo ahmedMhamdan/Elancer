@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 // Adapts TailAdmin DefaultInputs form composition using the existing licensed
 // ComponentCard, InputField, TextArea, Label and Button implementations.
 import { Link, useForm, usePage } from '@inertiajs/react';
@@ -16,6 +17,8 @@ export default function ProfileForm({
 }: {
     profile: MarketplaceProfile | null;
 }) {
+    const { t } = useTranslation();
+
     const { auth } = usePage().props;
     const client = auth.user.workspace_role === 'client';
     const form = useForm({
@@ -91,7 +94,7 @@ export default function ProfileForm({
                 {client
                     ? field(
                           'company',
-                          'Company name',
+                          t('Company name'),
                           120,
                           'Optional — leave blank if you hire as an individual.',
                       )
@@ -129,7 +132,7 @@ export default function ProfileForm({
                     title="Skills and expertise"
                     desc="Add up to 15 skills that describe your work."
                 >
-                    <Label htmlFor="profile-skills">Skills</Label>
+                    <Label htmlFor="profile-skills">{t('Skills')}</Label>
                     <SkillSelect
                         id="profile-skills"
                         value={form.data.skills}
@@ -151,8 +154,8 @@ export default function ProfileForm({
                 desc="Share your city and country. A street address is not needed."
             >
                 <div className="grid gap-5 sm:grid-cols-2">
-                    {field('country', 'Country', 100)}
-                    {field('city', 'City', 100)}
+                    {field('country', t('Country'), 100)}
+                    {field('city', t('City'), 100)}
                 </div>
             </ComponentCard>
             <div className="border-border bg-card flex flex-wrap items-center justify-between gap-4 rounded-xl border p-5">
@@ -174,7 +177,7 @@ export default function ProfileForm({
                         Reset
                     </Button>
                     <Button type="submit" disabled={form.processing}>
-                        {form.processing ? 'Saving…' : 'Save changes'}
+                        {form.processing ? 'Saving…' : t('Save changes')}
                     </Button>
                 </div>
             </div>

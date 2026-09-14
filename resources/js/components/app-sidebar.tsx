@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 // Dashboard integration of Ahmed's supplied SidebarDemo; real Elancer routes,
 // role-aware links, wordmark and account replace the demo's placeholders.
 import { Link, router, usePage } from '@inertiajs/react';
@@ -24,6 +25,8 @@ import { dashboard, home, logout } from '@/routes';
 import { edit } from '@/routes/profile';
 
 export function AppSidebar() {
+    const { t } = useTranslation();
+
     const { auth } = usePage().props;
     const { url } = usePage();
     const { open, isMobile, setOpenMobile, reducedMotion } = useSidebar();
@@ -42,14 +45,14 @@ export function AppSidebar() {
               dashboard: 'لوحة تحكم Elancer',
           }
         : {
-              overview: 'Overview',
+              overview: t('Overview'),
               settings: 'Account settings',
-              profile: 'My profile',
-              explore: 'Explore skills',
+              profile: t('My profile'),
+              explore: t('Explore skills'),
               categories: 'Categories',
               admins: 'Admin access',
-              logout: 'Log out',
-              navigation: 'Main navigation',
+              logout: t('Log out'),
+              navigation: t('Main navigation'),
               dashboard: 'Elancer dashboard',
           };
     const links = [

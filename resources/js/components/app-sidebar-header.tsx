@@ -1,3 +1,5 @@
+import { useTranslation } from '@/hooks/use-translation';
+import LanguageToggle from '@/components/language-toggle';
 import { Link } from '@inertiajs/react';
 import { ArrowUpRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/breadcrumbs';
@@ -12,6 +14,8 @@ export function AppSidebarHeader({
 }: {
     breadcrumbs?: BreadcrumbItem[];
 }) {
+    const { t } = useTranslation();
+
     return (
         <header className="workspace-header">
             <div className="flex min-w-0 items-center gap-3">
@@ -23,13 +27,14 @@ export function AppSidebarHeader({
                     href={home()}
                     className="workspace-site-link hidden sm:inline-flex"
                 >
-                    Explore Elancer{' '}
+                    {t('Explore Elancer')}{' '}
                     <ArrowUpRight
                         size={16}
                         strokeWidth={1.75}
                         aria-hidden="true"
                     />
                 </Link>
+                <LanguageToggle />
                 <ThemeToggle />
                 <NotificationDropdown />
             </div>
