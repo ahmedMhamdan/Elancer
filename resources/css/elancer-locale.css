@@ -33,3 +33,9 @@ html[lang='ar'] :is(h1, h2, h3, h4, p, label, button, a, .elancer-eyebrow) {
     cursor: wait;
     opacity: 0.55;
 }
+
+/* Keep small Arabic profile labels and their dots readable. */
+html[lang='ar'] .profile-summary-details dt {
+    font-size: 14px;
+    line-height: 1.75;
+}

@@ -162,7 +162,7 @@ export default function MarketplaceProfile({
                                     <dt>
                                         {isClient
                                             ? t('Company')
-                                            : t('Headline')}
+                                            : t('Professional headline')}
                                     </dt>
                                     <dd dir="auto">
                                         {(isClient

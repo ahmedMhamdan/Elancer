@@ -224,7 +224,7 @@ export const arabic: Record<string, string> = {
     Name: 'الاسم',
     Country: 'الدولة',
     City: 'المدينة',
-    Headline: 'المسمّى المهني',
+    Headline: 'المسمى المهني',
     Bio: 'نبذة',
     Skills: 'المهارات',
     'Company name': 'اسم الشركة',
@@ -453,7 +453,7 @@ export const arabic: Record<string, string> = {
     'Find the right people to bring your ideas to life.':
         'اعثر على المستقلين المناسبين لتنفيذ أفكارك.',
     'Your name *': 'اسمك *',
-    'Professional headline *': 'المسمّى المهني *',
+    'Professional headline *': 'المسمى المهني *',
     'e.g. Laravel developer for growing businesses':
         'مثلًا: مطوّر Laravel للشركات الناشئة',
     'Your skills *': 'مهاراتك *',
@@ -548,7 +548,7 @@ export const arabic: Record<string, string> = {
     'Not added yet': 'لم تُضف بعد',
     'Add a short introduction to help clients get to know you.':
         'أضف نبذة قصيرة تعرّف أصحاب المشاريع عليك.',
-    'Professional headline': 'المسمّى المهني',
+    'Professional headline': 'المسمى المهني',
     'Optional — leave blank if you hire as an individual.':
         'اختياري — اتركه فارغًا إذا كنت تتعامل بصفتك الشخصية.',
     'A short description of your work and specialty.': 'وصف موجز لعملك وتخصصك.',
