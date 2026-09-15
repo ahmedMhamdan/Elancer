@@ -13,3 +13,23 @@ input[autocomplete='one-time-code'] {
     direction: ltr;
     text-align: start;
 }
+
+/* Arabic typography follows the selected locale, including portal dialogs. */
+html[lang='ar'] {
+    --font-sans:
+        'Cairo', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+}
+
+html[lang='ar'] :is(h1, h2, h3, h4, p, label, button, a, .elancer-eyebrow) {
+    letter-spacing: normal;
+}
+.elancer-wordmark {
+    direction: ltr;
+    unicode-bidi: isolate;
+    font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+    white-space: nowrap;
+}
+.language-toggle:disabled {
+    cursor: wait;
+    opacity: 0.55;
+}

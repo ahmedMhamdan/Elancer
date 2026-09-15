@@ -3,7 +3,7 @@
     min-height: 100svh;
     background: var(--el-surface);
     color: var(--el-text);
-    font-family: 'Instrument Sans', sans-serif;
+    font-family: var(--font-sans);
 }
 .elancer-registration :is(a, button) {
     cursor: pointer;

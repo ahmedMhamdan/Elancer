@@ -128,3 +128,10 @@ adapts the supplied screenshot for Elancer's saved draft and existing next steps
 No crop editor exists in the inspected local source; the canvas crop, zoom and
 rotation editor is an Elancer extension using the adapted modal/buttons.
 The existing TailAdmin MIT license above applies to these adaptations.
+
+## Cairo typeface
+
+Arabic interface typography uses Cairo by The Cairo Project Authors, licensed under the SIL Open Font License 1.1. The existing Vite font pipeline downloads and serves the font locally.
+
+- [Font source](https://github.com/Gue3bara/Cairo)
+- [License](public/licenses/Cairo-OFL.txt)

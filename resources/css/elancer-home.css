@@ -2,7 +2,7 @@
 .elancer-home {
     background: var(--el-page);
     color: var(--el-text);
-    font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--font-sans);
 }
 .elancer-home a,
 .elancer-home button {
@@ -758,7 +758,7 @@
     overflow: visible;
 }
 .elancer-hover-lettering {
-    font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--font-sans);
     font-size: 136px;
     font-weight: 600;
     letter-spacing: -8px;

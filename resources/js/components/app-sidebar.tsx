@@ -115,7 +115,7 @@ export function AppSidebar() {
                     className="focus-visible:outline-ring flex h-11 shrink-0 items-center overflow-hidden rounded-lg px-3 focus-visible:outline-2 focus-visible:outline-offset-[-2px]"
                 >
                     <span
-                        className="relative block h-9 w-40 shrink-0"
+                        className={`relative block h-9 shrink-0 ${open || isMobile ? 'w-40' : 'w-6'}`}
                         dir="ltr"
                         aria-hidden="true"
                     >

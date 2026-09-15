@@ -5,7 +5,7 @@
     grid-template-rows: minmax(88px, 1fr) auto minmax(88px, 1fr);
     background: var(--el-surface);
     color: var(--el-text);
-    font-family: 'Instrument Sans', sans-serif;
+    font-family: var(--font-sans);
 }
 .elancer-two-factor :is(a, button, input):focus-visible {
     outline: 3px solid var(--el-accent);
