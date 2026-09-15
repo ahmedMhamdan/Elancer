@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 // Adapted from TailAdmin/src/components/form/input/TextArea.tsx (MIT).
 // Demo structure retained; Elancer theme tokens and native accessible form attributes added.
 // See THIRD_PARTY_NOTICES.md.
@@ -18,7 +19,7 @@ interface TextareaProps extends Omit<
 }
 
 const TextArea: React.FC<TextareaProps> = ({
-    placeholder = 'Enter your message', // Default placeholder
+    placeholder,
     rows = 3, // Default number of rows
     value = '', // Default value
     onChange, // Callback for changes
@@ -28,6 +29,7 @@ const TextArea: React.FC<TextareaProps> = ({
     hint = '', // Default hint text
     ...props
 }) => {
+    const { t } = useTranslation();
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         if (onChange) {
             onChange(e.target.value);
@@ -48,7 +50,7 @@ const TextArea: React.FC<TextareaProps> = ({
         <div className="relative">
             <textarea
                 {...props}
-                placeholder={placeholder}
+                placeholder={placeholder ?? t('Enter your message')}
                 rows={rows}
                 value={value}
                 onChange={handleChange}

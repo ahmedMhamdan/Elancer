@@ -36,14 +36,16 @@ function Review({
     close: () => void;
     onReviewed: () => void;
 }) {
+    const { t } = useTranslation();
+
     const form = useForm({ reason: '' });
     const [error, setError] = useState('');
     function decide(status: 'approved' | 'rejected') {
         if (
             !window.confirm(
                 status === 'approved'
-                    ? 'Approve this identity submission?'
-                    : 'Reject this submission and request new images?',
+                    ? t('Approve this identity submission?')
+                    : t('Reject this submission and request new images?'),
             )
         )
             return;
@@ -61,21 +63,23 @@ function Review({
     }
     return (
         <ComponentCard
-            title={`Review ${submission.name}`}
-            desc="Compare the ID and selfie before recording your decision. Images are removed after review."
+            title={t('Review :name', { name: submission.name })}
+            desc={t(
+                'Compare the ID and selfie before recording your decision. Images are removed after review.',
+            )}
         >
             <div className="grid gap-4 md:grid-cols-2">
                 {(['id', 'selfie'] as const).map((kind) => (
                     <figure key={kind}>
                         <figcaption className="mb-2 font-medium">
-                            {kind === 'id' ? 'Government ID' : 'Selfie'}
+                            {kind === 'id' ? t('Government ID') : t('Selfie')}
                         </figcaption>
                         <img
                             src={`/admin/identity/${submission.id}/image/${kind}`}
                             alt={
                                 kind === 'id'
-                                    ? 'Submitted government ID'
-                                    : 'Submitted selfie'
+                                    ? t('Submitted government ID')
+                                    : t('Submitted selfie')
                             }
                             className="border-border h-72 w-full rounded-lg border object-contain"
                         />
@@ -84,7 +88,7 @@ function Review({
             </div>
             <div>
                 <Label htmlFor="identity-review-reason">
-                    Review reason (shared with the user)
+                    {t('Review reason (shared with the user)')}
                 </Label>
                 <TextArea
                     id="identity-review-reason"
@@ -95,27 +99,27 @@ function Review({
                 />
                 <InputError message={form.errors.reason} />
             </div>
-            {error && <Alert variant="error" message={error} />}
+            {error && <Alert variant="error" message={t(error)} />}
             <div className="flex flex-wrap gap-3">
                 <Button
                     disabled={form.processing || !form.data.reason.trim()}
                     onClick={() => decide('approved')}
                 >
-                    Approve identity
+                    {t('Approve identity')}
                 </Button>
                 <Button
                     disabled={form.processing || !form.data.reason.trim()}
                     variant="danger-outline"
                     onClick={() => decide('rejected')}
                 >
-                    Request resubmission
+                    {t('Request resubmission')}
                 </Button>
                 <Button
                     variant="outline"
                     disabled={form.processing}
                     onClick={close}
                 >
-                    Close
+                    {t('Close')}
                 </Button>
             </div>
         </ComponentCard>
@@ -134,12 +138,14 @@ export default function IdentityReviews({
     const [selected, setSelected] = useState<Submission | null>(null);
     return (
         <div className="workspace-dashboard space-y-6">
-            <Head title="Identity reviews" />
+            <Head title={t('Identity reviews')} />
             <div className="workspace-page-heading">
-                <h1>Identity reviews</h1>
-                <p>Private document review for clients and freelancers.</p>
+                <h1>{t('Identity reviews')}</h1>
+                <p>
+                    {t('Private document review for clients and freelancers.')}
+                </p>
             </div>
-            {notice && <Alert message={notice} />}
+            {notice && <Alert message={t(notice)} />}
             {selected && (
                 <Review
                     key={selected.id}
@@ -155,23 +161,23 @@ export default function IdentityReviews({
                 />
             )}
             <TableScroll
-                label="Identity reviews"
+                label={t('Identity reviews')}
                 className="border-border bg-card rounded-xl border"
             >
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            {['Account', 'Status', t('Review')].map((label) => (
+                            {['Account', 'Status', 'Review'].map((label) => (
                                 <TableCell
                                     key={label}
                                     isHeader
                                     className={
-                                        label === t('Review')
+                                        label === 'Review'
                                             ? 'w-px px-5 py-3 text-end'
                                             : 'px-5 py-3 text-start'
                                     }
                                 >
-                                    {label}
+                                    {t(label)}
                                 </TableCell>
                             ))}
                         </TableRow>
@@ -189,7 +195,7 @@ export default function IdentityReviews({
                                     </p>
                                 </TableCell>
                                 <TableCell className="px-5 py-4">
-                                    {row.status}
+                                    {t(row.status)}
                                 </TableCell>
                                 <TableCell className="px-5 py-4 text-end">
                                     {row.status === 'pending' ? (
@@ -198,7 +204,7 @@ export default function IdentityReviews({
                                             variant="outline"
                                             onClick={() => setSelected(row)}
                                         >
-                                            Review documents
+                                            {t('Review documents')}
                                         </Button>
                                     ) : (
                                         <span className="text-muted-foreground text-sm">
@@ -214,7 +220,7 @@ export default function IdentityReviews({
                                     colSpan={3}
                                     className="text-muted-foreground p-8 text-center"
                                 >
-                                    No identity submissions yet.
+                                    {t('No identity submissions yet.')}
                                 </TableCell>
                             </TableRow>
                         )}

@@ -61,24 +61,30 @@ export default function MarketplaceProfile({
                     <div>
                         <h1>{t('My profile')}</h1>
                         <p>
-                            Welcome back, {name.trim().split(/\s+/)[0]}. Manage
-                            your {isClient ? 'client' : 'freelancer'} profile.
+                            {t(
+                                isClient
+                                    ? 'Welcome back, :name. Manage your client profile.'
+                                    : 'Welcome back, :name. Manage your freelancer profile.',
+                                { name: name.trim().split(/\s+/)[0] },
+                            )}
                         </p>
                     </div>
                 </div>
                 <div
                     className="workspace-summary"
-                    aria-label="Profile overview"
+                    aria-label={t('Profile overview')}
                 >
                     <section className="workspace-metric">
                         <span className="workspace-icon">
                             <UserRound aria-hidden="true" />
                         </span>
                         <div>
-                            <p>Profile essentials</p>
+                            <p>{t('Profile essentials')}</p>
                             <strong>
-                                {completed}
-                                <span> / {total} complete</span>
+                                {t(':completed / :total complete', {
+                                    completed,
+                                    total,
+                                })}
                             </strong>
                         </div>
                         <span className="workspace-metric-note">
@@ -90,8 +96,10 @@ export default function MarketplaceProfile({
                             <Globe2 aria-hidden="true" />
                         </span>
                         <div>
-                            <p>Profile visibility</p>
-                            <strong>{published ? 'Published' : 'Draft'}</strong>
+                            <p>{t('Profile visibility')}</p>
+                            <strong>
+                                {published ? t('Published') : t('Draft')}
+                            </strong>
                         </div>
                     </section>
                     <section className="workspace-metric">
@@ -99,11 +107,11 @@ export default function MarketplaceProfile({
                             <ShieldCheck aria-hidden="true" />
                         </span>
                         <div>
-                            <p>Email verification</p>
+                            <p>{t('Email verification')}</p>
                             <strong>
                                 {auth.user.email_verified_at
-                                    ? 'Verified'
-                                    : 'Pending'}
+                                    ? t('Verified')
+                                    : t('Pending')}
                             </strong>
                         </div>
                         {auth.user.email_verified_at && (
@@ -122,8 +130,8 @@ export default function MarketplaceProfile({
                     </div>
                     <aside>
                         <ComponentCard
-                            title="Your profile"
-                            desc="Your latest saved details."
+                            title={t('Your profile')}
+                            desc={t('Your latest saved details.')}
                         >
                             <div className="profile-summary-person">
                                 <div
@@ -141,47 +149,54 @@ export default function MarketplaceProfile({
                                     )}
                                 </div>
                                 <div>
-                                    <h3>{name}</h3>
+                                    <h3 dir="auto">{name}</h3>
                                     <span className="workspace-badge">
-                                        {published ? 'Published' : 'Draft'}
+                                        {published
+                                            ? t('Published')
+                                            : t('Draft')}
                                     </span>
                                 </div>
                             </div>
                             <dl className="profile-summary-details">
                                 <div>
                                     <dt>
-                                        {isClient ? 'Company' : t('Headline')}
+                                        {isClient
+                                            ? t('Company')
+                                            : t('Headline')}
                                     </dt>
-                                    <dd>
+                                    <dd dir="auto">
                                         {(isClient
                                             ? profile?.company
                                             : profile?.headline) ||
-                                            'Not added yet'}
+                                            t('Not added yet')}
                                     </dd>
                                 </div>
                                 <div>
-                                    <dt>Location</dt>
+                                    <dt>{t('Location')}</dt>
                                     <dd className="flex items-start gap-2">
                                         <MapPin
                                             size={16}
                                             className="shrink-0"
                                             aria-hidden="true"
                                         />
-                                        {profile?.location || 'Not added yet'}
+                                        {profile?.location ||
+                                            t('Not added yet')}
                                     </dd>
                                 </div>
                                 <div>
                                     <dt>{t('Bio')}</dt>
-                                    <dd>
+                                    <dd dir="auto">
                                         {profile?.bio ||
-                                            'Add a short introduction to help clients get to know you.'}
+                                            t(
+                                                'Add a short introduction to help clients get to know you.',
+                                            )}
                                     </dd>
                                 </div>
                                 {!isClient &&
                                     Boolean(profile?.skills?.length) && (
                                         <div>
                                             <dt>{t('Skills')}</dt>
-                                            <dd>
+                                            <dd dir="auto">
                                                 {profile?.skills?.map(
                                                     (skill) => (
                                                         <span
@@ -198,13 +213,13 @@ export default function MarketplaceProfile({
                             </dl>
                             <div className="profile-summary-progress">
                                 <div>
-                                    <span>Profile completion</span>
+                                    <span>{t('Profile completion')}</span>
                                     <strong>{percent}%</strong>
                                 </div>
                                 <progress
                                     value={completed}
                                     max={total}
-                                    aria-label="Saved profile essentials"
+                                    aria-label={t('Saved profile essentials')}
                                 />
                             </div>
                         </ComponentCard>

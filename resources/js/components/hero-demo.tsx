@@ -8,14 +8,16 @@ export default function HeroDemo() {
     return (
         <Hero
             trustBadge={{
-                text: 'A meeting place for talent & possibility',
+                text: t('A meeting place for talent & possibility'),
                 icons: ['✦'],
             }}
             headline={{
                 line1: t('Good people.'),
                 line2: t('Extraordinary work.'),
             }}
-            subtitle="Bring your ambition. Find your people. Make something matter."
+            subtitle={t(
+                'Bring your ambition. Find your people. Make something matter.',
+            )}
             buttons={{
                 primary: { text: t('Get started'), href: '/register' },
                 secondary: { text: t('Log in'), href: '/login' },

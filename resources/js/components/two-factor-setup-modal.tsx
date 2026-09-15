@@ -63,6 +63,8 @@ function TwoFactorSetupStep({
     onNextStep: () => void;
     errors: string[];
 }) {
+    const { t } = useTranslation();
+
     const { resolvedAppearance } = useAppearance();
     const [copiedText, copy] = useClipboard();
     const IconComponent = copiedText === manualSetupKey ? Check : Copy;
@@ -70,7 +72,7 @@ function TwoFactorSetupStep({
     return (
         <>
             {errors?.length ? (
-                <AlertError errors={errors} />
+                <AlertError errors={errors.map((error) => t(error))} />
             ) : (
                 <>
                     <div className="mx-auto flex max-w-md overflow-hidden">
@@ -105,7 +107,7 @@ function TwoFactorSetupStep({
                     <div className="relative flex w-full items-center justify-center">
                         <div className="bg-border absolute inset-0 top-1/2 h-px w-full" />
                         <span className="bg-card relative px-2 py-1">
-                            or, enter the code manually
+                            {t('or, enter the code manually')}
                         </span>
                     </div>
 
@@ -121,10 +123,17 @@ function TwoFactorSetupStep({
                                         type="text"
                                         readOnly
                                         value={manualSetupKey}
+                                        dir="ltr"
+                                        aria-label={t('Manual setup key')}
                                         className="bg-background text-foreground h-full w-full p-3 outline-none"
                                     />
                                     <button
                                         onClick={() => copy(manualSetupKey)}
+                                        aria-label={t(
+                                            copiedText === manualSetupKey
+                                                ? 'Copied'
+                                                : 'Copy setup key',
+                                        )}
                                         className="border-border hover:bg-muted border-l px-3"
                                     >
                                         <IconComponent className="w-4" />
@@ -222,7 +231,7 @@ function TwoFactorVerificationStep({
                                     processing || code.length < OTP_MAX_LENGTH
                                 }
                             >
-                                Confirm
+                                {t('Confirm')}
                             </Button>
                         </div>
                     </div>
@@ -256,7 +265,6 @@ export default function TwoFactorSetupModal({
     errors,
 }: Props) {
     const { t } = useTranslation();
-
     const [showVerificationStep, setShowVerificationStep] =
         useState<boolean>(false);
 
@@ -279,7 +287,7 @@ export default function TwoFactorSetupModal({
                 title: 'Verify authentication code',
                 description:
                     'Enter the 6-digit code from your authenticator app',
-                buttonText: t('Continue'),
+                buttonText: 'Continue',
             };
         }
 
@@ -287,7 +295,7 @@ export default function TwoFactorSetupModal({
             title: 'Enable two-factor authentication',
             description:
                 'To finish enabling two-factor authentication, scan the QR code or enter the setup key in your authenticator app',
-            buttonText: t('Continue'),
+            buttonText: 'Continue',
         };
     }, [twoFactorEnabled, showVerificationStep]);
 
@@ -332,9 +340,9 @@ export default function TwoFactorSetupModal({
             <DialogContent className="sm:max-w-md">
                 <DialogHeader className="flex items-center justify-center">
                     <GridScanIcon />
-                    <DialogTitle>{modalConfig.title}</DialogTitle>
+                    <DialogTitle>{t(modalConfig.title)}</DialogTitle>
                     <DialogDescription className="text-center">
-                        {modalConfig.description}
+                        {t(modalConfig.description)}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -348,7 +356,7 @@ export default function TwoFactorSetupModal({
                         <TwoFactorSetupStep
                             qrCodeSvg={qrCodeSvg}
                             manualSetupKey={manualSetupKey}
-                            buttonText={modalConfig.buttonText}
+                            buttonText={t(modalConfig.buttonText)}
                             onNextStep={handleModalNextStep}
                             errors={errors}
                         />

@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 import type { HTMLAttributes } from 'react';
 import ThemeIcon from '@/components/theme-icon';
 import { useAppearance } from '@/hooks/use-appearance';
@@ -15,10 +16,11 @@ export default function AppearanceToggleTab({
     ...props
 }: HTMLAttributes<HTMLDivElement>) {
     const { appearance, updateAppearance } = useAppearance();
+    const { t } = useTranslation();
     return (
         <div
             role="group"
-            aria-label="Color theme"
+            aria-label={t('Color theme')}
             className={cn(
                 'border-border bg-muted inline-flex flex-wrap gap-1 rounded-xl border p-1',
                 className,
@@ -39,7 +41,7 @@ export default function AppearanceToggleTab({
                     )}
                 >
                     <ThemeIcon mode={value} />
-                    {label}
+                    {t(label)}
                 </button>
             ))}
         </div>

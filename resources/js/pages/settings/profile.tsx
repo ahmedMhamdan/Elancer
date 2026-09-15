@@ -29,15 +29,15 @@ export default function Profile({
 
     return (
         <>
-            <Head title="Profile settings" />
+            <Head title={t('Profile settings')} />
 
-            <h1 className="sr-only">Profile settings</h1>
+            <h1 className="sr-only">{t('Profile settings')}</h1>
 
             <div className="space-y-6">
                 <Heading
                     variant="small"
                     title={t('Profile')}
-                    description="Update your name and email address"
+                    description={t('Update your name and email address')}
                 />
 
                 <Form
@@ -94,22 +94,26 @@ export default function Profile({
                                 auth.user.email_verified_at === null && (
                                     <div>
                                         <p className="text-muted-foreground -mt-4 text-sm">
-                                            Your email address is unverified.{' '}
+                                            {t(
+                                                'Your email address is unverified.',
+                                            )}{' '}
                                             <Link
                                                 href={send()}
                                                 as="button"
                                                 className="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
                                             >
-                                                Click here to re-send the
-                                                verification email.
+                                                {t(
+                                                    'Click here to re-send the verification email.',
+                                                )}
                                             </Link>
                                         </p>
 
                                         {status ===
                                             'verification-link-sent' && (
                                             <div className="mt-2 text-sm font-medium text-green-600">
-                                                A new verification link has been
-                                                sent to your email address.
+                                                {t(
+                                                    'A new verification link has been sent to your email address.',
+                                                )}
                                             </div>
                                         )}
                                     </div>

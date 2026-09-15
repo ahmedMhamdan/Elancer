@@ -106,7 +106,7 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
     const photoInputRef = useRef<HTMLInputElement>(null);
     const isFreelancer = form.data.role === 'freelancer';
     const skills = form.data.skills;
-    const firstName = form.data.name.trim().split(/\s+/)[0] || 'there';
+    const firstName = form.data.name.trim().split(/\s+/)[0] || t('friend');
 
     useEffect(() => {
         headingRef.current?.focus();
@@ -150,7 +150,7 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                   : [];
         const blankField = requiredFields.find((key) => !form.data[key].trim());
         if (blankField) {
-            form.setError(blankField, 'Please fill in this field.');
+            form.setError(blankField, t('Please fill in this field.'));
             document.getElementById(blankField)?.focus();
             return;
         }
@@ -163,7 +163,7 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
         ) {
             form.setError(
                 'skills',
-                'Add 1–15 skills, separated by commas. Each skill can be up to 50 characters.',
+                t('Choose 1–15 skills from the suggestions.'),
             );
             document.getElementById('skills')?.focus();
             return;
@@ -211,7 +211,7 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
             ? 'Tell us about the work you do.'
             : 'Tell us a little about yourself.',
         'A few details, and you’re ready to go.',
-        'Looking good, ' + firstName + '.',
+        t('Looking good, :name.', { name: firstName }),
     ];
     const descriptions = [
         'Choose where you’d like to start. You can hire and freelance with the same account.',
@@ -236,7 +236,7 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                     }}
                 />
             )}
-            <Head title="Set up your profile" />
+            <Head title={t('Set up your profile')} />
             <header className="onboarding-header">
                 <Link href={home()} aria-label={t('Elancer home')}>
                     <ElancerWordmark />
@@ -251,21 +251,24 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                     <div className="onboarding-progress">
                         <div className="flex items-center justify-between gap-4">
                             <span>
-                                Step {step + 1} of {steps.length}
+                                {t('Step :step of :total', {
+                                    step: step + 1,
+                                    total: steps.length,
+                                })}
                             </span>
-                            <span>{steps[step]}</span>
+                            <span>{t(steps[step])}</span>
                         </div>
                         <progress
                             max={steps.length}
                             value={step + 1}
-                            aria-label="Profile setup progress"
+                            aria-label={t('Profile setup progress')}
                         />
                     </div>
                     <div className="onboarding-heading">
                         <h1 ref={headingRef} tabIndex={-1}>
-                            {titles[step]}
+                            {t(titles[step])}
                         </h1>
-                        <p>{descriptions[step]}</p>
+                        <p>{t(descriptions[step])}</p>
                     </div>
                     <form onSubmit={next}>
                         <fieldset
@@ -273,7 +276,9 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                             aria-busy={form.processing}
                             className="min-w-0"
                         >
-                            <legend className="sr-only">{steps[step]}</legend>
+                            <legend className="sr-only">
+                                {t(steps[step])}
+                            </legend>
                             {step === 0 && (
                                 <div className="onboarding-role-grid">
                                     <Radio
@@ -292,11 +297,12 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                             <span className="onboarding-role-copy">
                                                 <Code2 aria-hidden="true" />
                                                 <strong>
-                                                    I’m a freelancer
+                                                    {t('I’m a freelancer')}
                                                 </strong>
                                                 <span>
-                                                    Find projects and put your
-                                                    skills to work.
+                                                    {t(
+                                                        'Find projects and put your skills to work.',
+                                                    )}
                                                 </span>
                                             </span>
                                         }
@@ -318,10 +324,13 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                         label={
                                             <span className="onboarding-role-copy">
                                                 <BriefcaseBusiness aria-hidden="true" />
-                                                <strong>I’m a client</strong>
+                                                <strong>
+                                                    {t('I’m a client')}
+                                                </strong>
                                                 <span>
-                                                    Find the right people to
-                                                    bring your ideas to life.
+                                                    {t(
+                                                        'Find the right people to bring your ideas to life.',
+                                                    )}
                                                 </span>
                                             </span>
                                         }
@@ -340,7 +349,7 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                 <div className="onboarding-details">
                                     <Field
                                         id="name"
-                                        label="Your name *"
+                                        label={t('Your name *')}
                                         error={form.errors.name}
                                     >
                                         <Input
@@ -363,7 +372,9 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                         <>
                                             <Field
                                                 id="headline"
-                                                label="Professional headline *"
+                                                label={t(
+                                                    'Professional headline *',
+                                                )}
                                                 error={form.errors.headline}
                                             >
                                                 <Input
@@ -371,7 +382,9 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                                     name="headline"
                                                     required
                                                     maxLength={120}
-                                                    placeholder="e.g. Laravel developer for growing businesses"
+                                                    placeholder={t(
+                                                        'e.g. Laravel developer for growing businesses',
+                                                    )}
                                                     value={form.data.headline}
                                                     onChange={(event) =>
                                                         form.setData(
@@ -384,7 +397,7 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                             </Field>
                                             <Field
                                                 id="skills"
-                                                label="Your skills *"
+                                                label={t('Your skills *')}
                                             >
                                                 <SkillSelect
                                                     id="skills"
@@ -406,7 +419,7 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                     ) : (
                                         <Field
                                             id="company"
-                                            label="Company name (optional)"
+                                            label={t('Company name (optional)')}
                                             error={form.errors.company}
                                         >
                                             <Input
@@ -414,7 +427,9 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                                 name="company"
                                                 maxLength={120}
                                                 autoComplete="organization"
-                                                placeholder="Your company or business"
+                                                placeholder={t(
+                                                    'Your company or business',
+                                                )}
                                                 value={form.data.company}
                                                 onChange={(event) =>
                                                     form.setData(
@@ -430,8 +445,10 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                         id="bio"
                                         label={
                                             isFreelancer
-                                                ? 'Your introduction *'
-                                                : 'About you or your company *'
+                                                ? t('Your introduction *')
+                                                : t(
+                                                      'About you or your company *',
+                                                  )
                                         }
                                         error={form.errors.bio}
                                     >
@@ -443,8 +460,12 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                             rows={5}
                                             placeholder={
                                                 isFreelancer
-                                                    ? 'Describe your experience and how you help clients.'
-                                                    : 'Tell freelancers about your business and the work you have in mind.'
+                                                    ? t(
+                                                          'Describe your experience and how you help clients.',
+                                                      )
+                                                    : t(
+                                                          'Tell freelancers about your business and the work you have in mind.',
+                                                      )
                                             }
                                             value={form.data.bio}
                                             onChange={(value) =>
@@ -462,7 +483,9 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                             {photoUrl ? (
                                                 <img
                                                     src={photoUrl}
-                                                    alt="Your selected profile photo"
+                                                    alt={t(
+                                                        'Your selected profile photo',
+                                                    )}
                                                     onError={() => {
                                                         setPhotoError(
                                                             'This image could not be opened. Choose another photo.',
@@ -487,8 +510,8 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                                 aria-hidden="true"
                                             />
                                             {photoUrl
-                                                ? 'Change photo'
-                                                : 'Upload photo'}
+                                                ? t('Change photo')
+                                                : t('Upload photo')}
                                         </label>
                                         <input
                                             ref={photoInputRef}
@@ -511,9 +534,9 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                             id="photo-help"
                                             className="onboarding-hint"
                                         >
-                                            Optional · JPG, PNG or WebP
+                                            {t('Optional · JPG, PNG or WebP')}
                                             <br />
-                                            Up to 2 MB
+                                            {t('Up to 2 MB')}
                                         </p>
                                         {photoUrl && photoSource && (
                                             <button
@@ -526,7 +549,7 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                                     setEditingPhoto(true);
                                                 }}
                                             >
-                                                Edit photo
+                                                {t('Edit photo')}
                                             </button>
                                         )}
                                         {photoUrl && (
@@ -543,7 +566,7 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                                             '';
                                                 }}
                                             >
-                                                Remove photo
+                                                {t('Remove photo')}
                                             </button>
                                         )}
                                         <p
@@ -561,7 +584,7 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                     <div className="onboarding-location-fields">
                                         <Field
                                             id="country"
-                                            label="Country or territory *"
+                                            label={t('Country or territory *')}
                                             error={form.errors.country}
                                         >
                                             <Input
@@ -570,7 +593,9 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                                 required
                                                 maxLength={100}
                                                 autoComplete="country-name"
-                                                placeholder="e.g. Palestine"
+                                                placeholder={t(
+                                                    'e.g. Palestine',
+                                                )}
                                                 value={form.data.country}
                                                 onChange={(event) =>
                                                     form.setData(
@@ -583,7 +608,7 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                         </Field>
                                         <Field
                                             id="city"
-                                            label="City *"
+                                            label={t('City *')}
                                             error={form.errors.city}
                                         >
                                             <Input
@@ -592,7 +617,7 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                                 required
                                                 maxLength={100}
                                                 autoComplete="address-level2"
-                                                placeholder="e.g. Hebron"
+                                                placeholder={t('e.g. Hebron')}
                                                 value={form.data.city}
                                                 onChange={(event) =>
                                                     form.setData(
@@ -604,8 +629,9 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                             />
                                         </Field>
                                         <p className="onboarding-location-note">
-                                            Your city and country help people
-                                            know where you’re based.
+                                            {t(
+                                                'Your city and country help people know where you’re based.',
+                                            )}
                                         </p>
                                     </div>
                                 </div>
@@ -613,7 +639,7 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                             {step === 3 && (
                                 <section
                                     className="onboarding-review"
-                                    aria-label="Review your profile"
+                                    aria-label={t('Review your profile')}
                                 >
                                     <div className="onboarding-review-person">
                                         <div className="onboarding-avatar">
@@ -640,7 +666,7 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                             className="onboarding-text-button"
                                             onClick={() => setStep(2)}
                                         >
-                                            Edit photo & location
+                                            {t('Edit photo & location')}
                                         </button>
                                     </div>
                                     <div className="onboarding-review-body">
@@ -673,7 +699,7 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                             className="onboarding-text-button"
                                             onClick={() => setStep(1)}
                                         >
-                                            Edit introduction
+                                            {t('Edit introduction')}
                                         </button>
                                     </div>
                                 </section>
@@ -691,7 +717,7 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                         className="onboarding-text-button"
                                         href={home()}
                                     >
-                                        Back to home
+                                        {t('Back to home')}
                                     </Link>
                                 )}
                                 <Button
@@ -702,11 +728,11 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                     }
                                 >
                                     {form.processing
-                                        ? 'Saving your profile…'
+                                        ? t('Saving your profile…')
                                         : step === 3
-                                          ? 'Save and continue'
+                                          ? t('Save and continue')
                                           : step === 2
-                                            ? 'Review your profile'
+                                            ? t('Review your profile')
                                             : t('Continue')}
                                 </Button>
                             </footer>

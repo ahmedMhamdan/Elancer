@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 // TailAdmin ComponentCard and DefaultInputs adaptations; private identity uploads.
 import { useForm } from '@inertiajs/react';
 import { useRef } from 'react';
@@ -16,6 +17,8 @@ export default function IdentityVerification({
 }: {
     identity: IdentityStatus;
 }) {
+    const { t } = useTranslation();
+
     const element = useRef<HTMLFormElement>(null);
     const form = useForm<{
         government_id: File | null;
@@ -32,24 +35,27 @@ export default function IdentityVerification({
                 : 'Verify your identity';
     return (
         <ComponentCard
-            title={title}
-            desc="Identity verification for clients and freelancers."
+            title={t(title)}
+            desc={t('Identity verification for clients and freelancers.')}
         >
             {identity?.status === 'pending' && (
                 <p className="text-muted-foreground text-sm">
-                    Your ID photo and selfie have been submitted. A super admin
-                    will review them. You are not yet verified.
+                    {t(
+                        'Your ID photo and selfie have been submitted. A super admin will review them. You are not yet verified.',
+                    )}
                 </p>
             )}
             {identity?.status === 'approved' && (
                 <p className="text-primary text-sm">
-                    A super admin approved your identity submission. The
-                    uploaded images have been removed.
+                    {t(
+                        'A super admin approved your identity submission. The uploaded images have been removed.',
+                    )}
                 </p>
             )}
             {identity?.status === 'rejected' && (
                 <p role="status" className="text-muted-foreground text-sm">
-                    Review feedback: {identity.reason}
+                    {t('Review feedback:')}
+                    {identity.reason}
                 </p>
             )}
             {(!identity || identity.status === 'rejected') && (
@@ -69,16 +75,13 @@ export default function IdentityVerification({
                     className="space-y-5"
                 >
                     <p className="text-muted-foreground text-sm">
-                        Upload a clear photo of your government-issued ID and a
-                        separate selfie showing your face. JPEG or PNG, up to 2
-                        MB each. Images are encrypted, private, and accessible
-                        only to super admins for review. They are removed after
-                        review or account deletion. This is a manual review, not
-                        an automated authenticity check.
+                        {t(
+                            'Upload a clear photo of your government-issued ID and a separate selfie showing your face. JPEG or PNG, up to 2 MB each. Images are encrypted, private, and accessible only to super admins for review. They are removed after review or account deletion. This is a manual review, not an automated authenticity check.',
+                        )}
                     </p>
                     <IdentityUpload
                         id="government-id"
-                        label="Government ID photo"
+                        label={t('Government ID photo')}
                         file={form.data.government_id}
                         onChange={(file) => form.setData('government_id', file)}
                         error={form.errors.government_id}
@@ -86,7 +89,7 @@ export default function IdentityVerification({
                     />
                     <IdentityUpload
                         id="identity-selfie"
-                        label="Selfie"
+                        label={t('Selfie')}
                         file={form.data.selfie}
                         onChange={(file) => form.setData('selfie', file)}
                         error={form.errors.selfie}
@@ -102,19 +105,21 @@ export default function IdentityVerification({
                             }
                             className="mt-1 size-4 shrink-0"
                         />
-                        I agree to submit these images for private manual
-                        identity review.
+                        {t(
+                            'I agree to submit these images for private manual identity review.',
+                        )}
                     </label>
                     <InputError message={form.errors.consent} />
                     {form.progress && (
                         <p role="status">
-                            Uploading: {form.progress.percentage}%
+                            {t('Uploading:')}
+                            {form.progress.percentage}%
                         </p>
                     )}
                     <Button type="submit" disabled={form.processing}>
                         {form.processing
-                            ? 'Submitting…'
-                            : 'Submit for verification'}
+                            ? t('Submitting…')
+                            : t('Submit for verification')}
                     </Button>
                 </form>
             )}

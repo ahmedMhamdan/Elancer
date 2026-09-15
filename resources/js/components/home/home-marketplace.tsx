@@ -21,32 +21,35 @@ import { homeCategories, sampleFreelancers } from '@/data/home-samples';
 import type { CategoryId, SampleFreelancer } from '@/data/home-samples';
 
 function PortfolioPreview({ freelancer }: { freelancer: SampleFreelancer }) {
+    const { t } = useTranslation();
+
     return (
         <div
             className={`elancer-portfolio-preview elancer-preview-${freelancer.preview}`}
             role="img"
-            aria-label={`Illustrative portfolio concept: ${freelancer.project}`}
+            aria-label={`Illustrative portfolio concept: ${t(freelancer.project)}`}
         >
             <span className="elancer-preview-caption">
-                SELECTED CONCEPT / 0{sampleFreelancers.indexOf(freelancer) + 1}
+                {t('SELECTED CONCEPT / 0')}
+                {sampleFreelancers.indexOf(freelancer) + 1}
             </span>
             {freelancer.preview === 'website' && (
                 <div className="elancer-mini-browser">
                     <div className="elancer-mini-nav">
                         <b>haven.</b>
-                        <span>OBJECTS FOR EVERYDAY</span>
+                        <span>{t('OBJECTS FOR EVERYDAY')}</span>
                         <Plus size={10} />
                     </div>
                     <div className="elancer-mini-store">
                         <div>
-                            <small>LESS, BUT BETTER.</small>
+                            <small>{t('LESS, BUT BETTER.')}</small>
                             <strong>
-                                A little space
+                                {t('A little space')}
                                 <br />
-                                to slow down.
+                                {t('to slow down.')}
                             </strong>
                             <span className="elancer-mini-cta">
-                                Explore the collection ↗
+                                {t('Explore the collection ↗')}
                             </span>
                         </div>
                         <div className="elancer-vase" />
@@ -64,27 +67,28 @@ function PortfolioPreview({ freelancer }: { freelancer: SampleFreelancer }) {
                     <strong>
                         forma<span>®</span>
                     </strong>
-                    <small>ROOM TO BECOME.</small>
+                    <small>{t('ROOM TO BECOME.')}</small>
                 </div>
             )}
             {freelancer.preview === 'editorial' && (
                 <div className="elancer-editorial-concept">
-                    <small>VOL. 01 / THE EVERYDAY ISSUE</small>
+                    <small>{t('VOL. 01 / THE EVERYDAY ISSUE')}</small>
                     <strong>
-                        Field
+                        {t('Field')}
                         <br />
-                        notes<span>✳</span>
+                        {t('notes')}
+                        <span>✳</span>
                     </strong>
-                    <span>Good stories take root.</span>
+                    <span>{t('Good stories take root.')}</span>
                 </div>
             )}
             {freelancer.preview === 'campaign' && (
                 <div className="elancer-campaign-concept">
-                    <span>SMALL STEPS. BIG DIFFERENCE.</span>
+                    <span>{t('SMALL STEPS. BIG DIFFERENCE.')}</span>
                     <strong>
-                        Good things
+                        {t('Good things')}
                         <br />
-                        <em>grow.</em>
+                        <em>{t('grow.')}</em>
                     </strong>
                     <div className="elancer-leaf-mark" />
                 </div>
@@ -93,10 +97,11 @@ function PortfolioPreview({ freelancer }: { freelancer: SampleFreelancer }) {
                 <div className="elancer-film-concept">
                     <div className="elancer-film-orbit" />
                     <strong>
-                        still /<br />
-                        <span>motion</span>
+                        {t('still /')}
+                        <br />
+                        <span>{t('motion')}</span>
                     </strong>
-                    <small>A STUDY IN POSSIBILITY</small>
+                    <small>{t('A STUDY IN POSSIBILITY')}</small>
                 </div>
             )}
             {freelancer.preview === 'analytics' && (
@@ -104,7 +109,7 @@ function PortfolioPreview({ freelancer }: { freelancer: SampleFreelancer }) {
                     <strong>
                         clarity<span>↗</span>
                     </strong>
-                    <span>THE BIG PICTURE</span>
+                    <span>{t('THE BIG PICTURE')}</span>
                     <div className="elancer-chart-bars">
                         {[40, 65, 48, 76, 60, 90, 80].map((height, index) => (
                             <i key={index} style={{ height: `${height}%` }} />
@@ -129,17 +134,17 @@ function FreelancerCard({ freelancer }: { freelancer: SampleFreelancer }) {
                     </span>
                     <div>
                         <h3>{freelancer.name}</h3>
-                        <p>{freelancer.role}</p>
+                        <p>{t(freelancer.role)}</p>
                     </div>
                     <span className="elancer-sample-label">{t('Sample')}</span>
                 </div>
-                <p className="elancer-talent-intro">{freelancer.intro}</p>
+                <p className="elancer-talent-intro">{t(freelancer.intro)}</p>
                 <ul
                     className="elancer-skill-tags"
-                    aria-label={`${freelancer.name}'s skills`}
+                    aria-label={t('Skills: :name', { name: freelancer.name })}
                 >
                     {freelancer.skills.map((skill) => (
-                        <li key={skill}>{skill}</li>
+                        <li key={t(skill)}>{t(skill)}</li>
                     ))}
                 </ul>
                 <Dialog>
@@ -147,7 +152,9 @@ function FreelancerCard({ freelancer }: { freelancer: SampleFreelancer }) {
                         <button
                             className="elancer-profile-trigger"
                             type="button"
-                            aria-label={`View sample profile: ${freelancer.name}`}
+                            aria-label={t('View sample profile: :name', {
+                                name: freelancer.name,
+                            })}
                         >
                             {t('View sample profile')}{' '}
                             <ArrowUpRight size={16} aria-hidden="true" />
@@ -160,20 +167,20 @@ function FreelancerCard({ freelancer }: { freelancer: SampleFreelancer }) {
                             </span>
                             <DialogTitle>{freelancer.name}</DialogTitle>
                             <DialogDescription>
-                                {freelancer.role}. {freelancer.intro}
+                                {t(freelancer.role)}. {t(freelancer.intro)}
                             </DialogDescription>
                         </DialogHeader>
                         <PortfolioPreview freelancer={freelancer} />
                         <div>
-                            <h3>{freelancer.project}</h3>
-                            <p>{freelancer.projectDescription}</p>
+                            <h3>{t(freelancer.project)}</h3>
+                            <p>{t(freelancer.projectDescription)}</p>
                         </div>
                         <ul
                             className="elancer-skill-tags"
                             aria-label={t('Skills')}
                         >
                             {freelancer.skills.map((skill) => (
-                                <li key={skill}>{skill}</li>
+                                <li key={t(skill)}>{t(skill)}</li>
                             ))}
                         </ul>
                         <p className="elancer-dialog-note">
@@ -386,7 +393,7 @@ export default function HomeMarketplace() {
                         >
                             {showAll
                                 ? t('Show fewer profiles')
-                                : 'Meet more sample talent'}
+                                : t('Meet more sample talent')}
                             <ArrowDown
                                 size={16}
                                 className={

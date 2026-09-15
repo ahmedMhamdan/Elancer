@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 // Adapted from local TailAdmin src/components/form/MultiSelect.tsx (MIT).
 // Preserves controlled selections, removable pills, relative wrapper and option rows.
 // Adds database search, debouncing/cancellation, input combobox and keyboard support.
@@ -18,6 +19,8 @@ export default function SkillSelect({
     error?: string;
     disabled?: boolean;
 }) {
+    const { t } = useTranslation();
+
     const [query, setQuery] = useState('');
     const [options, setOptions] = useState<Skill[]>([]);
     const [open, setOpen] = useState(false);
@@ -100,12 +103,14 @@ export default function SkillSelect({
                             key={name}
                             className="bg-primary/10 text-foreground flex max-w-full items-center rounded-full ps-3 text-sm"
                         >
-                            <span className="break-words">{name}</span>
+                            <span dir="auto" className="break-words">
+                                {name}
+                            </span>
                             <button
                                 type="button"
                                 disabled={disabled}
                                 className="focus-visible:outline-ring hover:bg-primary/15 flex size-11 shrink-0 items-center justify-center rounded-full focus-visible:outline-2"
-                                aria-label={'Remove ' + name}
+                                aria-label={t('Remove :name', { name })}
                                 onClick={() => {
                                     onChange(
                                         value.filter((item) => item !== name),
@@ -126,8 +131,8 @@ export default function SkillSelect({
                         maxLength={50}
                         placeholder={
                             value.length >= 15
-                                ? '15 skills selected'
-                                : 'Type a skill, e.g. Laravel'
+                                ? t('15 skills selected')
+                                : t('Type a skill, e.g. Laravel')
                         }
                         disabled={disabled || value.length >= 15}
                         aria-expanded={open}
@@ -182,7 +187,7 @@ export default function SkillSelect({
                         <div
                             id={id + '-list'}
                             role="listbox"
-                            aria-label="Skill suggestions"
+                            aria-label={t('Skill suggestions')}
                             aria-busy={loading}
                         >
                             {available.map((option, index) => (
@@ -212,17 +217,19 @@ export default function SkillSelect({
                                 className="text-muted-foreground p-4 text-sm"
                             >
                                 {loading
-                                    ? 'Searching skills…'
-                                    : failure ||
-                                      'No matching skills. Try another word.'}
+                                    ? t('Searching skills…')
+                                    : t(
+                                          failure ||
+                                              'No matching skills. Try another word.',
+                                      )}
                             </p>
                         )}
                     </div>
                 )}
             </div>
             <p id={id + '-hint'} className="text-muted-foreground mt-2 text-sm">
-                Type to search, then choose a suggestion. {value.length}/15
-                selected.
+                {t('Type to search, then choose a suggestion.')}{' '}
+                {t(':count/15 selected.', { count: value.length })}
             </p>
             {error && (
                 <p

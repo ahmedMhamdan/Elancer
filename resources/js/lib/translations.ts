@@ -1,6 +1,5 @@
-// English source copy is the fallback; translate interface copy, never member content.
+// Interface copy only. Member-authored and catalog content retain their entered language.
 export const arabic: Record<string, string> = {
-    'Talent showcase': 'نماذج المواهب',
     'How it works': 'كيف يعمل الموقع',
     'Main navigation': 'التنقل الرئيسي',
     'Mobile navigation': 'التنقل على الهاتف',
@@ -13,11 +12,9 @@ export const arabic: Record<string, string> = {
     'Explore skills': 'استكشف المهارات',
     'Skill categories': 'فئات المهارات',
     'Explore by category': 'استكشف حسب الفئة',
-    'Meet sample talent': 'تعرّف على نماذج المواهب',
     'See all skills': 'عرض جميع المهارات',
     'How Elancer works': 'كيف يعمل إيلانسر',
     'Development & IT': 'التطوير وتقنية المعلومات',
-    'Build something that works.': 'ابنِ شيئًا يصنع الفرق.',
     'Websites, applications, and the people behind them.':
         'مواقع وتطبيقات والمختصون الذين يطوّرونها.',
     'Web development': 'تطوير المواقع',
@@ -51,15 +48,11 @@ export const arabic: Record<string, string> = {
     'Go to your workspace': 'انتقل إلى مساحة عملك',
     'Create your account': 'أنشئ حسابك',
     'Work on your terms': 'اعمل بطريقتك',
-    'Less friction. More making.': 'عقبات أقل. إنجاز أكثر.',
     'Illustration of a freelancer in a green sweater working on a laptop at a sunlit desk.':
         'رسم لمستقل يرتدي سترة خضراء ويعمل على حاسوب محمول بجانب نافذة مشمسة.',
     'In your element.': 'في المكان المناسب.',
     'Doing what you do best.': 'تعمل فيما تتقنه.',
     'Built around people': 'صُمّم من أجلك',
-    'Make room for': 'أفسح المجال',
-    'your next': 'لقادمك',
-    'big thing.': 'المميز.',
     'A fresh perspective. A missing skill. Someone who just gets it. The right collaboration can change everything.':
         'رؤية جديدة. مهارة تحتاجها. شخص يفهم فكرتك. التعاون المناسب يمكن أن يغيّر كل شيء.',
     'Whether you’re building a business or a career on your own terms, there’s a place for you here.':
@@ -83,8 +76,6 @@ export const arabic: Record<string, string> = {
         'أضف عنوانًا مهنيًا ونبذة قصيرة وموقعك إلى ملفك الشخصي.',
     'One account, two ways to work': 'حساب واحد، وطريقتان للعمل',
     'Bring a project. Share your skills.': 'اطرح مشروعك. شارك مهاراتك.',
-    'Find a collaborator. Find your next chapter.':
-        'اعثر على شريك عمل. وابدأ فصلًا جديدًا.',
     'Make your own way forward.': 'اصنع طريقك نحو المستقبل.',
     'For clients': 'لأصحاب المشاريع',
     'You have the vision.': 'لديك الرؤية.',
@@ -112,14 +103,11 @@ export const arabic: Record<string, string> = {
     'Made for people who make things.': 'لمن يصنعون الإنجاز.',
     Explore: 'استكشف',
     'Explore categories': 'استكشف الفئات',
-    'Sample talent': 'نماذج المواهب',
     'Back to the beginning': 'العودة إلى البداية',
     'Your account': 'حسابك',
     'Your next step': 'خطوتك القادمة',
     'Your workspace': 'مساحة عملك',
     'Create an account': 'إنشاء حساب',
-    'A little ambition.': 'قليل من الطموح.',
-    'A lot of possibility.': 'وكثير من الإمكانات.',
     'Your next great collaboration starts with a hello.':
         'تعاونك القادم يبدأ بتحية.',
     'Let’s get to work': 'لنبدأ العمل',
@@ -138,7 +126,6 @@ export const arabic: Record<string, string> = {
     'Forgot password?': 'نسيت كلمة المرور؟',
     'Logging in...': 'جارٍ تسجيل الدخول...',
     'New to Elancer?': 'جديد على إيلانسر؟',
-    'Your next chapter starts here.': 'فصلك القادم يبدأ هنا.',
     'A familiar place for your skills, your people, and the work you love.':
         'مكان يجمع مهاراتك وفريقك والعمل الذي تحبه.',
     'A creative carrying a portfolio through the open doorway of a sunlit studio.':
@@ -172,7 +159,6 @@ export const arabic: Record<string, string> = {
         'تم إنشاء الحساب. الخطوة التالية تأكيد البريد الإلكتروني.',
     'Account created': 'تم إنشاء الحساب',
     'Verify email': 'تأكيد البريد الإلكتروني',
-    'Your next chapter.': 'فصلك القادم.',
     'One click away.': 'على بُعد نقرة.',
     'Check your inbox to verify your email and get started on Elancer.':
         'تحقق من بريدك الوارد لتأكيد عنوانك والبدء على إيلانسر.',
@@ -226,7 +212,6 @@ export const arabic: Record<string, string> = {
     'Hide password': 'إخفاء كلمة المرور',
     'Open navigation': 'فتح قائمة التنقل',
     'Close navigation': 'إغلاق قائمة التنقل',
-    Overview: 'نظرة عامة',
     'My profile': 'ملفي الشخصي',
     Settings: 'الإعدادات',
     Save: 'حفظ',
@@ -234,15 +219,12 @@ export const arabic: Record<string, string> = {
     Continue: 'متابعة',
     Back: 'رجوع',
     Review: 'مراجعة',
-    'Choose your role': 'اختر دورك',
-    'Introduce yourself': 'عرّف بنفسك',
-    'Your location': 'موقعك',
     Client: 'صاحب مشاريع',
     Freelancer: 'مستقل',
     Name: 'الاسم',
     Country: 'الدولة',
     City: 'المدينة',
-    Headline: 'العنوان المهني',
+    Headline: 'المسمّى المهني',
     Bio: 'نبذة',
     Skills: 'المهارات',
     'Company name': 'اسم الشركة',
@@ -250,8 +232,6 @@ export const arabic: Record<string, string> = {
     Saved: 'تم الحفظ',
     'Edit profile': 'تعديل الملف',
     Profile: 'الملف الشخصي',
-    Security: 'الأمان',
-    Appearance: 'المظهر',
     Dashboard: 'لوحة التحكم',
     'Delete account': 'حذف الحساب',
     'Forgot password': 'نسيت كلمة المرور',
@@ -261,7 +241,6 @@ export const arabic: Record<string, string> = {
     'Confirm new password': 'تأكيد كلمة المرور الجديدة',
     'Save password': 'حفظ كلمة المرور',
     Sample: 'نموذج',
-    'View sample profile': 'عرض الملف النموذجي',
     'Clear filters': 'مسح الفلاتر',
     Filters: 'الفلاتر',
     'All skills': 'جميع المهارات',
@@ -273,12 +252,10 @@ export const arabic: Record<string, string> = {
     'Start with the skill your idea needs.':
         'ابدأ بالمهارة التي تحتاجها فكرتك.',
     Selected: 'محدد',
-    'View sample talent': 'عرض نماذج المواهب',
     'Select a category to explore the sample talent below.':
         'اختر فئة لاستكشاف نماذج المواهب أدناه.',
     'A closer look at the work': 'نظرة أقرب إلى الأعمال',
     'Meet the skills behind the work.': 'تعرّف على المهارات وراء الأعمال.',
-    'Sample talent showcase': 'معرض نماذج المواهب',
     'Different strengths. A shared love for the craft.':
         'مهارات متنوعة. وشغف مشترك بالعمل.',
     'Explore these fictional profiles and portfolio concepts.':
@@ -286,7 +263,6 @@ export const arabic: Record<string, string> = {
     'Show all categories': 'عرض جميع الفئات',
     'Show fewer profiles': 'عرض ملفات أقل',
     'Show more sample talent': 'عرض المزيد من نماذج المواهب',
-    'Fictional sample profile': 'ملف شخصي افتراضي',
     'This profile and portfolio are fictional examples, not a real person or an offer for hire.':
         'هذا الملف وأعماله أمثلة افتراضية، ولا تمثل شخصًا حقيقيًا أو عرضًا للتوظيف.',
     'Websites, apps & clever solutions': 'مواقع وتطبيقات وحلول مبتكرة',
@@ -319,4 +295,454 @@ export const arabic: Record<string, string> = {
         'أفكارك. فريقك. فصلك القادم.',
     'A little ambition goes a long way.': 'قليل من الطموح يفتح آفاقًا واسعة.',
     'Discover a different way to work': 'اكتشف طريقة مختلفة للعمل',
+    'Navigation menu': 'قائمة التنقل',
+    'Color theme': 'مظهر الموقع',
+    'Delete your account and all of its resources':
+        'احذف حسابك وجميع البيانات المرتبطة به',
+    Warning: 'تنبيه',
+    'Please proceed with caution, this cannot be undone.':
+        'هذا الإجراء نهائي، ولن تتمكن من استعادة حسابك.',
+    'Are you sure you want to delete your account?':
+        'هل تريد حذف حسابك نهائيًا؟',
+    'Once your account is deleted, all of its resources and data will also be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.':
+        'سيُحذف حسابك وجميع بياناته نهائيًا. أدخل كلمة المرور لتأكيد الحذف.',
+    'Drop your image here': 'أفلت الصورة هنا',
+    'Image selected': 'تم اختيار الصورة',
+    'Drag a photo here or click to browse · JPEG / PNG · Max 2 MB':
+        'اسحب الصورة هنا أو اضغط لاختيارها · JPEG أو PNG · بحد أقصى 2 ميغابايت',
+    'Change file': 'تغيير الملف',
+    'Browse file': 'اختيار ملف',
+    MB: 'ميغابايت',
+    Remove: 'إزالة',
+    'Identity verification for clients and freelancers.':
+        'توثيق الهوية لأصحاب المشاريع والمستقلين.',
+    'Your ID photo and selfie have been submitted. A super admin will review them. You are not yet verified.':
+        'استلمنا صورة هويتك وصورتك الشخصية، وهما بانتظار مراجعة مسؤول الإدارة. لم تُوثّق هويتك بعد.',
+    'A super admin approved your identity submission. The uploaded images have been removed.':
+        'وافق مسؤول الإدارة على طلب توثيق هويتك، وحُذفت الصور المرفوعة بعد المراجعة.',
+    'Review feedback:': 'ملاحظات المراجعة:',
+    'Upload a clear photo of your government-issued ID and a separate selfie showing your face. JPEG or PNG, up to 2 MB each. Images are encrypted, private, and accessible only to super admins for review. They are removed after review or account deletion. This is a manual review, not an automated authenticity check.':
+        'أرفق صورة واضحة لوثيقة هويتك الرسمية وصورة شخصية منفصلة يظهر فيها وجهك بوضوح. نقبل JPEG وPNG بحجم لا يتجاوز 2 ميغابايت لكل صورة. تُحفظ الصور مشفّرة ولا يطّلع عليها سوى مسؤولي الإدارة للمراجعة، ثم تُحذف بعد المراجعة أو حذف الحساب. تُراجع الطلبات يدويًا، دون فحص آلي لأصالة الوثائق.',
+    'Government ID photo': 'صورة وثيقة الهوية',
+    Selfie: 'صورة شخصية للوجه',
+    'I agree to submit these images for private manual identity review.':
+        'أوافق على إرسال هذه الصور لمراجعة هويتي يدويًا وبخصوصية.',
+    'Uploading:': 'جارٍ الرفع:',
+    'Submitting…': 'جارٍ الإرسال…',
+    'Submit for verification': 'إرسال طلب التوثيق',
+    Passkeys: 'مفاتيح المرور',
+    'Manage your passkeys for passwordless sign-in':
+        'أدر مفاتيح المرور لتسجيل الدخول دون كلمة مرور',
+    'Manage your two-factor authentication settings':
+        'أضف طبقة حماية لحسابك بالمصادقة الثنائية',
+    'You will be prompted for a secure, random pin during login, which you can retrieve from the TOTP-supported application on your phone.':
+        'عند تسجيل الدخول، سيُطلب منك رمز تحقق مؤقت تجده في تطبيق المصادقة على هاتفك.',
+    'Disable 2FA': 'تعطيل المصادقة الثنائية',
+    'When you enable two-factor authentication, you will be prompted for a secure pin during login. This pin can be retrieved from a TOTP-supported application on your phone.':
+        'بعد تفعيل المصادقة الثنائية، ستحتاج إلى رمز مؤقت من تطبيق المصادقة على هاتفك عند تسجيل الدخول.',
+    'Continue setup': 'إكمال الإعداد',
+    'Enable 2FA': 'تفعيل المصادقة الثنائية',
+    Notifications: 'الإشعارات',
+    'Close notifications': 'إغلاق الإشعارات',
+    'No notifications yet': 'لا توجد إشعارات بعد',
+    'Project and account updates will appear here.':
+        'ستظهر هنا آخر مستجدات مشاريعك وحسابك.',
+    'Your profile is ready!': 'ملفك جاهز!',
+    'Welcome to Elancer. Your workspace is ready for the next step.':
+        'أهلًا بك في إيلانسر. مساحة عملك جاهزة لتبدأ.',
+    'Your client workspace': 'مساحة عملك كصاحب مشاريع',
+    'Your freelancer workspace': 'مساحة عملك كمستقل',
+    'A great start.': 'بداية موفّقة.',
+    'Make it yours.': 'أضف لمستك.',
+    'Your introduction and location are easy to update':
+        'يمكنك تعديل نبذتك ومكان إقامتك في أي وقت',
+    'Your details are saved as a draft. Completing setup does not publish your profile.':
+        'حُفظت بياناتك كمسودة. إكمال الإعداد لا يعني نشر ملفك للعامة.',
+    'Go to my workspace': 'الانتقال إلى مساحة عملي',
+    'Review my profile': 'مراجعة ملفي',
+    'Keep your account secure with two-factor authentication.':
+        'احمِ حسابك بتفعيل المصادقة الثنائية.',
+    Added: 'تاريخ الإضافة',
+    'Last used': 'آخر استخدام',
+    'Remove passkey': 'إزالة مفتاح المرور',
+    'Removing...': 'جارٍ الإزالة…',
+    'Passkeys are not supported in this browser.':
+        'هذا المتصفح لا يدعم مفاتيح المرور.',
+    'Add passkey': 'إضافة مفتاح مرور',
+    'Passkey name': 'اسم مفتاح المرور',
+    'e.g., MacBook Pro, iPhone': 'مثلًا: حاسوبي المحمول أو هاتفي',
+    'A name helps you identify this passkey later.':
+        'اختر اسمًا يسهل عليك تمييز هذا المفتاح لاحقًا.',
+    'Registering...': 'جارٍ التسجيل…',
+    'Register passkey': 'تسجيل مفتاح المرور',
+    'Make your photo fit': 'اضبط صورتك الشخصية',
+    'Drag to reposition, or use the sliders. The circle shows how your profile photo will appear.':
+        'اسحب الصورة أو استخدم أشرطة التمرير لضبط موضعها. توضح الدائرة كيف ستظهر صورتك في الملف الشخصي.',
+    'Profile photo crop preview': 'معاينة قص الصورة الشخصية',
+    'Opening photo…': 'جارٍ فتح الصورة…',
+    'Photo adjustments': 'ضبط الصورة',
+    Zoom: 'التكبير',
+    'Horizontal position': 'الموضع الأفقي',
+    'Vertical position': 'الموضع العمودي',
+    Rotate: 'تدوير',
+    Reset: 'إعادة ضبط',
+    'Preparing…': 'جارٍ التجهيز…',
+    'Apply photo': 'اعتماد الصورة',
+    'About you': 'نبذة عنك',
+    'Give people a clear picture of who you are and what you offer.':
+        'عرّف بنفسك وبالخبرات والخدمات التي تقدمها.',
+    'Edit account': 'تعديل بيانات الحساب',
+    'Your introduction': 'نبذة عنك',
+    'About me': 'نبذة عني',
+    'Skills and expertise': 'المهارات والخبرات',
+    'Add up to 15 skills that describe your work.':
+        'اختر حتى 15 مهارة تعبّر عن مجال عملك.',
+    'Where you are based': 'مكان إقامتك',
+    'Share your city and country. A street address is not needed.':
+        'أضف مدينتك ودولتك، دون الحاجة إلى عنوان تفصيلي.',
+    'Saving updates your draft; it does not publish your profile.':
+        'ستُحفظ التعديلات في المسودة دون نشر ملفك للعامة.',
+    'Saving…': 'جارٍ الحفظ…',
+    'Skill suggestions': 'المهارات المقترحة',
+    'Searching skills…': 'جارٍ البحث عن المهارات…',
+    'Type to search, then choose a suggestion.':
+        'ابحث عن مهارة، ثم اخترها من الاقتراحات.',
+    '2FA recovery codes': 'رموز استرداد المصادقة الثنائية',
+    'Recovery codes let you regain access if you lose your 2FA device. Store them in a secure password manager.':
+        'تتيح لك رموز الاسترداد دخول حسابك إذا فقدت جهاز المصادقة. احتفظ بها في مدير كلمات مرور آمن.',
+    Hide: 'إخفاء',
+    View: 'عرض',
+    'recovery codes': 'رموز الاسترداد',
+    'Regenerate codes': 'إنشاء رموز جديدة',
+    'Recovery codes': 'رموز الاسترداد',
+    'Loading recovery codes': 'جارٍ تحميل رموز الاسترداد',
+    'or, enter the code manually': 'أو أدخل مفتاح الإعداد يدويًا',
+    Confirm: 'تأكيد',
+    'Profile status': 'حالة الملف',
+    Published: 'منشور',
+    Draft: 'مسودة',
+    'Account security': 'أمان الحساب',
+    '2FA enabled': 'المصادقة الثنائية مفعّلة',
+    'Set up 2FA': 'تفعيل المصادقة الثنائية',
+    'Your next steps': 'خطواتك التالية',
+    'Keep your account ready for work.': 'جهّز حسابك لبدء العمل.',
+    Ready: 'جاهز',
+    Administration: 'الإدارة',
+    'Manage your assigned responsibilities.':
+        'الوصول إلى المهام الإدارية الموكلة إليك.',
+    'Manage categories': 'إدارة التصنيفات',
+    'Manage admin access': 'إدارة صلاحيات المشرفين',
+    'Profile overview': 'ملخص الملف الشخصي',
+    'Profile essentials': 'البيانات الأساسية',
+    'Profile visibility': 'ظهور الملف للعامة',
+    'Email verification': 'تأكيد البريد الإلكتروني',
+    Verified: 'مؤكّد',
+    Pending: 'قيد الانتظار',
+    'Your profile': 'ملفك الشخصي',
+    'Your latest saved details.': 'آخر بيانات حفظتها في ملفك.',
+    Company: 'الشركة',
+    Location: 'مكان الإقامة',
+    'Profile completion': 'اكتمال الملف',
+    'Saved profile essentials': 'البيانات الأساسية المحفوظة',
+    'Set up your profile': 'إعداد ملفك الشخصي',
+    'Profile setup progress': 'تقدّم إعداد الملف',
+    'I’m a freelancer': 'أنا مستقل',
+    'Find projects and put your skills to work.':
+        'ابحث عن مشاريع تناسب مهاراتك.',
+    'I’m a client': 'أنا صاحب مشاريع',
+    'Find the right people to bring your ideas to life.':
+        'اعثر على المستقلين المناسبين لتنفيذ أفكارك.',
+    'Your name *': 'اسمك *',
+    'Professional headline *': 'المسمّى المهني *',
+    'e.g. Laravel developer for growing businesses':
+        'مثلًا: مطوّر Laravel للشركات الناشئة',
+    'Your skills *': 'مهاراتك *',
+    'Company name (optional)': 'اسم الشركة (اختياري)',
+    'Your company or business': 'اسم شركتك أو نشاطك التجاري',
+    'Your selected profile photo': 'الصورة الشخصية المختارة',
+    'Change photo': 'تغيير الصورة',
+    'Upload photo': 'رفع صورة',
+    'Optional · JPG, PNG or WebP': 'اختياري · JPG أو PNG أو WebP',
+    'Up to 2 MB': 'بحد أقصى 2 ميغابايت',
+    'Edit photo': 'تعديل الصورة',
+    'Remove photo': 'إزالة الصورة',
+    'Country or territory *': 'الدولة أو المنطقة *',
+    'e.g. Palestine': 'مثلًا: فلسطين',
+    'City *': 'المدينة *',
+    'e.g. Hebron': 'مثلًا: الخليل',
+    'Your city and country help people know where you’re based.':
+        'تساعد مدينتك ودولتك الآخرين على معرفة مكان إقامتك.',
+    'Review your profile': 'مراجعة ملفك الشخصي',
+    'Edit photo & location': 'تعديل الصورة ومكان الإقامة',
+    'Edit introduction': 'تعديل النبذة',
+    'Back to home': 'العودة للرئيسية',
+    'Saving your profile…': 'جارٍ حفظ ملفك…',
+    'Save and continue': 'حفظ ومتابعة',
+    'SELECTED CONCEPT / 0': 'تصميم مختار / 0',
+    'OBJECTS FOR EVERYDAY': 'قطع لحياتك اليومية',
+    'LESS, BUT BETTER.': 'أقل عددًا، أفضل جودة.',
+    'A little space': 'مساحة صغيرة',
+    'to slow down.': 'للحظات هادئة.',
+    'Explore the collection ↗': 'استكشف المجموعة ↗',
+    'ROOM TO BECOME.': 'مساحة للنمو.',
+    'VOL. 01 / THE EVERYDAY ISSUE': 'العدد 01 / تفاصيل الحياة اليومية',
+    Field: 'من وحي',
+    notes: 'الحياة',
+    'Good stories take root.': 'هنا تبدأ الحكايات الجميلة.',
+    'SMALL STEPS. BIG DIFFERENCE.': 'خطوات صغيرة. أثر كبير.',
+    'Good things': 'الأشياء الجميلة',
+    'grow.': 'تنمو.',
+    'still /': 'سكون /',
+    motion: 'حركة',
+    'A STUDY IN POSSIBILITY': 'آفاق جديدة للإبداع',
+    'THE BIG PICTURE': 'الصورة الكاملة',
+    'Meet more sample talent': 'استعرض المزيد من الملفات التجريبية',
+    Close: 'إغلاق',
+    Page: 'الصفحة',
+    'Manage your profile and account settings':
+        'تحكّم في بيانات حسابك وإعداداته',
+    Email: 'البريد الإلكتروني',
+    'Appearance settings': 'إعدادات المظهر',
+    'Update the appearance settings for your account':
+        'اختر المظهر الذي يناسبك',
+    'Profile settings': 'إعدادات الملف الشخصي',
+    'Update your name and email address': 'عدّل اسمك وبريدك الإلكتروني',
+    'Your email address is unverified.': 'لم تؤكد بريدك الإلكتروني بعد.',
+    'Click here to re-send the verification email.':
+        'إعادة إرسال رسالة التأكيد.',
+    'A new verification link has been sent to your email address.':
+        'أرسلنا رابط تأكيد جديدًا إلى بريدك الإلكتروني.',
+    'Security settings': 'إعدادات الأمان',
+    'Update password': 'تغيير كلمة المرور',
+    'Ensure your account is using a long, random password to stay secure':
+        'احمِ حسابك بكلمة مرور طويلة يصعب تخمينها',
+    'Current password': 'كلمة المرور الحالية',
+    'Compare the ID and selfie before recording your decision. Images are removed after review.':
+        'قارن وثيقة الهوية بالصورة الشخصية قبل تسجيل قرارك. ستُحذف الصور بعد المراجعة.',
+    'Government ID': 'وثيقة الهوية',
+    'Review reason (shared with the user)': 'سبب القرار (يظهر للمستخدم)',
+    'Approve identity': 'الموافقة على توثيق الهوية',
+    'Request resubmission': 'طلب صور جديدة',
+    'Identity reviews': 'طلبات توثيق الهوية',
+    'Private document review for clients and freelancers.':
+        'مراجعة خاصة لوثائق أصحاب المشاريع والمستقلين.',
+    'Review documents': 'مراجعة الوثائق',
+    'No identity submissions yet.': 'لا توجد طلبات توثيق هوية بعد.',
+    Light: 'فاتح',
+    Dark: 'داكن',
+    System: 'حسب الجهاز',
+    Security: 'الأمان',
+    Appearance: 'المظهر',
+    Overview: 'نظرة عامة',
+    Account: 'الحساب',
+    Status: 'الحالة',
+    'Build your profile': 'أكمل ملفك الشخصي',
+    'Tell people about your experience, skills and location.':
+        'عرّف الآخرين بخبراتك ومهاراتك ومكان إقامتك.',
+    'Secure your account': 'احمِ حسابك',
+    'Manage your password, passkeys and two-factor authentication.':
+        'أدر كلمة المرور ومفاتيح المرور والمصادقة الثنائية.',
+    'Check your account details': 'راجع بيانات حسابك',
+    'Keep your name and email address up to date.':
+        'تأكد من صحة اسمك وبريدك الإلكتروني.',
+    'Not added yet': 'لم تُضف بعد',
+    'Add a short introduction to help clients get to know you.':
+        'أضف نبذة قصيرة تعرّف أصحاب المشاريع عليك.',
+    'Professional headline': 'المسمّى المهني',
+    'Optional — leave blank if you hire as an individual.':
+        'اختياري — اتركه فارغًا إذا كنت تتعامل بصفتك الشخصية.',
+    'A short description of your work and specialty.': 'وصف موجز لعملك وتخصصك.',
+    'Changes saved': 'تم حفظ التعديلات',
+    'Choose one JPEG or PNG image, up to 2 MB.':
+        'اختر صورة واحدة بصيغة JPEG أو PNG لا يزيد حجمها عن 2 ميغابايت.',
+    'Choose a JPG, PNG or WebP image smaller than 2 MB.':
+        'اختر صورة JPG أو PNG أو WebP لا يتجاوز حجمها 2 ميغابايت.',
+    'Could not load skills. Close and reopen to retry.':
+        'تعذّر تحميل المهارات. أغلق القائمة وافتحها للمحاولة مجددًا.',
+    '15 skills selected': 'اخترت 15 مهارة',
+    'Type a skill, e.g. Laravel': 'ابحث عن مهارة',
+    'No matching skills. Try another search.':
+        'لا توجد مهارات مطابقة. جرّب كلمة بحث أخرى.',
+    'All matching skills are selected.': 'اخترت جميع المهارات المطابقة.',
+    'Identity approved': 'تم توثيق الهوية',
+    'Identity review pending': 'طلب التوثيق قيد المراجعة',
+    'Identity needs resubmission': 'يرجى إعادة إرسال صور الهوية',
+    'Verify your identity': 'وثّق هويتك',
+    'Your profile details are saved': 'حُفظت بيانات ملفك الشخصي',
+    'Your skills and location are easy to update':
+        'يمكنك تعديل مهاراتك ومكان إقامتك في أي وقت',
+    'Your account is ready to personalize': 'حسابك جاهز لتضيف لمستك',
+    'Choose your role': 'اختر طريقة عملك',
+    'Introduce yourself': 'عرّف بنفسك',
+    'Your location': 'مكان إقامتك',
+    'How would you like to use Elancer?': 'كيف تودّ استخدام إيلانسر؟',
+    'Tell us about the work you do.': 'حدّثنا عن عملك وخبراتك.',
+    'Tell us a little about yourself.': 'عرّفنا بنفسك.',
+    'A few details, and you’re ready to go.': 'بقيت تفاصيل بسيطة لتبدأ.',
+    'Choose where you’d like to start. You can hire and freelance with the same account.':
+        'اختر كيف تريد أن تبدأ. يمكنك توظيف مستقلين والعمل كمستقل بالحساب نفسه.',
+    'Help clients understand your skills and what you bring to their project.':
+        'وضّح لأصحاب المشاريع مهاراتك وما يمكنك تقديمه لمشاريعهم.',
+    'Introduce yourself so freelancers know who they’ll be working with.':
+        'عرّف بنفسك ليعرف المستقلون من سيتعاملون معه.',
+    'Add your location and a photo to put a face to your name.':
+        'أضف مكان إقامتك وصورة شخصية ليتعرّف عليك الآخرون.',
+    'Take a moment to check your details before you enter your workspace.':
+        'راجع بياناتك قبل الانتقال إلى مساحة عملك.',
+    'Please fill in this field.': 'يرجى تعبئة هذا الحقل.',
+    'Choose 1–15 skills from the suggestions.':
+        'اختر من مهارة واحدة إلى 15 مهارة من الاقتراحات.',
+    'Could not prepare the photo. Try another image.':
+        'تعذّر تجهيز الصورة. جرّب صورة أخرى.',
+    'Could not open this photo. Try another image.':
+        'تعذّر فتح الصورة. جرّب صورة أخرى.',
+    'Approve this identity submission?':
+        'هل تريد الموافقة على توثيق هذه الهوية؟',
+    'Reject this submission and request new images?':
+        'هل تريد رفض الطلب وطلب صور جديدة؟',
+    'The submission could not be reviewed. You cannot review your own identity. Refresh and try again.':
+        'تعذّر تسجيل المراجعة. لا يمكنك مراجعة هويتك بنفسك. حدّث الصفحة وحاول مجددًا.',
+    'Submitted government ID': 'وثيقة الهوية المرفوعة',
+    'Submitted selfie': 'الصورة الشخصية المرفوعة',
+    'Identity review saved.': 'تم حفظ قرار المراجعة.',
+    pending: 'قيد المراجعة',
+    approved: 'تمت الموافقة',
+    rejected: 'يلزم إعادة الإرسال',
+    'Welcome back, :name. Here is your workspace at a glance.':
+        'أهلًا بعودتك، :name. إليك ملخص مساحة عملك.',
+    'Welcome back, :name. Manage your client profile.':
+        'أهلًا بعودتك، :name. حدّث ملفك كصاحب مشاريع من هنا.',
+    'Welcome back, :name. Manage your freelancer profile.':
+        'أهلًا بعودتك، :name. حدّث ملفك كمستقل من هنا.',
+    ':completed / :total complete': 'اكتملت :completed من :total',
+    ':count / 5,000 characters': ':count من 5,000 حرف',
+    ':count/15 selected.': 'اخترت :count من 15 مهارة.',
+    'Step :step of :total': 'الخطوة :step من :total',
+    'Looking good, :name.': 'ملفك جاهز للمراجعة، :name.',
+    'Remove :name': 'إزالة :name',
+    'Choose :label': 'اختيار :label',
+    'Change :label': 'تغيير :label',
+    'Review :name': 'مراجعة طلب :name',
+    'Are you sure you want to remove the passkey “:name”? You will no longer be able to use it to sign in.':
+        'هل تريد إزالة مفتاح المرور «:name»؟ لن تتمكن من استخدامه لتسجيل الدخول بعد إزالته.',
+    'Each recovery code can be used once. Generate new codes when you need more.':
+        'يمكن استخدام كل رمز استرداد مرة واحدة فقط. أنشئ رموزًا جديدة عند الحاجة.',
+    'Show recovery codes': 'عرض رموز الاسترداد',
+    'Hide recovery codes': 'إخفاء رموز الاسترداد',
+    'Talent showcase': 'استكشف المواهب',
+    'Sample talent': 'ملفات تجريبية',
+    'Sample talent showcase': 'نماذج لملفات المستقلين',
+    'View sample profile': 'عرض الملف التجريبي',
+    'Meet sample talent': 'استعرض الملفات التجريبية',
+    'Fictional sample profile': 'ملف تجريبي لشخصية افتراضية',
+    'View sample talent': 'عرض الملفات التجريبية',
+    'Make room for': 'افتح الباب',
+    ' your next': 'لفكرتك',
+    'big thing.': 'القادمة.',
+    'your next': 'لفكرتك',
+    'A little ambition.': 'طموحك هو البداية.',
+    'A lot of possibility.': 'والفرص أمامك واسعة.',
+    'Find a collaborator. Find your next chapter.':
+        'تعاون مثمر يفتح لك آفاقًا جديدة.',
+    'Your next chapter starts here.': 'خطوتك القادمة تبدأ هنا.',
+    'Your next chapter.': 'بدايتك الجديدة.',
+    'Build something that works.': 'حوّل فكرتك إلى منتج متكامل.',
+    'Less friction. More making.': 'خطوات أبسط. إنجاز أكبر.',
+    'Full-stack developer': 'مطوّر تطبيقات ويب متكاملة',
+    'Thoughtful web applications, from the first wireframe to the final interaction.':
+        'أطوّر تطبيقات ويب متقنة، من التخطيط الأولي إلى أدق تفاصيل الاستخدام.',
+    'Haven — a quieter kind of commerce': 'Haven — تجربة تسوّق أكثر هدوءًا',
+    'An illustrative storefront concept with a simple catalog, thoughtful product pages, and a calm shopping experience.':
+        'تصوّر تجريبي لمتجر إلكتروني بكتالوج بسيط وصفحات منتجات واضحة وتجربة تسوّق مريحة.',
+    'Brand & product designer': 'مصممة هويات بصرية ومنتجات رقمية',
+    'Distinctive identities and digital experiences with a little personality and a lot of purpose.':
+        'أصمّم هويات وتجارب رقمية تجمع بين الطابع المميز والهدف الواضح.',
+    'Forma — identity in good shape': 'Forma — هوية بصرية متكاملة',
+    'A fictional identity study exploring an expressive wordmark, a flexible visual system, and a tactile green palette.':
+        'دراسة تجريبية لهوية بصرية تجمع شعارًا كتابيًا معبّرًا ونظامًا مرنًا وألوانًا خضراء دافئة.',
+    'Writer & content strategist': 'كاتبة ومتخصصة في استراتيجية المحتوى',
+    'Clear, human words that turn complicated ideas into stories people want to read.':
+        'أحوّل الأفكار المعقدة إلى محتوى واضح وقريب من الناس، يستمتعون بقراءته.',
+    'Fieldnotes — stories worth keeping': 'Fieldnotes — حكايات تستحق أن تبقى',
+    'An illustrative editorial concept combining long-form stories, bilingual content direction, and clear information hierarchy.':
+        'تصوّر تحريري تجريبي يجمع القصص المطوّلة والمحتوى باللغتين مع ترتيب واضح للمعلومات.',
+    'Digital marketing strategist': 'متخصص في استراتيجيات التسويق الرقمي',
+    'Connecting a strong message with the people who need to hear it.':
+        'أوصل رسالتك إلى الجمهور الذي يبحث عنها.',
+    'Grow — a fresh campaign direction': 'Grow — رؤية جديدة لحملة تسويقية',
+    'A fictional campaign concept for a small sustainable business, from message planning to a coordinated launch.':
+        'تصوّر تجريبي لحملة تسوّق لمشروع صغير صديق للبيئة، من صياغة الرسالة إلى تنسيق الإطلاق.',
+    'Motion designer': 'مصممة رسوم متحركة',
+    'Small details, expressive movement, and stories that stay with you.':
+        'تفاصيل دقيقة، وحركة معبّرة، وقصص تترك أثرًا.',
+    'Still / Motion — a title sequence': 'Still / Motion — مشهد افتتاحي متحرك',
+    'An illustrative motion study built around geometric forms, changing rhythm, and clean editorial typography.':
+        'دراسة تجريبية للحركة تعتمد على الأشكال الهندسية والإيقاع المتغيّر والخطوط الواضحة.',
+    'Data analyst': 'محلل بيانات',
+    'Making complex information understandable, useful, and ready for a decision.':
+        'أحوّل البيانات المعقدة إلى معلومات واضحة تدعم قراراتك.',
+    'Clarity — information with direction': 'Clarity — بيانات تقود إلى القرار',
+    'A fictional dashboard concept for understanding trends. All shapes and values in this preview are illustrative.':
+        'تصوّر تجريبي للوحة بيانات تساعد على فهم الاتجاهات. جميع الأشكال والقيم المعروضة للتوضيح فقط.',
+    Arabic: 'العربية',
+    English: 'الإنجليزية',
+    'UI/UX': 'تصميم الواجهات وتجربة المستخدم',
+    SEO: 'تحسين محركات البحث',
+    Campaigns: 'الحملات التسويقية',
+    'Motion graphics': 'الرسوم المتحركة',
+    Animation: 'التحريك',
+    Storyboards: 'اللوحات القصصية',
+    Dashboards: 'لوحات البيانات',
+    'Illustrative portfolio concept: :project': 'تصوّر تجريبي لعمل: :project',
+    'Skills: :name': 'مهارات :name',
+    'View sample profile: :name': 'عرض الملف التجريبي: :name',
+    'Choose an image no larger than 6000 × 6000 pixels.':
+        'اختر صورة لا تتجاوز أبعادها 6000 × 6000 بكسل.',
+    'This image could not be opened. Try a different photo.':
+        'تعذّر فتح الصورة. جرّب صورة أخرى.',
+    'This image could not be opened. Choose another photo.':
+        'تعذّر فتح الصورة. اختر صورة أخرى.',
+    'No matching skills. Try another word.':
+        'لا توجد مهارات مطابقة. جرّب كلمة بحث أخرى.',
+    'Two-factor authentication enabled': 'المصادقة الثنائية مفعّلة',
+    'Two-factor authentication is now enabled. Scan the QR code or enter the setup key in your authenticator app.':
+        'تم تفعيل المصادقة الثنائية. امسح رمز QR أو أدخل مفتاح الإعداد في تطبيق المصادقة.',
+    'Verify authentication code': 'تأكيد رمز المصادقة',
+    'Enter the 6-digit code from your authenticator app':
+        'أدخل الرمز المكوّن من 6 أرقام من تطبيق المصادقة',
+    'Enable two-factor authentication': 'تفعيل المصادقة الثنائية',
+    'To finish enabling two-factor authentication, scan the QR code or enter the setup key in your authenticator app':
+        'لإكمال التفعيل، امسح رمز QR أو أدخل مفتاح الإعداد في تطبيق المصادقة',
+    'Failed to fetch QR code': 'تعذّر تحميل رمز QR',
+    'Failed to fetch a setup key': 'تعذّر تحميل مفتاح الإعداد',
+    'Failed to fetch recovery codes': 'تعذّر تحميل رموز الاسترداد',
+    'Manual setup key': 'مفتاح الإعداد اليدوي',
+    'Copy setup key': 'نسخ مفتاح الإعداد',
+    Copied: 'تم النسخ',
+    'Your introduction *': 'نبذة عنك *',
+    'About you or your company *': 'نبذة عنك أو عن شركتك *',
+    'Describe your experience and how you help clients.':
+        'حدّثنا عن خبراتك وما يمكنك تقديمه لأصحاب المشاريع.',
+    'Tell freelancers about your business and the work you have in mind.':
+        'عرّف المستقلين بنشاطك والعمل الذي ترغب في تنفيذه.',
+    friend: 'صديقنا',
+    'Something went wrong.': 'حدث خطأ. يرجى المحاولة مجددًا.',
+    'Show :label': 'إظهار :label',
+    'Hide :label': 'إخفاء :label',
+    Loading: 'جارٍ التحميل',
+    breadcrumb: 'مسار التنقل',
+    More: 'المزيد',
+    'A meeting place for talent & possibility': 'حيث تلتقي المواهب بالفرص',
+    'Bring your ambition. Find your people. Make something matter.':
+        'ابدأ بطموحك، وتعاون مع من يشاركك الرؤية، وأنجز عملًا يترك أثرًا.',
+    'No passkeys yet': 'لا توجد مفاتيح مرور بعد',
+    'Add a passkey to sign in without a password':
+        'أضف مفتاح مرور لتسجيل الدخول دون كلمة مرور',
+    'Enter your message': 'اكتب رسالتك',
+    'The passkey operation was cancelled.': 'أُلغيت عملية مفتاح المرور.',
+    'This device is already registered as a passkey.':
+        'هذا الجهاز مسجّل بالفعل كمفتاح مرور.',
+    'An unknown error occurred.': 'حدث خطأ غير متوقع. يرجى المحاولة مجددًا.',
+    'Passkeys are unavailable at this address.':
+        'مفاتيح المرور غير متاحة على هذا العنوان.',
 };

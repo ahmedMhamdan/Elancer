@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import type { ComponentProps } from 'react';
@@ -20,6 +21,7 @@ export default function AuthField({
     const [visible, setVisible] = useState(false);
     const isPassword = type === 'password';
 
+    const { t } = useTranslation();
     return (
         <div className="registration-field">
             <label htmlFor={id}>{label}</label>
@@ -41,7 +43,9 @@ export default function AuthField({
                         type="button"
                         className="registration-reveal"
                         onClick={() => setVisible((current) => !current)}
-                        aria-label={`${visible ? 'Hide' : 'Show'} ${label.toLowerCase()}`}
+                        aria-label={t(visible ? 'Hide :label' : 'Show :label', {
+                            label,
+                        })}
                         aria-pressed={visible}
                         aria-controls={id}
                     >

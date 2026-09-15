@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 // Adapted from local TailAdmin src/components/ui/modal/index.tsx (MIT).
 // Retains blurred backdrop, rounded panel, close control and content wrapper.
 // Radix supplies focus trapping/restoration, scroll lock and Escape semantics.
@@ -20,6 +21,8 @@ export default function Modal({
     children: ReactNode;
     className?: string;
 }) {
+    const { t } = useTranslation();
+
     return (
         <Dialog.Root
             open={open}
@@ -37,7 +40,7 @@ export default function Modal({
                 >
                     <Dialog.Close className="bg-muted text-muted-foreground focus-visible:outline-ring hover:bg-accent absolute end-3 top-3 flex size-11 items-center justify-center rounded-full focus-visible:outline-2">
                         <X size={20} aria-hidden="true" />
-                        <span className="sr-only">Close</span>
+                        <span className="sr-only">{t('Close')}</span>
                     </Dialog.Close>
                     <Dialog.Title className="pe-10 text-2xl font-semibold tracking-tight">
                         {title}

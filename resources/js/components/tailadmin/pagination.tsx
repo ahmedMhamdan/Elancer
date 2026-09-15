@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 // No table pagination exists in Ahmed's local TailAdmin source (checked 2026-09-12).
 // Elancer extension using its adapted Button; server URLs preserve filters/search.
 import { router, usePage } from '@inertiajs/react';
@@ -20,6 +21,8 @@ export default function Pagination({
     data: PaginationData;
     onNavigate?: () => void;
 }) {
+    const { t } = useTranslation();
+
     const page = usePage();
     const ar = page.props.auth.user.locale === 'ar';
     const numbers = [
@@ -50,8 +53,8 @@ export default function Pagination({
             className="border-border bg-card flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-3"
         >
             <p className="text-muted-foreground text-xs">
-                {ar ? 'الصفحة' : 'Page'} {data.current_page} / {data.last_page}{' '}
-                · {data.total} {ar ? 'نتيجة' : 'results'}
+                {ar ? 'الصفحة' : t('Page')} {data.current_page} /{' '}
+                {data.last_page} · {data.total} {ar ? 'نتيجة' : 'results'}
             </p>
             <div className="flex max-w-full flex-wrap items-center gap-1">
                 <Button

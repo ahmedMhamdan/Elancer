@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 import { Link, usePage } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
@@ -64,6 +65,8 @@ const activeItemStyles =
     'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
 
 export function AppHeader({ breadcrumbs = [] }: Props) {
+    const { t } = useTranslation();
+
     const page = usePage();
     const { auth } = page.props;
     const getInitials = useInitials();
@@ -90,7 +93,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                 className="bg-sidebar flex h-full w-64 flex-col items-stretch justify-between"
                             >
                                 <SheetTitle className="sr-only">
-                                    Navigation menu
+                                    {t('Navigation menu')}
                                 </SheetTitle>
                                 <SheetHeader className="flex justify-start text-left">
                                     <AppLogoIcon className="h-6 w-6 fill-current text-black dark:text-white" />

@@ -28,17 +28,18 @@ export default function PasskeyVerify({
 }: Props = {}) {
     const { t } = useTranslation();
 
-    const { verify, isLoading, error, isSupported } = usePasskeyVerify({
-        ...(routes && {
-            routes: {
-                options: routes.options.url,
-                submit: routes.submit.url,
+    const { verify, isLoading, error, errorInstance, isSupported } =
+        usePasskeyVerify({
+            ...(routes && {
+                routes: {
+                    options: routes.options.url,
+                    submit: routes.submit.url,
+                },
+            }),
+            onSuccess: (response) => {
+                router.visit(response.redirect ?? '/dashboard');
             },
-        }),
-        onSuccess: (response) => {
-            router.visit(response.redirect ?? '/dashboard');
-        },
-    });
+        });
 
     if (!isSupported) {
         return null;
@@ -60,7 +61,14 @@ export default function PasskeyVerify({
                         : (label ?? t('Sign in with a passkey'))}
                 </Button>
                 {error && (
-                    <InputError message={error} className="text-center" />
+                    <InputError
+                        message={t(
+                            errorInstance?.name === 'InvalidDomainError'
+                                ? 'Passkeys are unavailable at this address.'
+                                : error,
+                        )}
+                        className="text-center"
+                    />
                 )}
             </div>
 

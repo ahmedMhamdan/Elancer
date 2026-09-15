@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 // Screenshot-inspired completion composition using the local TailAdmin Modal and
 // UserProfile card structure: rounded panel, profile summary and action footer.
 // Content describes available Elancer features; profile setup does not publish it.
@@ -7,6 +8,8 @@ import { useState } from 'react';
 import Modal from '@/components/tailadmin/modal';
 import Button from '@/components/tailadmin/button';
 export default function OnboardingReady() {
+    const { t } = useTranslation();
+
     const [open, setOpen] = useState(true);
     const { auth } = usePage().props;
     const client = auth.user.workspace_role === 'client';
@@ -14,8 +17,10 @@ export default function OnboardingReady() {
         <Modal
             open={open}
             onClose={() => setOpen(false)}
-            title="Your profile is ready!"
-            description="Welcome to Elancer. Your workspace is ready for the next step."
+            title={t('Your profile is ready!')}
+            description={t(
+                'Welcome to Elancer. Your workspace is ready for the next step.',
+            )}
             className="max-w-4xl sm:p-10"
         >
             <div className="rounded-2xl bg-zinc-900 p-6 text-white sm:p-8">
@@ -23,13 +28,13 @@ export default function OnboardingReady() {
                     <div>
                         <p className="text-sm font-medium text-emerald-300">
                             {client
-                                ? 'Your client workspace'
-                                : 'Your freelancer workspace'}
+                                ? t('Your client workspace')
+                                : t('Your freelancer workspace')}
                         </p>
                         <h2 className="mt-3 text-2xl leading-tight font-semibold sm:text-3xl">
-                            A great start.
+                            {t('A great start.')}
                             <br />
-                            Make it yours.
+                            {t('Make it yours.')}
                         </h2>
                         <ul className="mt-6 space-y-4 text-sm text-zinc-200">
                             {[
@@ -44,8 +49,10 @@ export default function OnboardingReady() {
                                         aria-hidden="true"
                                     />
                                     {client && text.includes('skills')
-                                        ? 'Your introduction and location are easy to update'
-                                        : text}
+                                        ? t(
+                                              'Your introduction and location are easy to update',
+                                          )
+                                        : t(text)}
                                 </li>
                             ))}
                         </ul>
@@ -66,20 +73,21 @@ export default function OnboardingReady() {
                             {auth.user.name}
                         </p>
                         <p className="mt-2 text-sm text-zinc-300">
-                            Your details are saved as a draft. Completing setup
-                            does not publish your profile.
+                            {t(
+                                'Your details are saved as a draft. Completing setup does not publish your profile.',
+                            )}
                         </p>
                     </div>
                 </div>
                 <div className="mt-8 flex flex-wrap items-center gap-4">
                     <Button onClick={() => setOpen(false)}>
-                        Go to my workspace
+                        {t('Go to my workspace')}
                     </Button>
                     <Link
                         href="/my-profile"
                         className="min-h-11 px-2 py-3 text-sm underline underline-offset-4"
                     >
-                        Review my profile
+                        {t('Review my profile')}
                     </Link>
                 </div>
             </div>
@@ -88,7 +96,7 @@ export default function OnboardingReady() {
                 className="text-muted-foreground hover:text-foreground mt-5 flex min-h-11 items-center gap-3 text-sm"
             >
                 <ShieldCheck size={20} aria-hidden="true" />
-                Keep your account secure with two-factor authentication.
+                {t('Keep your account secure with two-factor authentication.')}
             </Link>
         </Modal>
     );

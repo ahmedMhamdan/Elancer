@@ -57,8 +57,10 @@ export default function Dashboard({
             <div className="workspace-page-heading">
                 <h1>{t('Overview')}</h1>
                 <p>
-                    Welcome back, {auth.user.name.split(' ')[0]}. Here is your
-                    workspace at a glance.
+                    {t(
+                        'Welcome back, :name. Here is your workspace at a glance.',
+                        { name: auth.user.name.trim().split(/\s+/)[0] },
+                    )}
                 </p>
             </div>
             <div className="workspace-summary">
@@ -78,9 +80,11 @@ export default function Dashboard({
                         <CheckCircle2 aria-hidden="true" />
                     </span>
                     <div>
-                        <p>Profile status</p>
+                        <p>{t('Profile status')}</p>
                         <strong>
-                            {profile?.published_at ? 'Published' : 'Draft'}
+                            {profile?.published_at
+                                ? t('Published')
+                                : t('Draft')}
                         </strong>
                     </div>
                 </section>
@@ -89,18 +93,18 @@ export default function Dashboard({
                         <ShieldCheck aria-hidden="true" />
                     </span>
                     <div>
-                        <p>Account security</p>
+                        <p>{t('Account security')}</p>
                         <strong>
                             {auth.user.two_factor_enabled
-                                ? '2FA enabled'
-                                : 'Set up 2FA'}
+                                ? t('2FA enabled')
+                                : t('Set up 2FA')}
                         </strong>
                     </div>
                 </section>
             </div>
             <ComponentCard
-                title="Your next steps"
-                desc="Keep your account ready for work."
+                title={t('Your next steps')}
+                desc={t('Keep your account ready for work.')}
             >
                 <div className="divide-border divide-y">
                     {tasks.map((task) => (
@@ -110,15 +114,15 @@ export default function Dashboard({
                             className="hover:bg-muted focus-visible:outline-ring flex min-h-20 items-center justify-between gap-4 rounded-lg px-2 py-5 focus-visible:outline-2"
                         >
                             <div>
-                                <h3 className="font-medium">{task.title}</h3>
+                                <h3 className="font-medium">{t(task.title)}</h3>
                                 <p className="text-muted-foreground mt-1 text-sm">
-                                    {task.description}
+                                    {t(task.description)}
                                 </p>
                             </div>
                             <span className="flex shrink-0 items-center gap-3">
                                 {task.done && (
                                     <span className="text-primary text-xs">
-                                        Ready
+                                        {t('Ready')}
                                     </span>
                                 )}
                                 <ArrowUpRight size={20} aria-hidden="true" />
@@ -130,22 +134,22 @@ export default function Dashboard({
             {(auth.user.is_admin === true ||
                 auth.user.is_super_admin === true) && (
                 <ComponentCard
-                    title="Administration"
-                    desc="Manage your assigned responsibilities."
+                    title={t('Administration')}
+                    desc={t('Manage your assigned responsibilities.')}
                 >
                     <div className="flex flex-wrap gap-4">
                         <Link
                             href="/admin/categories"
                             className="text-primary min-h-11 rounded-lg px-4 py-3 underline"
                         >
-                            Manage categories
+                            {t('Manage categories')}
                         </Link>
                         {auth.user.is_super_admin === true && (
                             <Link
                                 href="/admin/administrators"
                                 className="text-primary min-h-11 rounded-lg px-4 py-3 underline"
                             >
-                                Manage admin access
+                                {t('Manage admin access')}
                             </Link>
                         )}
                     </div>

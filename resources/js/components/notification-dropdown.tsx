@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 // Adapted from TailAdmin/src/components/header/NotificationDropdown.tsx (MIT).
 // Source: https://github.com/TailAdmin/free-react-tailwind-admin-dashboard
 // Keeps the demo bell SVG, panel/header composition and close SVG.
@@ -7,6 +8,8 @@ import { useCallback, useId, useRef, useState } from 'react';
 import { TailAdminDropdown } from '@/components/tailadmin-dropdown';
 
 export default function NotificationDropdown() {
+    const { t } = useTranslation();
+
     const [isOpen, setIsOpen] = useState(false);
     const triggerRef = useRef<HTMLButtonElement>(null);
     const panelId = useId();
@@ -24,7 +27,7 @@ export default function NotificationDropdown() {
                 ref={triggerRef}
                 type="button"
                 className="site-theme-toggle relative"
-                aria-label="Notifications"
+                aria-label={t('Notifications')}
                 aria-expanded={isOpen}
                 aria-controls={isOpen ? panelId : undefined}
                 onClick={() => setIsOpen((open) => !open)}
@@ -58,13 +61,13 @@ export default function NotificationDropdown() {
                         id={titleId}
                         className="text-foreground text-lg font-semibold"
                     >
-                        Notifications
+                        {t('Notifications')}
                     </h2>
                     <button
                         type="button"
                         onClick={closeAndFocus}
                         className="site-theme-toggle"
-                        aria-label="Close notifications"
+                        aria-label={t('Close notifications')}
                     >
                         <svg
                             className="fill-current"
@@ -85,10 +88,10 @@ export default function NotificationDropdown() {
                 </div>
                 <div className="flex min-h-40 flex-col items-center justify-center gap-2 px-4 py-8 text-center">
                     <p className="text-foreground font-medium">
-                        No notifications yet
+                        {t('No notifications yet')}
                     </p>
                     <p className="text-muted-foreground text-sm">
-                        Project and account updates will appear here.
+                        {t('Project and account updates will appear here.')}
                     </p>
                 </div>
             </TailAdminDropdown>

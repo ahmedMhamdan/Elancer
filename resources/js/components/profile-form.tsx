@@ -54,6 +54,7 @@ export default function ProfileForm({
             <Input
                 id={`profile-${key}`}
                 name={key}
+                dir="auto"
                 value={form.data[key]}
                 maxLength={max}
                 onChange={(e) => form.setData(key, e.target.value)}
@@ -74,8 +75,10 @@ export default function ProfileForm({
     return (
         <form id="profile-form" onSubmit={submit} className="space-y-6">
             <ComponentCard
-                title="About you"
-                desc="Give people a clear picture of who you are and what you offer."
+                title={t('About you')}
+                desc={t(
+                    'Give people a clear picture of who you are and what you offer.',
+                )}
             >
                 <div className="flex items-center justify-between gap-4">
                     <div>
@@ -88,7 +91,7 @@ export default function ProfileForm({
                         href="/settings/profile"
                         className="text-primary min-h-11 px-3 py-3 text-sm underline"
                     >
-                        Edit account
+                        {t('Edit account')}
                     </Link>
                 </div>
                 {client
@@ -96,21 +99,24 @@ export default function ProfileForm({
                           'company',
                           t('Company name'),
                           120,
-                          'Optional — leave blank if you hire as an individual.',
+                          t(
+                              'Optional — leave blank if you hire as an individual.',
+                          ),
                       )
                     : field(
                           'headline',
-                          'Professional headline',
+                          t('Professional headline'),
                           120,
-                          'A short description of your work and specialty.',
+                          t('A short description of your work and specialty.'),
                       )}
                 <div>
                     <Label htmlFor="profile-bio">
-                        {client ? 'Your introduction' : 'About me'}
+                        {client ? t('Your introduction') : t('About me')}
                     </Label>
                     <TextArea
                         id="profile-bio"
                         name="bio"
+                        dir="auto"
                         rows={6}
                         maxLength={5000}
                         value={form.data.bio}
@@ -119,7 +125,9 @@ export default function ProfileForm({
                         aria-describedby="profile-bio-error"
                     />
                     <p className="text-muted-foreground mt-2 text-sm">
-                        {form.data.bio.length} / 5,000 characters
+                        {t(':count / 5,000 characters', {
+                            count: form.data.bio.length,
+                        })}
                     </p>
                     <InputError
                         id="profile-bio-error"
@@ -129,8 +137,8 @@ export default function ProfileForm({
             </ComponentCard>
             {!client && (
                 <ComponentCard
-                    title="Skills and expertise"
-                    desc="Add up to 15 skills that describe your work."
+                    title={t('Skills and expertise')}
+                    desc={t('Add up to 15 skills that describe your work.')}
                 >
                     <Label htmlFor="profile-skills">{t('Skills')}</Label>
                     <SkillSelect
@@ -150,8 +158,10 @@ export default function ProfileForm({
                 </ComponentCard>
             )}
             <ComponentCard
-                title="Where you are based"
-                desc="Share your city and country. A street address is not needed."
+                title={t('Where you are based')}
+                desc={t(
+                    'Share your city and country. A street address is not needed.',
+                )}
             >
                 <div className="grid gap-5 sm:grid-cols-2">
                     {field('country', t('Country'), 100)}
@@ -160,11 +170,13 @@ export default function ProfileForm({
             </ComponentCard>
             <div className="border-border bg-card flex flex-wrap items-center justify-between gap-4 rounded-xl border p-5">
                 <p className="text-muted-foreground text-sm">
-                    Saving updates your draft; it does not publish your profile.
+                    {t(
+                        'Saving updates your draft; it does not publish your profile.',
+                    )}
                 </p>
                 <div className="flex items-center gap-3">
                     <span role="status" className="text-primary text-sm">
-                        {form.recentlySuccessful && 'Changes saved'}
+                        {form.recentlySuccessful && t('Changes saved')}
                     </span>
                     <Button
                         variant="outline"
@@ -174,10 +186,10 @@ export default function ProfileForm({
                             form.clearErrors();
                         }}
                     >
-                        Reset
+                        {t('Reset')}
                     </Button>
                     <Button type="submit" disabled={form.processing}>
-                        {form.processing ? 'Saving…' : t('Save changes')}
+                        {form.processing ? t('Saving…') : t('Save changes')}
                     </Button>
                 </div>
             </div>

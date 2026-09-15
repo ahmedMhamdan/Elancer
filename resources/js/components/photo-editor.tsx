@@ -116,8 +116,10 @@ export default function PhotoEditor({
             onClose={() => {
                 if (!saving) onClose();
             }}
-            title="Make your photo fit"
-            description="Drag to reposition, or use the sliders. The circle shows how your profile photo will appear."
+            title={t('Make your photo fit')}
+            description={t(
+                'Drag to reposition, or use the sliders. The circle shows how your profile photo will appear.',
+            )}
         >
             <div className="mx-auto max-w-80 space-y-4">
                 <div className="bg-muted relative aspect-square overflow-hidden rounded-xl">
@@ -125,7 +127,7 @@ export default function PhotoEditor({
                         ref={canvas}
                         width={SIZE}
                         height={SIZE}
-                        aria-label="Profile photo crop preview"
+                        aria-label={t('Profile photo crop preview')}
                         className="h-full w-full cursor-move touch-none"
                         onPointerDown={(event) => {
                             if (!image || saving) return;
@@ -178,16 +180,18 @@ export default function PhotoEditor({
                         className="pointer-events-none absolute inset-0 rounded-full border-2 border-white/90 shadow-[0_0_0_100px_rgba(0,0,0,0.4)]"
                     />
                 </div>
-                {!image && !error && <p role="status">Opening photo…</p>}
+                {!image && !error && <p role="status">{t('Opening photo…')}</p>}
                 {error && (
                     <p role="alert" className="text-destructive text-sm">
-                        {error}
+                        {t(error)}
                     </p>
                 )}
                 <fieldset disabled={!image || saving} className="space-y-3">
-                    <legend className="sr-only">Photo adjustments</legend>
+                    <legend className="sr-only">
+                        {t('Photo adjustments')}
+                    </legend>
                     <div>
-                        <Label htmlFor="photo-zoom">Zoom</Label>
+                        <Label htmlFor="photo-zoom">{t('Zoom')}</Label>
                         <input
                             id="photo-zoom"
                             type="range"
@@ -200,7 +204,9 @@ export default function PhotoEditor({
                         />
                     </div>
                     <div>
-                        <Label htmlFor="photo-x">Horizontal position</Label>
+                        <Label htmlFor="photo-x">
+                            {t('Horizontal position')}
+                        </Label>
                         <input
                             id="photo-x"
                             type="range"
@@ -213,7 +219,9 @@ export default function PhotoEditor({
                         />
                     </div>
                     <div>
-                        <Label htmlFor="photo-y">Vertical position</Label>
+                        <Label htmlFor="photo-y">
+                            {t('Vertical position')}
+                        </Label>
                         <input
                             id="photo-y"
                             type="range"
@@ -235,7 +243,7 @@ export default function PhotoEditor({
                             }}
                         >
                             <RotateCw size={16} aria-hidden="true" />
-                            Rotate
+                            {t('Rotate')}
                         </Button>
                         <Button
                             variant="outline"
@@ -246,7 +254,7 @@ export default function PhotoEditor({
                                 setY(0);
                             }}
                         >
-                            Reset
+                            {t('Reset')}
                         </Button>
                     </div>
                 </fieldset>
@@ -256,7 +264,7 @@ export default function PhotoEditor({
                     {t('Cancel')}
                 </Button>
                 <Button disabled={!image || saving} onClick={apply}>
-                    {saving ? 'Preparing…' : 'Apply photo'}
+                    {saving ? t('Preparing…') : t('Apply photo')}
                 </Button>
             </div>
         </Modal>

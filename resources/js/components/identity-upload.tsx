@@ -1,3 +1,4 @@
+import { useTranslation } from '@/hooks/use-translation';
 // Adapted from TailAdmin src/components/form/form-elements/DropZone.tsx (MIT),
 // retrieved 2026-09-12. Retains dashed wrapper, drop target, icon, instructions
 // and browse affordance. Compact layout, Elancer tokens and native file handling
@@ -21,6 +22,8 @@ export default function IdentityUpload({
     error?: string;
     disabled?: boolean;
 }) {
+    const { t } = useTranslation();
+
     const input = useRef<HTMLInputElement>(null);
     const [dragging, setDragging] = useState(false);
     const [localError, setLocalError] = useState('');
@@ -60,7 +63,9 @@ export default function IdentityUpload({
                 <button
                     type="button"
                     disabled={disabled}
-                    aria-label={`${file ? 'Change' : 'Choose'} ${label.toLowerCase()}`}
+                    aria-label={t(file ? 'Change :label' : 'Choose :label', {
+                        label,
+                    })}
                     aria-describedby={`${id}-help ${id}-error`}
                     aria-invalid={!!(localError || error)}
                     onClick={() => input.current?.click()}
@@ -87,20 +92,21 @@ export default function IdentityUpload({
                     <span className="min-w-0">
                         <span className="block text-sm font-medium">
                             {dragging
-                                ? 'Drop your image here'
+                                ? t('Drop your image here')
                                 : file
-                                  ? 'Image selected'
-                                  : `Choose ${label.toLowerCase()}`}
+                                  ? t('Image selected')
+                                  : t('Choose :label', { label })}
                         </span>
                         <span
                             id={`${id}-help`}
                             className="text-muted-foreground mt-1 block text-xs"
                         >
-                            Drag a photo here or click to browse · JPEG / PNG ·
-                            Max 2 MB
+                            {t(
+                                'Drag a photo here or click to browse · JPEG / PNG · Max 2 MB',
+                            )}
                         </span>
                         <span className="text-primary mt-2 block text-xs font-medium underline">
-                            {file ? 'Change file' : 'Browse file'}
+                            {file ? t('Change file') : t('Browse file')}
                         </span>
                     </span>
                 </button>
@@ -111,7 +117,8 @@ export default function IdentityUpload({
                         role="status"
                         className="text-muted-foreground min-w-0 text-xs break-all"
                     >
-                        {file.name} · {(file.size / 1024 / 1024).toFixed(2)} MB
+                        {file.name} · {(file.size / 1024 / 1024).toFixed(2)}{' '}
+                        {t('MB')}
                     </p>
                     <button
                         type="button"
@@ -123,11 +130,14 @@ export default function IdentityUpload({
                             if (input.current) input.current.value = '';
                         }}
                     >
-                        Remove
+                        {t('Remove')}
                     </button>
                 </div>
             )}
-            <InputError id={`${id}-error`} message={localError || error} />
+            <InputError
+                id={`${id}-error`}
+                message={localError ? t(localError) : error}
+            />
         </div>
     );
 }

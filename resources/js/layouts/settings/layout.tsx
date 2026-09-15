@@ -38,7 +38,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
         <div className="px-4 py-6">
             <Heading
                 title={t('Settings')}
-                description="Manage your profile and account settings"
+                description={t('Manage your profile and account settings')}
             />
 
             <div className="flex flex-col lg:flex-row lg:space-x-12">
@@ -61,7 +61,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                                     {item.icon && (
                                         <item.icon className="h-4 w-4" />
                                     )}
-                                    {item.title}
+                                    {t(item.title)}
                                 </Link>
                             </Button>
                         ))}
