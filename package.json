@@ -6,7 +6,7 @@
         "build": "vp build",
         "build:ssr": "vp build && vp build --ssr",
         "dev": "vp dev",
-        "check": "vp check",
+        "check": "vp check && node scripts/check-translations.mjs",
         "check:fix": "vp check --fix",
         "types:check": "tsc --noEmit"
     },

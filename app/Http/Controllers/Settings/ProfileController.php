@@ -54,7 +54,7 @@ class ProfileController extends Controller
 
         if ($user->is_super_admin) {
             throw ValidationException::withMessages([
-                'password' => 'Super-admin accounts cannot be deleted from account settings.',
+                'password' => __('Super-admin accounts cannot be deleted from account settings.'),
             ]);
         }
 

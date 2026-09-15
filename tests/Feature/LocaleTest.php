@@ -81,4 +81,29 @@ class LocaleTest extends TestCase
         ])->assertSessionHasNoErrors();
         $this->assertSame('ar', User::where('email', 'locale@example.test')->firstOrFail()->locale);
     }
+
+    public function test_arabic_profile_and_identity_validation_do_not_fall_back_to_english(): void
+    {
+        $user = User::factory()->create(['locale' => 'ar', 'onboarding_completed_at' => now()]);
+        $this->actingAs($user)->patch('/my-profile', ['skills' => ['missing-skill']])
+            ->assertSessionHasErrors(['skills.0' => 'قيمة المهارة غير موجودة ضمن الخيارات المتاحة.']);
+        $this->post('/my-profile/identity', [])->assertSessionHasErrors([
+            'government_id' => 'حقل صورة وثيقة الهوية مطلوب.',
+            'selfie' => 'حقل الصورة الشخصية للوجه مطلوب.',
+            'consent' => 'يجب الموافقة على إرسال الصور لمراجعة الهوية.',
+        ]);
+    }
+
+    public function test_arabic_security_validation_and_operational_messages_are_translated(): void
+    {
+        $user = User::factory()->create(['locale' => 'ar', 'onboarding_completed_at' => now()]);
+        $this->actingAs($user)->put('/settings/password', [
+            'current_password' => 'wrong-password',
+            'password' => 'a-valid-test-password',
+            'password_confirmation' => 'a-valid-test-password',
+        ])->assertSessionHasErrors(['current_password' => 'كلمة المرور الحالية غير صحيحة.']);
+        $this->assertSame('تم تحديث بيانات الحساب.', __('Profile updated.'));
+        $this->assertSame('تم تغيير كلمة المرور.', __('Password updated.'));
+        $this->assertSame('رمز المصادقة الثنائية غير صحيح.', __('The provided two factor authentication code was invalid.'));
+    }
 }

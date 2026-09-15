@@ -12,5 +12,21 @@
     "Regards,": "مع التحية،",
     "Whoops!": "عذرًا!",
     "All rights reserved.": "جميع الحقوق محفوظة.",
-    "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:": "إذا تعذّر الضغط على زر \":actionText\"، انسخ الرابط أدناه والصقه في متصفحك:"
+    "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:": "إذا تعذّر الضغط على زر \":actionText\"، انسخ الرابط أدناه والصقه في متصفحك:",
+    "Profile updated.": "تم تحديث بيانات الحساب.",
+    "Password updated.": "تم تغيير كلمة المرور.",
+    "We could not save your photo. Please try again.": "تعذّر حفظ صورتك. يرجى المحاولة مجددًا.",
+    "Super-admin accounts cannot be deleted from account settings.": "لا يمكن حذف حساب مسؤول الإدارة من إعدادات الحساب.",
+    "This submission is already pending or approved.": "هذا الطلب قيد المراجعة أو تمت الموافقة عليه بالفعل.",
+    "You cannot review your own identity.": "لا يمكنك مراجعة طلب توثيق هويتك بنفسك.",
+    "The provided two factor authentication code was invalid.": "رمز المصادقة الثنائية غير صحيح.",
+    "The provided two factor recovery code was invalid.": "رمز الاسترداد غير صحيح.",
+    "Invalid credential format.": "بيانات مفتاح المرور غير صالحة.",
+    "Passkey verification session expired. Please try again.": "انتهت جلسة التحقق بمفتاح المرور. يرجى المحاولة مجددًا.",
+    "Passkey registration session expired. Please try again.": "انتهت جلسة تسجيل مفتاح المرور. يرجى المحاولة مجددًا.",
+    "Unable to register passkey. Please try again.": "تعذّر تسجيل مفتاح المرور. يرجى المحاولة مجددًا.",
+    "Unable to register this passkey.": "تعذّر تسجيل مفتاح المرور هذا.",
+    "Unable to verify passkey. Please try again.": "تعذّر التحقق من مفتاح المرور. يرجى المحاولة مجددًا.",
+    "Passkey not recognized. It may have been removed from your account.": "مفتاح المرور غير معروف. ربما أُزيل من حسابك.",
+    "Unable to sign in with this account.": "تعذّر تسجيل الدخول بهذا الحساب."
 }

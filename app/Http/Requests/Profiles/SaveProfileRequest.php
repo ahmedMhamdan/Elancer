@@ -13,6 +13,12 @@ class SaveProfileRequest extends UpdateProfileRequest
             : $user->canParticipateInMarketplace());
     }
 
+    /** @return array<string, string> */
+    public function messages(): array
+    {
+        return ['skills.max' => __('validation.max.array')] + parent::messages();
+    }
+
     /** @return array<string, list<string>> */
     public function rules(): array
     {

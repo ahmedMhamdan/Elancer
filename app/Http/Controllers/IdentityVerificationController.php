@@ -30,7 +30,7 @@ class IdentityVerificationController extends Controller
             DB::transaction(function () use ($request, &$paths): void {
                 User::whereKey($request->user()->id)->lockForUpdate()->firstOrFail();
                 $verification = IdentityVerification::where('user_id', $request->user()->id)->lockForUpdate()->first();
-                abort_if($verification && $verification->status !== 'rejected', 409, 'This submission is already pending or approved.');
+                abort_if($verification && $verification->status !== 'rejected', 409, __('This submission is already pending or approved.'));
                 $data = ['user_id' => $request->user()->id, 'status' => 'pending', 'reason' => null, 'reviewed_by' => null, 'reviewed_at' => null, 'consented_at' => now()];
                 foreach (['government_id' => 'id', 'selfie' => 'selfie'] as $field => $key) {
                     $file = $request->file($field);
@@ -80,7 +80,7 @@ class IdentityVerificationController extends Controller
 
     public function review(Request $request, IdentityVerification $verification): RedirectResponse
     {
-        abort_if($verification->user_id === $request->user()->id, 403, 'You cannot review your own identity.');
+        abort_if($verification->user_id === $request->user()->id, 403, __('You cannot review your own identity.'));
         $data = $request->validate(['status' => ['required', 'in:approved,rejected'], 'reason' => ['required', 'string', 'max:1000']]);
         DB::transaction(function () use ($verification, $data, $request): void {
             $locked = IdentityVerification::lockForUpdate()->findOrFail($verification->id);
