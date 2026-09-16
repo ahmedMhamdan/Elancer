@@ -28,5 +28,8 @@
     "Unable to register this passkey.": "تعذّر تسجيل مفتاح المرور هذا.",
     "Unable to verify passkey. Please try again.": "تعذّر التحقق من مفتاح المرور. يرجى المحاولة مجددًا.",
     "Passkey not recognized. It may have been removed from your account.": "مفتاح المرور غير معروف. ربما أُزيل من حسابك.",
-    "Unable to sign in with this account.": "تعذّر تسجيل الدخول بهذا الحساب."
+    "Unable to sign in with this account.": "تعذّر تسجيل الدخول بهذا الحساب.",
+    "The search filters are invalid.": "خيارات البحث غير صالحة.",
+    "The maximum budget must be at least the minimum budget.": "يجب ألا يقل الحد الأعلى للميزانية عن الحد الأدنى.",
+    "Choose a future application cutoff.": "اختر موعدًا مستقبليًا لانتهاء التقديم."
 }

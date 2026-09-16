@@ -2,12 +2,14 @@
 
 use App\Http\Controllers\AdministratorController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ClientProjectController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\IdentityVerificationController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MarketplaceProfileController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ProfilePhotoController;
+use App\Http\Controllers\ProjectDiscoveryController;
 use App\Http\Controllers\SkillController;
 use App\Http\Middleware\EnsureCategoryAdministrator;
 use App\Http\Middleware\EnsureOnboardingIsComplete;
@@ -15,6 +17,9 @@ use App\Http\Middleware\EnsureSuperAdministrator;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
+Route::get('categories', [ProjectDiscoveryController::class, 'categories'])->name('categories.index');
+Route::get('jobs', [ProjectDiscoveryController::class, 'index'])->name('jobs.index');
+Route::get('jobs/{project}', [ProjectDiscoveryController::class, 'show'])->whereNumber('project')->name('jobs.show');
 Route::post('locale', LocaleController::class)->middleware('throttle:60,1')->name('locale.update');
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -57,4 +62,16 @@ Route::middleware(['auth', 'verified', EnsureSuperAdministrator::class])->prefix
     Route::get('/', [IdentityVerificationController::class, 'index'])->name('index');
     Route::get('{verification}/image/{kind}', [IdentityVerificationController::class, 'image'])->name('image');
     Route::put('{verification}', [IdentityVerificationController::class, 'review'])->middleware('throttle:20,1')->name('review');
+});
+
+Route::middleware(['auth', 'verified', EnsureOnboardingIsComplete::class])->prefix('my-projects')->name('projects.')->group(function () {
+    $controller = ClientProjectController::class;
+    Route::get('/', [$controller, 'index'])->name('index');
+    Route::post('/', [$controller, 'store'])->middleware('throttle:20,1')->name('store');
+    Route::get('{project}/edit', [$controller, 'edit'])->name('edit');
+    Route::patch('{project}', [$controller, 'update'])->middleware('throttle:120,1')->name('update');
+    Route::post('{project}/publish', [$controller, 'publish'])->middleware('throttle:10,1')->name('publish');
+    Route::delete('{project}', [$controller, 'destroy'])->name('destroy');
+    Route::post('{project}/restore', [$controller, 'restore'])->withTrashed()->name('restore');
+    Route::delete('{project}/permanent', [$controller, 'forceDestroy'])->withTrashed()->name('force-destroy');
 });

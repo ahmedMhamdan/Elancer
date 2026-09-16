@@ -21,10 +21,9 @@ export default function Pagination({
     data: PaginationData;
     onNavigate?: () => void;
 }) {
-    const { t } = useTranslation();
+    const { t, ar } = useTranslation();
 
     const page = usePage();
-    const ar = page.props.auth.user.locale === 'ar';
     const numbers = [
         ...new Set([
             1,

@@ -1,6 +1,11 @@
 <?php
 
 return [
+    'integer' => 'يجب أن يكون :attribute عددًا صحيحًا.',
+    'numeric' => 'يجب أن يكون :attribute رقمًا.',
+    'decimal' => 'يجب ألا يتجاوز :attribute منزلتين عشريتين.',
+    'date' => 'يجب أن يكون :attribute تاريخًا صالحًا.',
+    'after' => 'يجب أن يكون :attribute بعد :date.',
     'required' => 'حقل :attribute مطلوب.',
     'string' => 'يجب أن يكون :attribute نصًا.',
     'email' => 'يجب أن يكون :attribute بريدًا إلكترونيًا صالحًا.',
@@ -40,6 +45,9 @@ return [
         'uncompromised' => 'ظهرت كلمة المرور هذه في تسريب بيانات. اختر كلمة مرور أخرى.',
     ],
     'attributes' => [
+        'title' => 'عنوان المشروع', 'description' => 'تفاصيل المشروع', 'category_id' => 'التصنيف',
+        'version' => 'نسخة المسودة', 'budget_min' => 'الحد الأدنى للميزانية', 'budget_max' => 'الحد الأعلى للميزانية',
+        'application_closes_at' => 'آخر موعد للتقديم', 'screening_questions' => 'أسئلة المتقدمين', 'screening_questions.*' => 'السؤال',
         'name' => 'الاسم', 'email' => 'البريد الإلكتروني',
         'password' => 'كلمة المرور', 'locale' => 'اللغة',
         'current_password' => 'كلمة المرور الحالية', 'password_confirmation' => 'تأكيد كلمة المرور',
