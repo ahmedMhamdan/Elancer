@@ -31,13 +31,15 @@ export default function ElancerSiteHeader({
     const closeMenu = useCallback(() => setIsOpen(false), []);
     const destination = auth.user ? dashboard().url : register().url;
     const items = [
+        { name: t('Find jobs'), link: '/jobs' },
+        { name: t('Categories'), link: '/categories' },
         {
             name: t('Talent showcase'),
-            link: `${registration ? home().url : ''}#featured-freelancers`,
+            link: `${home().url}#featured-freelancers`,
         },
         {
             name: t('How it works'),
-            link: `${registration ? home().url : ''}#how-it-works`,
+            link: `${home().url}#how-it-works`,
         },
     ];
     return (
@@ -49,15 +51,23 @@ export default function ElancerSiteHeader({
                     className="elancer-desktop-links"
                 >
                     <ExploreSkillsMenu />
-                    {items.map((item) => (
-                        <a
-                            key={item.name}
-                            href={item.link}
-                            className="elancer-resizable-link elancer-top-link"
-                        >
-                            {item.name}
-                        </a>
-                    ))}
+                    {items
+                        .filter(
+                            (item) =>
+                                ![
+                                    '/categories',
+                                    `${home().url}#featured-freelancers`,
+                                ].includes(item.link),
+                        )
+                        .map((item) => (
+                            <a
+                                key={item.name}
+                                href={item.link}
+                                className="elancer-resizable-link elancer-top-link"
+                            >
+                                {item.name}
+                            </a>
+                        ))}
                 </nav>
                 <div className="flex shrink-0 items-center gap-2">
                     <LanguageToggle />

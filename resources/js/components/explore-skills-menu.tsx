@@ -206,11 +206,8 @@ export default function ExploreSkillsMenu({
                             </div>
                         </div>
                         <div className="elancer-explore-footer">
-                            <a
-                                href={`${home().url}#categories`}
-                                onClick={navigate}
-                            >
-                                {t('See all skills')}{' '}
+                            <a href="/categories" onClick={navigate}>
+                                {t('Browse job categories')}{' '}
                                 <ArrowRight size={16} aria-hidden="true" />
                             </a>
                             <a
