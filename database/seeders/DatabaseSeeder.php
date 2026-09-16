@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(SuperAdminSeeder::class);
+        $this->call(CategorySeeder::class);
 
         if (! User::where('email', 'test@example.com')->exists()) {
             User::factory()->create([
