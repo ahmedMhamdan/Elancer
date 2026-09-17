@@ -48,5 +48,18 @@
     "This photo did not pass the workplace-safe content check. Choose another photo.": "لم تجتز هذه الصورة فحص الملاءمة لبيئة العمل. اختر صورة أخرى.",
     "Photo safety checks are unavailable. Your current photo has not changed. Please try again later.": "فحص سلامة الصور غير متاح حاليًا. لم تتغير صورتك الحالية. حاول لاحقًا.",
     "This image could not be opened. Try a different photo.": "تعذّر فتح هذه الصورة. جرّب صورة أخرى.",
-    "Checking photo…": "جارٍ فحص الصورة…"
+    "Checking photo…": "جارٍ فحص الصورة…",
+    "Explore Elancer": "استكشف إيلانسر",
+    "Discover": "استكشف",
+    "Your workspace": "مساحة عملك",
+    "Get started": "ابدأ الآن",
+    "Browse categories": "تصفح التصنيفات",
+    "Search jobs": "ابحث عن مشاريع",
+    "Find the right field for your next project.": "اعثر على المجال المناسب لمشروعك القادم.",
+    "Explore projects by skill, budget, and category.": "استكشف المشاريع حسب المهارة والميزانية والتصنيف.",
+    "Return to your workspace.": "عُد إلى مساحة عملك.",
+    "Manage your profile and skills.": "أدر ملفك الشخصي ومهاراتك.",
+    "Manage your project drafts.": "أدر مسودات مشاريعك.",
+    "Join as a client or freelancer.": "انضم كصاحب مشاريع أو مستقل.",
+    "Continue where you left off.": "تابع من حيث توقفت."
 }

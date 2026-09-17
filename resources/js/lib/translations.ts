@@ -923,4 +923,15 @@ export const arabic: Record<string, string> = {
         'فحص سلامة الصور غير متاح حاليًا. لم تتغير صورتك الحالية. حاول لاحقًا.',
     'We could not save your photo. Please try again.':
         'تعذّر حفظ صورتك. حاول مرة أخرى.',
+    Discover: 'استكشف',
+    'Browse categories': 'تصفح التصنيفات',
+    'Find the right field for your next project.':
+        'اعثر على المجال المناسب لمشروعك القادم.',
+    'Explore projects by skill, budget, and category.':
+        'استكشف المشاريع حسب المهارة والميزانية والتصنيف.',
+    'Return to your workspace.': 'عُد إلى مساحة عملك.',
+    'Manage your profile and skills.': 'أدر ملفك الشخصي ومهاراتك.',
+    'Manage your project drafts.': 'أدر مسودات مشاريعك.',
+    'Join as a client or freelancer.': 'انضم كصاحب مشاريع أو مستقل.',
+    'Continue where you left off.': 'تابع من حيث توقفت.',
 };

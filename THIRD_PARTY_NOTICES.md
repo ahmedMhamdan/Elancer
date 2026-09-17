@@ -135,3 +135,12 @@ Arabic interface typography uses Cairo by The Cairo Project Authors, licensed un
 
 - [Font source](https://github.com/Gue3bara/Cairo)
 - [License](public/licenses/Cairo-OFL.txt)
+
+## Supplied motion navigation (2026-09-17)
+
+The public navigation adapts the React MotionNavigationMenu example supplied by
+Ahmed. Its spring viewport, directional content and animated highlight are adapted
+to Elancer tokens, Inertia links, RTL, reduced motion, and keyboard/touch handling.
+The unavailable Unlumen highlight import is replaced by a local Motion highlight;
+no Unlumen package or registry source is included. Existing installed Motion,
+Lucide and class-variance-authority dependencies retain their respective licenses.

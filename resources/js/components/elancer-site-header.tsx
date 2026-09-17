@@ -14,7 +14,7 @@ import {
     NavbarLogo,
     NavBody,
 } from '@/components/ui/resizable-navbar';
-import { dashboard, home, login, logout, register } from '@/routes';
+import { dashboard, login, logout, register } from '@/routes';
 import '../../css/elancer-site-header.css';
 
 export default function ElancerSiteHeader({
@@ -30,45 +30,14 @@ export default function ElancerSiteHeader({
     const [isOpen, setIsOpen] = useState(false);
     const closeMenu = useCallback(() => setIsOpen(false), []);
     const destination = auth.user ? dashboard().url : register().url;
-    const items = [
-        { name: t('Find jobs'), link: '/jobs' },
-        { name: t('Categories'), link: '/categories' },
-        {
-            name: t('Talent showcase'),
-            link: `${home().url}#featured-freelancers`,
-        },
-        {
-            name: t('How it works'),
-            link: `${home().url}#how-it-works`,
-        },
-    ];
+
     return (
         <Navbar>
             <NavBody>
                 <NavbarLogo />
-                <nav
-                    aria-label={t('Main navigation')}
-                    className="elancer-desktop-links"
-                >
+                <div className="elancer-desktop-links">
                     <ExploreSkillsMenu />
-                    {items
-                        .filter(
-                            (item) =>
-                                ![
-                                    '/categories',
-                                    `${home().url}#featured-freelancers`,
-                                ].includes(item.link),
-                        )
-                        .map((item) => (
-                            <Link
-                                key={item.name}
-                                href={item.link}
-                                className="elancer-resizable-link elancer-top-link"
-                            >
-                                {item.name}
-                            </Link>
-                        ))}
-                </nav>
+                </div>
                 <div className="flex shrink-0 items-center gap-2">
                     <LanguageToggle />
                     <ThemeToggle />
@@ -116,22 +85,7 @@ export default function ElancerSiteHeader({
                     </div>
                 </MobileNavHeader>
                 <MobileNavMenu isOpen={isOpen} onClose={closeMenu}>
-                    <nav
-                        aria-label={t('Mobile navigation')}
-                        className="flex flex-col"
-                    >
-                        <ExploreSkillsMenu mobile onNavigate={closeMenu} />
-                        {items.map((item) => (
-                            <Link
-                                key={item.link}
-                                href={item.link}
-                                onClick={closeMenu}
-                                className="elancer-resizable-link rounded-lg px-3 py-4 text-base hover:bg-[var(--el-soft)]"
-                            >
-                                {item.name}
-                            </Link>
-                        ))}
-                    </nav>
+                    <ExploreSkillsMenu mobile onNavigate={closeMenu} />
                     <div className="mt-2 flex items-center justify-between border-t border-[var(--el-border)] pt-4">
                         <LanguageToggle />
                         <ThemeToggle />
