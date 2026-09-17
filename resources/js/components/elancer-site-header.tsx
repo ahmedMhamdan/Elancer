@@ -60,13 +60,13 @@ export default function ElancerSiteHeader({
                                 ].includes(item.link),
                         )
                         .map((item) => (
-                            <a
+                            <Link
                                 key={item.name}
                                 href={item.link}
                                 className="elancer-resizable-link elancer-top-link"
                             >
                                 {item.name}
-                            </a>
+                            </Link>
                         ))}
                 </nav>
                 <div className="flex shrink-0 items-center gap-2">
@@ -122,14 +122,14 @@ export default function ElancerSiteHeader({
                     >
                         <ExploreSkillsMenu mobile onNavigate={closeMenu} />
                         {items.map((item) => (
-                            <a
+                            <Link
                                 key={item.link}
                                 href={item.link}
                                 onClick={closeMenu}
                                 className="elancer-resizable-link rounded-lg px-3 py-4 text-base hover:bg-[var(--el-soft)]"
                             >
                                 {item.name}
-                            </a>
+                            </Link>
                         ))}
                     </nav>
                     <div className="mt-2 flex items-center justify-between border-t border-[var(--el-border)] pt-4">

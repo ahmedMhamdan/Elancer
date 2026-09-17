@@ -894,4 +894,33 @@ export const arabic: Record<string, string> = {
     'The search filters are invalid.': 'خيارات البحث غير صالحة.',
     'This permanently deletes the draft. This cannot be undone.':
         'ستُحذف المسودة نهائيًا، ولا يمكن التراجع عن ذلك.',
+    'Language could not be changed. Please try again.':
+        'تعذّر تغيير اللغة. حاول مرة أخرى.',
+    'Use at least 12 characters, including uppercase and lowercase letters, a number, and a symbol.':
+        'استخدم 12 حرفًا على الأقل، تشمل أحرفًا إنجليزية كبيرة وصغيرة ورقمًا ورمزًا.',
+    'Profile photo': 'الصورة الشخصية',
+    'Use a clear, workplace-safe photo.':
+        'استخدم صورة واضحة ومناسبة لبيئة العمل.',
+    'Wait before uploading another photo. Limit: one per minute and three per hour.':
+        'انتظر قبل رفع صورة أخرى. الحد المسموح: محاولة واحدة في الدقيقة وثلاث محاولات في الساعة.',
+    'Sign in again to change your photo.': 'سجّل الدخول مجددًا لتغيير صورتك.',
+    'Photo upload could not be confirmed. Reload to check your current photo.':
+        'تعذّر تأكيد رفع الصورة. أعد تحميل الصفحة للتحقق من صورتك الحالية.',
+    'Choose a JPG, PNG or WebP photo up to 2 MB.':
+        'اختر صورة بصيغة JPG أو PNG أو WebP بحجم لا يتجاوز 2 ميجابايت.',
+    'Your cropped photo is sent to Sightengine for a workplace-safe content check before saving.':
+        'تُرسل صورتك المقصوصة إلى Sightengine للتحقق من ملاءمتها لبيئة العمل قبل حفظها.',
+    'Upload attempts are limited to one per minute and three per hour.':
+        'يُسمح بمحاولة رفع واحدة في الدقيقة وثلاث محاولات في الساعة.',
+    'Checking photo…': 'جارٍ فحص الصورة…',
+    'Save photo': 'حفظ الصورة',
+    'Photo updated': 'تم تحديث الصورة',
+    'Choose a photo with no more than 16 million pixels.':
+        'اختر صورة لا تتجاوز دقتها 16 مليون بكسل.',
+    'This photo did not pass the workplace-safe content check. Choose another photo.':
+        'لم تجتز هذه الصورة فحص الملاءمة لبيئة العمل. اختر صورة أخرى.',
+    'Photo safety checks are unavailable. Your current photo has not changed. Please try again later.':
+        'فحص سلامة الصور غير متاح حاليًا. لم تتغير صورتك الحالية. حاول لاحقًا.',
+    'We could not save your photo. Please try again.':
+        'تعذّر حفظ صورتك. حاول مرة أخرى.',
 };

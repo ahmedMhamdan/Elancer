@@ -12,6 +12,19 @@ class LocaleTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_json_language_save_returns_only_locale_without_redirecting_or_changing_another_account(): void
+    {
+        $user = User::factory()->create(['locale' => 'en']);
+        $other = User::factory()->create(['locale' => 'en']);
+        $this->actingAs($user)->postJson('/locale', ['locale' => 'ar', 'user_id' => $other->id])
+            ->assertOk()->assertExactJson(['locale' => 'ar'])->assertCookie('locale', 'ar')
+            ->assertSessionHas('locale', 'ar')->assertHeaderMissing('Location');
+        $this->assertSame('ar', $user->fresh()->locale);
+        $this->assertSame('en', $other->fresh()->locale);
+        $this->postJson('/locale', ['locale' => 'invalid'])->assertUnprocessable();
+        $this->assertSame('ar', $user->fresh()->locale);
+    }
+
     public function test_guest_can_switch_language_and_reload_with_rtl(): void
     {
         $this->from('/')->post('/locale', ['locale' => 'ar'])
@@ -76,8 +89,8 @@ class LocaleTest extends TestCase
         $this->withSession(['locale' => 'ar'])->post('/register', [
             'name' => 'Locale Test',
             'email' => 'locale@example.test',
-            'password' => 'a-valid-test-password',
-            'password_confirmation' => 'a-valid-test-password',
+            'password' => 'Strong-test-Password42!',
+            'password_confirmation' => 'Strong-test-Password42!',
         ])->assertSessionHasNoErrors();
         $this->assertSame('ar', User::where('email', 'locale@example.test')->firstOrFail()->locale);
     }
@@ -99,8 +112,8 @@ class LocaleTest extends TestCase
         $user = User::factory()->create(['locale' => 'ar', 'onboarding_completed_at' => now()]);
         $this->actingAs($user)->put('/settings/password', [
             'current_password' => 'wrong-password',
-            'password' => 'a-valid-test-password',
-            'password_confirmation' => 'a-valid-test-password',
+            'password' => 'Strong-test-Password42!',
+            'password_confirmation' => 'Strong-test-Password42!',
         ])->assertSessionHasErrors(['current_password' => 'كلمة المرور الحالية غير صحيحة.']);
         $this->assertSame('تم تحديث بيانات الحساب.', __('Profile updated.'));
         $this->assertSame('تم تغيير كلمة المرور.', __('Password updated.'));

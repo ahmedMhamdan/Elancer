@@ -23,6 +23,8 @@ export default function Pagination({
 }) {
     const { t, ar } = useTranslation();
 
+    const PreviousIcon = ar ? ChevronRight : ChevronLeft;
+    const NextIcon = ar ? ChevronLeft : ChevronRight;
     const page = usePage();
     const numbers = [
         ...new Set([
@@ -63,8 +65,9 @@ export default function Pagination({
                     onClick={() => visit(data.prev_page_url)}
                     aria-label={ar ? 'السابق' : 'Previous'}
                 >
-                    <ChevronLeft
-                        className="size-4 rtl:rotate-180"
+                    <PreviousIcon
+                        className="size-4"
+                        data-pagination-arrow
                         aria-hidden="true"
                     />
                 </Button>
@@ -105,8 +108,9 @@ export default function Pagination({
                     onClick={() => visit(data.next_page_url)}
                     aria-label={ar ? 'التالي' : 'Next'}
                 >
-                    <ChevronRight
-                        className="size-4 rtl:rotate-180"
+                    <NextIcon
+                        className="size-4"
+                        data-pagination-arrow
                         aria-hidden="true"
                     />
                 </Button>

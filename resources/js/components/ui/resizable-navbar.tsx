@@ -111,7 +111,7 @@ export function NavbarLogo() {
     return <Link href={home()} aria-label={t("Elancer home")} className="elancer-resizable-logo relative shrink-0 py-2"><ElancerWordmark /></Link>;
 }
 
-export function NavbarButton({ href, as: Tag = 'a', children, className, variant = 'primary', ...props }: {
+export function NavbarButton({ href, as: Tag = Link, children, className, variant = 'primary', ...props }: {
     href?: string; as?: React.ElementType; children: React.ReactNode; className?: string; variant?: 'primary' | 'secondary' | 'dark' | 'gradient';
 } & (React.ComponentPropsWithoutRef<'a'> | React.ComponentPropsWithoutRef<'button'>)) {
     return <Tag href={href || undefined} className={cn('elancer-navbar-button relative inline-flex min-h-11 cursor-pointer items-center justify-center rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors', variant === 'secondary' ? 'elancer-navbar-button-secondary' : 'elancer-navbar-button-primary', className)} {...props}>{children}</Tag>;

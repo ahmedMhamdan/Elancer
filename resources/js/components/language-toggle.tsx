@@ -1,11 +1,13 @@
 // Adapts local TailAdmin src/components/common/ThemeToggleButton.tsx (MIT).
 // Reuses Elancer's theme-button styling and native button behavior with AR/EN SVG paths.
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { useTranslation } from '@/hooks/use-translation';
 
 export default function LanguageToggle() {
-    const { ar } = useTranslation();
+    const page = usePage();
+    const { ar, t } = useTranslation();
     const [pending, setPending] = useState(false);
     return (
         <button
@@ -16,18 +18,54 @@ export default function LanguageToggle() {
             title={ar ? 'Switch to English' : 'التبديل إلى العربية'}
             aria-busy={pending}
             disabled={pending}
-            onClick={() =>
-                router.post(
-                    '/locale',
-                    { locale: ar ? 'en' : 'ar' },
-                    {
+            onClick={async () => {
+                setPending(true);
+                try {
+                    const token = decodeURIComponent(
+                        document.cookie
+                            .split('; ')
+                            .find((c) => c.startsWith('XSRF-TOKEN='))
+                            ?.slice(11) ?? '',
+                    );
+                    const response = await fetch('/locale', {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Accept: 'application/json',
+                            'X-XSRF-TOKEN': token,
+                        },
+                        body: JSON.stringify({ locale: ar ? 'en' : 'ar' }),
+                        signal: AbortSignal.timeout(15000),
+                    });
+                    if (!response.ok) throw new Error('Locale save failed');
+                    const { locale } = await response.json();
+                    if (locale !== 'en' && locale !== 'ar')
+                        throw new Error('Invalid locale');
+                    router.replace<typeof page.props>({
+                        props: (props) => ({
+                            ...props,
+                            locale,
+                            ...(props.auth.user
+                                ? {
+                                      auth: {
+                                          ...props.auth,
+                                          user: { ...props.auth.user, locale },
+                                      },
+                                  }
+                                : {}),
+                        }),
                         preserveScroll: true,
                         preserveState: true,
-                        onStart: () => setPending(true),
-                        onFinish: () => setPending(false),
-                    },
-                )
-            }
+                    });
+                } catch {
+                    toast.error(
+                        t('Language could not be changed. Please try again.'),
+                    );
+                } finally {
+                    setPending(false);
+                }
+            }}
         >
             <svg
                 width="24"

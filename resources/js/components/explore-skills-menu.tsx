@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { useEffect, useId, useRef, useState } from 'react';
+import { Link } from '@inertiajs/react';
 import { home } from '@/routes';
 
 const categories = [
@@ -192,7 +193,7 @@ export default function ExploreSkillsMenu({
                                             <li key={skill}>{t(skill)}</li>
                                         ))}
                                     </ul>
-                                    <a
+                                    <Link
                                         href={`${home().url}#featured-freelancers`}
                                         onClick={navigate}
                                     >
@@ -201,21 +202,21 @@ export default function ExploreSkillsMenu({
                                             size={16}
                                             aria-hidden="true"
                                         />
-                                    </a>
+                                    </Link>
                                 </motion.div>
                             </div>
                         </div>
                         <div className="elancer-explore-footer">
-                            <a href="/categories" onClick={navigate}>
+                            <Link href="/categories" onClick={navigate}>
                                 {t('Browse job categories')}{' '}
                                 <ArrowRight size={16} aria-hidden="true" />
-                            </a>
-                            <a
+                            </Link>
+                            <Link
                                 href={`${home().url}#how-it-works`}
                                 onClick={navigate}
                             >
                                 {t('How Elancer works')}
-                            </a>
+                            </Link>
                         </div>
                     </motion.div>
                 )}

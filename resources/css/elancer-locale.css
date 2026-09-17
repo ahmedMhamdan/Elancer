@@ -1,7 +1,7 @@
 /* Locale layout uses the existing Elancer tokens and typefaces. */
 html[dir='rtl'] .lucide-arrow-right,
 html[dir='rtl'] .lucide-arrow-up-right,
-html[dir='rtl'] .lucide-chevron-right {
+html[dir='rtl'] .lucide-chevron-right:not([data-pagination-arrow]) {
     transform: scaleX(-1);
 }
 html[dir='rtl']

@@ -57,5 +57,10 @@ router.on('success', (event) =>
     syncDocumentLocale(event.detail.page.props.locale),
 );
 
+// Local prop replacements emit clientVisit rather than a server success event.
+router.on('clientVisit', (event) =>
+    syncDocumentLocale(event.detail.page.props.locale),
+);
+
 // This will set light / dark mode on load...
 initializeTheme();
