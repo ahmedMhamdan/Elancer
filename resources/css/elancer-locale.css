@@ -39,3 +39,27 @@ html[lang='ar'] .profile-summary-details dt {
     font-size: 14px;
     line-height: 1.75;
 }
+
+/* Crossfade the saved locale without remounting the page. */
+html.locale-transition::view-transition-old(root) {
+    animation: locale-fade-out 180ms ease-out both;
+}
+html.locale-transition::view-transition-new(root) {
+    animation: locale-fade-in 240ms ease-out both;
+}
+@keyframes locale-fade-out {
+    to {
+        opacity: 0;
+    }
+}
+@keyframes locale-fade-in {
+    from {
+        opacity: 0;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    html.locale-transition::view-transition-old(root),
+    html.locale-transition::view-transition-new(root) {
+        animation: none;
+    }
+}

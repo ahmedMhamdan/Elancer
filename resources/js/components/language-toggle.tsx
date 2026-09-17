@@ -42,22 +42,57 @@ export default function LanguageToggle() {
                     const { locale } = await response.json();
                     if (locale !== 'en' && locale !== 'ar')
                         throw new Error('Invalid locale');
-                    router.replace<typeof page.props>({
-                        props: (props) => ({
-                            ...props,
-                            locale,
-                            ...(props.auth.user
-                                ? {
-                                      auth: {
-                                          ...props.auth,
-                                          user: { ...props.auth.user, locale },
-                                      },
-                                  }
-                                : {}),
-                        }),
-                        preserveScroll: true,
-                        preserveState: true,
-                    });
+                    const applyLocale = () =>
+                        new Promise<void>((resolve) => {
+                            router.replace<typeof page.props>({
+                                props: (props) => ({
+                                    ...props,
+                                    locale,
+                                    ...(props.auth.user
+                                        ? {
+                                              auth: {
+                                                  ...props.auth,
+                                                  user: {
+                                                      ...props.auth.user,
+                                                      locale,
+                                                  },
+                                              },
+                                          }
+                                        : {}),
+                                }),
+                                preserveScroll: true,
+                                preserveState: true,
+                                onFinish: () => {
+                                    document.documentElement.lang = locale;
+                                    document.documentElement.dir =
+                                        locale === 'ar' ? 'rtl' : 'ltr';
+                                    resolve();
+                                },
+                            });
+                        });
+                    const reduced = window.matchMedia(
+                        '(prefers-reduced-motion: reduce)',
+                    ).matches;
+                    if (!reduced && document.startViewTransition) {
+                        document.documentElement.classList.add(
+                            'locale-transition',
+                        );
+                        try {
+                            await document.startViewTransition(applyLocale)
+                                .finished;
+                        } finally {
+                            document.documentElement.classList.remove(
+                                'locale-transition',
+                            );
+                        }
+                    } else {
+                        await applyLocale();
+                        if (!reduced)
+                            document.documentElement.animate(
+                                [{ opacity: 0.65 }, { opacity: 1 }],
+                                { duration: 200, easing: 'ease-out' },
+                            );
+                    }
                 } catch {
                     toast.error(
                         t('Language could not be changed. Please try again.'),
