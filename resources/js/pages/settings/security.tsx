@@ -1,3 +1,4 @@
+import PasswordRequirements from '@/components/password-requirements';
 import { useTranslation } from '@/hooks/use-translation';
 import { Form, Head } from '@inertiajs/react';
 import { useRef } from 'react';
@@ -96,6 +97,7 @@ export default function Security(props: Props) {
                                     passwordrules={props.passwordRules}
                                 />
 
+                                <PasswordRequirements />
                                 <InputError message={errors.password} />
                             </div>
 

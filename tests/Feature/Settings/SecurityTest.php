@@ -78,6 +78,16 @@ class SecurityTest extends TestCase
             );
     }
 
+    public function test_password_update_rejects_weak_password_without_changing_hash(): void
+    {
+        $user = User::factory()->create();
+        $hash = $user->password;
+        $this->actingAs($user)->put(route('user-password.update'), [
+            'current_password' => 'password', 'password' => 'weak', 'password_confirmation' => 'weak',
+        ])->assertSessionHasErrors('password');
+        $this->assertSame($hash, $user->fresh()->password);
+    }
+
     public function test_password_can_be_updated()
     {
         $user = User::factory()->create();
@@ -87,15 +97,15 @@ class SecurityTest extends TestCase
             ->from(route('security.edit'))
             ->put(route('user-password.update'), [
                 'current_password' => 'password',
-                'password' => 'new-password',
-                'password_confirmation' => 'new-password',
+                'password' => 'Strong-test-Password42!',
+                'password_confirmation' => 'Strong-test-Password42!',
             ]);
 
         $response
             ->assertSessionHasNoErrors()
             ->assertRedirect(route('security.edit'));
 
-        $this->assertTrue(Hash::check('new-password', $user->refresh()->password));
+        $this->assertTrue(Hash::check('Strong-test-Password42!', $user->refresh()->password));
     }
 
     public function test_correct_password_must_be_provided_to_update_password()
@@ -107,8 +117,8 @@ class SecurityTest extends TestCase
             ->from(route('security.edit'))
             ->put(route('user-password.update'), [
                 'current_password' => 'wrong-password',
-                'password' => 'new-password',
-                'password_confirmation' => 'new-password',
+                'password' => 'Strong-test-Password42!',
+                'password_confirmation' => 'Strong-test-Password42!',
             ]);
 
         $response

@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Password;
 use Laravel\Fortify\Features;
 use Tests\TestCase;
 
@@ -67,8 +68,8 @@ class PasswordResetTest extends TestCase
             $response = $this->post(route('password.update'), [
                 'token' => $notification->token,
                 'email' => $user->email,
-                'password' => 'password',
-                'password_confirmation' => 'password',
+                'password' => 'Strong-test-Password42!',
+                'password_confirmation' => 'Strong-test-Password42!',
             ]);
 
             $response
@@ -79,6 +80,18 @@ class PasswordResetTest extends TestCase
         });
     }
 
+    public function test_password_reset_rejects_weak_password_with_valid_token(): void
+    {
+        $user = User::factory()->create();
+        $hash = $user->password;
+        $token = Password::createToken($user);
+        $this->post(route('password.update'), [
+            'token' => $token, 'email' => $user->email,
+            'password' => 'weak', 'password_confirmation' => 'weak',
+        ])->assertSessionHasErrors('password');
+        $this->assertSame($hash, $user->fresh()->password);
+    }
+
     public function test_password_cannot_be_reset_with_invalid_token(): void
     {
         $user = User::factory()->create();
@@ -86,8 +99,8 @@ class PasswordResetTest extends TestCase
         $response = $this->post(route('password.update'), [
             'token' => 'invalid-token',
             'email' => $user->email,
-            'password' => 'newpassword123',
-            'password_confirmation' => 'newpassword123',
+            'password' => 'Strong-test-Password42!',
+            'password_confirmation' => 'Strong-test-Password42!',
         ]);
 
         $response->assertSessionHasErrors('email');

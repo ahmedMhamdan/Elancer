@@ -37,7 +37,7 @@ class HandleInertiaRequests extends Middleware
     {
         $user = $request->user();
         $avatar = $user?->profile?->photo_path !== null
-            ? route('profile.photo')
+            ? route('profile.photo', ['v' => hash('sha256', $user->profile->photo_path)])
             : null;
 
         return [

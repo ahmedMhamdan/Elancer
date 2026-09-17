@@ -7,23 +7,30 @@ use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use RuntimeException;
 use Throwable;
 
 class CompleteOnboarding
 {
+    public function __construct(private PrepareProfilePhoto $prepare) {}
+
     /**
      * @param  array{role: string, name: string, bio: string, country: string, city: string, headline?: string, company?: string|null, skills?: list<string>}  $data
      */
     public function handle(User $user, array $data, ?UploadedFile $photo): bool
     {
+        if ($user->onboarding_completed_at !== null) {
+            return false;
+        }
+        $photoBytes = $photo !== null ? $this->prepare->handle($photo) : null;
         $newPhotoPath = null;
         $oldPhotoPath = null;
         $completed = false;
 
         try {
-            DB::transaction(function () use ($user, $data, $photo, &$newPhotoPath, &$oldPhotoPath, &$completed): void {
+            DB::transaction(function () use ($user, $data, $photoBytes, &$newPhotoPath, &$oldPhotoPath, &$completed): void {
                 // Serialize submissions for this account; only the first completion wins.
                 $account = User::query()->lockForUpdate()->findOrFail($user->id);
                 abort_unless($account->canParticipateInMarketplace(), 403);
@@ -35,10 +42,10 @@ class CompleteOnboarding
                 $profile = $account->profile()->firstOrNew();
                 $role = WorkspaceRole::from($data['role']);
 
-                if ($photo !== null) {
-                    $path = $photo->store('profile-photos/'.$account->id, 'local');
-
-                    if ($path === false) {
+                if ($photoBytes !== null) {
+                    $path = 'profile-photos/'.$account->id.'/'.Str::uuid().'.jpg';
+                    $newPhotoPath = $path;
+                    if (! Storage::disk('local')->put($path, $photoBytes)) {
                         throw ValidationException::withMessages([
                             'photo' => __('We could not save your photo. Please try again.'),
                         ]);

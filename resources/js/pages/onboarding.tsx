@@ -537,6 +537,10 @@ export default function Onboarding({ initial, submitUrl }: OnboardingProps) {
                                             {t('Optional · JPG, PNG or WebP')}
                                             <br />
                                             {t('Up to 2 MB')}
+                                            <br />
+                                            {t(
+                                                'Your cropped photo is sent to Sightengine for a workplace-safe content check before saving.',
+                                            )}
                                         </p>
                                         {photoUrl && photoSource && (
                                             <button

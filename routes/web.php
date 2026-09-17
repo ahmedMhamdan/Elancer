@@ -11,6 +11,7 @@ use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ProfilePhotoController;
 use App\Http\Controllers\ProjectDiscoveryController;
 use App\Http\Controllers\SkillController;
+use App\Http\Controllers\UpdateProfilePhotoController;
 use App\Http\Middleware\EnsureCategoryAdministrator;
 use App\Http\Middleware\EnsureOnboardingIsComplete;
 use App\Http\Middleware\EnsureSuperAdministrator;
@@ -25,10 +26,11 @@ Route::post('locale', LocaleController::class)->middleware('throttle:60,1')->nam
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('skills', SkillController::class)->middleware('throttle:120,1')->name('skills.index');
     Route::get('onboarding', OnboardingController::class)->name('onboarding');
-    Route::post('onboarding', [OnboardingController::class, 'store'])->middleware('throttle:10,1')->name('onboarding.store');
+    Route::post('onboarding', [OnboardingController::class, 'store'])->middleware(['throttle:10,1', 'throttle:profile-photos'])->name('onboarding.store');
     Route::get('account/profile-photo', ProfilePhotoController::class)->name('profile.photo');
     Route::middleware(EnsureOnboardingIsComplete::class)->group(function () {
         Route::get('my-profile', DashboardController::class)->name('marketplace-profile.edit');
+        Route::post('my-profile/photo', UpdateProfilePhotoController::class)->middleware('throttle:profile-photos')->name('profile.photo.update');
         Route::patch('my-profile', MarketplaceProfileController::class)->name('marketplace-profile.update');
         Route::get('dashboard', DashboardController::class)->name('dashboard');
         Route::patch('dashboard/profile', MarketplaceProfileController::class)->name('dashboard.profile.update');

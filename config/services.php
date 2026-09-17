@@ -14,6 +14,11 @@ return [
     |
     */
 
+    'sightengine' => [
+        'user' => env('SIGHTENGINE_API_USER'),
+        'secret' => env('SIGHTENGINE_API_SECRET'),
+        'workflow' => env('SIGHTENGINE_PROFILE_WORKFLOW'),
+    ],
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],

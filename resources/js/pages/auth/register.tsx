@@ -1,3 +1,4 @@
+import PasswordRequirements from '@/components/password-requirements';
 import { useTranslation } from '@/hooks/use-translation';
 import { Form, Head, Link } from '@inertiajs/react';
 import { Mail } from 'lucide-react';
@@ -102,6 +103,7 @@ export default function Register({ passwordRules }: Props) {
                                             required
                                             error={errors.password}
                                         />
+                                        <PasswordRequirements />
                                         <AuthField
                                             id="password_confirmation"
                                             name="password_confirmation"

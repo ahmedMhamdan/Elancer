@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -22,6 +23,22 @@ class CompleteOnboardingTest extends TestCase
     {
         parent::setUp();
         Storage::fake('local');
+        config(['services.sightengine.user' => 'test-user', 'services.sightengine.secret' => 'test-secret', 'services.sightengine.workflow' => 'test-workflow']);
+        Http::preventStrayRequests();
+        Http::fake(['api.sightengine.com/*' => Http::response(['status' => 'success', 'summary' => ['action' => 'accept'], 'workflow' => ['id' => 'test-workflow']])]);
+    }
+
+    public function test_unavailable_photo_moderation_does_not_complete_onboarding(): void
+    {
+        config(['services.sightengine.secret' => null]);
+        $user = User::factory()->create();
+        $this->actingAs($user)->post(route('onboarding.store'), [
+            ...$this->freelancerData(), 'photo' => UploadedFile::fake()->image('photo.jpg'),
+        ])->assertSessionHasErrors('photo');
+        $this->assertNull($user->fresh()->onboarding_completed_at);
+        $this->assertNull($user->fresh()->profile);
+        $this->assertSame([], Storage::disk('local')->allFiles());
+        Http::assertNothingSent();
     }
 
     /** @return array<string, mixed> */
@@ -57,7 +74,7 @@ class CompleteOnboardingTest extends TestCase
             ->component('dashboard')
             ->where('profile.skills', ['Laravel', 'PHP'])
             ->where('auth.user.workspace_role', 'freelancer')
-            ->where('auth.user.avatar', route('profile.photo'))
+            ->where('auth.user.avatar', route('profile.photo', ['v' => hash('sha256', $profile->photo_path)]))
             ->missing('profile.photo_path')->missing('auth.user.profile'));
         $this->get(route('profile.photo'))->assertOk()->assertHeader('Content-Type', 'image/jpeg');
         $this->get(route('onboarding'))->assertRedirect(route('dashboard'));
@@ -131,6 +148,7 @@ class CompleteOnboardingTest extends TestCase
             UploadedFile::fake()->image('large.jpg')->size(2049),
             UploadedFile::fake()->image('wide.jpg', 6001, 1),
         ] as $photo) {
+            $this->travel(61)->seconds();
             $this->actingAs($user)->post(route('onboarding.store'), [
                 ...$this->freelancerData(), 'photo' => $photo,
             ])->assertSessionHasErrors('photo');

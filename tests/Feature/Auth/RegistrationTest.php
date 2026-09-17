@@ -29,12 +29,24 @@ class RegistrationTest extends TestCase
         $response = $this->post(route('register.store'), [
             'name' => 'Test User',
             'email' => 'test@example.com',
-            'password' => 'password',
-            'password_confirmation' => 'password',
+            'password' => 'Strong-test-Password42!',
+            'password_confirmation' => 'Strong-test-Password42!',
         ]);
 
         $this->assertAuthenticated();
         $response->assertRedirect(route('dashboard', absolute: false));
+    }
+
+    public function test_registration_rejects_short_passwords_and_each_missing_character_class(): void
+    {
+        foreach (['password', 'Abcdefghi1!', 'ABCDEFGHIJK1!', 'abcdefghijk1!', 'Abcdefghijk!', 'Abcdefghijk12'] as $index => $password) {
+            $email = 'weak-'.$index.'@example.test';
+            $this->post(route('register.store'), [
+                'name' => 'Password Check', 'email' => $email,
+                'password' => $password, 'password_confirmation' => $password,
+            ])->assertSessionHasErrors('password');
+            $this->assertDatabaseMissing('users', ['email' => $email]);
+        }
     }
 
     public function test_registration_rejects_mismatched_passwords(): void
@@ -42,7 +54,7 @@ class RegistrationTest extends TestCase
         $response = $this->post(route('register.store'), [
             'name' => 'Learner',
             'email' => 'learner@example.com',
-            'password' => 'password',
+            'password' => 'Strong-test-Password42!',
             'password_confirmation' => 'different-password',
         ]);
 

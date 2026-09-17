@@ -11,6 +11,7 @@ import {
     UserRound,
 } from 'lucide-react';
 import ComponentCard from '@/components/component-card';
+import ProfilePhotoForm from '@/components/profile-photo-form';
 import ProfileForm from '@/components/profile-form';
 import { dashboard } from '@/routes';
 
@@ -125,6 +126,7 @@ export default function MarketplaceProfile({
                 </div>
                 <div className="workspace-columns">
                     <div className="min-w-0 space-y-6">
+                        <ProfilePhotoForm />
                         <ProfileForm profile={profile} />
                         <IdentityVerification identity={identity} />
                     </div>
