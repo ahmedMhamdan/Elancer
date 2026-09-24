@@ -1,4 +1,5 @@
 import { useTranslation } from '@/hooks/use-translation';
+import ElancerSpotlight from '@/components/elancer-spotlight';
 import LanguageToggle from '@/components/language-toggle';
 import { Link, router, usePage } from '@inertiajs/react';
 import { useCallback, useState } from 'react';
@@ -39,6 +40,7 @@ export default function ElancerSiteHeader({
                     <ExploreSkillsMenu />
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
+                    <ElancerSpotlight />
                     <LanguageToggle />
                     <ThemeToggle />
                     {auth.user && (
@@ -70,6 +72,7 @@ export default function ElancerSiteHeader({
                 <MobileNavHeader>
                     <NavbarLogo />
                     <div className="flex items-center gap-2">
+                        <ElancerSpotlight />
                         {!registration && (
                             <NavbarButton
                                 href={destination}

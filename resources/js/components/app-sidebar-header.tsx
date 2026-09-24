@@ -1,4 +1,5 @@
 import { useTranslation } from '@/hooks/use-translation';
+import ElancerSpotlight from '@/components/elancer-spotlight';
 import LanguageToggle from '@/components/language-toggle';
 import { Link } from '@inertiajs/react';
 import { ArrowUpRight } from 'lucide-react';
@@ -34,6 +35,7 @@ export function AppSidebarHeader({
                         aria-hidden="true"
                     />
                 </Link>
+                <ElancerSpotlight />
                 <LanguageToggle />
                 <ThemeToggle />
                 <NotificationDropdown />
