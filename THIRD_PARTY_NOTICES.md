@@ -144,3 +144,7 @@ to Elancer tokens, Inertia links, RTL, reduced motion, and keyboard/touch handli
 The unavailable Unlumen highlight import is replaced by a local Motion highlight;
 no Unlumen package or registry source is included. Existing installed Motion,
 Lucide and class-variance-authority dependencies retain their respective licenses.
+
+## Supplied Spotlight search (2026-09-24)
+
+The Spotlight search adapts Ahmed's supplied AppleSpotlight React example. Rounded search surfaces, animated placeholders and spring shortcuts use Elancer tokens, Inertia destinations, Arabic/RTL and reduced motion. Existing Radix Dialog provides accessible modal behavior. The Ctrl/Cmd+K entry adapts local TailAdmin src/layout/AppHeader.tsx under its existing MIT notice above. Installed Framer Motion and Lucide retain their respective licenses.

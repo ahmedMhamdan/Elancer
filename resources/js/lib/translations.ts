@@ -1,5 +1,12 @@
 // Interface copy only. Member-authored and catalog content retain their entered language.
 export const arabic: Record<string, string> = {
+    'Search Elancer': 'ابحث في إيلانسر',
+    'Search projects or freelancers, or open a shortcut.':
+        'ابحث عن مشاريع أو مستقلين، أو افتح أحد الاختصارات.',
+    'Search projects': 'ابحث عن مشاريع',
+    'Find work': 'ابحث عن عمل',
+    'No results found.': 'لا توجد نتائج.',
+    Shortcuts: 'اختصارات',
     'Find freelancers': 'ابحث عن مستقلين',
     'My proposals': 'عروضي',
     'Track your applications and drafts.': 'تابع عروضك ومسوداتك.',
