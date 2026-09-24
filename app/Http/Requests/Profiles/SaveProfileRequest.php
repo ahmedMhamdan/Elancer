@@ -29,6 +29,11 @@ class SaveProfileRequest extends UpdateProfileRequest
             'skills' => ['sometimes', 'nullable', 'array', 'list', 'max:15'],
             'skills.*' => ['required', 'string', 'max:50', 'distinct:ignore_case', 'exists:skills,name'],
             'photo_path' => ['missing'],
+            'availability' => ['sometimes', 'required', 'in:available,busy'],
+            'professional_links' => ['sometimes', 'array', 'list', 'max:5'],
+            'professional_links.*' => ['array:label,url'],
+            'professional_links.*.label' => ['required', 'string', 'max:80'],
+            'professional_links.*.url' => ['required', 'url:https', 'max:2000'],
         ];
     }
 }

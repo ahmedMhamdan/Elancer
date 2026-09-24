@@ -21,6 +21,7 @@ class DashboardController extends Controller
             'onboardingReady' => $request->routeIs('dashboard') && $request->session()->pull('onboarding_ready', false),
             'identity' => IdentityVerification::where('user_id', $user->id)->first()?->only(['status', 'reason', 'reviewed_at']),
             'profile' => $profile?->only([
+                'id', 'availability', 'professional_links',
                 'headline',
                 'bio',
                 'location',

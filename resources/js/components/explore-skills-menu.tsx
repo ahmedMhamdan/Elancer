@@ -31,6 +31,12 @@ export default function ExploreSkillsMenu({
     const links = auth.user
         ? [
               {
+                  href: '/my-proposals',
+                  title: t('My proposals'),
+                  description: t('Track your applications and drafts.'),
+                  icon: FolderKanban,
+              },
+              {
                   href: '/dashboard',
                   title: t('Dashboard'),
                   description: t('Return to your workspace.'),
@@ -76,6 +82,20 @@ export default function ExploreSkillsMenu({
                     </MotionNavigationMenuTrigger>
                     <MotionNavigationMenuContent>
                         <div className="elancer-discovery-menu">
+                            <MotionNavigationMenuLink
+                                href="/freelancers"
+                                onClick={onNavigate}
+                            >
+                                <UserRound size={22} aria-hidden="true" />
+                                <span>
+                                    <strong>{t('Find freelancers')}</strong>
+                                    <span>
+                                        {t(
+                                            'Discover people with the skills you need.',
+                                        )}
+                                    </span>
+                                </span>
+                            </MotionNavigationMenuLink>
                             <MotionNavigationMenuLink
                                 href="/categories"
                                 onClick={onNavigate}

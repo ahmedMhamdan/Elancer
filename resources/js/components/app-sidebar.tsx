@@ -56,6 +56,16 @@ export function AppSidebar() {
               dashboard: 'Elancer dashboard',
           };
     const links = [
+        {
+            label: t('Find freelancers'),
+            href: '/freelancers',
+            icon: <UserRound size={20} />,
+        },
+        {
+            label: t('My proposals'),
+            href: '/my-proposals',
+            icon: <FolderTree size={20} />,
+        },
         { label: t('Find jobs'), href: '/jobs', icon: <Compass size={20} /> },
         {
             label: t('My projects'),

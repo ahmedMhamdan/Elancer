@@ -131,12 +131,20 @@ export default function MyProjects({
                                         </Button>
                                     </>
                                 ) : (
-                                    <Link
-                                        className="job-post-link"
-                                        href={`/jobs/${project.id}`}
-                                    >
-                                        {t('View project')}
-                                    </Link>
+                                    <>
+                                        <Link
+                                            className="job-post-link"
+                                            href={`/jobs/${project.id}`}
+                                        >
+                                            {t('View project')}
+                                        </Link>
+                                        <Link
+                                            className="job-post-link"
+                                            href={`/my-projects/${project.id}/proposals`}
+                                        >
+                                            {t('Review applicants')}
+                                        </Link>
+                                    </>
                                 )}
                             </div>
                         </article>

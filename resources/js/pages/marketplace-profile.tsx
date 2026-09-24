@@ -13,9 +13,13 @@ import {
 import ComponentCard from '@/components/component-card';
 import ProfilePhotoForm from '@/components/profile-photo-form';
 import ProfileForm from '@/components/profile-form';
+import ProfilePublication from '@/components/profile-publication';
 import { dashboard } from '@/routes';
 
 export type MarketplaceProfile = {
+    id: number;
+    availability: string;
+    professional_links: { label: string; url: string }[] | null;
     headline: string | null;
     bio: string | null;
     location: string | null;
@@ -128,6 +132,7 @@ export default function MarketplaceProfile({
                     <div className="min-w-0 space-y-6">
                         <ProfilePhotoForm />
                         <ProfileForm profile={profile} />
+                        {!isClient && <ProfilePublication profile={profile} />}
                         <IdentityVerification identity={identity} />
                     </div>
                     <aside>

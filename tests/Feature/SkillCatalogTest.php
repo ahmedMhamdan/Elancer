@@ -72,6 +72,12 @@ class SkillCatalogTest extends TestCase
     {
         $profile = User::factory()->create()->profile()->create([]);
         $profile->forceFill(['skills' => ['Legacy Craft', 'Laravel']])->save();
+        // Roll back newer dependents before rebuilding the historical skill catalog.
+        $proposalMigration = require database_path('migrations/2026_09_18_180000_create_proposals_and_public_profiles.php');
+        $proposalMigration->down();
+        $projectMigration = require database_path('migrations/2026_09_15_160000_create_projects_table.php');
+        $projectMigration->down();
+
         $migration = require database_path('migrations/2026_09_13_100000_create_skill_catalog.php');
         $migration->down();
         $migration->up();
@@ -81,5 +87,7 @@ class SkillCatalogTest extends TestCase
         $migration->down();
         $this->assertSame(['Legacy Craft', 'Laravel'], $profile->fresh()->skills);
         $migration->up();
+        $projectMigration->up();
+        $proposalMigration->up();
     }
 }

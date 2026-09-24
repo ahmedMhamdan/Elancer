@@ -15,6 +15,7 @@ void createInertiaApp({
         switch (true) {
             case name.startsWith('discovery/'):
             case name.startsWith('projects/'):
+            case name.startsWith('proposals/'):
             case name === 'onboarding':
             case name === 'welcome':
             case name === 'auth/register':

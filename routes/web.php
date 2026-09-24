@@ -4,12 +4,14 @@ use App\Http\Controllers\AdministratorController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ClientProjectController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FreelancerController;
 use App\Http\Controllers\IdentityVerificationController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MarketplaceProfileController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ProfilePhotoController;
 use App\Http\Controllers\ProjectDiscoveryController;
+use App\Http\Controllers\ProposalController;
 use App\Http\Controllers\SkillController;
 use App\Http\Controllers\UpdateProfilePhotoController;
 use App\Http\Middleware\EnsureCategoryAdministrator;
@@ -21,6 +23,9 @@ Route::inertia('/', 'welcome')->name('home');
 Route::get('categories', [ProjectDiscoveryController::class, 'categories'])->name('categories.index');
 Route::get('jobs', [ProjectDiscoveryController::class, 'index'])->name('jobs.index');
 Route::get('jobs/{project}', [ProjectDiscoveryController::class, 'show'])->whereNumber('project')->name('jobs.show');
+Route::get('freelancers', [FreelancerController::class, 'index'])->name('freelancers.index');
+Route::get('freelancers/{profile}', [FreelancerController::class, 'show'])->whereNumber('profile')->name('freelancers.show');
+Route::get('freelancers/{profile}/photo', [FreelancerController::class, 'photo'])->whereNumber('profile')->name('freelancers.photo');
 Route::post('locale', LocaleController::class)->middleware('throttle:60,1')->name('locale.update');
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -29,6 +34,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('onboarding', [OnboardingController::class, 'store'])->middleware(['throttle:10,1', 'throttle:profile-photos'])->name('onboarding.store');
     Route::get('account/profile-photo', ProfilePhotoController::class)->name('profile.photo');
     Route::middleware(EnsureOnboardingIsComplete::class)->group(function () {
+        Route::patch('my-profile/publication', [FreelancerController::class, 'publication'])->name('freelancers.publication');
+        Route::get('my-proposals', [ProposalController::class, 'index'])->name('proposals.index');
+        Route::get('jobs/{project}/apply', [ProposalController::class, 'edit'])->name('proposals.edit');
+        Route::put('jobs/{project}/proposal', [ProposalController::class, 'save'])->middleware('throttle:120,1')->name('proposals.save');
+        Route::get('proposals/{proposal}', [ProposalController::class, 'show'])->name('proposals.show');
+        Route::post('proposals/{proposal}/withdraw', [ProposalController::class, 'withdraw'])->name('proposals.withdraw');
+        Route::patch('proposals/{proposal}/review', [ProposalController::class, 'review'])->name('proposals.review');
+        Route::get('my-projects/{project}/proposals', [ProposalController::class, 'applicants'])->name('proposals.applicants');
+        Route::get('my-projects/{project}/proposals/compare', [ProposalController::class, 'compare'])->name('proposals.compare');
         Route::get('my-profile', DashboardController::class)->name('marketplace-profile.edit');
         Route::post('my-profile/photo', UpdateProfilePhotoController::class)->middleware('throttle:profile-photos')->name('profile.photo.update');
         Route::patch('my-profile', MarketplaceProfileController::class)->name('marketplace-profile.update');

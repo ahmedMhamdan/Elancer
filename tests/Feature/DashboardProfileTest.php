@@ -27,7 +27,11 @@ class DashboardProfileTest extends TestCase
 
         $this->actingAs($user)->get(route('dashboard'))
             ->assertInertia(fn (Assert $page) => $page->component('dashboard')
-                ->has('profile', 8)
+                ->has('profile', 11)
+                ->where('profile.id', $user->profile->id)
+                ->where('profile.availability', 'available')
+                ->where('profile.professional_links', null)
+                ->missing('profile.photo_path')
                 ->where('profile.headline', 'Developer')
                 ->where('profile.bio', 'Hello')
                 ->where('profile.location', 'Hebron')

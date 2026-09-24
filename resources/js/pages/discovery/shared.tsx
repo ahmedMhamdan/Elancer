@@ -26,6 +26,7 @@ export type Job = {
     published_at: string;
     application_closes_at: string;
     open: boolean;
+    proposals_received: number;
     screening_questions?: string[];
 };
 export function DiscoveryLayout({ children }: { children: ReactNode }) {

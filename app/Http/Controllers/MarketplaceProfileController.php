@@ -30,6 +30,9 @@ class MarketplaceProfileController extends Controller
             if (array_key_exists('skills', $data)) {
                 $profile->syncSkillTags($data['skills'] ?? []);
             }
+            if ($profile->published_at && ! $profile->readyForPublication()) {
+                $profile->forceFill(['published_at' => null])->save();
+            }
         });
 
         return to_route($request->routeIs('marketplace-profile.update') ? 'marketplace-profile.edit' : 'dashboard');

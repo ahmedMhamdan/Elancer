@@ -1,0 +1,347 @@
+/* Existing Elancer tokens. Profile grouping adapts local TailAdmin UserMetaCard;
+   controls and tables reuse the licensed shared TailAdmin implementations. */
+.talent-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+}
+.talent-card,
+.market-panel {
+    background: var(--el-surface);
+    border: 1px solid var(--el-border);
+    border-radius: 14px;
+    padding: 24px;
+    min-width: 0;
+}
+.talent-card {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+.talent-person,
+.talent-profile-header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    min-width: 0;
+}
+.talent-avatar {
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--el-surface-soft);
+    color: var(--el-accent);
+    display: grid;
+    place-items: center;
+    font-weight: 600;
+    overflow: hidden;
+}
+.talent-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.talent-avatar-large {
+    width: 112px;
+    height: 112px;
+    font-size: 30px;
+}
+.talent-person h2 {
+    font-size: 18px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+.talent-person p {
+    color: var(--el-muted);
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+.talent-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--el-muted);
+}
+.talent-meta > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.talent-availability {
+    color: var(--el-accent);
+    font-size: 13px;
+    font-weight: 600;
+}
+.talent-excerpt {
+    font-size: 14px;
+    line-height: 1.7;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.talent-profile-link {
+    color: var(--el-accent);
+    font-weight: 600;
+    font-size: 14px;
+    margin-top: auto;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+.talent-filters {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr auto;
+    gap: 16px;
+    align-items: end;
+    padding: 22px;
+    background: var(--el-surface);
+    border: 1px solid var(--el-border);
+    border-radius: 14px;
+}
+.market-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    font-size: 14px;
+}
+.market-field > span {
+    font-weight: 500;
+}
+.market-field select {
+    width: 100%;
+    height: 44px;
+    padding: 8px 12px;
+    border: 1px solid var(--el-border);
+    border-radius: 8px;
+    background: var(--el-surface);
+    color: var(--el-text);
+}
+.market-field select:focus-visible {
+    outline: 2px solid var(--el-accent);
+    outline-offset: 2px;
+}
+.market-results {
+    margin: 24px 0 16px;
+    color: var(--el-muted);
+    font-size: 14px;
+}
+.market-empty {
+    text-align: center;
+    padding: 56px 20px;
+    background: var(--el-surface);
+    border: 1px dashed var(--el-border);
+    border-radius: 14px;
+}
+.market-empty h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+.market-empty p,
+.market-muted {
+    color: var(--el-muted);
+    font-size: 14px;
+    line-height: 1.7;
+}
+.talent-profile-header {
+    padding: 36px 0 40px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid var(--el-border);
+}
+.talent-profile-header h1 {
+    font-size: clamp(28px, 4vw, 40px);
+    line-height: 1.3;
+    font-weight: 600;
+    margin: 8px 0;
+    overflow-wrap: anywhere;
+}
+.talent-headline {
+    font-size: 20px;
+    margin-bottom: 12px;
+    overflow-wrap: anywhere;
+}
+.market-columns,
+.market-two-column {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 28px;
+    align-items: start;
+}
+.market-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    min-width: 0;
+}
+.market-panel h2,
+.market-stack section h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+.market-panel h3,
+.market-stack section h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+.market-prose {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    line-height: 1.8;
+    max-width: 78ch;
+}
+.talent-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.talent-links a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--el-border);
+    border-radius: 8px;
+    color: var(--el-accent);
+    overflow-wrap: anywhere;
+}
+.market-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 14px;
+}
+.market-link-editor {
+    display: grid;
+    grid-template-columns: 1fr 2fr auto;
+    gap: 12px;
+    align-items: end;
+}
+.market-workspace {
+    color: var(--el-text);
+}
+.proposal-terms {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    padding-block: 12px 24px;
+    border-bottom: 1px solid var(--el-border);
+}
+.proposal-terms dt {
+    color: var(--el-muted);
+    font-size: 13px;
+    margin-bottom: 6px;
+}
+.proposal-terms dd {
+    font-size: 22px;
+    font-weight: 600;
+}
+.proposal-status {
+    display: inline-flex;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    background: var(--el-surface-soft);
+    color: var(--el-muted);
+    white-space: nowrap;
+}
+.proposal-status-submitted,
+.proposal-status-reopened {
+    color: var(--el-accent);
+}
+.proposal-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--el-border);
+}
+.proposal-card h2 {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    overflow-wrap: anywhere;
+}
+.market-error {
+    padding: 14px 18px;
+    border: 1px solid var(--destructive);
+    border-radius: 10px;
+    color: var(--destructive);
+    font-size: 14px;
+}
+.proposal-history {
+    border-top: 1px solid var(--el-border);
+    padding-top: 16px;
+}
+.proposal-history summary {
+    cursor: pointer;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+.proposal-compare {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.market-check {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    font-size: 14px;
+}
+@media (max-width: 1024px) {
+    .talent-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .market-columns,
+    .market-two-column {
+        grid-template-columns: minmax(0, 1fr) 270px;
+    }
+    .talent-filters {
+        grid-template-columns: 1fr 1fr;
+    }
+    .proposal-compare {
+        grid-template-columns: 1fr;
+    }
+}
+@media (max-width: 700px) {
+    .talent-grid,
+    .market-columns,
+    .market-two-column,
+    .talent-filters,
+    .market-link-editor {
+        grid-template-columns: 1fr;
+    }
+    .talent-profile-header {
+        align-items: flex-start;
+        flex-direction: column;
+        padding-top: 20px;
+    }
+    .talent-avatar-large {
+        width: 88px;
+        height: 88px;
+    }
+    .market-panel,
+    .talent-card {
+        padding: 20px;
+    }
+    .proposal-card {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+    .market-workspace {
+        padding-inline: 16px !important;
+    }
+}

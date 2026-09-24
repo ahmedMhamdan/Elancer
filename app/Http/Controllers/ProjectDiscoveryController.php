@@ -55,7 +55,7 @@ class ProjectDiscoveryController extends Controller
             'posted' => $data['posted'] ?? 'any', 'status' => $data['status'] ?? 'open',
             'sort' => $data['sort'] ?? ($profileSkills ? 'match' : 'newest'),
         ];
-        $query = Project::query()->visible()->with(['category', 'skills']);
+        $query = Project::query()->visible()->with(['category', 'skills'])->withCount(['proposals as proposals_received' => fn (Builder $q) => $q->whereNotNull('submitted_at')]);
         if ($filters['q'] !== '') {
             $pattern = $this->pattern($filters['q']);
             $query->where(fn (Builder $q) => $q->whereRaw("LOWER(title) LIKE ? ESCAPE '!'", [$pattern])->orWhereRaw("LOWER(description) LIKE ? ESCAPE '!'", [$pattern]));
@@ -95,10 +95,15 @@ class ProjectDiscoveryController extends Controller
     {
         abort_unless(Project::query()->visible()->whereKey($project->id)->exists(), 404);
         $project->load(['category', 'skills', 'user.profile']);
+        $project->loadCount(['proposals as proposals_received' => fn (Builder $q) => $q->whereNotNull('submitted_at')]);
 
         return Inertia::render('discovery/job', [
             'project' => [...$this->summary($project), 'description' => $project->description, 'screening_questions' => $project->screening_questions ?? []],
             'returnUrl' => '/jobs'.(is_string($request->query('search')) && strlen($request->query('search')) <= 4000 && $request->query('search') !== '' ? '?'.$request->query('search') : ''),
+            'application' => [
+                'owner' => $request->user()?->id === $project->user_id,
+                'proposal' => $request->user() ? $project->proposals()->where('user_id', $request->user()->id)->first()?->only(['id', 'status']) : null,
+            ],
             'client' => [
                 'name' => $project->user->profile?->company ?: Str::before($project->user->name, ' '),
                 'country' => $project->user->profile?->country,
@@ -117,6 +122,7 @@ class ProjectDiscoveryController extends Controller
             'budget_min' => $project->budget_min, 'budget_max' => $project->budget_max,
             'published_at' => $project->published_at?->toIso8601String(),
             'application_closes_at' => $project->application_closes_at?->toIso8601String(),
+            'proposals_received' => (int) $project->getAttribute('proposals_received'),
             'open' => $project->status === 'published' && $project->application_closes_at?->isFuture(),
         ];
     }

@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import { DiscoveryLayout, JobDate, Money } from './shared';
@@ -7,6 +7,7 @@ export default function JobDetails({
     project,
     client,
     returnUrl,
+    application,
 }: {
     project: Job;
     client: {
@@ -15,8 +16,13 @@ export default function JobDetails({
         member_since: string | null;
     };
     returnUrl: string;
+    application: {
+        owner: boolean;
+        proposal: { id: number; status: string } | null;
+    };
 }) {
     const { t, locale } = useTranslation();
+    const { auth } = usePage().props;
     return (
         <DiscoveryLayout>
             <Head title={project.title} />
@@ -113,7 +119,43 @@ export default function JobDetails({
                         </p>
                     )}
                     <hr />
-                    <p>{t('Proposal submissions will be available soon.')}</p>
+                    <p>
+                        {t(':count proposals received', {
+                            count: project.proposals_received,
+                        })}
+                    </p>
+                    {application.owner ? (
+                        <Link
+                            className="job-post-link"
+                            href={`/my-projects/${project.id}/proposals`}
+                        >
+                            {t('Review applicants')}
+                        </Link>
+                    ) : application.proposal ? (
+                        <Link
+                            className="job-post-link"
+                            href={`/proposals/${application.proposal.id}`}
+                        >
+                            {t('View your proposal')}
+                        </Link>
+                    ) : (
+                        project.open && (
+                            <Link
+                                className="job-post-link"
+                                href={
+                                    auth.user
+                                        ? `/jobs/${project.id}/apply`
+                                        : '/login'
+                                }
+                            >
+                                {t(
+                                    auth.user
+                                        ? 'Apply to this project'
+                                        : 'Log in to apply',
+                                )}
+                            </Link>
+                        )
+                    )}
                 </aside>
             </div>
         </DiscoveryLayout>
