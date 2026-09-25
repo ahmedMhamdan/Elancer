@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Conversations\HiringAccess;
+use App\Actions\Invitations\InvitationLifecycle;
+use App\Models\Conversation;
 use App\Models\Profile;
 use App\Models\Project;
 use App\Models\Proposal;
@@ -85,6 +88,7 @@ class ProposalController extends Controller
             if (($proposal->version ?? 0) !== $request->integer('version')) {
                 return response()->json(['conflict' => true, 'proposal' => $proposal ? $this->details($proposal, true) : null], 409);
             }
+            abort_if(InvitationLifecycle::blocked($locked->user_id, $user->id), 403);
             $submit = $request->input('action') === 'submit';
             $presence = $submit ? 'required' : 'nullable';
             $data = Validator::make($request->all(), [
@@ -121,6 +125,7 @@ class ProposalController extends Controller
                 $proposal->submitted_at ??= now();
                 $proposal->draft = null;
                 $proposal->save();
+                InvitationLifecycle::accept($proposal);
                 $this->event($proposal, $user->id, $first ? 'submitted' : (in_array($previousStatus, ['withdrawn', 'reopened'], true) ? 'resubmitted' : 'revised'), $data);
             } else {
                 if (! $proposal->exists) {
@@ -156,6 +161,8 @@ class ProposalController extends Controller
             'proposal' => $this->details($proposal, $author),
             'project' => $this->projectDetails($proposal->project),
             'author' => $author,
+            'conversationId' => Conversation::query()->where('proposal_id', $proposal->id)->value('id'),
+            'canStartConversation' => ! $author && HiringAccess::writable($proposal),
             'canEdit' => $author && $this->canEdit($proposal->project, $proposal),
             'canReview' => ! $author && $proposal->project->status === 'published',
         ]);

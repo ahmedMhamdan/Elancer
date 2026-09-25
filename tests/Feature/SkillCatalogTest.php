@@ -74,6 +74,10 @@ class SkillCatalogTest extends TestCase
         $profile->forceFill(['skills' => ['Legacy Craft', 'Laravel']])->save();
         // Roll back newer dependents before rebuilding the historical skill catalog.
         $proposalMigration = require database_path('migrations/2026_09_18_180000_create_proposals_and_public_profiles.php');
+        $invitationMigration = require database_path('migrations/2026_09_24_200000_create_invitations_and_user_blocks.php');
+        $conversationMigration = require database_path('migrations/2026_09_25_090000_create_hiring_conversations.php');
+        $conversationMigration->down();
+        $invitationMigration->down();
         $proposalMigration->down();
         $projectMigration = require database_path('migrations/2026_09_15_160000_create_projects_table.php');
         $projectMigration->down();
@@ -89,5 +93,7 @@ class SkillCatalogTest extends TestCase
         $migration->up();
         $projectMigration->up();
         $proposalMigration->up();
+        $invitationMigration->up();
+        $conversationMigration->up();
     }
 }

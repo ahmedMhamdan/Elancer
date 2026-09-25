@@ -49,11 +49,11 @@ class FreelancerController extends Controller
         ]);
     }
 
-    public function show(Profile $profile): Response
+    public function show(Request $request, Profile $profile): Response
     {
         abort_unless(Profile::query()->publiclyVisible()->whereKey($profile->id)->exists(), 404);
 
-        return Inertia::render('discovery/freelancer', ['freelancer' => $profile->load(['user', 'skillTags'])->publicDetails()]);
+        return Inertia::render('discovery/freelancer', ['freelancer' => $profile->load(['user', 'skillTags'])->publicDetails(), 'canContact' => $request->user()?->id !== $profile->user_id]);
     }
 
     public function photo(Profile $profile): HttpResponse

@@ -3,9 +3,12 @@
 use App\Http\Controllers\AdministratorController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ClientProjectController;
+use App\Http\Controllers\ContactBlockController;
+use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FreelancerController;
 use App\Http\Controllers\IdentityVerificationController;
+use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MarketplaceProfileController;
 use App\Http\Controllers\OnboardingController;
@@ -34,6 +37,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('onboarding', [OnboardingController::class, 'store'])->middleware(['throttle:10,1', 'throttle:profile-photos'])->name('onboarding.store');
     Route::get('account/profile-photo', ProfilePhotoController::class)->name('profile.photo');
     Route::middleware(EnsureOnboardingIsComplete::class)->group(function () {
+        Route::post('invitations/{invitation}/block', [ContactBlockController::class, 'fromInvitation'])->middleware('throttle:20,1')->name('invitations.block');
+        Route::get('messages', [ConversationController::class, 'index'])->name('messages.index');
+        Route::post('proposals/{proposal}/conversation', [ConversationController::class, 'start'])->middleware('throttle:20,1')->name('messages.start');
+        Route::get('messages/{conversation}', [ConversationController::class, 'show'])->whereNumber('conversation')->name('messages.show');
+        Route::post('messages/{conversation}', [ConversationController::class, 'send'])->whereNumber('conversation')->middleware('throttle:60,1')->name('messages.send');
+        Route::patch('messages/{conversation}/state', [ConversationController::class, 'state'])->whereNumber('conversation')->name('messages.state');
+        Route::patch('messages/items/{message}', [ConversationController::class, 'edit'])->whereNumber('message')->middleware('throttle:30,1')->name('messages.edit');
+        Route::post('messages/{conversation}/block', [ContactBlockController::class, 'fromConversation'])->whereNumber('conversation')->middleware('throttle:20,1')->name('messages.block');
+        Route::get('invitations', [InvitationController::class, 'index'])->name('invitations.index');
+        Route::get('freelancers/{profile}/invite', [InvitationController::class, 'create'])->name('invitations.create');
+        Route::post('freelancers/{profile}/invite', [InvitationController::class, 'store'])->middleware('throttle:20,1')->name('invitations.store');
+        Route::get('invitations/{invitation}', [InvitationController::class, 'show'])->name('invitations.show');
+        Route::patch('invitations/{invitation}', [InvitationController::class, 'update'])->middleware('throttle:30,1')->name('invitations.update');
+        Route::get('blocked-accounts', [ContactBlockController::class, 'index'])->name('contacts.blocked');
+        Route::post('freelancers/{profile}/block', [ContactBlockController::class, 'store'])->middleware('throttle:20,1')->name('contacts.block');
+        Route::delete('blocked-accounts/{block}', [ContactBlockController::class, 'destroy'])->whereNumber('block')->name('contacts.unblock');
         Route::patch('my-profile/publication', [FreelancerController::class, 'publication'])->name('freelancers.publication');
         Route::get('my-proposals', [ProposalController::class, 'index'])->name('proposals.index');
         Route::get('jobs/{project}/apply', [ProposalController::class, 'edit'])->name('proposals.edit');
