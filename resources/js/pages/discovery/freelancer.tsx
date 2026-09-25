@@ -1,4 +1,5 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage, router } from '@inertiajs/react';
+import Button from '@/components/tailadmin/button';
 import { ArrowLeft, ExternalLink, MapPin } from 'lucide-react';
 import { DiscoveryLayout } from './shared';
 import type { Freelancer } from '@/components/freelancer-card';
@@ -6,10 +7,13 @@ import { useTranslation } from '@/hooks/use-translation';
 import '../../../css/elancer-marketplace.css';
 export default function FreelancerProfile({
     freelancer: person,
+    canContact,
 }: {
     freelancer: Freelancer;
+    canContact: boolean;
 }) {
     const { t } = useTranslation();
+    const { auth } = usePage().props;
     return (
         <DiscoveryLayout>
             <Head title={person.name} />
@@ -52,6 +56,39 @@ export default function FreelancerProfile({
                     )}
                 </div>
             </section>
+            {canContact && (
+                <div className="market-actions mb-4">
+                    <Link
+                        className="job-button"
+                        href={
+                            auth.user
+                                ? `/freelancers/${person.id}/invite`
+                                : '/login'
+                        }
+                    >
+                        {t('Invite to a project')}
+                    </Link>
+                    {auth.user && (
+                        <Button
+                            variant="danger-outline"
+                            onClick={() => {
+                                if (
+                                    window.confirm(
+                                        t(
+                                            'Block this account? New invitations and proposal contact will be stopped.',
+                                        ),
+                                    )
+                                )
+                                    router.post(
+                                        `/freelancers/${person.id}/block`,
+                                    );
+                            }}
+                        >
+                            {t('Block account')}
+                        </Button>
+                    )}
+                </div>
+            )}
             <div className="market-columns">
                 <div className="market-stack">
                     <section className="market-panel">

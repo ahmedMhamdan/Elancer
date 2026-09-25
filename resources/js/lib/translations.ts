@@ -1,5 +1,81 @@
 // Interface copy only. Member-authored and catalog content retain their entered language.
 export const arabic: Record<string, string> = {
+    Messages: 'الرسائل',
+    Inbox: 'الوارد',
+    'Archived conversations': 'المحادثات المؤرشفة',
+    'Hiring conversations': 'محادثات التوظيف',
+    'No conversations here yet.': 'لا توجد محادثات هنا بعد.',
+    'Clients can start a conversation after receiving a proposal.':
+        'يمكن للعملاء بدء محادثة بعد استلام عرض.',
+    ':count unread': ':count غير مقروءة',
+    You: 'أنت',
+    Counterpart: 'الطرف الآخر',
+    Edited: 'معدّلة',
+    'Correct message': 'تصحيح الرسالة',
+    'Save correction': 'حفظ التصحيح',
+    'Correction history': 'سجل التصحيحات',
+    'Refresh messages': 'تحديث الرسائل',
+    'Mark conversation as read': 'تمييز المحادثة كمقروءة',
+    Unarchive: 'إلغاء الأرشفة',
+    'Archive conversation': 'أرشفة المحادثة',
+    'This hiring conversation is read-only.': 'هذه المحادثة للقراءة فقط.',
+    Message: 'الرسالة',
+    'You can correct sent text for 15 minutes. Messages cannot be deleted.':
+        'يمكنك تصحيح النص المرسل خلال 15 دقيقة. لا يمكن حذف الرسائل.',
+    'Send message': 'إرسال الرسالة',
+    'Open conversation': 'فتح المحادثة',
+    'Start a hiring conversation': 'بدء محادثة توظيف',
+    'First message': 'الرسالة الأولى',
+    'Start conversation': 'بدء المحادثة',
+    'The message correction window has ended.': 'انتهت مهلة تصحيح الرسالة.',
+    'This message changed. Reload before correcting it.':
+        'تغيّرت الرسالة. أعد تحميل الصفحة قبل تصحيحها.',
+    'This send request was already used for another message.':
+        'سبق استخدام طلب الإرسال هذا لرسالة أخرى.',
+    Invitations: 'الدعوات',
+    'Received invitations': 'الدعوات الواردة',
+    'Sent invitations': 'الدعوات المرسلة',
+    'Blocked accounts': 'الحسابات المحظورة',
+    'No invitations yet.': 'لا توجد دعوات بعد.',
+    'View invitation': 'عرض الدعوة',
+    'Invite to a project': 'دعوة إلى مشروع',
+    'Invitations are unavailable between these accounts.':
+        'لا يمكن إرسال دعوات بين هذين الحسابين.',
+    'Choose an open project': 'اختر مشروعًا مفتوحًا',
+    'An invitation is accepted only when a proposal is submitted.':
+        'تُقبل الدعوة عند إرسال عرض فقط.',
+    'Send invitation': 'إرسال الدعوة',
+    'Publish an open project before inviting freelancers.':
+        'انشر مشروعًا مفتوحًا قبل دعوة المستقلين.',
+    'Invitation sent': 'أُرسلت الدعوة',
+    'Invitation resent': 'أُعيد إرسال الدعوة',
+    'This invitation is not currently actionable.':
+        'لا يمكن متابعة هذه الدعوة حاليًا.',
+    'Respond with a proposal': 'الرد بإرسال عرض',
+    'Decline invitation': 'رفض الدعوة',
+    'Next eligible resend time': 'موعد إتاحة إعادة الإرسال',
+    'Resend invitation': 'إعادة إرسال الدعوة',
+    'Invitation history': 'سجل الدعوة',
+    'Unblocking does not restore cancelled invitations.':
+        'رفع الحظر لا يعيد الدعوات الملغاة.',
+    'No blocked accounts.': 'لا توجد حسابات محظورة.',
+    Unblock: 'رفع الحظر',
+    'Block account': 'حظر الحساب',
+    'Block this account? New invitations and proposal contact will be stopped.':
+        'هل تريد حظر هذا الحساب؟ سيتوقف التواصل الجديد عبر الدعوات والعروض.',
+    Accepted: 'مقبولة',
+    Cancelled: 'ملغاة',
+    'This freelancer is not available for invitations.':
+        'لا يمكن دعوة هذا المستقل حاليًا.',
+    'This invitation cannot be sent right now.':
+        'لا يمكن إرسال هذه الدعوة حاليًا.',
+    'This freelancer has already applied.': 'سبق أن أرسل هذا المستقل عرضًا.',
+    'An invitation already exists. Open your sent invitations.':
+        'توجد دعوة سابقة. افتح الدعوات المرسلة.',
+    'This invitation changed. Reload before responding.':
+        'تغيّرت هذه الدعوة. أعد تحميل الصفحة قبل الرد.',
+    'Wait seven days after decline before sending another invitation.':
+        'انتظر سبعة أيام بعد الرفض قبل إرسال دعوة أخرى.',
     'Search Elancer': 'ابحث في إيلانسر',
     'Search projects or freelancers, or open a shortcut.':
         'ابحث عن مشاريع أو مستقلين، أو افتح أحد الاختصارات.',

@@ -57,6 +57,16 @@ export function AppSidebar() {
           };
     const links = [
         {
+            label: t('Messages'),
+            href: '/messages',
+            icon: <UserRound size={20} />,
+        },
+        {
+            label: t('Invitations'),
+            href: '/invitations',
+            icon: <UserRound size={20} />,
+        },
+        {
             label: t('Find freelancers'),
             href: '/freelancers',
             icon: <UserRound size={20} />,

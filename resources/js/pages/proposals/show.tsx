@@ -1,3 +1,4 @@
+import StartConversation from '@/components/start-conversation';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import Button from '@/components/tailadmin/button';
 import TextArea from '@/components/tailadmin/textarea';
@@ -17,12 +18,16 @@ export default function Show({
     author,
     canEdit,
     canReview,
+    conversationId,
+    canStartConversation,
 }: {
     proposal: Proposal;
     project: ProposalProject;
     author: boolean;
     canEdit: boolean;
     canReview: boolean;
+    conversationId: number | null;
+    canStartConversation: boolean;
 }) {
     const { t } = useTranslation();
     const form = useForm({
@@ -53,6 +58,11 @@ export default function Show({
         <ProposalLayout title={t('Proposal details')}>
             <Head title={t('Proposal details')} />
             <div className="market-stack">
+                <StartConversation
+                    proposalId={proposal.id}
+                    conversationId={conversationId}
+                    canStart={canStartConversation}
+                />
                 <Link
                     href={
                         author
