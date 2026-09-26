@@ -1,3 +1,6 @@
+import ConnectedAccounts, {
+    type SocialAccountProps,
+} from '@/components/connected-accounts';
 import LanguageToggle from '@/components/language-toggle';
 import { useTranslation } from '@/hooks/use-translation';
 import ElancerWordmark from '@/components/elancer-wordmark';
@@ -16,7 +19,11 @@ import {
 } from '@/actions/Laravel/Passkeys/Http/Controllers/PasskeyConfirmationController';
 import PasskeyVerify from '@/components/passkey-verify';
 
-export default function ConfirmPassword() {
+export default function ConfirmPassword({
+    hasPassword,
+    connectedProviders,
+    socialProviders,
+}: SocialAccountProps & { hasPassword: boolean }) {
     const { t } = useTranslation();
 
     return (
@@ -39,7 +46,7 @@ export default function ConfirmPassword() {
                     <h1>{t('Confirm it’s you.')}</h1>
                     <p>
                         {t(
-                            'Enter your password or use a passkey to continue securely with your Elancer account.',
+                            'Confirm your identity using an available sign-in method.',
                         )}
                     </p>
                 </div>
@@ -51,48 +58,62 @@ export default function ConfirmPassword() {
                             options: confirmOptions(),
                             submit: confirmStore(),
                         }}
+                        hideSeparator={!hasPassword}
                         label={t('Confirm with passkey')}
                         loadingLabel={t('Confirming...')}
-                        separator={t('Or confirm with password')}
+                        separator={
+                            hasPassword
+                                ? t('Or confirm with password')
+                                : undefined
+                        }
                     />
 
-                    <Form {...store.form()} resetOnSuccess={['password']}>
-                        {({ processing, errors }) => (
-                            <div className="space-y-6">
-                                <div className="grid gap-2">
-                                    <Label htmlFor="password">
-                                        {t('Password')}
-                                    </Label>
-                                    <PasswordInput
-                                        id="password"
-                                        name="password"
-                                        placeholder={t('Password')}
-                                        autoComplete="current-password"
-                                        aria-invalid={!!errors.password}
-                                        aria-describedby="confirm-password-error"
-                                        autoFocus
-                                    />
+                    {hasPassword && (
+                        <Form {...store.form()} resetOnSuccess={['password']}>
+                            {({ processing, errors }) => (
+                                <div className="space-y-6">
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="password">
+                                            {t('Password')}
+                                        </Label>
+                                        <PasswordInput
+                                            id="password"
+                                            name="password"
+                                            placeholder={t('Password')}
+                                            autoComplete="current-password"
+                                            aria-invalid={!!errors.password}
+                                            aria-describedby="confirm-password-error"
+                                            autoFocus
+                                        />
 
-                                    <InputError
-                                        id="confirm-password-error"
-                                        role="alert"
-                                        message={errors.password}
-                                    />
-                                </div>
+                                        <InputError
+                                            id="confirm-password-error"
+                                            role="alert"
+                                            message={errors.password}
+                                        />
+                                    </div>
 
-                                <div className="flex items-center">
-                                    <Button
-                                        className="two-factor-submit"
-                                        disabled={processing}
-                                        data-test="confirm-password-button"
-                                    >
-                                        {processing && <Spinner />}
-                                        {t('Confirm password')}
-                                    </Button>
+                                    <div className="flex items-center">
+                                        <Button
+                                            className="two-factor-submit"
+                                            disabled={processing}
+                                            data-test="confirm-password-button"
+                                        >
+                                            {processing && <Spinner />}
+                                            {t('Confirm password')}
+                                        </Button>
+                                    </div>
                                 </div>
-                            </div>
-                        )}
-                    </Form>
+                            )}
+                        </Form>
+                    )}
+                    <div className="mt-6">
+                        <ConnectedAccounts
+                            confirm
+                            connectedProviders={connectedProviders}
+                            socialProviders={socialProviders}
+                        />
+                    </div>
                 </div>
                 <Link
                     href="/dashboard"

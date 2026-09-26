@@ -1,5 +1,5 @@
 import { useTranslation } from '@/hooks/use-translation';
-import { Form } from '@inertiajs/react';
+import { Form, Link, usePage } from '@inertiajs/react';
 import { useRef } from 'react';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import Heading from '@/components/heading';
@@ -19,6 +19,8 @@ import { Label } from '@/components/ui/label';
 
 export default function DeleteUser() {
     const { t } = useTranslation();
+    const hasPassword = usePage<{ auth: { user: { has_password: boolean } } }>()
+        .props.auth.user.has_password;
 
     const passwordInput = useRef<HTMLInputElement>(null);
 
@@ -54,7 +56,9 @@ export default function DeleteUser() {
                         </DialogTitle>
                         <DialogDescription>
                             {t(
-                                'Once your account is deleted, all of its resources and data will also be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.',
+                                hasPassword
+                                    ? 'Once your account is deleted, all of its resources and data will also be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.'
+                                    : 'Confirm your identity first, then type DELETE to permanently delete your account.',
                             )}
                         </DialogDescription>
 
@@ -69,24 +73,47 @@ export default function DeleteUser() {
                         >
                             {({ resetAndClearErrors, processing, errors }) => (
                                 <>
-                                    <div className="grid gap-2">
-                                        <Label
-                                            htmlFor="password"
-                                            className="sr-only"
-                                        >
-                                            {t('Password')}
-                                        </Label>
+                                    {hasPassword ? (
+                                        <div className="grid gap-2">
+                                            <Label
+                                                htmlFor="password"
+                                                className="sr-only"
+                                            >
+                                                {t('Password')}
+                                            </Label>
 
-                                        <PasswordInput
-                                            id="password"
-                                            name="password"
-                                            ref={passwordInput}
-                                            placeholder={t('Password')}
-                                            autoComplete="current-password"
-                                        />
+                                            <PasswordInput
+                                                id="password"
+                                                name="password"
+                                                ref={passwordInput}
+                                                placeholder={t('Password')}
+                                                autoComplete="current-password"
+                                            />
 
-                                        <InputError message={errors.password} />
-                                    </div>
+                                            <InputError
+                                                message={errors.password}
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="grid gap-2">
+                                            <Link href="/user/confirm-password">
+                                                {t('Confirm your identity')}
+                                            </Link>
+                                            <Label htmlFor="delete-confirmation">
+                                                {t('Type DELETE to confirm')}
+                                            </Label>
+                                            <input
+                                                id="delete-confirmation"
+                                                name="confirmation"
+                                                required
+                                                pattern="DELETE"
+                                                className="rounded-md border p-2"
+                                            />
+                                            <InputError
+                                                message={errors.confirmation}
+                                            />
+                                        </div>
+                                    )}
 
                                     <DialogFooter className="gap-2">
                                         <DialogClose asChild>
