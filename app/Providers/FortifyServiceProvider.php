@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Actions\Auth\SocialProviders;
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
 use App\Http\Responses\OnboardingVerifyEmailResponse;
@@ -76,6 +77,7 @@ class FortifyServiceProvider extends ServiceProvider
     private function configureViews(): void
     {
         Fortify::loginView(fn (Request $request) => Inertia::render('auth/login', [
+            'socialProviders' => SocialProviders::availability(),
             'canResetPassword' => Features::enabled(Features::resetPasswords()),
             'status' => $request->session()->get('status'),
         ]));
@@ -95,12 +97,17 @@ class FortifyServiceProvider extends ServiceProvider
         ]));
 
         Fortify::registerView(fn () => Inertia::render('auth/register', [
+            'socialProviders' => SocialProviders::availability(),
             'passwordRules' => Password::defaults()->toPasswordRulesString(),
         ]));
 
         Fortify::twoFactorChallengeView(fn () => Inertia::render('auth/two-factor-challenge'));
 
-        Fortify::confirmPasswordView(fn () => Inertia::render('auth/confirm-password'));
+        Fortify::confirmPasswordView(fn (Request $request) => Inertia::render('auth/confirm-password', [
+            'hasPassword' => $request->user()->password !== null,
+            'connectedProviders' => SocialProviders::connected($request->user()),
+            'socialProviders' => SocialProviders::availability(),
+        ]));
     }
 
     /**

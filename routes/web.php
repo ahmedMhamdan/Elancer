@@ -16,6 +16,7 @@ use App\Http\Controllers\ProfilePhotoController;
 use App\Http\Controllers\ProjectDiscoveryController;
 use App\Http\Controllers\ProposalController;
 use App\Http\Controllers\SkillController;
+use App\Http\Controllers\SocialAuthController;
 use App\Http\Controllers\UpdateProfilePhotoController;
 use App\Http\Middleware\EnsureCategoryAdministrator;
 use App\Http\Middleware\EnsureOnboardingIsComplete;
@@ -70,6 +71,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
+Route::middleware('guest')->group(function () {
+    Route::get('auth/{provider}/redirect', [SocialAuthController::class, 'redirect'])->whereIn('provider', ['google', 'github'])->middleware('throttle:10,1')->name('social.redirect');
+    Route::get('auth/complete', [SocialAuthController::class, 'complete'])->name('social.complete');
+    Route::post('auth/complete', [SocialAuthController::class, 'store'])->middleware('throttle:6,1')->name('social.store');
+});
+Route::get('auth/{provider}/callback', [SocialAuthController::class, 'callback'])->whereIn('provider', ['google', 'github'])->middleware('throttle:20,1')->name('social.callback');
+Route::middleware('auth')->group(function () {
+    Route::post('settings/social/{provider}/confirm', [SocialAuthController::class, 'confirm'])->whereIn('provider', ['google', 'github'])->middleware('throttle:10,1')->name('social.confirm');
+    Route::post('settings/social/{provider}', [SocialAuthController::class, 'connect'])->whereIn('provider', ['google', 'github'])->middleware(['verified', 'password.confirm', 'throttle:10,1'])->name('social.connect');
+    Route::delete('settings/social/{provider}', [SocialAuthController::class, 'disconnect'])->whereIn('provider', ['google', 'github'])->middleware(['verified', 'password.confirm', 'throttle:10,1'])->name('social.disconnect');
+});
 require __DIR__.'/settings.php';
 
 Route::middleware(['auth', 'verified', EnsureCategoryAdministrator::class])

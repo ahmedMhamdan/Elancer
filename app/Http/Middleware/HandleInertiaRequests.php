@@ -45,7 +45,7 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'locale' => app()->getLocale(),
             'auth' => [
-                'user' => $user === null ? null : [...$user->attributesToArray(), 'avatar' => $avatar],
+                'user' => $user === null ? null : [...$user->attributesToArray(), 'avatar' => $avatar, 'has_password' => $user->password !== null],
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
