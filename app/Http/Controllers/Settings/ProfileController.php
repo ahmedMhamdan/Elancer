@@ -9,6 +9,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -59,9 +60,11 @@ class ProfileController extends Controller
         }
 
         $photoPath = $user->profile()->first()?->photo_path;
+        DB::transaction(function () use ($user): void {
+            $locked = $user->newQuery()->lockForUpdate()->findOrFail($user->id);
+            $locked->delete();
+        }, 3);
         Auth::logout();
-
-        $user->delete();
 
         if ($photoPath !== null) {
             Storage::disk('local')->delete($photoPath);

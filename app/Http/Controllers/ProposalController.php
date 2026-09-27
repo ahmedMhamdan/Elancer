@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Actions\Conversations\HiringAccess;
 use App\Actions\Invitations\InvitationLifecycle;
+use App\Actions\Offers\OfferLifecycle;
 use App\Models\Conversation;
+use App\Models\Offer;
 use App\Models\Profile;
 use App\Models\Project;
 use App\Models\Proposal;
@@ -28,6 +30,9 @@ class ProposalController extends Controller
     private function canEdit(Project $project, ?Proposal $proposal): bool
     {
         if ($project->status !== 'published' || ! Project::query()->visible()->whereKey($project->id)->exists()) {
+            return false;
+        }
+        if ($proposal && Offer::query()->where('proposal_id', $proposal->id)->where('status', 'pending')->where('expires_at', '>', now())->exists()) {
             return false;
         }
         if ($proposal?->status === 'declined') {
@@ -163,6 +168,8 @@ class ProposalController extends Controller
             'author' => $author,
             'conversationId' => Conversation::query()->where('proposal_id', $proposal->id)->value('id'),
             'canStartConversation' => ! $author && HiringAccess::writable($proposal),
+            'canOffer' => ! $author && HiringAccess::writable($proposal),
+            'offers' => Offer::query()->where('proposal_id', $proposal->id)->orderByDesc('id')->get(['id', 'status']),
             'canEdit' => $author && $this->canEdit($proposal->project, $proposal),
             'canReview' => ! $author && $proposal->project->status === 'published',
         ]);
@@ -177,6 +184,8 @@ class ProposalController extends Controller
             $project = Project::query()->lockForUpdate()->findOrFail($proposal->project_id);
             $locked = Proposal::query()->lockForUpdate()->findOrFail($proposal->id);
             abort_unless($project->status === 'published' && $locked->version === $request->integer('version') && in_array($locked->status, ['submitted', 'reopened'], true), 409);
+            OfferLifecycle::expire($project->id);
+            abort_if(Offer::query()->where('proposal_id', $locked->id)->where('status', 'pending')->exists(), 409, __('Respond to the pending offer before withdrawing this proposal.'));
             $locked->status = 'withdrawn';
             $locked->version++;
             $locked->save();
@@ -224,7 +233,9 @@ class ProposalController extends Controller
             $project = Project::query()->lockForUpdate()->findOrFail($proposal->project_id);
             $locked = Proposal::query()->lockForUpdate()->findOrFail($proposal->id);
             abort_unless($project->status === 'published' && $locked->version === (int) $data['version'], 409, __('This proposal changed. Reload before reviewing it.'));
+            OfferLifecycle::expire($project->id);
             if ($data['action'] === 'decline') {
+                abort_if(Offer::query()->where('proposal_id', $locked->id)->where('status', 'pending')->exists(), 409, __('Withdraw the pending offer before declining this proposal.'));
                 abort_unless(in_array($locked->status, ['submitted', 'reopened'], true), 409);
                 $locked->status = 'declined';
                 $this->event($locked, $request->user()->id, 'declined');

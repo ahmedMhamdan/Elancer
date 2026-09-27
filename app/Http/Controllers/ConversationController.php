@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Conversations\HiringAccess;
+use App\Models\Contract;
 use App\Models\Conversation;
 use App\Models\ConversationMessage;
 use App\Models\Project;
@@ -11,6 +12,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -18,12 +20,18 @@ class ConversationController extends Controller
 {
     public function index(Request $request): Response
     {
-        $request->validate(['archived' => ['nullable', 'boolean'], 'page' => ['nullable', 'integer', 'min:1', 'max:100000']]);
+        $request->validate(['kind' => ['nullable', Rule::in(['hiring', 'contracts'])], 'archived' => ['nullable', 'boolean'], 'page' => ['nullable', 'integer', 'min:1', 'max:100000']]);
         $user = $request->user()->id;
         $archived = $request->boolean('archived');
         $query = Conversation::query()->with(['proposal.project', 'client', 'freelancer'])->where(fn ($q) => $q
             ->where(fn ($q) => $q->where('client_id', $user)->where('client_archived', $archived))
             ->orWhere(fn ($q) => $q->where('freelancer_id', $user)->where('freelancer_archived', $archived)));
+
+        if ($request->input('kind') === 'contracts') {
+            $query->whereIn('proposal_id', Contract::query()->select('proposal_id'));
+        } elseif ($request->input('kind') === 'hiring') {
+            $query->whereNotIn('proposal_id', Contract::query()->select('proposal_id'));
+        }
 
         return Inertia::render('messages/index', ['conversations' => $query->orderByDesc('updated_at')->orderByDesc('id')->paginate(20)->withQueryString()->through(fn (Conversation $conversation) => $this->summary($conversation, $user)), 'archived' => $archived]);
     }
@@ -36,7 +44,7 @@ class ConversationController extends Controller
             $this->lockParticipants($proposal->project->user_id, $proposal->user_id);
             Project::query()->lockForUpdate()->findOrFail($proposal->project_id);
             $proposal = Proposal::query()->lockForUpdate()->findOrFail($proposal->id);
-            abort_unless(HiringAccess::writable($proposal), 409, __('This hiring conversation is read-only.'));
+            abort_unless(HiringAccess::conversationWritable($proposal), 409, __('This hiring conversation is read-only.'));
             $conversation = Conversation::query()->where('proposal_id', $proposal->id)->lockForUpdate()->first();
             if ($conversation) {
                 return $conversation;
@@ -56,7 +64,7 @@ class ConversationController extends Controller
         abort_unless($conversation->contains($request->user()->id), 404);
         $request->validate(['page' => ['nullable', 'integer', 'min:1', 'max:100000']]);
         $user = $request->user()->id;
-        $writable = HiringAccess::writable($conversation->proposal);
+        $writable = HiringAccess::conversationWritable($conversation->proposal);
         $messages = $conversation->messages()->orderByDesc('id')->paginate(30);
         $revisions = DB::table('message_revisions')->whereIn('conversation_message_id', $messages->getCollection()->pluck('id'))->orderBy('version')->get(['conversation_message_id', 'body', 'version', 'created_at'])->groupBy('conversation_message_id');
         $visibleThrough = (int) ($messages->getCollection()->max('id') ?? 0);
@@ -136,7 +144,7 @@ class ConversationController extends Controller
         $this->lockParticipants($conversation->client_id, $conversation->freelancer_id);
         Project::query()->lockForUpdate()->findOrFail($conversation->proposal->project_id);
         $proposal = Proposal::query()->lockForUpdate()->findOrFail($conversation->proposal_id);
-        abort_unless(HiringAccess::writable($proposal), 409, __('This hiring conversation is read-only.'));
+        abort_unless(HiringAccess::conversationWritable($proposal), 409, __('This hiring conversation is read-only.'));
 
         return Conversation::query()->lockForUpdate()->findOrFail($conversation->id);
     }
@@ -160,6 +168,7 @@ class ConversationController extends Controller
         return [
             'id' => $conversation->id, 'project' => $conversation->proposal->project->only(['id', 'title']),
             'proposal_id' => $conversation->proposal_id,
+            'contract_id' => Contract::query()->where('proposal_id', $conversation->proposal_id)->value('id'),
             'counterpart' => $user === $conversation->client_id ? $conversation->freelancer->name : $conversation->client->name,
             'archived' => (bool) $conversation->getAttribute($conversation->archiveColumn($user)),
             'unread' => $conversation->messages()->where('sender_id', '!=', $user)->where('id', '>', $conversation->getAttribute($conversation->readColumn($user)))->count(),

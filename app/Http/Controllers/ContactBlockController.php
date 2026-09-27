@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Invitations\InvitationLifecycle;
+use App\Actions\Offers\OfferLifecycle;
 use App\Models\Conversation;
 use App\Models\Invitation;
 use App\Models\Profile;
@@ -49,6 +50,7 @@ class ContactBlockController extends Controller
         DB::transaction(function () use ($request, $target): void {
             User::query()->whereIn('id', [$request->user()->id, $target])->orderBy('id')->lockForUpdate()->get();
             DB::table('user_blocks')->insertOrIgnore(['user_id' => $request->user()->id, 'blocked_user_id' => $target, 'created_at' => now()]);
+            OfferLifecycle::restrict($request->user()->id, $target);
             $invitations = Invitation::query()->where('status', 'pending')->where(function ($q) use ($request, $target): void {
                 $q->where(fn ($q) => $q->where('recipient_id', $request->user()->id)->whereHas('project', fn ($p) => $p->where('user_id', $target)))
                     ->orWhere(fn ($q) => $q->where('recipient_id', $target)->whereHas('project', fn ($p) => $p->where('user_id', $request->user()->id)));

@@ -67,7 +67,7 @@ class Project extends Model
     /** @param Builder<Project> $query */
     public function scopeVisible(Builder $query): void
     {
-        $query->whereIn('status', ['published', 'closed'])
+        $query->whereIn('status', ['published', 'closed', 'hired'])
             ->whereNotNull('published_at')->where('published_at', '<=', now())
             ->whereNotNull('application_closes_at')
             ->whereNotNull('title')->whereNotNull('description')

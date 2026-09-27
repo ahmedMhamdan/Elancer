@@ -12,7 +12,7 @@
     "Regards,": "مع التحية،",
     "Whoops!": "عذرًا!",
     "All rights reserved.": "جميع الحقوق محفوظة.",
-    "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:": "إذا تعذّر الضغط على زر \":actionText\"، انسخ الرابط أدناه والصقه في متصفحك:",
+    "If you\u0027re having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:": "إذا تعذّر الضغط على زر \":actionText\"، انسخ الرابط أدناه والصقه في متصفحك:",
     "Profile updated.": "تم تحديث بيانات الحساب.",
     "Password updated.": "تم تغيير كلمة المرور.",
     "We could not save your photo. Please try again.": "تعذّر حفظ صورتك. حاول مرة أخرى.",
@@ -266,5 +266,12 @@
     "Provider disconnected.": "تم إلغاء ربط الحساب.",
     "New member": "عضو جديد",
     "An account already uses this email. Sign in to that account, then connect this provider in Security settings.": "يوجد حساب يستخدم هذا البريد. سجل الدخول إليه، ثم اربط المزود في إعدادات الأمان.",
-    "An account already uses this email or provider. Sign in to that account, then connect this provider in Security settings.": "يوجد حساب يستخدم هذا البريد أو المزود. سجل الدخول إليه، ثم اربط المزود في إعدادات الأمان."
+    "An account already uses this email or provider. Sign in to that account, then connect this provider in Security settings.": "يوجد حساب يستخدم هذا البريد أو المزود. سجل الدخول إليه، ثم اربط المزود في إعدادات الأمان.",
+    "This offer request was already used. Reload before trying again.": "استُخدم طلب إرسال العرض هذا سابقًا. أعد تحميل الصفحة قبل المحاولة مجددًا.",
+    "Hiring changed. Reload the proposal before sending an offer.": "تغيّرت حالة التوظيف. أعد تحميل طلب التقديم قبل إرسال العرض.",
+    "This project already has a pending offer. Withdraw it or wait for its expiry.": "يوجد عرض لهذا المشروع قيد الانتظار. اسحبه أو انتظر انتهاء صلاحيته.",
+    "This offer is no longer available. Reload to see its current status.": "لم يعد هذا العرض متاحًا. أعد تحميل الصفحة للاطلاع على حالته الحالية.",
+    "Respond to the pending offer before withdrawing this proposal.": "ردّ على العرض المعلّق قبل سحب طلب التقديم.",
+    "Withdraw the pending offer before declining this proposal.": "اسحب العرض المعلّق قبل رفض طلب التقديم.",
+    "Contract obligations prevent account closure.": "لا يمكن إغلاق الحساب لوجود التزامات تعاقدية."
 }

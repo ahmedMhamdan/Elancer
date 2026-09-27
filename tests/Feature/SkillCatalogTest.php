@@ -76,6 +76,8 @@ class SkillCatalogTest extends TestCase
         $proposalMigration = require database_path('migrations/2026_09_18_180000_create_proposals_and_public_profiles.php');
         $invitationMigration = require database_path('migrations/2026_09_24_200000_create_invitations_and_user_blocks.php');
         $conversationMigration = require database_path('migrations/2026_09_25_090000_create_hiring_conversations.php');
+        $offerMigration = require database_path('migrations/2026_09_27_120000_create_offers_and_contracts.php');
+        $offerMigration->down();
         $conversationMigration->down();
         $invitationMigration->down();
         $proposalMigration->down();
@@ -95,5 +97,6 @@ class SkillCatalogTest extends TestCase
         $proposalMigration->up();
         $invitationMigration->up();
         $conversationMigration->up();
+        $offerMigration->up();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Actions\Offers\OfferLifecycle;
 use App\Enums\AccountStatus;
 use App\Enums\WorkspaceRole;
 use Carbon\CarbonImmutable;
@@ -15,6 +16,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Contracts\PasskeyUser;
 use Laravel\Fortify\PasskeyAuthenticatable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -100,9 +103,32 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
         return $this->status === AccountStatus::Active && $this->hasVerifiedEmail();
     }
 
+    public function save(array $options = []): bool
+    {
+        if ($this->exists && $this->isDirty('status')) {
+            return DB::transaction(function () use ($options): bool {
+                self::query()->whereKey($this->id)->lockForUpdate()->firstOrFail();
+                if ($this->status === AccountStatus::Deactivated && Contract::query()->where(fn ($q) => $q->where('client_id', $this->id)->orWhere('freelancer_id', $this->id))->exists()) {
+                    throw ValidationException::withMessages(['status' => __('Contract obligations prevent account closure.')]);
+                }
+                $saved = parent::save($options);
+                if ($this->status !== AccountStatus::Active) {
+                    OfferLifecycle::restrict($this->id);
+                }
+
+                return $saved;
+            }, 3);
+        }
+
+        return parent::save($options);
+    }
+
     protected static function booted(): void
     {
         static::deleting(function (self $user): void {
+            if (Contract::query()->where(fn ($q) => $q->where('client_id', $user->id)->orWhere('freelancer_id', $user->id))->exists()) {
+                throw ValidationException::withMessages(['password' => __('Contract obligations prevent account closure.')]);
+            }
             IdentityVerification::where('user_id', $user->id)->first()?->delete();
         });
     }
