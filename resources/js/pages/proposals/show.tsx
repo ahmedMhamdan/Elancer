@@ -20,6 +20,8 @@ export default function Show({
     canReview,
     conversationId,
     canStartConversation,
+    canOffer,
+    offers,
 }: {
     proposal: Proposal;
     project: ProposalProject;
@@ -28,6 +30,8 @@ export default function Show({
     canReview: boolean;
     conversationId: number | null;
     canStartConversation: boolean;
+    canOffer: boolean;
+    offers: { id: number; status: string }[];
 }) {
     const { t } = useTranslation();
     const form = useForm({
@@ -58,6 +62,18 @@ export default function Show({
         <ProposalLayout title={t('Proposal details')}>
             <Head title={t('Proposal details')} />
             <div className="market-stack">
+                <div className="market-actions">
+                    {canOffer && (
+                        <Link href={`/proposals/${proposal.id}/offer`}>
+                            {t('Send final offer')}
+                        </Link>
+                    )}
+                    {offers.map((offer) => (
+                        <Link key={offer.id} href={`/offers/${offer.id}`}>
+                            {t('Offer :number', { number: offer.id })}
+                        </Link>
+                    ))}
+                </div>
                 <StartConversation
                     proposalId={proposal.id}
                     conversationId={conversationId}

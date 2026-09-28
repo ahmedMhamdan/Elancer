@@ -56,6 +56,12 @@ export function AppSidebar() {
               dashboard: 'Elancer dashboard',
           };
     const links = [
+        { label: t('Offers'), href: '/offers', icon: <FolderTree size={20} /> },
+        {
+            label: t('Contracts'),
+            href: '/contracts',
+            icon: <FolderTree size={20} />,
+        },
         {
             label: t('Messages'),
             href: '/messages',

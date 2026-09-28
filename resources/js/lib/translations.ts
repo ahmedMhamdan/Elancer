@@ -1,5 +1,72 @@
 // Interface copy only. Member-authored and catalog content retain their entered language.
 export const arabic: Record<string, string> = {
+    Expired: 'منتهي الصلاحية',
+    Hiring: 'التوظيف',
+    Offers: 'العروض النهائية',
+    Contracts: 'العقود',
+    Agreement: 'الاتفاق',
+    'Closed by restriction': 'أُغلق بسبب قيود التواصل أو الحساب',
+    'Changes requested': 'طُلبت تعديلات',
+    'Fixed price (USD)': 'السعر الثابت بالدولار الأمريكي',
+    'Included revision rounds': 'جولات التعديل المشمولة',
+    'Scope summary': 'ملخص نطاق العمل',
+    'Named deliverables': 'المخرجات المتفق عليها',
+    'Delivery time starts only after verified sandbox funding. Weekends count as calendar days.':
+        'تبدأ مدة التسليم بعد تأكيد التمويل التجريبي فقط، وتشمل أيام العطلة.',
+    'Send final offer': 'إرسال العرض النهائي',
+    'Send this final offer? Its terms cannot be edited and it expires in 72 hours.':
+        'هل تريد إرسال هذا العرض النهائي؟ لا يمكن تعديل شروطه وتنتهي صلاحيته بعد ٧٢ ساعة.',
+    'Only one offer can be pending for this project. Other applicants can still apply until the cutoff.':
+        'يمكن أن يكون للمشروع عرض نهائي واحد قيد الانتظار. ويستمر استقبال الطلبات حتى موعد إغلاق التقديم.',
+    'One deliverable per line, up to 20. Each name can contain up to 200 characters.':
+        'اكتب كل مخرج في سطر مستقل، بحد أقصى ٢٠ مخرجًا و٢٠٠ حرف لكل اسم.',
+    'No final offers yet.': 'لا توجد عروض نهائية بعد.',
+    'Clients can send a final offer from a submitted proposal.':
+        'يمكن للعميل إرسال عرض نهائي من صفحة طلب تقديم مستلم.',
+    'Sent offer': 'عرض مُرسل',
+    'Received offer': 'عرض مُستلم',
+    'Expires at': 'تنتهي الصلاحية في',
+    'Final offer': 'العرض النهائي',
+    'Refresh status': 'تحديث الحالة',
+    'Closed at': 'أُغلق في',
+    'Response details': 'تفاصيل الرد',
+    'Open contract': 'فتح العقد',
+    'Respond to offer': 'الرد على العرض',
+    'Acceptance closes hiring and creates a contract awaiting sandbox funding.':
+        'تؤدي الموافقة إلى إغلاق التوظيف وإنشاء عقد بانتظار التمويل التجريبي.',
+    'Withdraw this offer? It will no longer be available for acceptance.':
+        'هل تريد سحب هذا العرض؟ لن يكون متاحًا للموافقة بعد ذلك.',
+    'Withdraw offer': 'سحب العرض',
+    'Accept these exact terms and create the contract?':
+        'هل توافق على هذه الشروط كما هي وتريد إنشاء العقد؟',
+    'Accept offer': 'الموافقة على العرض',
+    'Decline this offer? It will no longer be available for acceptance.':
+        'هل تريد رفض هذا العرض؟ لن يكون متاحًا للموافقة بعد ذلك.',
+    'Decline offer': 'رفض العرض',
+    'Requested changes': 'التعديلات المطلوبة',
+    'Requesting changes closes this offer. The client may send a replacement with a new 72-hour window.':
+        'طلب التعديلات يُغلق هذا العرض. ويمكن للعميل إرسال عرض بديل بصلاحية جديدة مدتها ٧٢ ساعة.',
+    'Close this offer and send your requested changes?':
+        'هل تريد إغلاق هذا العرض وإرسال التعديلات المطلوبة؟',
+    'Request changes': 'طلب تعديلات',
+    'Prepare replacement offer': 'إعداد عرض بديل',
+    'Offer history': 'سجل العروض',
+    'Offer :number': 'العرض :number',
+    'Contact was blocked.': 'تم حظر التواصل.',
+    'An account was restricted.': 'فُرضت قيود على أحد الحسابات.',
+    'Hiring is no longer available for this offer.':
+        'لم يعد التوظيف متاحًا لهذا العرض.',
+    'No contracts yet.': 'لا توجد عقود بعد.',
+    'A contract is created when the freelancer accepts a final offer.':
+        'يُنشأ العقد عندما يوافق المستقل على عرض نهائي.',
+    'Awaiting sandbox funding': 'بانتظار التمويل التجريبي',
+    'Contract agreement': 'اتفاق العقد',
+    'The agreement is accepted. Funding is not available yet, and the delivery clock has not started.':
+        'تمت الموافقة على الاتفاق. التمويل غير متاح بعد، ولم تبدأ مدة التسليم.',
+    'Accepted at': 'تاريخ الموافقة',
+    'Open messages': 'فتح المحادثة',
+    'View accepted offer': 'عرض العرض المقبول',
+    Conversations: 'المحادثات',
     Unavailable: 'غير متاح',
     'Some sign-in providers are not available yet. You can use email to continue.':
         'بعض مزودي تسجيل الدخول غير متاحين حاليًا. يمكنك المتابعة بالبريد الإلكتروني.',

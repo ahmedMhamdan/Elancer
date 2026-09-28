@@ -148,3 +148,13 @@ Lucide and class-variance-authority dependencies retain their respective license
 ## Supplied Spotlight search (2026-09-24)
 
 The Spotlight search adapts Ahmed's supplied AppleSpotlight React example. Rounded search surfaces, animated placeholders and spring shortcuts use Elancer tokens, Inertia destinations, Arabic/RTL and reduced motion. Existing Radix Dialog provides accessible modal behavior. The Ctrl/Cmd+K entry adapts local TailAdmin src/layout/AppHeader.tsx under its existing MIT notice above. Installed Framer Motion and Lucide retain their respective licenses.
+
+## Final offers and contract agreements (2026-09-27)
+
+The offer and contract pages under resources/js/pages/offers/ and
+resources/js/pages/contracts/ reuse Elancer's existing TailAdmin Input, TextArea,
+Button and pagination adaptations. Local TailAdmin sources inspected for this
+slice: src/components/form/form-elements/DefaultInputs.tsx,
+src/components/common/ComponentCard.tsx and src/components/ui/button/Button.tsx.
+Forms and agreement summaries retain existing Elancer panels, theme tokens,
+English/Arabic labels and RTL behavior. The MIT license above applies.

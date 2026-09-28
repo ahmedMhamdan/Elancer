@@ -1,4 +1,4 @@
-﻿import { Head, Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/hooks/use-translation';
@@ -8,6 +8,7 @@ export type ConversationSummary = {
     id: number;
     project: { id: number; title: string };
     proposal_id: number;
+    contract_id: number | null;
     counterpart: string;
     archived: boolean;
     unread: number;
@@ -33,6 +34,10 @@ export function MessageLayout({ children }: { children: ReactNode }) {
                 <h1 className="text-2xl font-semibold">{t('Messages')}</h1>
                 <nav className="market-actions" aria-label={t('Messages')}>
                     <Link href="/messages">{t('Inbox')}</Link>
+                    <Link href="/messages?kind=hiring">{t('Hiring')}</Link>
+                    <Link href="/messages?kind=contracts">
+                        {t('Contracts')}
+                    </Link>
                     <Link href="/messages?archived=1">
                         {t('Archived conversations')}
                     </Link>

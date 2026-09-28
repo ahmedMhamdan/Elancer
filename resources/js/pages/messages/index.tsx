@@ -1,4 +1,4 @@
-﻿import { Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import Pagination from '@/components/tailadmin/pagination';
 import { useTranslation } from '@/hooks/use-translation';
 import { JobDate, type Page } from '@/pages/discovery/shared';
@@ -15,9 +15,7 @@ export default function Index({
     return (
         <MessageLayout>
             <h2>
-                {archived
-                    ? t('Archived conversations')
-                    : t('Hiring conversations')}
+                {archived ? t('Archived conversations') : t('Conversations')}
             </h2>
             {!conversations.data.length && (
                 <section className="market-panel">
@@ -45,6 +43,11 @@ export default function Index({
                             </span>
                         )}
                     </div>
+                    {conversation.contract_id && (
+                        <Link href={`/contracts/${conversation.contract_id}`}>
+                            {t('Open contract')}
+                        </Link>
+                    )}
                     <h2>
                         <Link href={`/messages/${conversation.id}`} dir="auto">
                             {conversation.project.title}
