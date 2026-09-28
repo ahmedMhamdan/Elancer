@@ -55,7 +55,7 @@ class OfferController extends Controller
             $locked = Proposal::query()->lockForUpdate()->findOrFail($proposal->id);
             $existing = Offer::query()->where('client_id', $proposal->project->user_id)->where('client_token', $data['client_token'])->first();
             if ($existing) {
-                if ($existing->proposal_id !== $proposal->id || $existing->terms != $terms) {
+                if ($existing->proposal_id !== $proposal->id || collect($existing->terms)->sortKeys()->all() !== collect($terms)->sortKeys()->all()) {
                     throw ValidationException::withMessages(['offer' => __('This offer request was already used. Reload before trying again.')]);
                 }
 

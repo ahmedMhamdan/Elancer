@@ -69,11 +69,13 @@ class OfferContractTest extends TestCase
     {
         [$client, $freelancer, $proposal] = $this->participants();
         $payload = $this->payload();
+        $payload['scope'] = '0e'.str_repeat('1', 50);
         $url = '/proposals/'.$proposal->id.'/offer';
         $this->actingAs($client)->post($url, [...$payload, 'amount' => '10.123', 'deliverables' => []])->assertSessionHasErrors(['amount', 'deliverables']);
         $this->post($url, $payload)->assertSessionHasNoErrors()->assertRedirect();
         $this->post($url, $payload)->assertSessionHasNoErrors()->assertRedirect();
         $this->post($url, [...$payload, 'amount' => '900'])->assertSessionHasErrors('offer');
+        $this->post($url, [...$payload, 'scope' => '0e'.str_repeat('2', 50)])->assertSessionHasErrors('offer');
         $second = $proposal->replicate();
         $second->forceFill(['user_id' => User::factory()->create(['onboarding_completed_at' => now()])->id])->save();
         $this->post('/proposals/'.$second->id.'/offer', $this->payload())->assertSessionHasErrors('offer');
