@@ -609,3 +609,57 @@
 .workspace-columns {
     gap: 20px;
 }
+
+/* Grouped navigation keeps the narrow rail clear; scrolling belongs to links only. */
+.sidebar-navigation {
+    scrollbar-width: thin;
+    scrollbar-color: var(--el-border) transparent;
+}
+.sidebar-navigation[data-expanded='false'] {
+    scrollbar-width: none;
+}
+.sidebar-navigation::-webkit-scrollbar {
+    width: 5px;
+}
+.sidebar-navigation::-webkit-scrollbar-thumb {
+    background: var(--el-border);
+    border-radius: 8px;
+}
+.sidebar-navigation[data-expanded='false']::-webkit-scrollbar {
+    display: none;
+}
+.sidebar-navigation-group {
+    margin-top: 8px;
+}
+.sidebar-group-trigger {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    text-align: start;
+    cursor: pointer;
+}
+.sidebar-group-trigger:hover {
+    background: var(--sidebar-accent);
+}
+.sidebar-group-trigger[data-active='true'] {
+    color: var(--sidebar-accent-foreground);
+    background: var(--sidebar-accent);
+}
+.sidebar-group-links {
+    margin: 4px 0 8px;
+    padding-inline-start: 10px;
+    border-inline-start: 1px solid var(--sidebar-border);
+}
+.sidebar-group-links a {
+    margin-top: 2px;
+}
+.sidebar-group-trigger:focus-visible,
+.sidebar-brand:focus-visible,
+.sidebar-account:focus-visible {
+    outline: 2px solid var(--el-muted);
+    outline-offset: -2px;
+}

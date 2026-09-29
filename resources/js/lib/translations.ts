@@ -1449,4 +1449,10 @@ export const arabic: Record<string, string> = {
     'Illustrative project idea': 'فكرة مشروع توضيحية',
     'Explore another guide': 'تصفّح دليلًا آخر',
     'Elancer guides': 'أدلة إيلانسر',
+    'My work': 'أعمالي',
+    Communication: 'التواصل',
+    Marketplace: 'سوق العمل',
+    'Admin access': 'صلاحيات الإدارة',
+    'Elancer dashboard': 'لوحة تحكم إيلانسر',
+    'Account settings': 'إعدادات الحساب',
 };

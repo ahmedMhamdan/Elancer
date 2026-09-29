@@ -1,16 +1,27 @@
 import { useTranslation } from '@/hooks/use-translation';
-// Dashboard integration of Ahmed's supplied SidebarDemo; real Elancer routes,
-// role-aware links, wordmark and account replace the demo's placeholders.
+// Preserve Ahmed's supplied sidebar primitive. Grouped item disclosure adapts
+// TailAdmin src/layout/AppSidebar.tsx (MIT); see THIRD_PARTY_NOTICES.md.
 import { Link, router, usePage } from '@inertiajs/react';
-import { motion } from 'framer-motion';
+import { useId, useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import {
+    BriefcaseBusiness,
+    ChevronDown,
     Compass,
-    FolderTree,
+    FileText,
+    FolderKanban,
+    Handshake,
     LayoutDashboard,
+    LayoutGrid,
     LogOut,
+    Mail,
+    MessageSquare,
+    MessagesSquare,
+    Search,
     Settings,
     ShieldCheck,
     UserRound,
+    UserRoundX,
 } from 'lucide-react';
 import ElancerWordmark from '@/components/elancer-wordmark';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -21,183 +32,256 @@ import {
     useSidebar,
 } from '@/components/ui/sidebar';
 import { useInitials } from '@/hooks/use-initials';
-import { dashboard, home, logout } from '@/routes';
+import { dashboard, logout } from '@/routes';
 import { edit } from '@/routes/profile';
 
 export function AppSidebar() {
     const { t } = useTranslation();
-
     const { auth } = usePage().props;
-    const { url } = usePage();
-    const { open, isMobile, setOpenMobile, reducedMotion } = useSidebar();
+    const path = usePage().url.split('?')[0];
+    const { open, isMobile, setOpen, setOpenMobile } = useSidebar();
+    const wide = open || isMobile;
     const initials = useInitials();
-    const ar = auth.user.locale === 'ar';
-    const text = ar
-        ? {
-              overview: 'نظرة عامة',
-              settings: 'إعدادات الحساب',
-              profile: 'ملفي الشخصي',
-              explore: 'استكشاف المهارات',
-              categories: 'التصنيفات',
-              admins: 'صلاحيات الإدارة',
-              logout: 'تسجيل الخروج',
-              navigation: 'التنقل الرئيسي',
-              dashboard: 'لوحة تحكم Elancer',
-          }
-        : {
-              overview: t('Overview'),
-              settings: 'Account settings',
-              profile: t('My profile'),
-              explore: t('Explore skills'),
-              categories: 'Categories',
-              admins: 'Admin access',
-              logout: t('Log out'),
-              navigation: t('Main navigation'),
-              dashboard: 'Elancer dashboard',
-          };
-    const links = [
-        { label: t('Offers'), href: '/offers', icon: <FolderTree size={20} /> },
+    const reduced = useReducedMotion();
+    const spring = reduced
+        ? { duration: 0 }
+        : { type: 'spring' as const, stiffness: 350, damping: 32 };
+    const id = useId();
+    const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+    const active = (href: string) =>
+        path === href || path.startsWith(href + '/');
+    const groups = [
         {
-            label: t('Contracts'),
-            href: '/contracts',
-            icon: <FolderTree size={20} />,
+            id: 'work',
+            label: t('My work'),
+            icon: BriefcaseBusiness,
+            links: [
+                {
+                    label: t('My projects'),
+                    href: '/my-projects',
+                    icon: <FolderKanban size={20} />,
+                },
+                {
+                    label: t('My proposals'),
+                    href: '/my-proposals',
+                    icon: <FileText size={20} />,
+                },
+                {
+                    label: t('Offers'),
+                    href: '/offers',
+                    icon: <Mail size={20} />,
+                },
+                {
+                    label: t('Contracts'),
+                    href: '/contracts',
+                    icon: <Handshake size={20} />,
+                },
+            ],
         },
         {
-            label: t('Messages'),
-            href: '/messages',
-            icon: <UserRound size={20} />,
+            id: 'communication',
+            label: t('Communication'),
+            icon: MessagesSquare,
+            links: [
+                {
+                    label: t('Messages'),
+                    href: '/messages',
+                    icon: <MessageSquare size={20} />,
+                },
+                {
+                    label: t('Invitations'),
+                    href: '/invitations',
+                    icon: <Mail size={20} />,
+                },
+                {
+                    label: t('Blocked accounts'),
+                    href: '/blocked-accounts',
+                    icon: <UserRoundX size={20} />,
+                },
+            ],
         },
         {
-            label: t('Invitations'),
-            href: '/invitations',
-            icon: <UserRound size={20} />,
+            id: 'marketplace',
+            label: t('Marketplace'),
+            icon: Compass,
+            links: [
+                {
+                    label: t('Find jobs'),
+                    href: '/jobs',
+                    icon: <Search size={20} />,
+                },
+                {
+                    label: t('Find freelancers'),
+                    href: '/freelancers',
+                    icon: <UserRound size={20} />,
+                },
+                {
+                    label: t('Categories'),
+                    href: '/categories',
+                    icon: <LayoutGrid size={20} />,
+                },
+            ],
         },
         {
-            label: t('Find freelancers'),
-            href: '/freelancers',
-            icon: <UserRound size={20} />,
-        },
-        {
-            label: t('My proposals'),
-            href: '/my-proposals',
-            icon: <FolderTree size={20} />,
-        },
-        { label: t('Find jobs'), href: '/jobs', icon: <Compass size={20} /> },
-        {
-            label: t('My projects'),
-            href: '/my-projects',
-            icon: <FolderTree size={20} />,
-        },
-        {
-            label: text.overview,
-            href: dashboard().url,
-            icon: <LayoutDashboard size={20} />,
-        },
-        {
-            label: text.profile,
-            href: '/my-profile',
-            icon: <UserRound size={20} />,
-        },
-        {
-            label: text.settings,
-            href: edit().url,
-            icon: <Settings size={20} />,
+            id: 'account',
+            label: t('Account'),
+            icon: Settings,
+            links: [
+                {
+                    label: t('My profile'),
+                    href: '/my-profile',
+                    icon: <UserRound size={20} />,
+                },
+                {
+                    label: t('Account settings'),
+                    href: edit().url,
+                    icon: <Settings size={20} />,
+                },
+            ],
         },
         ...(auth.user.is_admin === true || auth.user.is_super_admin === true
             ? [
                   {
-                      label: text.categories,
-                      href: '/admin/categories',
-                      icon: <FolderTree size={20} />,
+                      id: 'administration',
+                      label: t('Administration'),
+                      icon: ShieldCheck,
+                      links: [
+                          {
+                              label: t('Categories'),
+                              href: '/admin/categories',
+                              icon: <LayoutGrid size={20} />,
+                          },
+                          ...(auth.user.is_super_admin === true
+                              ? [
+                                    {
+                                        label: t('Admin access'),
+                                        href: '/admin/administrators',
+                                        icon: <ShieldCheck size={20} />,
+                                    },
+                                    {
+                                        label: t('Identity reviews'),
+                                        href: '/admin/identity',
+                                        icon: <ShieldCheck size={20} />,
+                                    },
+                                ]
+                              : []),
+                      ],
                   },
               ]
             : []),
-        ...(auth.user.is_super_admin === true
-            ? [
-                  {
-                      label: text.admins,
-                      href: '/admin/administrators',
-                      icon: <ShieldCheck size={20} />,
-                  },
-              ]
-            : []),
-        ...(auth.user.is_super_admin === true
-            ? [
-                  {
-                      label: ar ? 'مراجعة الهوية' : 'Identity reviews',
-                      href: '/admin/identity',
-                      icon: <ShieldCheck size={20} />,
-                  },
-              ]
-            : []),
-        {
-            label: text.explore,
-            href: home().url + '#categories',
-            icon: <Compass size={20} />,
-        },
     ];
-    const path = url.split('?')[0];
     return (
-        <SidebarBody className="justify-between gap-6">
-            <div className="flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto">
-                <Link
-                    href={dashboard()}
-                    aria-label={text.dashboard}
-                    onClick={() => setOpenMobile(false)}
-                    className="focus-visible:outline-ring flex h-11 shrink-0 items-center overflow-hidden rounded-lg px-3 focus-visible:outline-2 focus-visible:outline-offset-[-2px]"
-                >
+        <SidebarBody className="gap-4">
+            <Link
+                href={dashboard()}
+                aria-label={t('Elancer dashboard')}
+                onClick={() => setOpenMobile(false)}
+                className="sidebar-brand flex h-11 shrink-0 items-center overflow-hidden rounded-lg px-3"
+            >
+                {wide ? (
+                    <ElancerWordmark />
+                ) : (
                     <span
-                        className={`relative block h-9 shrink-0 ${open || isMobile ? 'w-40' : 'w-6'}`}
+                        className="text-2xl font-semibold"
                         dir="ltr"
                         aria-hidden="true"
                     >
-                        <motion.span
-                            className="absolute inset-0 flex items-center"
-                            initial={false}
-                            animate={{
-                                opacity: open || isMobile ? 1 : 0,
-                                x: open || isMobile ? 0 : -8,
-                            }}
-                            transition={{ duration: reducedMotion ? 0 : 0.2 }}
-                        >
-                            <ElancerWordmark />
-                        </motion.span>
-                        <motion.span
-                            className="text-foreground absolute inset-y-0 start-0 flex items-center text-2xl font-semibold"
-                            initial={false}
-                            animate={{
-                                opacity: open || isMobile ? 0 : 1,
-                                scale: open || isMobile ? 0.85 : 1,
-                            }}
-                            transition={{ duration: reducedMotion ? 0 : 0.16 }}
-                        >
-                            E<span className="text-primary">.</span>
-                        </motion.span>
-                    </span>{' '}
-                </Link>
-                <nav
-                    aria-label={text.navigation}
-                    className="mt-8 flex flex-col gap-2"
-                >
-                    {links.map((link) => (
-                        <SidebarLink
-                            key={link.href}
-                            link={link}
-                            aria-current={
-                                !link.href.includes('#') &&
-                                (path === link.href ||
-                                    path.startsWith(link.href + '/'))
-                                    ? 'page'
-                                    : undefined
-                            }
-                        />
-                    ))}
-                </nav>
-            </div>
-            <div className="border-sidebar-border flex shrink-0 flex-col gap-3 border-t pt-4">
+                        E<span className="text-primary">.</span>
+                    </span>
+                )}
+            </Link>
+            <nav
+                aria-label={t('Main navigation')}
+                className="sidebar-navigation min-h-0 flex-1 overflow-x-hidden overflow-y-auto"
+                data-expanded={wide}
+            >
                 <SidebarLink
                     link={{
-                        label: text.logout,
+                        label: t('Overview'),
+                        href: dashboard().url,
+                        icon: <LayoutDashboard size={20} />,
+                    }}
+                    aria-current={active('/dashboard') ? 'page' : undefined}
+                />
+                {groups.map((group) => {
+                    const Icon = group.icon;
+                    const current = group.links.some((link) =>
+                        active(link.href),
+                    );
+                    const groupOpen = expanded[group.id] ?? current;
+                    return (
+                        <div
+                            key={group.id}
+                            className="sidebar-navigation-group"
+                        >
+                            <button
+                                type="button"
+                                className="sidebar-group-trigger"
+                                aria-label={group.label}
+                                title={!wide ? group.label : undefined}
+                                aria-expanded={wide && groupOpen}
+                                aria-controls={id + '-' + group.id}
+                                data-active={current}
+                                onClick={() => {
+                                    if (!wide && !isMobile) setOpen(true);
+                                    setExpanded((previous) => ({
+                                        ...previous,
+                                        [group.id]: !wide || !groupOpen,
+                                    }));
+                                }}
+                            >
+                                <Icon
+                                    size={20}
+                                    className="shrink-0"
+                                    aria-hidden="true"
+                                />
+                                <SidebarLabel>{group.label}</SidebarLabel>
+                                {wide && (
+                                    <ChevronDown
+                                        size={16}
+                                        className={
+                                            groupOpen
+                                                ? 'ms-auto shrink-0 rotate-180 transition-transform duration-200 motion-reduce:transition-none'
+                                                : 'ms-auto shrink-0 transition-transform duration-200 motion-reduce:transition-none'
+                                        }
+                                        aria-hidden="true"
+                                    />
+                                )}
+                            </button>
+                            <motion.div
+                                id={id + '-' + group.id}
+                                inert={!wide || !groupOpen}
+                                aria-hidden={!wide || !groupOpen}
+                                initial={false}
+                                animate={{
+                                    height: wide && groupOpen ? 'auto' : 0,
+                                    opacity: wide && groupOpen ? 1 : 0,
+                                }}
+                                transition={spring}
+                                className="overflow-hidden"
+                            >
+                                <div className="sidebar-group-links">
+                                    {group.links.map((link) => (
+                                        <SidebarLink
+                                            key={link.href}
+                                            link={link}
+                                            aria-current={
+                                                active(link.href)
+                                                    ? 'page'
+                                                    : undefined
+                                            }
+                                        />
+                                    ))}
+                                </div>
+                            </motion.div>
+                        </div>
+                    );
+                })}
+            </nav>
+            <div className="border-sidebar-border flex shrink-0 flex-col gap-2 border-t pt-3">
+                <SidebarLink
+                    link={{
+                        label: t('Log out'),
                         href: logout(),
                         icon: <LogOut size={20} />,
                     }}
@@ -206,9 +290,9 @@ export function AppSidebar() {
                 />
                 <Link
                     href={edit()}
-                    aria-label={auth.user.name + ' — ' + text.settings}
+                    aria-label={auth.user.name + ' — ' + t('Account settings')}
                     onClick={() => setOpenMobile(false)}
-                    className="hover:bg-sidebar-accent focus-visible:outline-ring flex min-h-11 items-center gap-3 overflow-hidden rounded-lg px-2 focus-visible:outline-2 focus-visible:outline-offset-[-2px]"
+                    className="sidebar-account hover:bg-sidebar-accent flex min-h-11 items-center gap-3 overflow-hidden rounded-lg px-2"
                 >
                     <Avatar className="size-7 shrink-0">
                         <AvatarImage

@@ -248,9 +248,9 @@ export function SidebarTrigger({ className }: { className?: string }) {
             {isMobile ? (
                 <Menu size={20} aria-hidden="true" />
             ) : pinned ? (
-                <PanelLeftClose size={20} aria-hidden="true" />
+                <PanelLeftClose size={20} aria-hidden="true" className={dir === 'rtl' ? 'rotate-180' : undefined} />
             ) : (
-                <PanelLeftOpen size={20} aria-hidden="true" />
+                <PanelLeftOpen size={20} aria-hidden="true" className={dir === 'rtl' ? 'rotate-180' : undefined} />
             )}
         </button>
     );
