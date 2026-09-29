@@ -14,6 +14,24 @@ class ProjectDiscoveryTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_guest_search_options_exclude_deleted_categories_and_internal_fields(): void
+    {
+        $visible = Category::create(['categoryname' => 'Public category']);
+        $deleted = Category::create(['categoryname' => 'Removed category']);
+        $deleted->delete();
+
+        $response = $this->getJson('/search/filters')->assertOk();
+        $response->assertJsonFragment(['id' => $visible->id, 'slug' => $visible->slug, 'categoryname' => $visible->categoryname])
+            ->assertJsonMissing(['categoryname' => $deleted->categoryname]);
+        foreach ($response->json('categories') as $category) {
+            $this->assertEqualsCanonicalizing(['id', 'slug', 'categoryname'], array_keys($category));
+        }
+        $this->assertNotEmpty($response->json('skills'));
+        foreach ($response->json('skills') as $skill) {
+            $this->assertEqualsCanonicalizing(['id', 'name'], array_keys($skill));
+        }
+    }
+
     private function project(array $overrides = [], array $skills = []): Project
     {
         $category = Category::create(['categoryname' => 'Development']);

@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Project;
 use App\Models\Skill;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -15,6 +16,14 @@ use Inertia\Response;
 
 class ProjectDiscoveryController extends Controller
 {
+    public function filters(): JsonResponse
+    {
+        return response()->json([
+            'categories' => Category::query()->orderBy('categoryname')->get(['id', 'slug', 'categoryname']),
+            'skills' => Skill::query()->orderBy('name')->get(['id', 'name']),
+        ]);
+    }
+
     public function categories(Request $request): Response
     {
         $q = $request->query('q', '');

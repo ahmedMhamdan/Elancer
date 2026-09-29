@@ -31,6 +31,7 @@ foreach (['how-it-works', 'project-guides', 'inspiration', 'why-elancer', 'resou
     Route::inertia('learn/'.$guide, 'learn/show', ['guide' => $guide])->name('learn.'.$guide);
 }
 
+Route::get('search/filters', [ProjectDiscoveryController::class, 'filters'])->middleware('throttle:60,1')->name('search.filters');
 Route::get('categories', [ProjectDiscoveryController::class, 'categories'])->name('categories.index');
 Route::get('jobs', [ProjectDiscoveryController::class, 'index'])->name('jobs.index');
 Route::get('jobs/{project}', [ProjectDiscoveryController::class, 'show'])->whereNumber('project')->name('jobs.show');
