@@ -1,15 +1,16 @@
 import { usePage } from '@inertiajs/react';
 import {
     ArrowUpRight,
+    BookOpen,
+    Compass,
     FolderKanban,
     LayoutDashboard,
-    LayoutGrid,
-    LogIn,
-    Search,
-    UserPlus,
+    Lightbulb,
+    ListChecks,
     UserRound,
 } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
+import { publicGuides } from '@/data/public-guides';
 import {
     MotionNavigationMenu,
     MotionNavigationMenuContent,
@@ -18,6 +19,8 @@ import {
     MotionNavigationMenuList,
     MotionNavigationMenuTrigger,
 } from '@/components/ui/motion-navigation-menu';
+
+const guideIcons = [Compass, ListChecks, Lightbulb, UserRound, BookOpen];
 
 export default function ExploreSkillsMenu({
     mobile = false,
@@ -28,6 +31,7 @@ export default function ExploreSkillsMenu({
 }) {
     const { t } = useTranslation();
     const { auth } = usePage().props;
+    const guides = publicGuides(t);
     const links = auth.user
         ? [
               {
@@ -59,103 +63,78 @@ export default function ExploreSkillsMenu({
                     ]
                   : []),
           ]
-        : [
-              {
-                  href: '/register',
-                  title: t('Create account'),
-                  description: t('Join as a client or freelancer.'),
-                  icon: UserPlus,
-              },
-              {
-                  href: '/login',
-                  title: t('Log in'),
-                  description: t('Continue where you left off.'),
-                  icon: LogIn,
-              },
-          ];
+        : [];
     return (
         <MotionNavigationMenu mobile={mobile} aria-label={t('Explore Elancer')}>
             <MotionNavigationMenuList>
-                <MotionNavigationMenuItem value="discover">
-                    <MotionNavigationMenuTrigger>
-                        {t('Discover')}
-                    </MotionNavigationMenuTrigger>
-                    <MotionNavigationMenuContent>
-                        <div className="elancer-discovery-menu">
-                            <MotionNavigationMenuLink
-                                href="/freelancers"
-                                onClick={onNavigate}
-                            >
-                                <UserRound size={22} aria-hidden="true" />
-                                <span>
-                                    <strong>{t('Find freelancers')}</strong>
-                                    <span>
-                                        {t(
-                                            'Discover people with the skills you need.',
-                                        )}
-                                    </span>
-                                </span>
-                            </MotionNavigationMenuLink>
-                            <MotionNavigationMenuLink
-                                href="/categories"
-                                onClick={onNavigate}
-                                className="elancer-menu-feature"
-                            >
-                                <LayoutGrid size={25} aria-hidden="true" />
-                                <span>
-                                    <strong>{t('Browse categories')}</strong>
-                                    <span>
-                                        {t(
-                                            'Find the right field for your next project.',
-                                        )}
-                                    </span>
-                                </span>
-                                <ArrowUpRight size={20} aria-hidden="true" />
-                            </MotionNavigationMenuLink>
-                            <MotionNavigationMenuLink
-                                href="/jobs"
-                                onClick={onNavigate}
-                            >
-                                <Search size={22} aria-hidden="true" />
-                                <span>
-                                    <strong>{t('Search jobs')}</strong>
-                                    <span>
-                                        {t(
-                                            'Explore projects by skill, budget, and category.',
-                                        )}
-                                    </span>
-                                </span>
-                                <ArrowUpRight size={18} aria-hidden="true" />
-                            </MotionNavigationMenuLink>
-                        </div>
-                    </MotionNavigationMenuContent>
-                </MotionNavigationMenuItem>
-                <MotionNavigationMenuItem value="account">
-                    <MotionNavigationMenuTrigger>
-                        {auth.user ? t('Your workspace') : t('Get started')}
-                    </MotionNavigationMenuTrigger>
-                    <MotionNavigationMenuContent className="elancer-account-menu">
-                        {links.map(
-                            ({ href, title, description, icon: Icon }) => (
-                                <MotionNavigationMenuLink
-                                    key={href}
-                                    href={href}
-                                    onClick={onNavigate}
-                                >
-                                    <Icon size={21} aria-hidden="true" />
-                                    <span>
-                                        <strong>{title}</strong>
-                                        <span>{description}</span>
-                                    </span>
-                                    <ArrowUpRight
-                                        size={17}
-                                        aria-hidden="true"
-                                    />
-                                </MotionNavigationMenuLink>
-                            ),
-                        )}
-                    </MotionNavigationMenuContent>
-                </MotionNavigationMenuItem>
+                {guides.map((guide, index) => {
+                    const Icon = guideIcons[index];
+                    return (
+                        <MotionNavigationMenuItem
+                            key={guide.id}
+                            value={guide.id}
+                        >
+                            <MotionNavigationMenuTrigger>
+                                {guide.title}
+                            </MotionNavigationMenuTrigger>
+                            <MotionNavigationMenuContent className="elancer-guide-menu">
+                                <div className="elancer-guide-menu-intro">
+                                    <Icon size={22} aria-hidden="true" />
+                                    <p>{guide.intro}</p>
+                                </div>
+                                {guide.sections.map((section) => (
+                                    <MotionNavigationMenuLink
+                                        key={section.id}
+                                        href={
+                                            '/learn/' +
+                                            guide.id +
+                                            '#' +
+                                            section.id
+                                        }
+                                        onClick={onNavigate}
+                                    >
+                                        <span>
+                                            <strong>{section.title}</strong>
+                                            <span>{section.description}</span>
+                                        </span>
+                                        <ArrowUpRight
+                                            size={18}
+                                            aria-hidden="true"
+                                        />
+                                    </MotionNavigationMenuLink>
+                                ))}
+                            </MotionNavigationMenuContent>
+                        </MotionNavigationMenuItem>
+                    );
+                })}
+                {auth.user && (
+                    <MotionNavigationMenuItem value="account">
+                        <MotionNavigationMenuTrigger>
+                            {t('Your workspace')}
+                        </MotionNavigationMenuTrigger>
+                        <MotionNavigationMenuContent className="elancer-account-menu">
+                            {links.map(
+                                ({ href, title, description, icon: Icon }) => (
+                                    <MotionNavigationMenuLink
+                                        key={href}
+                                        href={href}
+                                        onClick={onNavigate}
+                                    >
+                                        <Icon size={21} aria-hidden="true" />
+                                        <span>
+                                            <strong>{title}</strong>
+                                            <span>{description}</span>
+                                        </span>
+                                        <ArrowUpRight
+                                            size={17}
+                                            aria-hidden="true"
+                                        />
+                                    </MotionNavigationMenuLink>
+                                ),
+                            )}
+                        </MotionNavigationMenuContent>
+                    </MotionNavigationMenuItem>
+                )}
             </MotionNavigationMenuList>
         </MotionNavigationMenu>
     );

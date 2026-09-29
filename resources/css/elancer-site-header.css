@@ -98,7 +98,7 @@
 .elancer-home-refined .elancer-hero-content {
     padding-top: 168px;
 }
-@media (max-width: 1023px) {
+@media (max-width: 1279px) {
     .elancer-home-refined .elancer-resizable-navbar {
         margin-bottom: -70px;
     }
@@ -304,4 +304,44 @@
 .elancer-resizable-navbar .site-theme-toggle:hover {
     border-color: var(--el-border-strong);
     background: var(--el-soft);
+}
+
+/* Five learning groups share the supplied motion menu and public header. */
+.elancer-desktop-links .elancer-explore-trigger {
+    padding-inline: 9px;
+    gap: 5px;
+}
+.elancer-guide-menu {
+    width: min(420px, calc(100vw - 32px));
+}
+.elancer-guide-menu-intro {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 4px 12px 8px;
+    padding: 12px 0 16px;
+    border-bottom: 1px solid var(--el-border);
+    color: var(--el-accent);
+}
+.elancer-guide-menu-intro svg {
+    flex-shrink: 0;
+}
+.elancer-guide-menu-intro p {
+    font-size: 14px;
+    line-height: 1.7;
+}
+.elancer-guide-menu .motion-navigation-link {
+    justify-content: space-between;
+}
+.elancer-guide-menu .motion-navigation-link > span {
+    min-width: 0;
+}
+.motion-navigation-mobile .motion-navigation-list {
+    flex-wrap: wrap;
+}
+.motion-navigation-mobile .elancer-guide-menu {
+    width: 100%;
+}
+[dir='rtl'] .elancer-guide-menu .motion-navigation-link > svg {
+    transform: scaleX(-1);
 }

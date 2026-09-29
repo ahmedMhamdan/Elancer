@@ -1262,4 +1262,191 @@ export const arabic: Record<string, string> = {
     'Manage your project drafts.': 'أدر مسودات مشاريعك.',
     'Join as a client or freelancer.': 'انضم كصاحب مشاريع أو مستقل.',
     'Continue where you left off.': 'تابع من حيث توقفت.',
+    'From a first conversation to a clear agreement.':
+        'من أول محادثة إلى اتفاق واضح.',
+    'Hiring a freelancer': 'توظيف مستقل',
+    'Turn your idea into a project that the right people can understand.':
+        'حوّل فكرتك إلى مشروع واضح للمستقل المناسب.',
+    'Describe the outcome, required skills and budget in your project draft. Review it before publishing.':
+        'حدّد النتيجة المطلوبة والمهارات والميزانية في مسودة مشروعك، ثم راجعها قبل النشر.',
+    'Review proposals and portfolio samples. Compare how each freelancer approaches your requirements.':
+        'راجع العروض ونماذج الأعمال، وقارن طريقة كل مستقل في تلبية متطلباتك.',
+    'Start a private conversation after a proposal is submitted, then send a final offer with the agreed terms.':
+        'ابدأ محادثة خاصة بعد تقديم العرض، ثم أرسل عرضًا نهائيًا بالشروط المتفق عليها.',
+    'Working as a freelancer': 'العمل كمستقل',
+    'Show your experience and apply for work that fits your skills.':
+        'اعرض خبرتك وتقدّم للمشاريع المناسبة لمهاراتك.',
+    'Complete onboarding and your profile, add your skills and portfolio, then publish your profile when it is ready.':
+        'أكمل بيانات البداية وملفك الشخصي، وأضف مهاراتك وأعمالك، ثم انشر ملفك عندما يصبح جاهزًا.',
+    'Read the project brief carefully. Explain your approach, ask specific questions and propose a realistic price.':
+        'اقرأ وصف المشروع بعناية، واشرح طريقة عملك، واطرح أسئلة محددة، واقترح سعرًا واقعيًا.',
+    'Review the final offer before accepting. Request changes if the scope, price or delivery duration needs adjustment.':
+        'راجع العرض النهائي قبل قبوله، واطلب التعديل إذا احتاج النطاق أو السعر أو مدة التسليم إلى تغيير.',
+    'Offers and agreements': 'العروض والاتفاقات',
+    'Keep the work, price and expectations in one agreed record.':
+        'اجمع تفاصيل العمل والسعر والتوقعات في اتفاق واحد.',
+    'A final offer records the scope, named deliverables, fixed USD price, calendar-day duration and included revision rounds.':
+        'يسجّل العرض النهائي نطاق العمل والمخرجات المحددة والسعر الثابت بالدولار والمدة بالأيام التقويمية وجولات التعديل المشمولة.',
+    'An offer lasts 72 hours. A client can have one pending offer per project; a replacement creates a separate history entry.':
+        'يبقى العرض متاحًا لمدة 72 ساعة. يمكن لصاحب المشروع إرسال عرض واحد قيد الانتظار لكل مشروع، ويُحفظ أي عرض بديل كسجل مستقل.',
+    'Acceptance preserves an agreement snapshot and closes hiring for that project. Contract messages remain available to its participants.':
+        'يحفظ القبول نسخة ثابتة من الاتفاق ويغلق التوظيف للمشروع. وتبقى رسائل العقد متاحة لطرفيه.',
+    'Funding is not available yet. Accepted contracts await funding, and the delivery clock has not started.':
+        'التمويل غير متاح بعد. تبقى العقود المقبولة بانتظار التمويل، ولا تبدأ مدة التسليم.',
+    'Frequently asked questions': 'الأسئلة الشائعة',
+    'A few useful answers before you start.': 'إجابات مفيدة قبل أن تبدأ.',
+    'Can I hire and freelance with one account? Yes. Switch your workspace for the task you want to do; access still depends on your role in each project.':
+        'هل أستطيع التوظيف والعمل كمستقل بحساب واحد؟ نعم. بدّل مساحة العمل حسب المهمة، وتبقى الصلاحيات مرتبطة بدورك في كل مشروع.',
+    'Does saving my profile publish it? No. Profile publication is a separate action after the required information is complete.':
+        'هل يُنشر ملفي بمجرد حفظه؟ لا. النشر خطوة مستقلة بعد إكمال المعلومات المطلوبة.',
+    'Can I change an accepted agreement? Its recorded terms are preserved. Resolve questions in contract messages rather than assuming the agreement has changed.':
+        'هل أستطيع تغيير اتفاق مقبول؟ تُحفظ شروط الاتفاق كما قُبلت. ناقش الأسئلة في رسائل العقد ولا تفترض أن الاتفاق تغيّر.',
+    'Project guides': 'دليل المشاريع',
+    'A little preparation makes proposals easier to compare.':
+        'التحضير الجيد يجعل مقارنة العروض أسهل.',
+    'Write a project brief': 'كتابة وصف المشروع',
+    'Explain the result you need and who it is for.':
+        'اشرح النتيجة التي تحتاجها ولمن تُقدّم.',
+    'Start with the problem: who is affected, what is missing today and what a successful outcome would change.':
+        'ابدأ بالمشكلة: من يتأثر بها؟ ما الذي ينقصك اليوم؟ وما التغيير الذي ستحققه النتيجة الناجحة؟',
+    'List existing assets, required integrations and constraints. Share references and explain what you like about them.':
+        'اذكر المواد المتاحة والتكاملات المطلوبة والقيود. أرفق مراجع واشرح ما يعجبك فيها.',
+    'Example brief: a bilingual five-page website for a local studio, with service pages, a contact form and editable content.':
+        'مثال لوصف مشروع: موقع ثنائي اللغة لاستوديو محلي من خمس صفحات، مع صفحات للخدمات ونموذج تواصل ومحتوى قابل للتحرير.',
+    'Define deliverables': 'تحديد المخرجات',
+    'Make completion something both sides can check.':
+        'اجعل اكتمال العمل أمرًا يستطيع الطرفان التحقق منه.',
+    'Name each item: pages, screens, files, source code or documentation. Specify formats and what must be editable.':
+        'سمِّ كل عنصر: صفحات أو شاشات أو ملفات أو شفرة مصدرية أو توثيق. حدّد الصيغ وما يجب أن يكون قابلًا للتحرير.',
+    'Describe acceptance criteria, such as supported screen sizes, languages and the main tasks a user must complete.':
+        'صف معايير القبول، مثل أحجام الشاشات واللغات المدعومة والمهام الأساسية التي يجب أن ينجزها المستخدم.',
+    'State what is excluded and how many revision rounds are included. Separate corrections from additional features.':
+        'وضّح ما لا يشمله العمل وعدد جولات التعديل المتفق عليها، وميّز بين التصحيحات والميزات الإضافية.',
+    'Set a budget': 'تحديد الميزانية',
+    'Connect your budget to scope and priorities.':
+        'اربط الميزانية بنطاق العمل وأولوياتك.',
+    'Separate essential deliverables from optional improvements. Reduce scope if your budget cannot cover both.':
+        'افصل المخرجات الأساسية عن التحسينات الاختيارية، وقلّص النطاق إذا لم تكفِ الميزانية لكليهما.',
+    'Account for complexity, research, revisions and handover. Ask freelancers to explain what their quoted price includes.':
+        'راعِ التعقيد والبحث والتعديلات وتسليم الملفات، واطلب من المستقل توضيح ما يشمله السعر.',
+    'Project budgets are guidance; proposals may differ. The accepted final offer fixes the agreed price in USD.':
+        'ميزانية المشروع تقديرية وقد تختلف عنها العروض. يحدّد العرض النهائي المقبول السعر المتفق عليه بالدولار.',
+    'Compare proposals': 'مقارنة العروض',
+    'Look for understanding as well as a price.':
+        'ابحث عن فهم المشروع إلى جانب السعر.',
+    'Compare relevant experience, the proposed approach, availability and how clearly the freelancer addresses your brief.':
+        'قارن الخبرة ذات الصلة وطريقة التنفيذ والتفرغ ومدى وضوح استجابة المستقل لوصف مشروعك.',
+    'Ask shortlisted applicants the same key questions so you can compare answers fairly.':
+        'اطرح الأسئلة الأساسية نفسها على المرشحين لتتمكن من مقارنة إجاباتهم بإنصاف.',
+    'Clarify ownership of final files, handover expectations and revisions before sending the final offer.':
+        'وضّح ملكية الملفات النهائية ومتطلبات التسليم والتعديلات قبل إرسال العرض النهائي.',
+    'Get inspired': 'استلهم أفكارًا',
+    'Starting points for your next brief, ready to adapt to your needs.':
+        'أفكار أولية لوصف مشروعك القادم، يمكنك تكييفها مع احتياجاتك.',
+    'Website examples': 'أفكار للمواقع',
+    'A bilingual website for an independent studio.':
+        'موقع ثنائي اللغة لاستوديو مستقل.',
+    'Give visitors a clear introduction, a small selection of work, service details and a simple way to get in touch.':
+        'قدّم للزائر تعريفًا واضحًا ونماذج مختارة من الأعمال وتفاصيل الخدمات وطريقة بسيطة للتواصل.',
+    'Possible deliverables: a responsive five-page site, editable project entries, a contact form and a short handover guide.':
+        'مخرجات مقترحة: موقع متجاوب من خمس صفحات، وأعمال قابلة للتحرير، ونموذج تواصل، ودليل مختصر للتسليم.',
+    'Brand identities': 'أفكار للهويات البصرية',
+    'A consistent visual identity for a neighbourhood cafe.':
+        'هوية بصرية متناسقة لمقهى محلي.',
+    'Choose the audience, personality and places the identity will appear before deciding on a visual direction.':
+        'حدّد الجمهور وشخصية العلامة ومواضع استخدامها قبل اختيار الاتجاه البصري.',
+    'Possible deliverables: logo variations, colour and typography guidance, menu layout and reusable social post templates.':
+        'مخرجات مقترحة: نسخ الشعار، ودليل الألوان والخطوط، وتصميم القائمة، وقوالب منشورات قابلة لإعادة الاستخدام.',
+    'App designs': 'أفكار لتصميم التطبيقات',
+    'An appointment-booking experience for a small service business.':
+        'تجربة لحجز المواعيد في مشروع خدمات صغير.',
+    'Map the journey from choosing a service to selecting a time and receiving confirmation. Include empty and error states.':
+        'ارسم رحلة المستخدم من اختيار الخدمة والوقت إلى تأكيد الحجز، مع مراعاة حالات عدم وجود بيانات والأخطاء.',
+    'Possible deliverables: user flows, a clickable prototype, mobile screen designs and a reusable component library.':
+        'مخرجات مقترحة: مسارات المستخدم، ونموذج تفاعلي، وتصميم شاشات الهاتف، ومكتبة عناصر قابلة لإعادة الاستخدام.',
+    'Featured portfolios': 'معارض أعمال مختارة',
+    'Meet people through the work they choose to share.':
+        'تعرّف إلى المستقلين من خلال الأعمال التي يختارون مشاركتها.',
+    'No portfolios have been selected for this showcase yet. Explore published freelancer profiles to see the work available now.':
+        'لم تُختَر معارض أعمال لهذا القسم بعد. تصفّح ملفات المستقلين المنشورة للاطلاع على الأعمال المتاحة حاليًا.',
+    'A future feature will credit its creator and use work approved for publication. The examples above are editorial ideas, not completed client projects.':
+        'سيذكر أي عرض مستقبلي صاحب العمل ويستخدم أعمالًا معتمدة للنشر. الأفكار أعلاه أمثلة توضيحية وليست مشاريع منجزة لعملاء.',
+    'Explore freelancer profiles': 'تصفّح ملفات المستقلين',
+    'Why Elancer': 'لماذا إيلانسر',
+    'A shared place for independent skills and well-defined projects.':
+        'مساحة تجمع المهارات المستقلة والمشاريع واضحة التفاصيل.',
+    'About the platform': 'عن المنصة',
+    'Built around clear communication and fixed-price project agreements.':
+        'منصة تقوم على التواصل الواضح واتفاقات المشاريع بسعر ثابت.',
+    'Clients describe projects and review proposals. Freelancers publish their experience and choose work suited to their skills.':
+        'يصف أصحاب المشاريع احتياجاتهم ويراجعون العروض، وينشر المستقلون خبراتهم ويختارون المشاريع المناسبة لمهاراتهم.',
+    'English and Arabic interfaces support the same workflows. One account can use both client and freelancer workspaces.':
+        'تدعم الواجهتان العربية والإنجليزية مسارات العمل نفسها، ويمكن للحساب الواحد استخدام مساحة صاحب المشاريع ومساحة المستقل.',
+    'Collaboration tools': 'أدوات التعاون',
+    'Keep hiring discussions close to the proposal and agreement.':
+        'أبقِ نقاشات التوظيف مرتبطة بالعرض والاتفاق.',
+    'Clients can invite freelancers, shortlist proposals and compare applicants before choosing who to work with.':
+        'يمكن لصاحب المشروع دعوة المستقلين وحفظ العروض في القائمة المختصرة ومقارنة المتقدمين قبل الاختيار.',
+    'Private hiring conversations connect project participants. Accepted contracts keep their own conversation and agreement record.':
+        'تجمع محادثات التوظيف الخاصة أطراف المشروع، وتحافظ العقود المقبولة على محادثتها وسجل اتفاقها.',
+    'Formal delivery, payment and revision workflows are still upcoming. Current contract screens show when funding has not started.':
+        'مسارات التسليم الرسمي والدفع والتعديلات ما زالت قادمة. توضّح شاشات العقود الحالية أن التمويل لم يبدأ.',
+    'How agreements work': 'كيف تعمل الاتفاقات',
+    'Make the final terms explicit before accepting.':
+        'اجعل الشروط النهائية واضحة قبل القبول.',
+    'A proposal starts the discussion. A final offer records the exact scope, price, duration and revisions the two sides agree to.':
+        'يبدأ العرض الأولي النقاش، ويسجّل العرض النهائي النطاق والسعر والمدة والتعديلات التي يتفق عليها الطرفان.',
+    'Acceptance saves a fixed copy of those terms. A later profile edit does not rewrite the recorded agreement.':
+        'يحفظ القبول نسخة ثابتة من الشروط، ولا تؤدي التعديلات اللاحقة على الملف الشخصي إلى تغيير سجل الاتفاق.',
+    'Read the agreement guide': 'اقرأ دليل الاتفاقات',
+    'Success stories': 'قصص النجاح',
+    'Real experiences will belong here.': 'هنا ستكون التجارب الحقيقية.',
+    'We have not published verified customer success stories yet. We will share them with the participants’ permission when they are available.':
+        'لم ننشر قصص نجاح موثّقة للعملاء بعد. سنشاركها بإذن أصحابها عندما تتوفر.',
+    'Until then, explore sample project ideas or published profiles without treating them as customer endorsements.':
+        'حتى ذلك الحين، تصفّح أفكار المشاريع التوضيحية أو الملفات المنشورة، دون اعتبارها شهادات توصية من العملاء.',
+    'Explore project ideas': 'استكشف أفكار المشاريع',
+    Resources: 'مصادر مفيدة',
+    'Practical guidance for both sides of a project.':
+        'إرشادات عملية لكلا طرفي المشروع.',
+    'Client guide': 'دليل أصحاب المشاريع',
+    'Prepare the details that make a collaboration easier.':
+        'جهّز التفاصيل التي تجعل التعاون أسهل.',
+    'Write the brief, decide which deliverables matter most and identify the assets you can provide.':
+        'اكتب وصف المشروع وحدّد أهم المخرجات والمواد التي يمكنك توفيرها.',
+    'Compare proposals, clarify questions in messages and review every term before sending a final offer.':
+        'قارن العروض ووضّح الأسئلة في الرسائل وراجع كل شرط قبل إرسال العرض النهائي.',
+    'Open the project guides': 'افتح دليل المشاريع',
+    'Freelancer guide': 'دليل المستقلين',
+    'Make your experience easy to understand.': 'اعرض خبرتك بطريقة يسهل فهمها.',
+    'Use a specific headline and explain your contribution to portfolio work. Only publish material you have permission to share.':
+        'استخدم عنوانًا مهنيًا محددًا واشرح مساهمتك في أعمالك، وانشر فقط المواد المسموح لك بمشاركتها.',
+    'Tailor each proposal to the brief. State assumptions, realistic timing and what is included in your price.':
+        'خصّص كل عرض لوصف المشروع، ووضّح افتراضاتك والوقت الواقعي وما يشمله السعر.',
+    'Read final offers carefully. Ask for changes before acceptance when expectations do not match.':
+        'اقرأ العروض النهائية بعناية واطلب التعديلات قبل القبول إذا اختلفت التوقعات.',
+    'Read the freelancer walkthrough': 'اقرأ خطوات العمل كمستقل',
+    'Help centre': 'مركز المساعدة',
+    'Start with the common questions and account controls.':
+        'ابدأ بالأسئلة الشائعة وإعدادات الحساب.',
+    'For access problems, use the password reset option on the login page or your connected sign-in provider.':
+        'عند تعذّر الدخول، استخدم خيار إعادة تعيين كلمة المرور في صفحة الدخول أو مزوّد تسجيل الدخول المرتبط بحسابك.',
+    'Language and appearance controls are in the navigation. Account and security options are available in Settings after sign-in.':
+        'ستجد أدوات اللغة والمظهر في شريط التنقل، وخيارات الحساب والأمان في الإعدادات بعد تسجيل الدخول.',
+    'For project questions, keep the discussion in the relevant conversation so both participants can refer to it. This page is a self-service guide, not a support ticket form.':
+        'لأسئلة المشروع، أبقِ النقاش في المحادثة المرتبطة به ليتمكن الطرفان من الرجوع إليه. هذه الصفحة دليل للمساعدة الذاتية وليست نموذجًا لتذاكر الدعم.',
+    'Read common questions': 'اقرأ الأسئلة الشائعة',
+    'Platform updates': 'تحديثات المنصة',
+    'What is available, and what is still being built.':
+        'ما هو متاح، وما زال قيد التطوير.',
+    'September 2026: profiles, project discovery, proposals, invitations and private hiring conversations are available.':
+        'سبتمبر 2026: الملفات الشخصية وتصفّح المشاريع والعروض والدعوات ومحادثات التوظيف الخاصة متاحة.',
+    'Google and GitHub sign-in, final offers and recorded contract agreements have been added.':
+        'أُضيف تسجيل الدخول باستخدام Google وGitHub، والعروض النهائية، وسجلات اتفاقات العقود.',
+    'Coming later: sandbox funding and formal delivery workflows. No real payment collection is available in the current project.':
+        'لاحقًا: التمويل التجريبي ومسارات التسليم الرسمي. تحصيل المدفوعات الحقيقية غير متاح في المشروع الحالي.',
+    'On this page': 'في هذه الصفحة',
+    'Illustrative project idea': 'فكرة مشروع توضيحية',
+    'Explore another guide': 'تصفّح دليلًا آخر',
+    'Elancer guides': 'أدلة إيلانسر',
 };

@@ -33,10 +33,10 @@ export function NavBody({ children, className, visible }: NavBodyProps) {
         <motion.div
             initial={false}
             style={{ maxWidth: 1280 }}
-            animate={{ maxWidth: visible ? 1000 : 1280, y: visible ? 4 : 0 }}
+            animate={{ maxWidth: visible ? 1220 : 1280, y: visible ? 4 : 0 }}
             transition={reduceMotion ? { duration: 0 } : { duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             data-compact={visible}
-            className={cn('elancer-resizable-body relative mx-auto hidden w-[calc(100%-2rem)] items-center justify-between gap-6 rounded-full px-6 py-3 lg:flex', className)}
+            className={cn('elancer-resizable-body relative mx-auto hidden w-[calc(100%-2rem)] items-center justify-between gap-3 rounded-full px-4 py-3 min-[1280px]:flex', className)}
         >{children}</motion.div>
     );
 }
@@ -65,7 +65,7 @@ export function MobileNav({ children, className, visible }: NavBodyProps) {
         <motion.div initial={false} data-mobile-navbar data-compact={visible}
             animate={{ y: visible ? 4 : 0, width: visible ? 'calc(100% - 2rem)' : 'calc(100% - 1rem)' }}
             transition={reduceMotion ? { duration: 0 } : { duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            className={cn('elancer-resizable-body relative mx-auto flex w-[calc(100%-1rem)] flex-col rounded-[28px] px-4 py-2 lg:hidden', className)}
+            className={cn('elancer-resizable-body relative mx-auto flex w-[calc(100%-1rem)] flex-col rounded-[28px] px-4 py-2 min-[1280px]:hidden', className)}
         >{children}</motion.div>
     );
 }
