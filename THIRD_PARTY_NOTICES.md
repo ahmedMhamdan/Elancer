@@ -158,3 +158,7 @@ slice: src/components/form/form-elements/DefaultInputs.tsx,
 src/components/common/ComponentCard.tsx and src/components/ui/button/Button.tsx.
 Forms and agreement summaries retain existing Elancer panels, theme tokens,
 English/Arabic labels and RTL behavior. The MIT license above applies.
+
+## Grouped navigation and scoped search (2026-09-29)
+
+Workspace grouping adapts local TailAdmin src/layout/AppSidebar.tsx while preserving the supplied sidebar primitive. Search filter controls adapt src/components/form/form-elements/SelectInputs.tsx, with Elancer tokens and existing catalog filters. The TailAdmin MIT notice above applies.

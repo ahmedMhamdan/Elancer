@@ -1455,4 +1455,23 @@ export const arabic: Record<string, string> = {
     'Admin access': 'صلاحيات الإدارة',
     'Elancer dashboard': 'لوحة تحكم إيلانسر',
     'Account settings': 'إعدادات الحساب',
+    'Search type': 'نوع البحث',
+    'Search jobs by title or keyword':
+        'ابحث عن مشاريع بالعنوان أو بكلمة مفتاحية',
+    'Search freelancers by name or expertise':
+        'ابحث عن مستقلين بالاسم أو التخصص',
+    'Search categories by name': 'ابحث عن تصنيف بالاسم',
+    'For freelancers: find projects that fit your skills.':
+        'للمستقلين: اعثر على مشاريع تناسب مهاراتك.',
+    'For business owners: find the right person for your project.':
+        'لأصحاب الأعمال: اعثر على المستقل المناسب لمشروعك.',
+    'Explore fields of work and the projects in each category.':
+        'تصفّح مجالات العمل والمشاريع في كل تصنيف.',
+    'Could not load search filters.': 'تعذّر تحميل خيارات البحث.',
+    'Loading filters…': 'جارٍ تحميل خيارات البحث…',
+    'Minimum budget (USD)': 'الحد الأدنى للميزانية (دولار)',
+    'Maximum budget (USD)': 'الحد الأعلى للميزانية (دولار)',
+    Jobs: 'المشاريع',
+    Freelancers: 'المستقلون',
+    'Try again': 'حاول مجددًا',
 };
