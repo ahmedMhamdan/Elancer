@@ -1,188 +1,295 @@
-﻿// Compose controls reuse local TailAdmin form/form-elements/TextAreaInput.tsx and existing adapted buttons.
-import { Link, router, useForm } from '@inertiajs/react';
-import { useState } from 'react';
-import Button from '@/components/tailadmin/button';
-import TextArea from '@/components/tailadmin/textarea';
+// Compose/correction controls reuse the inspected local TailAdmin TextArea/Button sources.
+import { Link, router, useForm, usePage } from '@inertiajs/react';
+import {
+    Archive,
+    ArchiveRestore,
+    CheckCheck,
+    MoreHorizontal,
+    RefreshCw,
+    Send,
+    ShieldBan,
+} from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import InputError from '@/components/input-error';
+import Button from '@/components/tailadmin/button';
 import Pagination from '@/components/tailadmin/pagination';
+import TextArea from '@/components/tailadmin/textarea';
+import {
+    ChatTemplate,
+    type ConversationFilters,
+} from '@/components/ui/chat-template';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useTranslation } from '@/hooks/use-translation';
-import { type Page } from '@/pages/discovery/shared';
+import { cn } from '@/lib/utils';
+import type { Page } from '@/pages/discovery/shared';
 import {
     MessageLayout,
     type ConversationSummary,
     type Message,
 } from './shared';
 
-function MessageItem({ message }: { message: Message }) {
+function MessageItem({
+    message,
+    counterpart,
+}: {
+    message: Message;
+    counterpart: string;
+}) {
     const { t, locale } = useTranslation();
     const [editing, setEditing] = useState(false);
     const form = useForm({ body: message.body, version: message.version });
     return (
-        <article className="market-panel market-stack">
-            <div className="market-actions">
-                <strong>{message.mine ? t('You') : t('Counterpart')}</strong>
-                <time dateTime={message.created_at}>
-                    {new Date(message.created_at).toLocaleString(locale, {
-                        timeZoneName: 'short',
-                    })}
-                </time>
-                {message.edited_at && <span>{t('Edited')}</span>}
-            </div>
-            {editing ? (
-                <form
-                    className="market-stack"
-                    onSubmit={(event) => {
-                        event.preventDefault();
-                        form.patch(`/messages/items/${message.id}`, {
-                            preserveScroll: true,
-                            onSuccess: () => setEditing(false),
-                        });
-                    }}
-                >
-                    <div className="market-field">
-                        <label htmlFor={`correction-${message.id}`}>
+        <article
+            className={cn('chat-message', message.mine && 'chat-message-mine')}
+            aria-label={message.mine ? t('You') : counterpart}
+        >
+            <div className="chat-bubble">
+                {editing ? (
+                    <form
+                        className="chat-edit space-y-3"
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            form.patch('/messages/items/' + message.id, {
+                                preserveScroll: true,
+                                onSuccess: () => setEditing(false),
+                            });
+                        }}
+                    >
+                        <label
+                            className="block text-sm font-medium"
+                            htmlFor={'correction-' + message.id}
+                        >
                             {t('Correct message')}
                         </label>
                         <TextArea
-                            id={`correction-${message.id}`}
+                            id={'correction-' + message.id}
                             value={form.data.body}
                             onChange={(value) => form.setData('body', value)}
                             required
                             maxLength={10000}
+                            autoFocus
+                            aria-invalid={!!form.errors.body}
                         />
-                    </div>
-                    <InputError message={form.errors.body} />
-                    <div className="market-actions">
-                        <Button type="submit" disabled={form.processing}>
-                            {t('Save correction')}
-                        </Button>
-                        <Button
-                            variant="outline"
-                            onClick={() => setEditing(false)}
-                        >
-                            {t('Cancel')}
-                        </Button>
-                    </div>
-                </form>
-            ) : (
-                <p className="market-prose break-words" dir="auto">
-                    {message.body}
-                </p>
-            )}
-            {message.can_edit && !editing && (
-                <div>
-                    <Button
-                        variant="outline"
-                        onClick={() => {
-                            form.setData({
-                                body: message.body,
-                                version: message.version,
-                            });
-                            setEditing(true);
-                        }}
+                        <InputError message={form.errors.body} />
+                        <div className="flex flex-wrap gap-2">
+                            <Button
+                                type="submit"
+                                disabled={
+                                    form.processing || !form.data.body.trim()
+                                }
+                            >
+                                {t('Save correction')}
+                            </Button>
+                            <Button
+                                variant="outline"
+                                disabled={form.processing}
+                                onClick={() => setEditing(false)}
+                            >
+                                {t('Cancel')}
+                            </Button>
+                        </div>
+                    </form>
+                ) : (
+                    <p
+                        className="text-sm leading-7 whitespace-pre-wrap"
+                        dir="auto"
                     >
-                        {t('Correct message')}
-                    </Button>
+                        {message.body}
+                    </p>
+                )}
+                <div className="chat-message-meta">
+                    <span>{message.mine ? t('You') : counterpart}</span>
+                    <time dateTime={message.created_at}>
+                        {new Date(message.created_at).toLocaleString(locale, {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit',
+                        })}
+                    </time>
+                    {message.edited_at && <span>{t('Edited')}</span>}
                 </div>
-            )}
-            {!!message.revisions.length && (
-                <details>
-                    <summary className="cursor-pointer">
-                        {t('Correction history')}
-                    </summary>
-                    <ol className="market-stack mt-3">
-                        {message.revisions.map((revision) => (
-                            <li key={revision.version}>
-                                <p
-                                    className="market-prose break-words"
-                                    dir="auto"
-                                >
-                                    {revision.body}
-                                </p>
-                                <time dateTime={revision.created_at}>
-                                    {new Date(
-                                        revision.created_at,
-                                    ).toLocaleString(locale, {
-                                        timeZoneName: 'short',
-                                    })}
-                                </time>
-                            </li>
-                        ))}
-                    </ol>
-                </details>
-            )}
+                {(message.can_edit || message.revisions.length > 0) && (
+                    <div className="chat-message-actions">
+                        {message.can_edit && !editing && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    form.setData({
+                                        body: message.body,
+                                        version: message.version,
+                                    });
+                                    setEditing(true);
+                                }}
+                            >
+                                {t('Correct message')}
+                            </button>
+                        )}
+                        {!!message.revisions.length && (
+                            <details>
+                                <summary>{t('Correction history')}</summary>
+                                <ol className="mt-2 space-y-3 border-t border-current/20 pt-3">
+                                    {message.revisions.map((revision) => (
+                                        <li key={revision.version}>
+                                            <p
+                                                className="text-sm leading-relaxed whitespace-pre-wrap"
+                                                dir="auto"
+                                            >
+                                                {revision.body}
+                                            </p>
+                                            <time
+                                                dateTime={revision.created_at}
+                                            >
+                                                {new Date(
+                                                    revision.created_at,
+                                                ).toLocaleString(locale, {
+                                                    timeZoneName: 'short',
+                                                })}
+                                            </time>
+                                        </li>
+                                    ))}
+                                </ol>
+                            </details>
+                        )}
+                    </div>
+                )}
+            </div>
         </article>
     );
 }
 
-export default function Show({
-    conversation,
-    messages,
-    writable,
-    visibleThrough,
-}: {
+type ShowProps = {
     conversation: ConversationSummary;
+    conversations: Page<ConversationSummary>;
+    filters: ConversationFilters;
     messages: Page<Message>;
     writable: boolean;
     visibleThrough: number;
-}) {
-    const { t } = useTranslation();
-    const form = useForm({ body: '', client_token: crypto.randomUUID() });
+};
+
+export default function Show(props: ShowProps) {
     return (
         <MessageLayout>
-            <section className="market-panel market-stack">
-                <h2 dir="auto">{conversation.project.title}</h2>
-                <p dir="auto">{conversation.counterpart}</p>
-                <div className="market-actions">
-                    <Link href={`/proposals/${conversation.proposal_id}`}>
-                        {t('View proposal')}
-                    </Link>
-                    <Button
-                        variant="outline"
-                        onClick={() =>
-                            router.reload({
-                                only: [
-                                    'messages',
-                                    'conversation',
-                                    'writable',
-                                    'visibleThrough',
-                                ],
-                            })
-                        }
+            <ConversationChat key={props.conversation.id} {...props} />
+        </MessageLayout>
+    );
+}
+
+function ConversationChat({
+    conversation,
+    conversations,
+    filters,
+    messages,
+    writable,
+    visibleThrough,
+}: ShowProps) {
+    const { t, ar } = useTranslation();
+    const page = usePage();
+    const form = useForm({ body: '', client_token: crypto.randomUUID() });
+    const [refreshing, setRefreshing] = useState(false);
+    const thread = useRef<HTMLDivElement>(null);
+    const latestId = messages.data[0]?.id;
+    useEffect(() => {
+        if (thread.current)
+            thread.current.scrollTop = thread.current.scrollHeight;
+    }, [conversation.id, messages.current_page, latestId]);
+    const header = (
+        <div className="flex shrink-0 gap-1">
+            <button
+                type="button"
+                className="chat-icon-button"
+                disabled={refreshing}
+                aria-label={t('Refresh messages')}
+                onClick={() => {
+                    setRefreshing(true);
+                    router.reload({
+                        only: [
+                            'messages',
+                            'conversation',
+                            'conversations',
+                            'writable',
+                            'visibleThrough',
+                        ],
+                        onFinish: () => setRefreshing(false),
+                    });
+                }}
+            >
+                <RefreshCw
+                    className={cn(
+                        'size-4',
+                        refreshing && 'motion-safe:animate-spin',
+                    )}
+                    aria-hidden="true"
+                />
+            </button>
+            <DropdownMenu dir={ar ? 'rtl' : 'ltr'}>
+                <DropdownMenuTrigger asChild>
+                    <button
+                        type="button"
+                        className="chat-icon-button"
+                        aria-label={t('Conversation actions')}
                     >
-                        {t('Refresh messages')}
-                    </Button>
+                        <MoreHorizontal className="size-5" aria-hidden="true" />
+                    </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                    <DropdownMenuItem asChild>
+                        <Link href={'/proposals/' + conversation.proposal_id}>
+                            {t('View proposal')}
+                        </Link>
+                    </DropdownMenuItem>
+                    {conversation.contract_id && (
+                        <DropdownMenuItem asChild>
+                            <Link
+                                href={'/contracts/' + conversation.contract_id}
+                            >
+                                {t('Open contract')}
+                            </Link>
+                        </DropdownMenuItem>
+                    )}
+                    <DropdownMenuSeparator />
                     {conversation.unread > 0 && visibleThrough > 0 && (
-                        <Button
-                            variant="outline"
-                            onClick={() =>
+                        <DropdownMenuItem
+                            onSelect={() =>
                                 router.patch(
-                                    `/messages/${conversation.id}/state`,
+                                    '/messages/' + conversation.id + '/state',
                                     { read_through: visibleThrough },
                                     { preserveScroll: true },
                                 )
                             }
                         >
+                            <CheckCheck aria-hidden="true" />
                             {t('Mark conversation as read')}
-                        </Button>
+                        </DropdownMenuItem>
                     )}
-                    <Button
-                        variant="outline"
-                        onClick={() =>
+                    <DropdownMenuItem
+                        onSelect={() =>
                             router.patch(
-                                `/messages/${conversation.id}/state`,
+                                '/messages/' + conversation.id + '/state',
                                 { archived: !conversation.archived },
                                 { preserveScroll: true },
                             )
                         }
                     >
+                        {conversation.archived ? (
+                            <ArchiveRestore aria-hidden="true" />
+                        ) : (
+                            <Archive aria-hidden="true" />
+                        )}
                         {conversation.archived
                             ? t('Unarchive')
                             : t('Archive conversation')}
-                    </Button>
-                    <Button
-                        variant="danger-outline"
-                        onClick={() => {
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                        className="text-destructive"
+                        onSelect={() => {
                             if (
                                 window.confirm(
                                     t(
@@ -191,66 +298,113 @@ export default function Show({
                                 )
                             )
                                 router.post(
-                                    `/messages/${conversation.id}/block`,
+                                    '/messages/' + conversation.id + '/block',
                                 );
                         }}
                     >
+                        <ShieldBan aria-hidden="true" />
                         {t('Block account')}
-                    </Button>
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+        </div>
+    );
+    const composer = writable ? (
+        <form
+            className="chat-composer"
+            onSubmit={(event) => {
+                event.preventDefault();
+                form.post(page.url, {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        form.setData({
+                            body: '',
+                            client_token: crypto.randomUUID(),
+                        });
+                        document.getElementById('message-body')?.focus();
+                    },
+                });
+            }}
+        >
+            <label htmlFor="message-body" className="sr-only">
+                {t('Message')}
+            </label>
+            <div className="flex items-end gap-2">
+                <div className="min-w-0 flex-1">
+                    <TextArea
+                        id="message-body"
+                        rows={2}
+                        required
+                        maxLength={10000}
+                        value={form.data.body}
+                        onChange={(value) => form.setData('body', value)}
+                        placeholder={t('Type a message')}
+                        aria-describedby="message-help"
+                        aria-invalid={!!form.errors.body}
+                        disabled={form.processing}
+                        dir="auto"
+                    />
                 </div>
-            </section>
-            {!writable && (
-                <p role="status" className="market-panel">
-                    {t('This hiring conversation is read-only.')}
-                </p>
-            )}
-            <div className="market-stack">
+                <Button
+                    type="submit"
+                    className="mb-1 min-h-11"
+                    disabled={form.processing || !form.data.body.trim()}
+                    startIcon={
+                        <Send
+                            className="size-4 rtl:rotate-180"
+                            aria-hidden="true"
+                        />
+                    }
+                >
+                    <span className="sr-only sm:not-sr-only">
+                        {form.processing ? t('Sending...') : t('Send message')}
+                    </span>
+                </Button>
+            </div>
+            <InputError message={form.errors.body} />
+            <p
+                id="message-help"
+                className="text-muted-foreground mt-2 text-xs leading-relaxed"
+            >
+                {t(
+                    'You can correct sent text for 15 minutes. Messages cannot be deleted.',
+                )}
+            </p>
+        </form>
+    ) : (
+        <p role="status" className="chat-readonly">
+            {t('This hiring conversation is read-only.')}
+        </p>
+    );
+    return (
+        <ChatTemplate
+            conversations={conversations}
+            filters={filters}
+            selected={conversation}
+            header={header}
+            composer={composer}
+        >
+            <div
+                ref={thread}
+                className="chat-thread"
+                tabIndex={0}
+                role="region"
+                aria-label={t('Message history')}
+                aria-busy={refreshing}
+            >
+                {messages.last_page > 1 && (
+                    <div className="mb-5">
+                        <Pagination data={messages} />
+                    </div>
+                )}
                 {[...messages.data].reverse().map((message) => (
-                    <MessageItem key={message.id} message={message} />
+                    <MessageItem
+                        key={message.id}
+                        message={message}
+                        counterpart={conversation.counterpart}
+                    />
                 ))}
             </div>
-            <Pagination data={messages} />
-            {writable && (
-                <form
-                    className="market-panel market-stack"
-                    onSubmit={(event) => {
-                        event.preventDefault();
-                        form.post(`/messages/${conversation.id}`, {
-                            preserveScroll: true,
-                            onSuccess: () =>
-                                form.setData({
-                                    body: '',
-                                    client_token: crypto.randomUUID(),
-                                }),
-                        });
-                    }}
-                >
-                    <label className="market-field">
-                        <span>{t('Message')}</span>
-                        <TextArea
-                            rows={4}
-                            required
-                            maxLength={10000}
-                            value={form.data.body}
-                            onChange={(value) => form.setData('body', value)}
-                        />
-                    </label>
-                    <InputError message={form.errors.body} />
-                    <p className="market-muted">
-                        {t(
-                            'You can correct sent text for 15 minutes. Messages cannot be deleted.',
-                        )}
-                    </p>
-                    <div>
-                        <Button
-                            type="submit"
-                            disabled={form.processing || !form.data.body.trim()}
-                        >
-                            {t('Send message')}
-                        </Button>
-                    </div>
-                </form>
-            )}
-        </MessageLayout>
+        </ChatTemplate>
     );
 }
