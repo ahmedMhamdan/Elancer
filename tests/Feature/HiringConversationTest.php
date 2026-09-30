@@ -125,4 +125,34 @@ class HiringConversationTest extends TestCase
         $this->actingAs($freelancer)->get('/messages/'.$conversation->id)->assertOk();
         $this->assertDatabaseCount('conversation_messages', 1);
     }
+
+    public function test_chat_search_previews_and_unread_filters_do_not_expose_other_threads(): void
+    {
+        [$client, $freelancer, $proposal] = $this->participants();
+        $freelancer->forceFill(['name' => 'Shared search name'])->save();
+        $conversation = $this->start($client, $proposal);
+        $this->actingAs($freelancer)->post('/messages/'.$conversation->id, ['body' => 'Participant preview.', 'client_token' => (string) Str::uuid()])->assertRedirect();
+        [$otherClient, $otherFreelancer, $otherProposal] = $this->participants();
+        $otherFreelancer->forceFill(['name' => 'Shared search name'])->save();
+        $otherConversation = $this->start($otherClient, $otherProposal);
+
+        $this->actingAs($client)->get('/messages?q=Shared&unread=1')->assertInertia(fn (Assert $page) => $page
+            ->has('conversations.data', 1)
+            ->where('conversations.data.0.id', $conversation->id)
+            ->where('conversations.data.0.preview', 'Participant preview.')
+            ->missing('conversations.data.0.freelancer_read_through'));
+        $this->get('/messages/'.$conversation->id.'?q=Shared&unread=1')->assertInertia(fn (Assert $page) => $page
+            ->has('conversations.data', 1)->where('conversations.data.0.id', $conversation->id)
+            ->where('conversation.preview', 'Participant preview.'));
+        $this->get('/messages?q=application')->assertInertia(fn (Assert $page) => $page->has('conversations.data', 1));
+        $this->get('/messages/'.$otherConversation->id.'?q=Shared')->assertNotFound();
+        $this->get('/messages?kind=contracts')->assertInertia(fn (Assert $page) => $page->has('conversations.data', 0));
+        $latest = $conversation->messages()->max('id');
+        $this->patch('/messages/'.$conversation->id.'/state', ['read_through' => $latest, 'archived' => true])->assertRedirect();
+        $this->get('/messages?unread=1&archived=1')->assertInertia(fn (Assert $page) => $page->has('conversations.data', 0));
+        $this->get('/messages?archived=1&q=Shared')->assertInertia(fn (Assert $page) => $page->has('conversations.data', 1));
+        $this->actingAs($freelancer)->get('/messages?archived=1')->assertInertia(fn (Assert $page) => $page->has('conversations.data', 0));
+        $this->get('/messages?unread=1')->assertInertia(fn (Assert $page) => $page->has('conversations.data', 1)->where('conversations.data.0.id', $conversation->id));
+        $this->get('/messages?q='.str_repeat('x', 101))->assertRedirect()->assertSessionHasErrors('q');
+    }
 }

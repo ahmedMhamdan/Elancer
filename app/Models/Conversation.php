@@ -6,6 +6,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @property int $id
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property bool $client_archived
  * @property bool $freelancer_archived
  * @property CarbonImmutable $updated_at
+ * @property-read ConversationMessage|null $latestMessage
  * @property-read Proposal $proposal
  * @property-read User $client
  * @property-read User $freelancer
@@ -52,6 +54,12 @@ class Conversation extends Model
     public function messages(): HasMany
     {
         return $this->hasMany(ConversationMessage::class);
+    }
+
+    /** @return HasOne<ConversationMessage, $this> */
+    public function latestMessage(): HasOne
+    {
+        return $this->hasOne(ConversationMessage::class)->latestOfMany();
     }
 
     public function contains(int $user): bool

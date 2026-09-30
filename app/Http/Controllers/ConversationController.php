@@ -9,9 +9,11 @@ use App\Models\ConversationMessage;
 use App\Models\Project;
 use App\Models\Proposal;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -20,20 +22,14 @@ class ConversationController extends Controller
 {
     public function index(Request $request): Response
     {
-        $request->validate(['kind' => ['nullable', Rule::in(['hiring', 'contracts'])], 'archived' => ['nullable', 'boolean'], 'page' => ['nullable', 'integer', 'min:1', 'max:100000']]);
+        $filters = $this->filters($request);
         $user = $request->user()->id;
-        $archived = $request->boolean('archived');
-        $query = Conversation::query()->with(['proposal.project', 'client', 'freelancer'])->where(fn ($q) => $q
-            ->where(fn ($q) => $q->where('client_id', $user)->where('client_archived', $archived))
-            ->orWhere(fn ($q) => $q->where('freelancer_id', $user)->where('freelancer_archived', $archived)));
 
-        if ($request->input('kind') === 'contracts') {
-            $query->whereIn('proposal_id', Contract::query()->select('proposal_id'));
-        } elseif ($request->input('kind') === 'hiring') {
-            $query->whereNotIn('proposal_id', Contract::query()->select('proposal_id'));
-        }
-
-        return Inertia::render('messages/index', ['conversations' => $query->orderByDesc('updated_at')->orderByDesc('id')->paginate(20)->withQueryString()->through(fn (Conversation $conversation) => $this->summary($conversation, $user)), 'archived' => $archived]);
+        return Inertia::render('messages/index', [
+            'conversations' => $this->inbox($user, $filters)->paginate(20)->withQueryString()->through(fn (Conversation $conversation) => $this->summary($conversation, $user)),
+            'archived' => $filters['archived'],
+            'filters' => $filters,
+        ]);
     }
 
     public function start(Request $request, Proposal $proposal): RedirectResponse
@@ -62,14 +58,17 @@ class ConversationController extends Controller
     public function show(Request $request, Conversation $conversation): Response
     {
         abort_unless($conversation->contains($request->user()->id), 404);
-        $request->validate(['page' => ['nullable', 'integer', 'min:1', 'max:100000']]);
+        $filters = $this->filters($request);
+        $conversation->loadMissing(['latestMessage']);
         $user = $request->user()->id;
         $writable = HiringAccess::conversationWritable($conversation->proposal);
-        $messages = $conversation->messages()->orderByDesc('id')->paginate(30);
+        $messages = $conversation->messages()->orderByDesc('id')->paginate(30)->withQueryString();
         $revisions = DB::table('message_revisions')->whereIn('conversation_message_id', $messages->getCollection()->pluck('id'))->orderBy('version')->get(['conversation_message_id', 'body', 'version', 'created_at'])->groupBy('conversation_message_id');
         $visibleThrough = (int) ($messages->getCollection()->max('id') ?? 0);
 
         return Inertia::render('messages/show', [
+            'conversations' => $this->inbox($user, $filters)->paginate(20, ['*'], 'list_page')->withQueryString()->through(fn (Conversation $item) => $this->summary($item, $user)),
+            'filters' => $filters,
             'conversation' => $this->summary($conversation, $user), 'writable' => $writable, 'visibleThrough' => $visibleThrough,
             'messages' => $messages->through(fn (ConversationMessage $message) => [
                 ...$message->only(['id', 'body', 'version', 'created_at', 'edited_at']),
@@ -83,13 +82,14 @@ class ConversationController extends Controller
     public function send(Request $request, Conversation $conversation): RedirectResponse
     {
         abort_unless($conversation->contains($request->user()->id), 404);
+        $filters = $this->filters($request);
         $data = $request->validate(['body' => ['required', 'string', 'max:10000'], 'client_token' => ['required', 'uuid']]);
         DB::transaction(function () use ($request, $conversation, $data): void {
             $locked = $this->lockWritable($conversation);
             $this->sendMessage($locked, $request->user()->id, $data['body'], $data['client_token']);
         }, 3);
 
-        return to_route('messages.show', $conversation);
+        return to_route('messages.show', ['conversation' => $conversation, ...array_filter($filters, fn ($value) => $value !== '' && $value !== false), ...($request->integer('list_page') > 1 ? ['list_page' => $request->integer('list_page')] : [])]);
     }
 
     public function edit(Request $request, ConversationMessage $message): RedirectResponse
@@ -134,6 +134,55 @@ class ConversationController extends Controller
         return back();
     }
 
+    /** @return array{kind: string, archived: bool, unread: bool, q: string} */
+    private function filters(Request $request): array
+    {
+        $request->validate([
+            'kind' => ['nullable', Rule::in(['hiring', 'contracts'])],
+            'archived' => ['nullable', 'boolean'],
+            'unread' => ['nullable', 'boolean'],
+            'q' => ['nullable', 'string', 'max:100'],
+            'page' => ['nullable', 'integer', 'min:1', 'max:100000'],
+            'list_page' => ['nullable', 'integer', 'min:1', 'max:100000'],
+        ]);
+
+        return ['kind' => $request->string('kind')->value(), 'archived' => $request->boolean('archived'),
+            'unread' => $request->boolean('unread'), 'q' => $request->string('q')->trim()->value()];
+    }
+
+    /**
+     * @param  array{kind: string, archived: bool, unread: bool, q: string}  $filters
+     * @return Builder<Conversation>
+     */
+    private function inbox(int $user, array $filters): Builder
+    {
+        $query = Conversation::query()->with(['proposal.project', 'client', 'freelancer', 'latestMessage'])
+            ->where(fn ($q) => $q
+                ->where(fn ($q) => $q->where('client_id', $user)->where('client_archived', $filters['archived']))
+                ->orWhere(fn ($q) => $q->where('freelancer_id', $user)->where('freelancer_archived', $filters['archived'])));
+
+        if ($filters['kind'] === 'contracts') {
+            $query->whereIn('proposal_id', Contract::query()->select('proposal_id'));
+        } elseif ($filters['kind'] === 'hiring') {
+            $query->whereNotIn('proposal_id', Contract::query()->select('proposal_id'));
+        }
+
+        if ($filters['q'] !== '') {
+            $term = '%'.$filters['q'].'%';
+            $query->where(fn ($q) => $q->whereHas('proposal.project', fn ($q) => $q->where('title', 'like', $term))
+                ->orWhere(fn ($q) => $q->where('client_id', $user)->whereHas('freelancer', fn ($q) => $q->where('name', 'like', $term)))
+                ->orWhere(fn ($q) => $q->where('freelancer_id', $user)->whereHas('client', fn ($q) => $q->where('name', 'like', $term))));
+        }
+
+        if ($filters['unread']) {
+            $query->whereHas('messages', fn ($q) => $q->where('sender_id', '!=', $user)->where(fn ($q) => $q
+                ->where(fn ($q) => $q->where('conversations.client_id', $user)->whereColumn('conversation_messages.id', '>', 'conversations.client_read_through'))
+                ->orWhere(fn ($q) => $q->where('conversations.freelancer_id', $user)->whereColumn('conversation_messages.id', '>', 'conversations.freelancer_read_through'))));
+        }
+
+        return $query->orderByDesc('updated_at')->orderByDesc('id');
+    }
+
     private function lockParticipants(int $client, int $freelancer): void
     {
         User::query()->whereIn('id', [$client, $freelancer])->orderBy('id')->lockForUpdate()->get();
@@ -170,6 +219,7 @@ class ConversationController extends Controller
             'proposal_id' => $conversation->proposal_id,
             'contract_id' => Contract::query()->where('proposal_id', $conversation->proposal_id)->value('id'),
             'counterpart' => $user === $conversation->client_id ? $conversation->freelancer->name : $conversation->client->name,
+            'preview' => Str::limit($conversation->latestMessage->body ?? '', 120),
             'archived' => (bool) $conversation->getAttribute($conversation->archiveColumn($user)),
             'unread' => $conversation->messages()->where('sender_id', '!=', $user)->where('id', '>', $conversation->getAttribute($conversation->readColumn($user)))->count(),
             'updated_at' => $conversation->updated_at,
