@@ -162,3 +162,14 @@ English/Arabic labels and RTL behavior. The MIT license above applies.
 ## Grouped navigation and scoped search (2026-09-29)
 
 Workspace grouping adapts local TailAdmin src/layout/AppSidebar.tsx while preserving the supplied sidebar primitive. Search filter controls adapt src/components/form/form-elements/SelectInputs.tsx, with Elancer tokens and existing catalog filters. The TailAdmin MIT notice above applies.
+
+## Supplied messaging template (2026-09-30)
+
+resources/js/components/ui/chat-template.tsx adapts the Chat template by Manoj
+Rayi supplied by Ahmed from https://21st.dev/@rayimanoj8/components/chat-template/whatsapp-mock.
+21st.dev identifies its license as MIT; upstream author/source:
+https://github.com/rayimanoj8/. The contact-list/chat-window composition is retained;
+Elancer adaptations use real scoped records, existing dashboard navigation,
+TailAdmin controls, English/Arabic, theme tokens, mobile list/detail navigation and
+native scrolling. Calls and unsupported media/group features are omitted.
+Existing installed Radix and Lucide dependencies retain their licenses.
