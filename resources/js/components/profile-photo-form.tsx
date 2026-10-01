@@ -1,6 +1,7 @@
 // Reuses the existing TailAdmin-backed crop editor and form controls.
 import { router, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
+import { ImagePlus } from 'lucide-react';
 import ComponentCard from '@/components/component-card';
 import PhotoEditor from '@/components/photo-editor';
 import Button from '@/components/tailadmin/button';
@@ -113,7 +114,14 @@ export default function ProfilePhotoForm() {
                         />
                     )}
                     <div className="min-w-0 flex-1">
-                        <Label htmlFor="profile-photo">
+                        <Label
+                            htmlFor="profile-photo"
+                            className="flex items-center gap-2"
+                        >
+                            <ImagePlus
+                                className="text-primary size-5"
+                                aria-hidden="true"
+                            />
                             {t('Change photo')}
                         </Label>
                         <Input
