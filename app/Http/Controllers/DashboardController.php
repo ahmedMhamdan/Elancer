@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Dashboard\BuildOverview;
 use App\Models\IdentityVerification;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -18,6 +19,7 @@ class DashboardController extends Controller
         $profile = $user->profile;
 
         return Inertia::render($request->routeIs('marketplace-profile.edit') ? 'marketplace-profile' : 'dashboard', [
+            ...($request->routeIs('dashboard') ? ['overview' => app(BuildOverview::class)->handle($user)] : []),
             'onboardingReady' => $request->routeIs('dashboard') && $request->session()->pull('onboarding_ready', false),
             'identity' => IdentityVerification::where('user_id', $user->id)->first()?->only(['status', 'reason', 'reviewed_at']),
             'profile' => $profile?->only([
