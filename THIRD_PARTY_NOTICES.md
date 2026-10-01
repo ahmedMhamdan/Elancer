@@ -173,3 +173,12 @@ Elancer adaptations use real scoped records, existing dashboard navigation,
 TailAdmin controls, English/Arabic, theme tokens, mobile list/detail navigation and
 native scrolling. Calls and unsupported media/group features are omitted.
 Existing installed Radix and Lucide dependencies retain their licenses.
+
+## Supplied Overview layout (2026-09-30)
+
+resources/js/components/ui/app-1.tsx adapts Ahmed's supplied App Dashboard Layout by shadcnstore:
+https://21st.dev/@shadcnstore/components/app-1 and https://shadcnstore.com/r/app-1.json.
+The card/chart/work/activity composition is retained inside Elancer's existing shell; sample records are replaced with scoped workspace data.
+TailAdmin src/components/ecommerce/EcommerceMetrics.tsx, StatisticsChart.tsx and RecentOrders.tsx were inspected and adapted for metric blocks, chart structure and linked rows; the TailAdmin MIT notice above applies.
+New chart/progress primitives adapt shadcn/ui (MIT), https://github.com/shadcn-ui/ui. Copyright (c) 2023 shadcn.
+Recharts (MIT), https://github.com/recharts/recharts, and Radix Progress retain their upstream notices in installed packages.
