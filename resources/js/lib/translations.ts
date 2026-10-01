@@ -1,5 +1,67 @@
 // Interface copy only. Member-authored and catalog content retain their entered language.
 export const arabic: Record<string, string> = {
+    Contract: 'عقد',
+    Project: 'مشروع',
+    Proposal: 'عرض',
+    ':count proposals': ':count عروض',
+    'Untitled draft': 'مسودة بلا عنوان',
+    'Your proposals': 'عروضك',
+    'Owned projects, excluding trash': 'مشاريعك، باستثناء المحذوفة',
+    'Draft and submitted applications': 'العروض المحفوظة والمرسلة',
+    'Received proposals': 'العروض المستلمة',
+    'Submitted applications to your projects': 'العروض المرسلة إلى مشاريعك',
+    'Pending invitations': 'دعوات بانتظار الرد',
+    'Invitations awaiting your response': 'دعوات لم ترد عليها بعد',
+    ':count awaiting payment': ':count بانتظار الدفع',
+    'Unread messages': 'رسائل غير مقروءة',
+    'Messages from your conversations': 'رسائل من محادثاتك',
+    'Find projects': 'ابحث عن مشاريع',
+    'Manage projects': 'إدارة المشاريع',
+    'Profile readiness': 'جاهزية الملف',
+    'Client profile': 'ملف العميل',
+    'Help freelancers get to know you.': 'عرّف المستقلين بنفسك.',
+    'Prepare your profile for the marketplace.':
+        'جهّز ملفك للظهور في سوق العمل.',
+    ':count of :total profile checks': ':count من :total متطلبات الملف',
+    'To do': 'غير مكتمل',
+    'Manage profile': 'إدارة الملف',
+    'Your work': 'عملك',
+    'View all': 'عرض الكل',
+    'Recent projects and accepted agreements.':
+        'آخر مشاريعك والاتفاقات المقبولة.',
+    'Recent proposals and accepted agreements.':
+        'آخر عروضك والاتفاقات المقبولة.',
+    'Your work starts here': 'ابدأ عملك من هنا',
+    'Create a project brief to start receiving proposals.':
+        'أنشئ وصف مشروعك لتبدأ باستقبال العروض.',
+    'Find a project and prepare your first proposal.':
+        'ابحث عن مشروع وجهّز عرضك الأول.',
+    'Recent activity': 'آخر النشاطات',
+    'Messages, proposals and agreements from your workspace.':
+        'رسائلك وعروضك واتفاقاتك الأخيرة.',
+    'sent a message': 'أرسل رسالة',
+    'submitted a proposal': 'أرسل عرضًا',
+    'accepted an agreement': 'قبل اتفاقًا',
+    'No workspace activity yet': 'لا يوجد نشاط بعد',
+    'Your messages, submitted proposals and accepted agreements will appear here.':
+        'ستظهر هنا رسائلك وعروضك المرسلة واتفاقاتك المقبولة.',
+    'Proposals received': 'عروض مستلمة',
+    'Proposals submitted': 'عروض مرسلة',
+    'Contracts accepted': 'عقود مقبولة',
+    'Workspace activity': 'نشاط العمل',
+    'Submitted proposals and accepted contracts over the last eight weeks.':
+        'العروض المرسلة والعقود المقبولة خلال الأسابيع الثمانية الأخيرة.',
+    'Weekly workspace activity': 'نشاط العمل الأسبوعي',
+    'No activity in this period': 'لا يوجد نشاط خلال هذه الفترة',
+    'Submitted proposals and accepted agreements will build your activity chart.':
+        'سيظهر نشاطك هنا عند إرسال العروض وقبول الاتفاقات.',
+    'Weeks start Monday (UTC). The current week is still in progress.':
+        'يبدأ الأسبوع يوم الاثنين بتوقيت UTC. الأسبوع الحالي لم ينتهِ بعد.',
+    'View chart data': 'عرض بيانات الرسم',
+    'Week starting': 'بداية الأسبوع',
+    Closed: 'مغلق',
+    Hired: 'تم التوظيف',
+    'Awaiting payment': 'بانتظار الدفع',
     Previous: 'السابق',
     Next: 'التالي',
     Unread: 'غير المقروءة',
