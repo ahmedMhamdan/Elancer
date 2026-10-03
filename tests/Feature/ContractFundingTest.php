@@ -112,6 +112,8 @@ class ContractFundingTest extends TestCase
         $this->assertDatabaseCount('payment_attempts', 1);
         $this->get('/finance')->assertInertia(fn (Assert $page) => $page->where('summary.client.funded.count', 1)->where('summary.client.funded.total', '750.25')
             ->where('summary.client.awaiting.count', 0)->where('summary.freelancer.funded.count', 0)->where('contracts.data.0.payment.status', 'succeeded'));
+        $this->get('/finance/payments')->assertInertia(fn (Assert $page) => $page->component('finance/payments')->has('attempts.data', 1)->where('attempts.data.0.status', 'succeeded'));
+        $this->actingAs(User::factory()->create(['onboarding_completed_at' => now()]))->get('/finance/payments')->assertInertia(fn (Assert $page) => $page->has('attempts.data', 0));
         $this->actingAs($freelancer)->get('/dashboard')->assertInertia(fn (Assert $page) => $page->where('overview.finance.funded.total', '750.25'));
     }
 
