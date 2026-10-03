@@ -1,6 +1,14 @@
 // Cards/forms reuse local TailAdmin common/ComponentCard.tsx and form/form-elements/DefaultInputs.tsx.
 // Existing adaptations retain Elancer tokens, keyboard controls and RTL. See THIRD_PARTY_NOTICES.md.
 import { Head, Link } from '@inertiajs/react';
+import {
+    CircleCheck,
+    CreditCard,
+    FlaskConical,
+    Landmark,
+    WalletCards,
+    type LucideIcon,
+} from 'lucide-react';
 import type { ReactNode } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/hooks/use-translation';
@@ -100,10 +108,88 @@ export function PaymentStatus({ status }: { status: string }) {
 export function useProviderLabel() {
     const { t } = useTranslation();
     const labels: Record<string, string> = {
+        stripe: t('Stripe (test mode)'),
+        moyasar: t('Moyasar (test mode)'),
         paypal: t('PayPal (test mode)'),
         simulator: t('Offline test simulator'),
     };
     return (provider: string) => labels[provider] ?? provider;
+}
+export function useProviderHint() {
+    const { t } = useTranslation();
+    const hints: Record<string, string> = {
+        stripe: t('Pay by card on Stripe’s secure page.'),
+        moyasar: t('mada, cards and Apple Pay on Moyasar’s secure page.'),
+        paypal: t('Pay with a PayPal test account.'),
+        simulator: t('Stand-in used for automated testing.'),
+    };
+    return (provider: string) => hints[provider] ?? '';
+}
+// Brand-coloured tiles with generic glyphs identify each provider without reproducing its logo artwork.
+const MARKS: Record<string, { color: string; Icon: LucideIcon }> = {
+    stripe: { color: '#635bff', Icon: CreditCard },
+    moyasar: { color: '#1e9e63', Icon: Landmark },
+    paypal: { color: '#003087', Icon: WalletCards },
+    simulator: { color: '#626f60', Icon: FlaskConical },
+};
+export function ProviderMark({ provider }: { provider: string }) {
+    const { color, Icon } = MARKS[provider] ?? MARKS.simulator;
+    return (
+        <span
+            className="provider-mark"
+            style={{ backgroundColor: color }}
+            aria-hidden="true"
+        >
+            <Icon className="size-5" />
+        </span>
+    );
+}
+export function ProviderOptions({
+    providers,
+    value,
+    onChange,
+}: {
+    providers: string[];
+    value: string;
+    onChange: (provider: string) => void;
+}) {
+    const { t } = useTranslation();
+    const label = useProviderLabel();
+    const hint = useProviderHint();
+    return (
+        <fieldset>
+            <legend className="market-muted mb-3">
+                {t('Payment provider')}
+            </legend>
+            <div className="provider-options">
+                {providers.map((provider) => (
+                    <label key={provider} className="provider-option">
+                        <input
+                            type="radio"
+                            name="provider"
+                            className="sr-only"
+                            value={provider}
+                            checked={value === provider}
+                            onChange={() => onChange(provider)}
+                        />
+                        <ProviderMark provider={provider} />
+                        <span className="min-w-0 flex-1">
+                            <span className="block font-medium">
+                                {label(provider)}
+                            </span>
+                            <span className="market-muted block text-sm">
+                                {hint(provider)}
+                            </span>
+                        </span>
+                        <CircleCheck
+                            className="provider-option-check size-5"
+                            aria-hidden="true"
+                        />
+                    </label>
+                ))}
+            </div>
+        </fieldset>
+    );
 }
 export function usePaymentReason() {
     const { t } = useTranslation();

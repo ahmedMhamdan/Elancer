@@ -20,6 +20,8 @@ import {
     ContractStatus,
     OfferTime,
     PaymentStatus,
+    ProviderMark,
+    useProviderHint,
     useProviderLabel,
     type Payment,
 } from '@/pages/offers/shared';
@@ -58,6 +60,7 @@ export default function Finance({
     const { t, locale } = useTranslation();
     const { auth } = usePage().props;
     const providerLabel = useProviderLabel();
+    const providerHint = useProviderHint();
     const groups = [
         {
             key: 'client',
@@ -338,9 +341,16 @@ export default function Finance({
                                                 </Link>
                                             </TableCell>
                                             <TableCell className={cell}>
-                                                {providerLabel(
-                                                    attempt.provider,
-                                                )}
+                                                <span className="flex items-center gap-2 whitespace-nowrap">
+                                                    <ProviderMark
+                                                        provider={
+                                                            attempt.provider
+                                                        }
+                                                    />
+                                                    {providerLabel(
+                                                        attempt.provider,
+                                                    )}
+                                                </span>
                                             </TableCell>
                                             <TableCell
                                                 className={`${cell} whitespace-nowrap`}
@@ -379,10 +389,21 @@ export default function Finance({
                 <section className="market-panel market-stack">
                     <h2>{t('Payment providers')}</h2>
                     {providers.length ? (
-                        <ul className="list-disc space-y-2 ps-6">
+                        <ul className="provider-options">
                             {providers.map((provider) => (
-                                <li key={provider}>
-                                    {providerLabel(provider)}
+                                <li
+                                    key={provider}
+                                    className="provider-option provider-option-static"
+                                >
+                                    <ProviderMark provider={provider} />
+                                    <span className="min-w-0 flex-1">
+                                        <span className="block font-medium">
+                                            {providerLabel(provider)}
+                                        </span>
+                                        <span className="market-muted block text-sm">
+                                            {providerHint(provider)}
+                                        </span>
+                                    </span>
                                 </li>
                             ))}
                         </ul>

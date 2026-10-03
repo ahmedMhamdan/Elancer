@@ -1633,6 +1633,14 @@ export const arabic: Record<string, string> = {
     'Not completed': 'لم تكتمل',
     'Verified, needs review': 'مؤكّدة وتحتاج إلى مراجعة',
     'PayPal (test mode)': 'PayPal (وضع تجريبي)',
+    'Stripe (test mode)': 'Stripe (وضع تجريبي)',
+    'Moyasar (test mode)': 'ميسّر (وضع تجريبي)',
+    'Pay by card on Stripe’s secure page.':
+        'ادفع بالبطاقة عبر صفحة Stripe الآمنة.',
+    'mada, cards and Apple Pay on Moyasar’s secure page.':
+        'مدى والبطاقات و Apple Pay عبر صفحة ميسّر الآمنة.',
+    'Pay with a PayPal test account.': 'ادفع بحساب PayPal تجريبي.',
+    'Stand-in used for automated testing.': 'بديل يُستخدم في الاختبارات الآلية.',
     'Offline test simulator': 'محاكي الاختبار المحلي',
     'The provider declined the payment.': 'رفض مزوّد الدفع هذه الدفعة.',
     'The payment was cancelled before completion.':

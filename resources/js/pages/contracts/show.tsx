@@ -10,6 +10,7 @@ import {
     ContractStatus,
     OfferTime,
     PaymentStatus,
+    ProviderOptions,
     usePaymentReason,
     useProviderLabel,
     type Contract,
@@ -188,34 +189,13 @@ export default function Show({
                                         max={contract.agreement.amount}
                                     />
                                 </p>
-                                <fieldset className="market-stack !gap-2">
-                                    <legend className="market-muted mb-2">
-                                        {t('Payment provider')}
-                                    </legend>
-                                    {providers.map((provider) => (
-                                        <label
-                                            key={provider}
-                                            className="market-check"
-                                        >
-                                            <input
-                                                type="radio"
-                                                name="provider"
-                                                value={provider}
-                                                checked={
-                                                    form.data.provider ===
-                                                    provider
-                                                }
-                                                onChange={() =>
-                                                    form.setData(
-                                                        'provider',
-                                                        provider,
-                                                    )
-                                                }
-                                            />
-                                            {providerLabel(provider)}
-                                        </label>
-                                    ))}
-                                </fieldset>
+                                <ProviderOptions
+                                    providers={providers}
+                                    value={form.data.provider}
+                                    onChange={(provider) =>
+                                        form.setData('provider', provider)
+                                    }
+                                />
                                 <div>
                                     <Button
                                         disabled={form.processing}
