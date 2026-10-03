@@ -26,7 +26,8 @@ class ContractFundingTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        config(['payments.simulator.enabled' => true]);
+        // Real keys in a developer's .env must never reach the tests.
+        config(['payments.simulator.enabled' => true, 'payments.stripe.secret' => null, 'payments.moyasar.secret' => null, 'payments.paypal.client_id' => null, 'payments.paypal.secret' => null]);
     }
 
     /** @return array{User, User, Contract} */
@@ -221,6 +222,70 @@ class ContractFundingTest extends TestCase
         $this->get('/payments/'.$attempt->id.'/return');
         $this->assertSame('active', $contract->fresh()->status);
         $this->assertDatabaseHas('payment_events', ['provider' => 'paypal', 'event_reference' => 'CAPTURE-1', 'amount_minor' => 75025]);
+    }
+
+    public function test_stripe_test_session_must_be_paid_and_not_live_before_activation(): void
+    {
+        [$client, , $contract] = $this->contract();
+        config(['payments.stripe.secret' => 'sk_live_refused']);
+        $this->actingAs($client)->post('/contracts/'.$contract->id.'/payments', ['provider' => 'stripe', 'client_token' => (string) Str::uuid()])->assertSessionHasErrors('provider');
+        config(['payments.stripe.secret' => 'sk_test_example']);
+        $reads = 0;
+        $session = fn (array $state) => ['id' => 'cs_test_1', 'url' => 'https://checkout.stripe.com/c/pay/cs_test_1', 'livemode' => false,
+            'amount_total' => 75025, 'currency' => 'usd', 'payment_intent' => 'pi_1', 'client_reference_id' => PaymentAttempt::query()->value('reference'), ...$state];
+        $created = 0;
+        Http::fake(['*/v1/checkout/sessions' => function () use ($session, &$created) {
+            return Http::response(++$created === 1 ? $session(['status' => 'open', 'payment_status' => 'unpaid']) : ['id' => 'cs_test_2', 'url' => 'https://checkout.stripe.com/c/pay/cs_test_2']);
+        },
+            '*/v1/checkout/sessions/cs_test_1' => function () use ($session, &$reads) {
+                return Http::response($session(++$reads === 1 ? ['status' => 'open', 'payment_status' => 'unpaid'] : ['status' => 'complete', 'payment_status' => 'paid', 'livemode' => true]));
+            },
+            '*/v1/checkout/sessions/cs_test_2' => fn () => Http::response(['id' => 'cs_test_2', 'livemode' => false, 'status' => 'complete', 'payment_status' => 'paid',
+                'amount_total' => 75025, 'currency' => 'usd', 'payment_intent' => 'pi_2', 'client_reference_id' => PaymentAttempt::query()->latest('id')->value('reference')])]);
+        $this->post('/contracts/'.$contract->id.'/payments', ['provider' => 'stripe', 'client_token' => (string) Str::uuid()])
+            ->assertRedirect('https://checkout.stripe.com/c/pay/cs_test_1');
+        $attempt = PaymentAttempt::query()->firstOrFail();
+        Http::assertSent(fn ($request) => $request->url() === 'https://api.stripe.com/v1/checkout/sessions'
+            && $request['line_items'][0]['price_data']['unit_amount'] == 75025 && $request->header('Idempotency-Key') === [$attempt->reference]);
+        $this->get('/payments/'.$attempt->id.'/return');
+        $this->assertSame('pending', $attempt->fresh()->status);
+        // A session reported as live is refused even when it says paid.
+        $this->get('/payments/'.$attempt->id.'/return');
+        $this->assertSame(['failed', 'mismatch'], [$attempt->fresh()->status, $attempt->fresh()->failure_reason]);
+        $this->assertSame('awaiting_payment', $contract->fresh()->status);
+
+        $this->post('/contracts/'.$contract->id.'/payments', ['provider' => 'stripe', 'client_token' => (string) Str::uuid()])->assertRedirect();
+        $this->get('/payments/'.PaymentAttempt::query()->latest('id')->value('id').'/return');
+        $this->assertSame('active', $contract->fresh()->status);
+        $this->assertDatabaseHas('payment_events', ['provider' => 'stripe', 'event_reference' => 'pi_2']);
+    }
+
+    public function test_moyasar_test_invoice_must_be_paid_and_resumes_without_a_second_invoice(): void
+    {
+        [$client, , $contract] = $this->contract();
+        config(['payments.moyasar.secret' => 'sk_live_refused']);
+        $this->actingAs($client)->post('/contracts/'.$contract->id.'/payments', ['provider' => 'moyasar', 'client_token' => (string) Str::uuid()])->assertSessionHasErrors('provider');
+        config(['payments.moyasar.secret' => 'sk_test_example']);
+        $status = 'initiated';
+        $invoice = function () use (&$status) {
+            return Http::response(['id' => 'inv-1', 'status' => $status, 'amount' => 75025, 'currency' => 'USD',
+                'url' => 'https://checkout.moyasar.com/invoices/inv-1', 'metadata' => ['reference' => PaymentAttempt::query()->value('reference')]]);
+        };
+        Http::fake(['https://api.moyasar.com/v1/invoices' => $invoice, 'https://api.moyasar.com/v1/invoices/inv-1' => $invoice]);
+        $this->post('/contracts/'.$contract->id.'/payments', ['provider' => 'moyasar', 'client_token' => (string) Str::uuid()])
+            ->assertRedirect('https://checkout.moyasar.com/invoices/inv-1');
+        $attempt = PaymentAttempt::query()->firstOrFail();
+        Http::assertSent(fn ($request) => $request->method() === 'POST' && $request['amount'] === 75025 && $request['currency'] === 'USD'
+            && $request['metadata']['reference'] === $attempt->reference && $request->hasHeader('Authorization', 'Basic '.base64_encode('sk_test_example:')));
+        // Continuing reads the existing invoice; it never creates a second one.
+        $this->post('/contracts/'.$contract->id.'/payments', ['provider' => 'moyasar', 'client_token' => (string) Str::uuid()])->assertRedirect('https://checkout.moyasar.com/invoices/inv-1');
+        Http::assertSentCount(2);
+        $this->get('/payments/'.$attempt->id.'/return');
+        $this->assertSame('awaiting_payment', $contract->fresh()->status);
+        $status = 'paid';
+        $this->get('/payments/'.$attempt->id.'/return');
+        $this->assertSame('active', $contract->fresh()->status);
+        $this->assertDatabaseHas('payment_events', ['provider' => 'moyasar', 'event_reference' => 'inv-1', 'amount_minor' => 75025]);
     }
 
     public function test_money_converts_without_floating_point(): void
