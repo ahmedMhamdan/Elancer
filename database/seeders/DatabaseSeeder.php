@@ -24,5 +24,10 @@ class DatabaseSeeder extends Seeder
                 'email' => 'test@example.com',
             ]);
         }
+
+        // The demo marketplace is a local-only file; include it when present so a fresh local seed keeps the review logins.
+        if (app()->environment('local') && class_exists(DemoMarketplaceSeeder::class)) {
+            $this->call(DemoMarketplaceSeeder::class);
+        }
     }
 }
