@@ -568,6 +568,37 @@
     overflow-y: auto;
 }
 
+.workspace-notification-dot {
+    position: absolute;
+    top: 9px;
+    inset-inline-end: 10px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    border: 2px solid var(--el-surface);
+    background: var(--el-brand);
+}
+.workspace-notification-item {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    border-bottom: 1px solid var(--el-border);
+    border-radius: 8px;
+    text-align: start;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+.workspace-notification-item:hover {
+    background: var(--el-surface-soft);
+}
+.workspace-notification-item:focus-visible {
+    outline: 2px solid var(--el-accent);
+    outline-offset: -2px;
+}
+.workspace-notification-item[data-unread='true'] {
+    background: var(--el-surface-soft);
+}
+
 .workspace-header .site-theme-toggle {
     border-color: transparent;
     background: transparent;

@@ -1,25 +1,78 @@
 import { useTranslation } from '@/hooks/use-translation';
 // Adapted from TailAdmin/src/components/header/NotificationDropdown.tsx (MIT).
 // Source: https://github.com/TailAdmin/free-react-tailwind-admin-dashboard
-// Keeps the demo bell SVG, panel/header composition and close SVG.
-// Elancer changes: palette tokens, responsive positioning, accessible dismissal,
-// and an empty state until Ahmed implements recipient-scoped notifications.
-import { useCallback, useId, useRef, useState } from 'react';
+// Keeps the demo bell SVG, unread dot, panel/header composition, actor/text/meta
+// item rows and close SVG. Elancer changes: palette tokens, responsive positioning,
+// accessible dismissal, initials instead of demo photos and the recipient's own
+// persisted notifications.
+import { router, usePage } from '@inertiajs/react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { TailAdminDropdown } from '@/components/tailadmin-dropdown';
 
+type Item = {
+    id: string;
+    kind: string | null;
+    title: string | null;
+    actor: string | null;
+    read: boolean;
+    created_at: string | null;
+};
+
 export default function NotificationDropdown() {
-    const { t } = useTranslation();
+    const { t, locale } = useTranslation();
+    const unread = usePage().props.notifications.unread;
 
     const [isOpen, setIsOpen] = useState(false);
+    const [items, setItems] = useState<Item[] | null>(null);
+    const [failed, setFailed] = useState(false);
     const triggerRef = useRef<HTMLButtonElement>(null);
     const panelId = useId();
     const titleId = useId();
     const closeDropdown = useCallback(() => setIsOpen(false), []);
 
+    const load = useCallback(() => {
+        setFailed(false);
+        fetch('/notifications', {
+            headers: { Accept: 'application/json' },
+            credentials: 'same-origin',
+        })
+            .then((response) =>
+                response.ok ? response.json() : Promise.reject(response),
+            )
+            .then((data: { notifications: Item[] }) =>
+                setItems(data.notifications),
+            )
+            .catch(() => setFailed(true));
+    }, []);
+    // Reload whenever the panel opens or the shared unread count changes while it is open.
+    useEffect(() => {
+        if (isOpen) load();
+    }, [isOpen, unread, load]);
+
     function closeAndFocus() {
         closeDropdown();
         triggerRef.current?.focus();
     }
+
+    // Events are stored by kind so they read in the recipient's current language.
+    const sentences: Record<string, string> = {
+        invitation_received: t('invited you to apply to'),
+        proposal_received: t('sent a proposal for'),
+        offer_received: t('sent you a final offer for'),
+        offer_accepted: t('accepted your offer for'),
+        offer_declined: t('declined your offer for'),
+        offer_changes_requested: t('requested changes to your offer for'),
+        offer_withdrawn: t('withdrew the offer for'),
+        contract_funded: t('funded the contract for'),
+        payment_verified: t('Your test payment was verified for'),
+    };
+    const when = (value: string | null) =>
+        value
+            ? new Date(value).toLocaleString(locale, {
+                  dateStyle: 'medium',
+                  timeStyle: 'short',
+              })
+            : '';
 
     return (
         <div className="workspace-notifications relative">
@@ -27,11 +80,21 @@ export default function NotificationDropdown() {
                 ref={triggerRef}
                 type="button"
                 className="site-theme-toggle relative"
-                aria-label={t('Notifications')}
+                aria-label={
+                    unread > 0
+                        ? t('Notifications, :count unread', { count: unread })
+                        : t('Notifications')
+                }
                 aria-expanded={isOpen}
                 aria-controls={isOpen ? panelId : undefined}
                 onClick={() => setIsOpen((open) => !open)}
             >
+                {unread > 0 && (
+                    <span
+                        className="workspace-notification-dot"
+                        aria-hidden="true"
+                    />
+                )}
                 <svg
                     className="fill-current"
                     aria-hidden="true"
@@ -86,14 +149,98 @@ export default function NotificationDropdown() {
                         </svg>
                     </button>
                 </div>
-                <div className="flex min-h-40 flex-col items-center justify-center gap-2 px-4 py-8 text-center">
-                    <p className="text-foreground font-medium">
-                        {t('No notifications yet')}
+                {failed ? (
+                    <div className="flex min-h-40 flex-col items-center justify-center gap-3 px-4 py-8 text-center">
+                        <p className="text-foreground font-medium" role="alert">
+                            {t('Notifications could not be loaded.')}
+                        </p>
+                        <button
+                            type="button"
+                            className="text-primary min-h-11 text-sm font-medium underline-offset-4 hover:underline"
+                            onClick={load}
+                        >
+                            {t('Try again')}
+                        </button>
+                    </div>
+                ) : items === null ? (
+                    <p
+                        className="text-muted-foreground px-4 py-8 text-center text-sm"
+                        role="status"
+                    >
+                        {t('Loading notifications…')}
                     </p>
-                    <p className="text-muted-foreground text-sm">
-                        {t('Project and account updates will appear here.')}
-                    </p>
-                </div>
+                ) : items.length === 0 ? (
+                    <div className="flex min-h-40 flex-col items-center justify-center gap-2 px-4 py-8 text-center">
+                        <p className="text-foreground font-medium">
+                            {t('No notifications yet')}
+                        </p>
+                        <p className="text-muted-foreground text-sm">
+                            {t('Project and account updates will appear here.')}
+                        </p>
+                    </div>
+                ) : (
+                    <>
+                        <ul className="flex flex-col">
+                            {items.map((item) => (
+                                <li key={item.id}>
+                                    <button
+                                        type="button"
+                                        className="workspace-notification-item"
+                                        data-unread={!item.read}
+                                        onClick={() => {
+                                            closeDropdown();
+                                            router.patch(
+                                                `/notifications/${item.id}`,
+                                            );
+                                        }}
+                                    >
+                                        <span className="block text-sm">
+                                            {item.actor && (
+                                                <bdi className="text-foreground font-medium">
+                                                    {item.actor}
+                                                </bdi>
+                                            )}{' '}
+                                            <span className="text-muted-foreground">
+                                                {sentences[item.kind ?? ''] ??
+                                                    t('Workspace update for')}
+                                            </span>{' '}
+                                            <bdi className="text-foreground font-medium">
+                                                {item.title}
+                                            </bdi>
+                                        </span>
+                                        <span className="text-muted-foreground mt-1.5 flex items-center gap-2 text-xs">
+                                            {!item.read && (
+                                                <span>{t('Unread')}</span>
+                                            )}
+                                            <time
+                                                dateTime={
+                                                    item.created_at ?? undefined
+                                                }
+                                            >
+                                                {when(item.created_at)}
+                                            </time>
+                                        </span>
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                        {unread > 0 && (
+                            <button
+                                type="button"
+                                className="border-border text-foreground hover:bg-muted mt-3 block min-h-11 w-full rounded-lg border px-4 py-2 text-center text-sm font-medium"
+                                onClick={() =>
+                                    router.post(
+                                        '/notifications/read',
+                                        {},
+                                        { preserveScroll: true },
+                                    )
+                                }
+                            >
+                                {t('Mark all as read')}
+                            </button>
+                        )}
+                    </>
+                )}
             </TailAdminDropdown>
         </div>
     );
