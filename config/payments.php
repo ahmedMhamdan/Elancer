@@ -15,6 +15,16 @@ return [
         'enabled' => (bool) env('PAYMENT_SIMULATOR', false),
     ],
 
+    'stripe' => [
+        // Only a test-mode key (sk_test_...) is accepted; anything else leaves Stripe switched off.
+        'secret' => env('STRIPE_TEST_SECRET_KEY'),
+    ],
+
+    'moyasar' => [
+        // Moyasar test secret key (sk_test_...); anything else leaves Moyasar switched off.
+        'secret' => env('MOYASAR_TEST_SECRET_KEY'),
+    ],
+
     'paypal' => [
         'base_url' => 'https://api-m.sandbox.paypal.com',
         'client_id' => env('PAYPAL_SANDBOX_CLIENT_ID'),
