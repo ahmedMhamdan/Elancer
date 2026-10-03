@@ -25,6 +25,7 @@ import {
     useProviderLabel,
     type Payment,
 } from '@/pages/offers/shared';
+import { PaymentHistory, cell, head, type Attempt } from './payment-history';
 import '../../../css/elancer-marketplace.css';
 
 type Totals = { count: number; total: string };
@@ -40,11 +41,6 @@ type Row = {
     is_client: boolean;
     payment: Payment | null;
 };
-type Attempt = Payment & { contract_id: number; project_title: string | null };
-
-const head =
-    'text-muted-foreground px-4 py-3 text-start text-sm font-medium whitespace-nowrap';
-const cell = 'px-4 py-4 text-start text-sm';
 
 export default function Finance({
     summary,
@@ -295,95 +291,16 @@ export default function Finance({
                 <Pagination data={contracts} />
 
                 <section className="border-border bg-card overflow-hidden rounded-2xl border">
-                    <h2 className="!mb-0 px-4 pt-5 pb-3">
-                        {t('Payment history')}
-                    </h2>
-                    {attempts.length ? (
-                        <TableScroll label={t('Payment history')}>
-                            <Table className="w-full">
-                                <TableHeader className="border-border border-y">
-                                    <TableRow>
-                                        <TableCell isHeader className={head}>
-                                            {t('Reference')}
-                                        </TableCell>
-                                        <TableCell isHeader className={head}>
-                                            {t('Project')}
-                                        </TableCell>
-                                        <TableCell isHeader className={head}>
-                                            {t('Payment provider')}
-                                        </TableCell>
-                                        <TableCell isHeader className={head}>
-                                            {t('Amount')}
-                                        </TableCell>
-                                        <TableCell isHeader className={head}>
-                                            {t('Status')}
-                                        </TableCell>
-                                        <TableCell isHeader className={head}>
-                                            {t('Started')}
-                                        </TableCell>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody className="divide-border divide-y">
-                                    {attempts.map((attempt) => (
-                                        <TableRow key={attempt.id}>
-                                            <TableCell className={cell}>
-                                                <bdi className="font-mono text-xs">
-                                                    {attempt.reference}
-                                                </bdi>
-                                            </TableCell>
-                                            <TableCell className={cell}>
-                                                <Link
-                                                    href={`/contracts/${attempt.contract_id}`}
-                                                    dir="auto"
-                                                    className="font-medium wrap-anywhere underline-offset-4 hover:underline"
-                                                >
-                                                    {attempt.project_title}
-                                                </Link>
-                                            </TableCell>
-                                            <TableCell className={cell}>
-                                                <span className="flex items-center gap-2 whitespace-nowrap">
-                                                    <ProviderMark
-                                                        provider={
-                                                            attempt.provider
-                                                        }
-                                                    />
-                                                    {providerLabel(
-                                                        attempt.provider,
-                                                    )}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell
-                                                className={`${cell} whitespace-nowrap`}
-                                            >
-                                                <Money
-                                                    min={attempt.amount}
-                                                    max={attempt.amount}
-                                                />
-                                            </TableCell>
-                                            <TableCell className={cell}>
-                                                <PaymentStatus
-                                                    status={attempt.status}
-                                                />
-                                            </TableCell>
-                                            <TableCell
-                                                className={`${cell} whitespace-nowrap`}
-                                            >
-                                                <OfferTime
-                                                    value={attempt.created_at}
-                                                />
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableScroll>
-                    ) : (
-                        <p className="market-muted px-4 pb-5">
-                            {t(
-                                'No payment attempts yet. They appear here when a client starts funding a contract.',
-                            )}
-                        </p>
-                    )}
+                    <div className="flex flex-wrap items-center justify-between gap-3 px-4 pt-5 pb-3">
+                        <h2 className="!mb-0">{t('Payment history')}</h2>
+                        <Link
+                            href="/finance/payments"
+                            className="text-primary inline-flex min-h-11 items-center text-sm font-medium underline-offset-4 hover:underline"
+                        >
+                            {t('View all payments')}
+                        </Link>
+                    </div>
+                    <PaymentHistory attempts={attempts} />
                 </section>
 
                 <section className="market-panel market-stack">

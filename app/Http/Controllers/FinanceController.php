@@ -6,6 +6,7 @@ use App\Actions\Payments\ContractFunding;
 use App\Models\Contract;
 use App\Models\PaymentAttempt;
 use App\Payments\Gateways;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -28,9 +29,28 @@ class FinanceController extends Controller
                 'counterpart' => $contract->client_id === $user ? $contract->agreement['freelancer_name'] ?? null : $contract->agreement['client_name'] ?? null,
                 'is_client' => $contract->client_id === $user, 'payment' => $latest->get($contract->id)?->summary(),
             ]),
-            'attempts' => PaymentAttempt::query()->whereIn('contract_id', $mine()->select('id'))->with('contract')->orderByDesc('id')->limit(10)->get()
-                ->map(fn (PaymentAttempt $attempt) => [...$attempt->summary(), 'contract_id' => $attempt->contract_id,
-                    'project_title' => $attempt->contract->agreement['project_title'] ?? null]),
+            'attempts' => $this->attempts($user)->limit(10)->get()->map($this->attempt(...)),
         ]);
+    }
+
+    /** Every payment attempt on the member's own contracts, newest first. */
+    public function payments(Request $request): Response
+    {
+        return Inertia::render('finance/payments', [
+            'attempts' => $this->attempts($request->user()->id)->paginate(15)->through($this->attempt(...)),
+        ]);
+    }
+
+    /** @return Builder<PaymentAttempt> */
+    private function attempts(int $user): Builder
+    {
+        return PaymentAttempt::query()->with('contract')->orderByDesc('id')->whereIn('contract_id',
+            Contract::query()->select('id')->where(fn ($q) => $q->where('client_id', $user)->orWhere('freelancer_id', $user)));
+    }
+
+    /** @return array<string, mixed> */
+    private function attempt(PaymentAttempt $attempt): array
+    {
+        return [...$attempt->summary(), 'contract_id' => $attempt->contract_id, 'project_title' => $attempt->contract->agreement['project_title'] ?? null];
     }
 }

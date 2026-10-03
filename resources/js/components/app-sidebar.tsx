@@ -2,9 +2,10 @@ import { useTranslation } from '@/hooks/use-translation';
 // Preserve Ahmed's supplied sidebar primitive. Grouped item disclosure adapts
 // TailAdmin src/layout/AppSidebar.tsx (MIT); see THIRD_PARTY_NOTICES.md.
 import { Link, router, usePage } from '@inertiajs/react';
-import { useId, useState } from 'react';
+import { useId, useState, type ReactNode } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
+    Banknote,
     BriefcaseBusiness,
     ChevronDown,
     Compass,
@@ -18,11 +19,13 @@ import {
     Mail,
     MessageSquare,
     MessagesSquare,
+    ReceiptText,
     Search,
     Settings,
     ShieldCheck,
     UserRound,
     UserRoundX,
+    type LucideIcon,
 } from 'lucide-react';
 import ElancerWordmark from '@/components/elancer-wordmark';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -49,9 +52,19 @@ export function AppSidebar() {
         : { type: 'spring' as const, stiffness: 350, damping: 32 };
     const id = useId();
     const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-    const active = (href: string) =>
-        path === href || path.startsWith(href + '/');
-    const groups = [
+    const active = (href: string, exact = false) =>
+        path === href || (!exact && path.startsWith(href + '/'));
+    const groups: {
+        id: string;
+        label: string;
+        icon: LucideIcon;
+        links: {
+            label: string;
+            href: string;
+            icon: ReactNode;
+            exact?: boolean;
+        }[];
+    }[] = [
         {
             id: 'work',
             label: t('My work'),
@@ -77,10 +90,23 @@ export function AppSidebar() {
                     href: '/contracts',
                     icon: <Handshake size={20} />,
                 },
+            ],
+        },
+        {
+            id: 'finance',
+            label: t('Payments and finance'),
+            icon: Banknote,
+            links: [
                 {
-                    label: t('Finance'),
+                    label: t('Finance overview'),
                     href: '/finance',
+                    exact: true,
                     icon: <CreditCard size={20} />,
+                },
+                {
+                    label: t('Payment history'),
+                    href: '/finance/payments',
+                    icon: <ReceiptText size={20} />,
                 },
             ],
         },
@@ -212,7 +238,7 @@ export function AppSidebar() {
                 {groups.map((group) => {
                     const Icon = group.icon;
                     const current = group.links.some((link) =>
-                        active(link.href),
+                        active(link.href, link.exact),
                     );
                     const groupOpen = expanded[group.id] ?? current;
                     return (
@@ -267,12 +293,12 @@ export function AppSidebar() {
                                 className="overflow-hidden"
                             >
                                 <div className="sidebar-group-links">
-                                    {group.links.map((link) => (
+                                    {group.links.map(({ exact, ...link }) => (
                                         <SidebarLink
                                             key={link.href}
                                             link={link}
                                             aria-current={
-                                                active(link.href)
+                                                active(link.href, exact)
                                                     ? 'page'
                                                     : undefined
                                             }

@@ -58,6 +58,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('contracts', [ContractController::class, 'index'])->name('contracts.index');
         Route::get('contracts/{contract}', [ContractController::class, 'show'])->whereNumber('contract')->name('contracts.show');
         Route::get('finance', FinanceController::class)->name('finance.index');
+        Route::get('finance/payments', [FinanceController::class, 'payments'])->name('finance.payments');
         Route::post('contracts/{contract}/payments', [PaymentController::class, 'store'])->whereNumber('contract')->middleware('throttle:20,1')->name('payments.store');
         Route::get('payments/{attempt}/simulator', [PaymentController::class, 'simulator'])->whereNumber('attempt')->name('payments.simulator');
         Route::post('payments/{attempt}/simulator', [PaymentController::class, 'decide'])->whereNumber('attempt')->middleware('throttle:20,1')->name('payments.decide');
