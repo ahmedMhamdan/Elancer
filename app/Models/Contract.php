@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -14,6 +15,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $conversation_id
  * @property string $status
  * @property array<string, mixed> $agreement
+ * @property CarbonImmutable|null $funded_at
+ * @property CarbonImmutable|null $delivery_due_at
  */
 class Contract extends Model
 {
@@ -21,7 +24,7 @@ class Contract extends Model
 
     protected function casts(): array
     {
-        return ['agreement' => 'array'];
+        return ['agreement' => 'array', 'funded_at' => 'immutable_datetime', 'delivery_due_at' => 'immutable_datetime'];
     }
 
     protected static function booted(): void
