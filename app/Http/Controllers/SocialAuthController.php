@@ -48,11 +48,33 @@ class SocialAuthController extends Controller
         return $driver;
     }
 
+    private function callbackOrigin(string $provider): ?string
+    {
+        $callback = parse_url((string) config("services.$provider.redirect"));
+        if (! is_array($callback) || ! isset($callback['scheme'], $callback['host'])) {
+            return null;
+        }
+        $port = $callback['port'] ?? null;
+        $default = $port === null || ($callback['scheme'] === 'http' && $port === 80) || ($callback['scheme'] === 'https' && $port === 443);
+
+        return $callback['scheme'].'://'.$callback['host'].($default ? '' : ':'.$port);
+    }
+
     private function begin(Request $request, string $provider, string $purpose): Response
     {
         abort_unless(in_array($provider, SocialProviders::NAMES, true), 404);
         if (! SocialProviders::enabled($provider)) {
             return back()->withErrors(['social' => __('This sign-in provider is not available yet.')]);
+        }
+        // The provider returns to the registered callback address, whose session cookie is separate from any other local address.
+        $origin = $this->callbackOrigin($provider);
+        if ($origin !== null && $origin !== $request->getSchemeAndHttpHost() && ! $request->boolean('canonical')) {
+            if ($purpose !== 'login') {
+                return back()->withErrors(['social' => __('Open Elancer at :address to use this sign-in provider.', ['address' => $origin])]);
+            }
+            $target = $origin.$request->getBaseUrl().$request->getPathInfo().'?canonical=1';
+
+            return $request->header('X-Inertia') ? Inertia::location($target) : redirect()->away($target);
         }
         $request->session()->forget(['oauth.pending_signup', 'oauth.flow']);
         if ($purpose === 'login') {
@@ -72,7 +94,9 @@ class SocialAuthController extends Controller
     {
         abort_unless(in_array($provider, SocialProviders::NAMES, true), 404);
         $flow = $request->session()->pull('oauth.flow');
-        $destination = $request->user() ? 'security.edit' : 'login';
+        // Only a pending link or confirmation belongs in Security; any other returning callback leaves a signed-in member in the workspace.
+        $pending = is_array($flow) && in_array($flow['purpose'] ?? null, ['link', 'confirm'], true);
+        $destination = $request->user() ? ($pending ? 'security.edit' : 'dashboard') : 'login';
         if (! is_array($flow) || ($flow['provider'] ?? null) !== $provider || ($flow['started_at'] ?? 0) < time() - 600 || ($flow['user_id'] ?? null) !== $request->user()?->id || ! SocialProviders::enabled($provider)) {
             $request->session()->forget(['state', 'code_verifier']);
 
@@ -194,7 +218,8 @@ class SocialAuthController extends Controller
 
     private function login(Request $request, User $user): Response
     {
-        $request->session()->forget(['admin.two_factor_proof', 'auth.password_confirmed_at']);
+        // Provider sign-in always opens the workspace; a stored destination could demand a second provider confirmation.
+        $request->session()->forget(['admin.two_factor_proof', 'auth.password_confirmed_at', 'url.intended']);
         $request->session()->regenerate();
         if ($user->hasEnabledTwoFactorAuthentication()) {
             $request->session()->put(['login.id' => $user->id, 'login.remember' => false]);
@@ -204,7 +229,7 @@ class SocialAuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard'));
+        return to_route('dashboard');
     }
 
     public function disconnect(Request $request, string $provider): Response

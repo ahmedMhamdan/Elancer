@@ -25,7 +25,7 @@ class SocialAuthenticationTest extends TestCase
     {
         parent::setUp();
         foreach (['google', 'github'] as $provider) {
-            config(["services.$provider.client_id" => 'test-client', "services.$provider.client_secret" => 'test-secret', "services.$provider.redirect" => "http://localhost/auth/$provider/callback"]);
+            config(["services.$provider.client_id" => 'test-client', "services.$provider.client_secret" => 'test-secret', "services.$provider.redirect" => url("/auth/$provider/callback")]);
         }
     }
 
@@ -58,7 +58,7 @@ class SocialAuthenticationTest extends TestCase
         $query = [];
         parse_str(parse_url($response->headers->get('Location'), PHP_URL_QUERY), $query);
         $this->assertNotEmpty($query['state']);
-        $this->assertSame('http://localhost/auth/google/callback', $query['redirect_uri']);
+        $this->assertSame(url('/auth/google/callback'), $query['redirect_uri']);
         $this->get('/auth/google/callback?state=wrong&code=fake')->assertRedirect('/login')->assertSessionHasErrors('social');
         $this->assertGuest();
         $this->assertDatabaseCount('users', 0);
@@ -133,6 +133,31 @@ class SocialAuthenticationTest extends TestCase
         $this->withSession($this->flow())->get('/auth/google/callback?error=access_denied')->assertSessionHasErrors('social');
         $this->assertGuest();
         $this->assertDatabaseCount('users', 0);
+    }
+
+    public function test_sign_in_started_on_another_local_address_restarts_on_the_callback_address(): void
+    {
+        $restart = url('/auth/google/redirect').'?canonical=1';
+        $this->get('http://127.0.0.1:8123/auth/google/redirect')->assertRedirect($restart)->assertSessionMissing('oauth.flow');
+        $this->get('/auth/google/redirect?canonical=1')->assertSessionHas('oauth.flow.purpose', 'login');
+    }
+
+    public function test_confirmation_started_on_another_local_address_names_the_callback_address(): void
+    {
+        $user = User::factory()->create(['password' => null]);
+        $this->identity($user);
+        $this->actingAs($user)->from('http://127.0.0.1:8123/user/confirm-password')->post('http://127.0.0.1:8123/settings/social/google/confirm')->assertRedirect('http://127.0.0.1:8123/user/confirm-password')->assertSessionHasErrors('social')->assertSessionMissing('oauth.flow');
+    }
+
+    public function test_provider_sign_in_opens_the_dashboard_instead_of_a_stored_or_security_destination(): void
+    {
+        $user = User::factory()->create(['password' => null]);
+        $this->identity($user);
+        $this->remote();
+        $this->withSession([...$this->flow(), 'url' => ['intended' => url('/settings/security')]])->get('/auth/google/callback')->assertRedirect('/dashboard')->assertSessionMissing('url.intended')->assertSessionMissing('auth.password_confirmed_at');
+        $this->assertAuthenticatedAs($user);
+        $this->get('/auth/google/callback?code=replayed')->assertRedirect('/dashboard');
+        $this->withSession($this->flow('google', 'link', $user))->get('/auth/google/callback?error=access_denied')->assertRedirect('/settings/security')->assertSessionHasErrors('social');
     }
 
     public function test_explicit_link_requires_recent_auth_and_cannot_reassign_an_identity(): void
