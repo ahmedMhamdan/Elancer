@@ -36,6 +36,9 @@ export type Contract = {
     conversation_id: number;
     status: string;
     created_at: string;
+    funded_at: string | null;
+    delivery_due_at: string | null;
+    is_client: boolean;
     agreement: Terms & {
         project_title: string;
         client_name: string;
@@ -43,6 +46,84 @@ export type Contract = {
         accepted_at: string;
     };
 };
+export type Payment = {
+    id: number;
+    reference: string;
+    provider: string;
+    status: string;
+    failure_reason: string | null;
+    amount: string;
+    currency: string;
+    created_at: string;
+    verified_at: string | null;
+};
+
+export function ContractStatus({ status }: { status: string }) {
+    const { t } = useTranslation();
+    const labels: Record<string, string> = {
+        awaiting_payment: t('Awaiting funding'),
+        active: t('Funded and active'),
+    };
+    return (
+        <span
+            className={
+                status === 'active'
+                    ? 'proposal-status proposal-status-submitted'
+                    : 'proposal-status'
+            }
+        >
+            {labels[status] ?? status}
+        </span>
+    );
+}
+export function PaymentStatus({ status }: { status: string }) {
+    const { t } = useTranslation();
+    const labels: Record<string, string> = {
+        pending: t('Checking payment'),
+        succeeded: t('Verified'),
+        failed: t('Not completed'),
+        cancelled: t('Cancelled'),
+        unapplied: t('Verified, needs review'),
+    };
+    return (
+        <span
+            className={
+                status === 'succeeded'
+                    ? 'proposal-status proposal-status-submitted'
+                    : 'proposal-status'
+            }
+        >
+            {labels[status] ?? status}
+        </span>
+    );
+}
+export function useProviderLabel() {
+    const { t } = useTranslation();
+    const labels: Record<string, string> = {
+        paypal: t('PayPal (test mode)'),
+        simulator: t('Offline test simulator'),
+    };
+    return (provider: string) => labels[provider] ?? provider;
+}
+export function usePaymentReason() {
+    const { t } = useTranslation();
+    const reasons: Record<string, string> = {
+        declined: t('The provider declined the payment.'),
+        cancelled: t('The payment was cancelled before completion.'),
+        mismatch: t(
+            'The provider reported details that do not match this contract, so nothing was applied.',
+        ),
+        provider_unavailable: t(
+            'The provider could not be reached, so no payment was started.',
+        ),
+        unknown_payment: t('The provider has no record of this payment.'),
+        contract_not_awaiting: t(
+            'The contract was no longer awaiting funding when this payment was verified.',
+        ),
+    };
+    return (reason: string | null) =>
+        reason ? (reasons[reason] ?? null) : null;
+}
 
 export function AgreementLayout({
     title,

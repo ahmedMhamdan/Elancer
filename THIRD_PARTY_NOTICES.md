@@ -182,3 +182,7 @@ The card/chart/work/activity composition is retained inside Elancer's existing s
 TailAdmin src/components/ecommerce/EcommerceMetrics.tsx, StatisticsChart.tsx and RecentOrders.tsx were inspected and adapted for metric blocks, chart structure and linked rows; the TailAdmin MIT notice above applies.
 New chart/progress primitives adapt shadcn/ui (MIT), https://github.com/shadcn-ui/ui. Copyright (c) 2023 shadcn.
 Recharts (MIT), https://github.com/recharts/recharts, and Radix Progress retain their upstream notices in installed packages.
+
+## Finance and notifications (2026-10-03)
+
+resources/js/pages/finance/index.tsx adapts local TailAdmin src/components/ecommerce/EcommerceMetrics.tsx (icon tile and metric block) and RecentOrders.tsx (bordered table card) with the existing Elancer table adaptation; demo trends, images and filters are replaced by the member's own contracts and payment attempts. resources/js/components/notification-dropdown.tsx extends the existing adaptation of src/components/header/NotificationDropdown.tsx with its unread dot and actor/text/meta item rows. The TailAdmin MIT notice above applies.

@@ -96,6 +96,25 @@ export function App1({ overview, published }: { overview: OverviewData; publishe
                 </Card>
             </div>
 
+            <Card className="overview-card">
+                <CardHeader>
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                        <CardTitle><h2>{t('Finance')}</h2></CardTitle>
+                        <Link href="/finance" className="overview-text-link">{t('Open finance')}<ChevronRight className={ar ? 'size-4 rotate-180' : 'size-4'} aria-hidden="true" /></Link>
+                    </div>
+                    <CardDescription>{t('Agreed contract amounts in test mode. No real money moves.')}</CardDescription>
+                </CardHeader>
+                <CardContent className="grid gap-4 sm:grid-cols-2">
+                    {([['awaiting', client ? 'Awaiting your funding' : 'Awaiting client funding'], ['funded', client ? 'Funded by you' : 'Funded for your work']] as const).map(([key, label]) => (
+                        <div key={key}>
+                            <p className="text-muted-foreground text-sm">{t(label)}</p>
+                            <p className="mt-1 text-2xl font-semibold tabular-nums"><bdi>{Number(overview.finance[key].total).toLocaleString(locale, { style: 'currency', currency: 'USD' })}</bdi></p>
+                            <p className="text-muted-foreground mt-1 text-xs">{overview.finance[key].count === 1 ? t('1 contract') : t(':count contracts', { count: number(overview.finance[key].count) })}</p>
+                        </div>
+                    ))}
+                </CardContent>
+            </Card>
+
             <div className="grid min-w-0 items-start gap-6 lg:grid-cols-2">
                 <Card className="overview-card">
                     <CardHeader>

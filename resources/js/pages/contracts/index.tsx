@@ -2,7 +2,11 @@ import { Link } from '@inertiajs/react';
 import Pagination from '@/components/tailadmin/pagination';
 import { useTranslation } from '@/hooks/use-translation';
 import { Money, type Page } from '@/pages/discovery/shared';
-import { AgreementLayout, type Contract } from '@/pages/offers/shared';
+import {
+    AgreementLayout,
+    ContractStatus,
+    type Contract,
+} from '@/pages/offers/shared';
 export default function Index({ contracts }: { contracts: Page<Contract> }) {
     const { t } = useTranslation();
     return (
@@ -28,7 +32,7 @@ export default function Index({ contracts }: { contracts: Page<Contract> }) {
                         </Link>
                     </h2>
                     <div className="market-actions">
-                        <span>{t('Awaiting sandbox funding')}</span>
+                        <ContractStatus status={contract.status} />
                         <Money
                             min={contract.agreement.amount}
                             max={contract.agreement.amount}

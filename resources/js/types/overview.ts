@@ -8,6 +8,7 @@ export type OverviewData = {
         awaiting_payment: number;
         unread: number;
     };
+    finance: Record<'awaiting' | 'funded', { count: number; total: string }>;
     chart: { week: string; proposals: number; contracts: number }[];
     work: {
         id: string;
