@@ -1,3 +1,4 @@
+import type { RealtimeConfig } from '@/lib/realtime';
 import type { Auth } from '@/types/auth';
 
 declare module 'react' {
@@ -13,6 +14,7 @@ declare module '@inertiajs/core' {
             locale: 'en' | 'ar';
             auth: Auth;
             notifications: { unread: number };
+            realtime: RealtimeConfig | null;
             sidebarOpen: boolean;
             [key: string]: unknown;
         };

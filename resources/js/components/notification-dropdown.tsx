@@ -8,6 +8,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import { router, usePage } from '@inertiajs/react';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { TailAdminDropdown } from '@/components/tailadmin-dropdown';
+import { useNotificationSentence } from '@/hooks/use-notification-sentence';
 
 type Item = {
     id: string;
@@ -54,18 +55,7 @@ export default function NotificationDropdown() {
         triggerRef.current?.focus();
     }
 
-    // Events are stored by kind so they read in the recipient's current language.
-    const sentences: Record<string, string> = {
-        invitation_received: t('invited you to apply to'),
-        proposal_received: t('sent a proposal for'),
-        offer_received: t('sent you a final offer for'),
-        offer_accepted: t('accepted your offer for'),
-        offer_declined: t('declined your offer for'),
-        offer_changes_requested: t('requested changes to your offer for'),
-        offer_withdrawn: t('withdrew the offer for'),
-        contract_funded: t('funded the contract for'),
-        payment_verified: t('Your test payment was verified for'),
-    };
+    const sentence = useNotificationSentence();
     const when = (value: string | null) =>
         value
             ? new Date(value).toLocaleString(locale, {
@@ -201,8 +191,7 @@ export default function NotificationDropdown() {
                                                 </bdi>
                                             )}{' '}
                                             <span className="text-muted-foreground">
-                                                {sentences[item.kind ?? ''] ??
-                                                    t('Workspace update for')}
+                                                {sentence(item.kind)}
                                             </span>{' '}
                                             <bdi className="text-foreground font-medium">
                                                 {item.title}
