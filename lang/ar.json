@@ -257,6 +257,7 @@
     "Confirm your identity": "تأكيد هويتك",
     "Type DELETE to confirm": "اكتب DELETE للتأكيد",
     "This sign-in provider is not available yet.": "مزود تسجيل الدخول هذا غير متاح حاليًا.",
+    "Open Elancer at :address to use this sign-in provider.": "افتح إيلانسر على العنوان :address لاستخدام مزود تسجيل الدخول هذا.",
     "The sign-in request expired. Please try again.": "انتهت صلاحية طلب تسجيل الدخول. حاول مرة أخرى.",
     "Provider sign-in was cancelled. You can try again.": "تم إلغاء تسجيل الدخول عبر المزود. يمكنك المحاولة مجددًا.",
     "Provider sign-in failed. Please try again.": "تعذر تسجيل الدخول عبر المزود. حاول مرة أخرى.",
@@ -273,5 +274,10 @@
     "This offer is no longer available. Reload to see its current status.": "لم يعد هذا العرض متاحًا. أعد تحميل الصفحة للاطلاع على حالته الحالية.",
     "Respond to the pending offer before withdrawing this proposal.": "ردّ على العرض المعلّق قبل سحب طلب التقديم.",
     "Withdraw the pending offer before declining this proposal.": "اسحب العرض المعلّق قبل رفض طلب التقديم.",
-    "Contract obligations prevent account closure.": "لا يمكن إغلاق الحساب لوجود التزامات تعاقدية."
+    "Contract obligations prevent account closure.": "لا يمكن إغلاق الحساب لوجود التزامات تعاقدية.",
+    "This payment request was already used. Reload before trying again.": "استُخدم طلب الدفع هذا سابقًا. أعد تحميل الصفحة قبل المحاولة مجددًا.",
+    "This contract is not awaiting funding.": "هذا العقد ليس بانتظار التمويل.",
+    "Funding is paused while an account on this contract is restricted.": "التمويل متوقف ما دام أحد حسابَي هذا العقد مقيّدًا.",
+    "The payment provider could not be reached. No payment was started; try again.": "تعذّر الوصول إلى مزوّد الدفع. لم تبدأ أي دفعة؛ حاول مجددًا.",
+    "The payment provider could not be reached. The payment status is unchanged; check again shortly.": "تعذّر الوصول إلى مزوّد الدفع. لم تتغير حالة الدفع؛ تحقق مجددًا بعد قليل."
 }

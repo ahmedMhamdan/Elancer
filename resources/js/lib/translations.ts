@@ -175,6 +175,8 @@ export const arabic: Record<string, string> = {
     'Type DELETE to confirm': 'اكتب DELETE للتأكيد',
     'This sign-in provider is not available yet.':
         'مزود تسجيل الدخول هذا غير متاح حاليًا.',
+    'Open Elancer at :address to use this sign-in provider.':
+        'افتح إيلانسر على العنوان :address لاستخدام مزود تسجيل الدخول هذا.',
     'The sign-in request expired. Please try again.':
         'انتهت صلاحية طلب تسجيل الدخول. حاول مرة أخرى.',
     'Provider sign-in was cancelled. You can try again.':
@@ -1555,4 +1557,98 @@ export const arabic: Record<string, string> = {
     Jobs: 'المشاريع',
     Freelancers: 'المستقلون',
     'Try again': 'حاول مجددًا',
+    Finance: 'المالية',
+    'invited you to apply to': 'دعاك للتقديم على',
+    'sent a proposal for': 'أرسل طلب تقديم على',
+    'sent you a final offer for': 'أرسل لك عرضًا نهائيًا لمشروع',
+    'accepted your offer for': 'وافق على عرضك لمشروع',
+    'declined your offer for': 'رفض عرضك لمشروع',
+    'requested changes to your offer for': 'طلب تعديلات على عرضك لمشروع',
+    'withdrew the offer for': 'سحب العرض الخاص بمشروع',
+    'funded the contract for': 'موّل عقد مشروع',
+    'Your test payment was verified for': 'تم تأكيد دفعتك التجريبية لمشروع',
+    'Notifications, :count unread': 'الإشعارات، :count غير مقروءة',
+    'Notifications could not be loaded.': 'تعذّر تحميل الإشعارات.',
+    'Loading notifications…': 'جارٍ تحميل الإشعارات…',
+    'Workspace update for': 'تحديث يخص',
+    'Mark all as read': 'تحديد الكل كمقروء',
+    'Open finance': 'فتح المالية',
+    'Agreed contract amounts in test mode. No real money moves.':
+        'مبالغ العقود المتفق عليها في الوضع التجريبي. لا تُحوَّل أي أموال حقيقية.',
+    'Awaiting your funding': 'بانتظار تمويلك',
+    'Awaiting client funding': 'بانتظار تمويل صاحب المشروع',
+    'Funded by you': 'موّلتها أنت',
+    'Funded for your work': 'مموّلة لعملك',
+    ':count contracts': ':count عقود',
+    '1 contract': 'عقد واحد',
+    Funding: 'التمويل',
+    'Test mode': 'وضع تجريبي',
+    'Funding verified at': 'تاريخ تأكيد التمويل',
+    'First delivery due': 'موعد التسليم الأول',
+    'A test payment was verified. The delivery clock is running; deliveries and completion are not available yet.':
+        'تم تأكيد دفعة تجريبية وبدأ احتساب مدة التسليم. التسليم وإتمام العمل غير متاحين بعد.',
+    'A payment through :provider is being checked. The contract activates only after the provider confirms it.':
+        'يجري التحقق من دفعة عبر :provider. لا يُفعَّل العقد إلا بعد تأكيد مزوّد الدفع.',
+    'Check payment status': 'تحقق من حالة الدفع',
+    'Continue payment': 'متابعة الدفع',
+    'Cancel this payment attempt? If the provider already completed it, the contract is funded instead.':
+        'هل تريد إلغاء محاولة الدفع هذه؟ إذا كان مزوّد الدفع قد أتمّها، فسيُموَّل العقد بدل إلغائها.',
+    'Cancel attempt': 'إلغاء المحاولة',
+    'Last attempt': 'آخر محاولة',
+    'Funding is paused while an account on this contract is restricted.':
+        'التمويل متوقف ما دام أحد حسابَي هذا العقد مقيّدًا.',
+    'Waiting for the client to fund this contract. The delivery clock has not started.':
+        'بانتظار تمويل صاحب المشروع لهذا العقد. لم يبدأ احتساب مدة التسليم بعد.',
+    'No payment provider is connected yet, so funding is not available.':
+        'لم يُربط أي مزوّد دفع بعد، لذا التمويل غير متاح.',
+    'Fund the agreed amount to start the work. This is a test payment: no real money moves.':
+        'موّل المبلغ المتفق عليه ليبدأ العمل. هذه دفعة تجريبية ولا تُحوَّل أي أموال حقيقية.',
+    'Payment provider': 'مزوّد الدفع',
+    'Fund contract': 'تمويل العقد',
+    'As a client': 'بصفتك صاحب مشاريع',
+    'As a freelancer': 'بصفتك مستقلًا',
+    'Agreed contract amounts and test payments. Elancer does not hold or move real money, so there is no balance to withdraw.':
+        'مبالغ العقود المتفق عليها والدفعات التجريبية. لا تحتفظ Elancer بأموال حقيقية ولا تحوّلها، لذا لا يوجد رصيد للسحب.',
+    'Contracts and funding': 'العقود والتمويل',
+    'Your role': 'صفتك',
+    Amount: 'المبلغ',
+    Actions: 'الإجراءات',
+    'Starts after funding': 'يبدأ بعد التمويل',
+    'Payment history': 'سجل الدفعات',
+    Reference: 'المرجع',
+    Started: 'تاريخ البدء',
+    'No payment attempts yet. They appear here when a client starts funding a contract.':
+        'لا توجد محاولات دفع بعد. ستظهر هنا عندما يبدأ صاحب المشروع تمويل عقد.',
+    'Payment providers': 'مزوّدو الدفع',
+    'Not available yet': 'غير متاح بعد',
+    'Refunds, which arrive with agreed contract cancellation.':
+        'استرداد المبالغ، وسيتوفر مع إلغاء العقد بالاتفاق.',
+    'Deliveries, revisions and completion after funding.':
+        'التسليم والتعديلات وإتمام العمل بعد التمويل.',
+    'Real payments, payouts and withdrawals are outside this test marketplace.':
+        'المدفوعات الحقيقية وتحويل الأرباح والسحب خارج نطاق هذا السوق التجريبي.',
+    'Awaiting funding': 'بانتظار التمويل',
+    'Funded and active': 'مموَّل وجارٍ',
+    'Checking payment': 'جارٍ التحقق من الدفع',
+    'Not completed': 'لم تكتمل',
+    'Verified, needs review': 'مؤكّدة وتحتاج إلى مراجعة',
+    'PayPal (test mode)': 'PayPal (وضع تجريبي)',
+    'Offline test simulator': 'محاكي الاختبار المحلي',
+    'The provider declined the payment.': 'رفض مزوّد الدفع هذه الدفعة.',
+    'The payment was cancelled before completion.':
+        'أُلغيت الدفعة قبل اكتمالها.',
+    'The provider reported details that do not match this contract, so nothing was applied.':
+        'أبلغ مزوّد الدفع عن بيانات لا تطابق هذا العقد، فلم يُطبَّق شيء.',
+    'The provider could not be reached, so no payment was started.':
+        'تعذّر الوصول إلى مزوّد الدفع، فلم تبدأ أي دفعة.',
+    'The provider has no record of this payment.':
+        'لا يوجد سجل لهذه الدفعة لدى مزوّد الدفع.',
+    'The contract was no longer awaiting funding when this payment was verified.':
+        'لم يكن العقد بانتظار التمويل عند تأكيد هذه الدفعة.',
+    'This page stands in for a payment provider during testing. No real money moves.':
+        'تقوم هذه الصفحة مقام مزوّد الدفع أثناء الاختبار. لا تُحوَّل أي أموال حقيقية.',
+    'Approve test payment': 'الموافقة على الدفعة التجريبية',
+    'Decline test payment': 'رفض الدفعة التجريبية',
+    'This payment attempt is already closed.': 'محاولة الدفع هذه مغلقة.',
+    'Back to contract': 'العودة إلى العقد',
 };
