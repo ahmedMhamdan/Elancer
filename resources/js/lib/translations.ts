@@ -1659,4 +1659,11 @@ export const arabic: Record<string, string> = {
     'Decline test payment': 'رفض الدفعة التجريبية',
     'This payment attempt is already closed.': 'محاولة الدفع هذه مغلقة.',
     'Back to contract': 'العودة إلى العقد',
+    'Payments and finance': 'المدفوعات والمالية',
+    'Finance overview': 'نظرة عامة على المالية',
+    'View all payments': 'عرض جميع الدفعات',
+    'Every test payment attempt on your contracts, newest first.':
+        'جميع محاولات الدفع التجريبية على عقودك، من الأحدث إلى الأقدم.',
+    'sent you a message about': 'أرسل لك رسالة بخصوص',
+    Open: 'فتح',
 };
