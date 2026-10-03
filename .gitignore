@@ -47,3 +47,10 @@ yarn-error.log
 /.agents/
 /.cursor/
 /.junie/
+
+# Local demo seed work
+/app/Console/Commands/SetDemoPassword.php
+/database/seeders/Demo/DemoCatalog.php
+/database/seeders/DemoMarketplaceSeeder.php
+/database/seeders/README.md
+/tests/Feature/DemoMarketplaceSeederTest.php
