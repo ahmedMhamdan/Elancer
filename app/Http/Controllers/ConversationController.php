@@ -3,15 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Conversations\HiringAccess;
+use App\Events\WorkspaceSignal;
 use App\Models\Contract;
 use App\Models\Conversation;
 use App\Models\ConversationMessage;
 use App\Models\Project;
 use App\Models\Proposal;
 use App\Models\User;
+use App\Notifications\WorkspaceEvent;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -107,6 +111,8 @@ class ConversationController extends Controller
             DB::table('message_revisions')->insert(['conversation_message_id' => $locked->id, 'body' => $locked->body, 'version' => $locked->version, 'created_at' => now()]);
             $locked->forceFill(['body' => $data['body'], 'version' => $locked->version + 1, 'edited_at' => now()])->save();
         }, 3);
+        $conversation = $message->conversation;
+        WorkspaceSignal::send($message->sender_id === $conversation->client_id ? $conversation->freelancer_id : $conversation->client_id, conversation: $conversation->id);
 
         return back();
     }
@@ -130,6 +136,9 @@ class ConversationController extends Controller
             $locked->timestamps = false;
             $locked->forceFill($changes)->save();
         });
+        if (isset($data['read_through'])) {
+            $this->messageNotifications($request->user(), $conversation->id)->each->markAsRead();
+        }
 
         return back();
     }
@@ -209,6 +218,35 @@ class ConversationController extends Controller
         $message = new ConversationMessage;
         $message->forceFill(['conversation_id' => $conversation->id, 'sender_id' => $sender, 'body' => $body, 'client_token' => $token])->save();
         $conversation->forceFill(['client_archived' => false, 'freelancer_archived' => false])->touch();
+        DB::afterCommit(fn () => $this->announce($conversation, $sender));
+    }
+
+    /** The counterpart's open pages update at once; the bell keeps one unread entry per conversation however many messages arrive. */
+    private function announce(Conversation $conversation, int $sender): void
+    {
+        $recipient = User::query()->find($sender === $conversation->client_id ? $conversation->freelancer_id : $conversation->client_id);
+        if (! $recipient) {
+            return;
+        }
+        if ($this->messageNotifications($recipient, $conversation->id)->isNotEmpty()) {
+            WorkspaceSignal::send($recipient->id, conversation: $conversation->id);
+
+            return;
+        }
+        $recipient->notify(new WorkspaceEvent('message_received', '/messages/'.$conversation->id, $conversation->proposal->project->title,
+            User::query()->whereKey($sender)->value('name'), $conversation->id));
+    }
+
+    /**
+     * The member's unread bell entries for one conversation.
+     *
+     * @return Collection<int, DatabaseNotification>
+     */
+    private function messageNotifications(User $user, int $conversation): Collection
+    {
+        // The stored JSON is narrowed by text so the query stays portable, then matched exactly.
+        return $user->unreadNotifications()->where('data', 'like', '%"kind":"message_received"%')->get()
+            ->filter(fn (DatabaseNotification $notification) => ($notification->data['conversation'] ?? null) === $conversation)->values();
     }
 
     /** @return array<string, mixed> */
