@@ -2,6 +2,7 @@
 
 namespace App\Actions\Dashboard;
 
+use App\Actions\Payments\ContractFunding;
 use App\Enums\WorkspaceRole;
 use App\Models\Contract;
 use App\Models\ConversationMessage;
@@ -87,6 +88,7 @@ class BuildOverview
             'counts' => ['projects' => (clone $projects)->count(), 'proposals' => (clone $proposals)->count(),
                 'invitations' => Invitation::query()->where('recipient_id', $user->id)->where('status', 'pending')->count(),
                 'contracts' => (clone $contracts)->count(), 'awaiting_payment' => (clone $contracts)->where('status', 'awaiting_payment')->count(), 'unread' => $unread],
+            'finance' => ContractFunding::summary($user->id)[$client ? 'client' : 'freelancer'],
             'chart' => $chart, 'work' => $work, 'agreements' => $agreements, 'activity' => $activity,
             'profile_checks' => $checks,
         ];
