@@ -11,6 +11,8 @@ use App\Models\Profile;
 use App\Models\Project;
 use App\Models\Proposal;
 use App\Models\ProposalEvent;
+use App\Models\User;
+use App\Notifications\WorkspaceEvent;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -131,6 +133,9 @@ class ProposalController extends Controller
                 $proposal->draft = null;
                 $proposal->save();
                 InvitationLifecycle::accept($proposal);
+                if ($first) {
+                    DB::afterCommit(fn () => User::query()->find($locked->user_id)?->notify(new WorkspaceEvent('proposal_received', '/proposals/'.$proposal->id, $locked->title, $user->name)));
+                }
                 $this->event($proposal, $user->id, $first ? 'submitted' : (in_array($previousStatus, ['withdrawn', 'reopened'], true) ? 'resubmitted' : 'revised'), $data);
             } else {
                 if (! $proposal->exists) {

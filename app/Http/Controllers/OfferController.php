@@ -8,6 +8,8 @@ use App\Models\Contract;
 use App\Models\Offer;
 use App\Models\Project;
 use App\Models\Proposal;
+use App\Models\User;
+use App\Notifications\WorkspaceEvent;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -72,6 +74,7 @@ class OfferController extends Controller
             $offer->forceFill(['project_id' => $locked->project_id, 'pending_project_id' => $locked->project_id, 'proposal_id' => $locked->id,
                 'client_id' => $locked->project->user_id, 'freelancer_id' => $locked->user_id, 'terms' => $terms,
                 'client_token' => $data['client_token'], 'expires_at' => now()->addHours(72)])->save();
+            $this->notify($offer, 'offer_received', $offer->freelancer_id, $offer->client_id, '/offers/'.$offer->id);
 
             return $offer;
         }, 3);
@@ -122,9 +125,15 @@ class OfferController extends Controller
                 return null;
             }
             if ($data['action'] === 'accept') {
-                return OfferLifecycle::accept($current);
+                $contract = OfferLifecycle::accept($current);
+                $this->notify($current, 'offer_accepted', $current->client_id, $current->freelancer_id, '/contracts/'.$contract->id);
+
+                return $contract;
             }
             OfferLifecycle::close($current, $target, $data['reason'] ?? null);
+            // The client withdraws; every other response comes from the freelancer.
+            $withdrawn = $data['action'] === 'withdraw';
+            $this->notify($current, 'offer_'.$target, $withdrawn ? $current->freelancer_id : $current->client_id, $withdrawn ? $current->client_id : $current->freelancer_id, '/offers/'.$current->id);
 
             return $current;
         }, 3);
@@ -133,6 +142,12 @@ class OfferController extends Controller
         }
 
         return $result instanceof Contract ? to_route('contracts.show', $result) : to_route('offers.show', $offer);
+    }
+
+    private function notify(Offer $offer, string $kind, int $recipient, int $actor, string $href): void
+    {
+        $title = $offer->project->title;
+        DB::afterCommit(fn () => User::query()->find($recipient)?->notify(new WorkspaceEvent($kind, $href, $title, User::query()->whereKey($actor)->value('name'))));
     }
 
     /** @return array<string, mixed> */

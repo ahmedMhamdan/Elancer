@@ -47,6 +47,8 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $user === null ? null : [...$user->attributesToArray(), 'avatar' => $avatar, 'has_password' => $user->password !== null],
             ],
+            // The recipient's own count only; the list loads when the bell opens.
+            'notifications' => ['unread' => $user?->unreadNotifications()->count() ?? 0],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }

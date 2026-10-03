@@ -8,6 +8,7 @@ use App\Models\Profile;
 use App\Models\Project;
 use App\Models\Proposal;
 use App\Models\User;
+use App\Notifications\WorkspaceEvent;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -52,6 +53,7 @@ class InvitationController extends Controller
             $invitation = new Invitation;
             $invitation->forceFill(['project_id' => $project->id, 'recipient_id' => $recipient->id, 'status' => 'pending', 'version' => 1, 'sent_at' => now()])->save();
             Lifecycle::event($invitation, 'sent');
+            DB::afterCommit(fn () => $recipient->notify(new WorkspaceEvent('invitation_received', '/invitations/'.$invitation->id, $project->title, $owner->name)));
 
             return $invitation;
         }, 3);
