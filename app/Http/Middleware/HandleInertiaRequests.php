@@ -49,7 +49,27 @@ class HandleInertiaRequests extends Middleware
             ],
             // The recipient's own count only; the list loads when the bell opens.
             'notifications' => ['unread' => $user?->unreadNotifications()->count() ?? 0],
+            'realtime' => $user === null ? null : $this->realtime(),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
+    }
+
+    /**
+     * Public connection details for the member's live-update channel; null when broadcasting is off.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function realtime(): ?array
+    {
+        $driver = config('broadcasting.default');
+        $connection = config('broadcasting.connections.'.$driver);
+        if (! in_array($driver, ['reverb', 'pusher'], true) || blank($connection['key'] ?? null)) {
+            return null;
+        }
+        $reverb = $driver === 'reverb';
+
+        return ['driver' => $driver, 'key' => $connection['key'], 'host' => $reverb ? $connection['options']['host'] : null,
+            'port' => $reverb ? (int) $connection['options']['port'] : null, 'secure' => $connection['options']['scheme'] === 'https',
+            'cluster' => $reverb ? null : $connection['options']['cluster']];
     }
 }

@@ -10,7 +10,7 @@ use Illuminate\Notifications\Notification;
  */
 class WorkspaceEvent extends Notification
 {
-    public function __construct(private string $kind, private string $href, private ?string $title = null, private ?string $actor = null) {}
+    public function __construct(private string $kind, private string $href, private ?string $title = null, private ?string $actor = null, public readonly ?int $conversation = null) {}
 
     /** @return list<string> */
     public function via(object $notifiable): array
@@ -18,9 +18,9 @@ class WorkspaceEvent extends Notification
         return ['database'];
     }
 
-    /** @return array<string, string|null> */
+    /** @return array<string, int|string|null> */
     public function toArray(object $notifiable): array
     {
-        return ['kind' => $this->kind, 'href' => $this->href, 'title' => $this->title, 'actor' => $this->actor];
+        return ['kind' => $this->kind, 'href' => $this->href, 'title' => $this->title, 'actor' => $this->actor, 'conversation' => $this->conversation];
     }
 }
