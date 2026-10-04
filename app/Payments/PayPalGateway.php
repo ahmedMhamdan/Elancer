@@ -76,6 +76,22 @@ class PayPalGateway implements PaymentGateway
         return ($this->order($attempt)['status'] ?? null) !== 'COMPLETED';
     }
 
+    public function refund(PaymentAttempt $attempt, string $capture, ?string $refund = null): Refund
+    {
+        // The request id makes a repeated refund return the first result instead of refunding again.
+        $result = $refund !== null
+            ? $this->api()->get('/v2/payments/refunds/'.$refund)->throw()->json()
+            : $this->api()->withHeaders(['PayPal-Request-Id' => $attempt->reference.'-refund'])
+                ->withBody('{}', 'application/json')->post('/v2/payments/captures/'.$capture.'/refund')->throw()->json();
+        $reference = is_string($result['id'] ?? null) ? $result['id'] : $refund;
+
+        return match ($result['status'] ?? null) {
+            'COMPLETED' => new Refund(Refund::SUCCEEDED, $reference, Money::minor((string) ($result['amount']['value'] ?? '0')), (string) ($result['amount']['currency_code'] ?? '')),
+            'FAILED', 'CANCELLED' => Refund::failed('declined', $reference),
+            default => new Refund(Refund::PENDING, $reference),
+        };
+    }
+
     /** @return array<string, mixed> */
     private function order(PaymentAttempt $attempt): array
     {

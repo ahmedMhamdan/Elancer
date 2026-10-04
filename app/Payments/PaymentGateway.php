@@ -17,4 +17,10 @@ interface PaymentGateway
 
     /** True when the provider-side payment can no longer complete; false when it already completed. */
     public function void(PaymentAttempt $attempt): bool;
+
+    /**
+     * Refund the whole verified capture, or read the state of a refund already started.
+     * Starting is idempotent on the attempt, so a retry never refunds twice.
+     */
+    public function refund(PaymentAttempt $attempt, string $capture, ?string $refund = null): Refund;
 }

@@ -69,6 +69,22 @@ class StripeGateway implements PaymentGateway
         return ($session['status'] ?? null) !== 'complete';
     }
 
+    public function refund(PaymentAttempt $attempt, string $capture, ?string $refund = null): Refund
+    {
+        // The capture reference is the payment intent recorded at verification.
+        $result = $refund !== null
+            ? $this->api()->get('/v1/refunds/'.$refund)->throw()->json()
+            : $this->api()->withHeaders(['Idempotency-Key' => $attempt->reference.'-refund'])->asForm()
+                ->post('/v1/refunds', ['payment_intent' => $capture, 'metadata' => ['reference' => $attempt->reference]])->throw()->json();
+        $reference = is_string($result['id'] ?? null) ? $result['id'] : $refund;
+
+        return match ($result['status'] ?? null) {
+            'succeeded' => new Refund(Refund::SUCCEEDED, $reference, (int) $result['amount'], strtoupper((string) $result['currency'])),
+            'failed', 'canceled' => Refund::failed('declined', $reference),
+            default => new Refund(Refund::PENDING, $reference),
+        };
+    }
+
     /** @return array<string, mixed> */
     private function session(PaymentAttempt $attempt): array
     {

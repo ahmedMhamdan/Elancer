@@ -44,6 +44,16 @@ class SimulatorGateway implements PaymentGateway
         return SimulatedPayment::query()->where('reference', $attempt->provider_reference)->value('status') !== 'approved';
     }
 
+    public function refund(PaymentAttempt $attempt, string $capture, ?string $refund = null): Refund
+    {
+        SimulatedPayment::query()->where('reference', $capture)->where('status', 'approved')->update(['status' => 'refunded']);
+        $payment = SimulatedPayment::query()->where('reference', $capture)->first();
+
+        return $payment?->status === 'refunded'
+            ? new Refund(Refund::SUCCEEDED, 'R-'.$payment->reference, $payment->amount_minor, $payment->currency)
+            : Refund::failed('unknown_payment');
+    }
+
     /** The payer's decision on the simulator page. Only an undecided payment can change. */
     public function decide(PaymentAttempt $attempt, bool $approve): void
     {

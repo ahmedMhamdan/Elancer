@@ -18,6 +18,8 @@ return [
     'stripe' => [
         // Only a test-mode key (sk_test_...) is accepted; anything else leaves Stripe switched off.
         'secret' => env('STRIPE_TEST_SECRET_KEY'),
+        // Optional signing secret (whsec_...) for /payments/webhooks/stripe; the endpoint is off without it.
+        'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
     ],
 
     'moyasar' => [

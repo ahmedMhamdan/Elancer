@@ -36,7 +36,8 @@ class ContractFunding
             $minor = ['awaiting' => 0, 'funded' => 0];
             $count = ['awaiting' => 0, 'funded' => 0];
             foreach (Contract::query()->where($column, $user)->get(['id', 'status', 'agreement', 'funded_at']) as $contract) {
-                $group = $contract->funded_at ? 'funded' : ($contract->status === 'awaiting_payment' ? 'awaiting' : null);
+                // A cancelled contract's refunded amount is no longer funded.
+                $group = $contract->status === 'cancelled' ? null : ($contract->funded_at ? 'funded' : ($contract->status === 'awaiting_payment' ? 'awaiting' : null));
                 if ($group !== null) {
                     $minor[$group] += Money::minor((string) $contract->agreement['amount']);
                     $count[$group]++;
