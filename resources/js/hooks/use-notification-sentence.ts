@@ -14,6 +14,20 @@ export function useNotificationSentence() {
         contract_funded: t('funded the contract for'),
         payment_verified: t('Your test payment was verified for'),
         message_received: t('sent you a message about'),
+        delivery_submitted: t('submitted a delivery for'),
+        revision_requested: t('requested a revision for'),
+        contract_completed: t('approved your delivery and completed'),
+        review_received: t('left you a review for'),
+        cancellation_requested: t('asked to cancel the contract for'),
+        cancellation_accepted: t('accepted cancelling the contract for'),
+        cancellation_declined: t('declined cancelling the contract for'),
+        cancellation_withdrawn: t(
+            'withdrew the request to cancel the contract for',
+        ),
+        contract_cancelled: t('cancelled the unfunded contract for'),
+        contract_refunded: t(
+            'The test payment was refunded and the contract cancelled for',
+        ),
     };
     return (kind: string | null) =>
         sentences[kind ?? ''] ?? t('Workspace update for');

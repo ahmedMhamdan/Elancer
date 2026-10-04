@@ -5,7 +5,7 @@ import { useTranslation } from '@/hooks/use-translation';
 // item rows and close SVG. Elancer changes: palette tokens, responsive positioning,
 // accessible dismissal, initials instead of demo photos and the recipient's own
 // persisted notifications.
-import { router, usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { TailAdminDropdown } from '@/components/tailadmin-dropdown';
 import { useNotificationSentence } from '@/hooks/use-notification-sentence';
@@ -230,6 +230,13 @@ export default function NotificationDropdown() {
                         )}
                     </>
                 )}
+                <Link
+                    href="/notifications"
+                    className="text-primary mt-3 flex min-h-11 items-center justify-center text-sm font-medium underline-offset-4 hover:underline"
+                    onClick={closeDropdown}
+                >
+                    {t('View all notifications')}
+                </Link>
             </TailAdminDropdown>
         </div>
     );
