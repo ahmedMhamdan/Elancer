@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Contracts\ContractWork;
+use App\Models\ContractReview;
 use App\Models\Profile;
 use App\Models\Skill;
 use Illuminate\Database\Eloquent\Builder;
@@ -10,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -53,7 +56,16 @@ class FreelancerController extends Controller
     {
         abort_unless(Profile::query()->publiclyVisible()->whereKey($profile->id)->exists(), 404);
 
-        return Inertia::render('discovery/freelancer', ['freelancer' => $profile->load(['user', 'skillTags'])->publicDetails(), 'canContact' => $request->user()?->id !== $profile->user_id]);
+        // Q18/Q82: published reviews only, with the client's first name and nothing that links to an account.
+        $reviews = ContractReview::query()->with('contract')->where('subject_id', $profile->user_id)->orderByDesc('id')->limit(50)->get()
+            ->filter(fn (ContractReview $review) => $review->contract->freelancer_id === $profile->user_id && ContractWork::reviewsPublished($review->contract))
+            ->take(10)->values()->map(fn (ContractReview $review) => [
+                'id' => $review->id, 'rating' => $review->rating, 'body' => $review->body, 'created_at' => $review->created_at,
+                'author' => Str::before(trim((string) ($review->contract->agreement['client_name'] ?? '')), ' '),
+                'project_title' => $review->contract->agreement['project_title'] ?? null,
+            ]);
+
+        return Inertia::render('discovery/freelancer', ['freelancer' => $profile->load(['user', 'skillTags'])->publicDetails(), 'canContact' => $request->user()?->id !== $profile->user_id, 'reviews' => $reviews]);
     }
 
     public function photo(Profile $profile): HttpResponse

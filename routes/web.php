@@ -4,7 +4,9 @@ use App\Http\Controllers\AdministratorController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ClientProjectController;
 use App\Http\Controllers\ContactBlockController;
+use App\Http\Controllers\ContractCancellationController;
 use App\Http\Controllers\ContractController;
+use App\Http\Controllers\ContractWorkController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FinanceController;
@@ -17,6 +19,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OfferController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PaymentWebhookController;
 use App\Http\Controllers\ProfilePhotoController;
 use App\Http\Controllers\ProjectDiscoveryController;
 use App\Http\Controllers\ProposalController;
@@ -41,6 +44,7 @@ Route::get('jobs/{project}', [ProjectDiscoveryController::class, 'show'])->where
 Route::get('freelancers', [FreelancerController::class, 'index'])->name('freelancers.index');
 Route::get('freelancers/{profile}', [FreelancerController::class, 'show'])->whereNumber('profile')->name('freelancers.show');
 Route::get('freelancers/{profile}/photo', [FreelancerController::class, 'photo'])->whereNumber('profile')->name('freelancers.photo');
+Route::post('payments/webhooks/stripe', [PaymentWebhookController::class, 'stripe'])->middleware('throttle:120,1')->name('payments.webhooks.stripe');
 Route::post('locale', LocaleController::class)->middleware('throttle:60,1')->name('locale.update');
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -57,6 +61,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::patch('offers/{offer}', [OfferController::class, 'update'])->whereNumber('offer')->middleware('throttle:30,1')->name('offers.update');
         Route::get('contracts', [ContractController::class, 'index'])->name('contracts.index');
         Route::get('contracts/{contract}', [ContractController::class, 'show'])->whereNumber('contract')->name('contracts.show');
+        Route::post('contracts/{contract}/deliveries', [ContractWorkController::class, 'deliver'])->whereNumber('contract')->middleware('throttle:20,1')->name('contracts.deliver');
+        Route::post('contracts/{contract}/revisions', [ContractWorkController::class, 'revise'])->whereNumber('contract')->middleware('throttle:20,1')->name('contracts.revise');
+        Route::post('contracts/{contract}/complete', [ContractWorkController::class, 'complete'])->whereNumber('contract')->middleware('throttle:20,1')->name('contracts.complete');
+        Route::put('contracts/{contract}/review', [ContractWorkController::class, 'review'])->whereNumber('contract')->middleware('throttle:20,1')->name('contracts.review');
+        Route::post('contracts/{contract}/cancellation', [ContractCancellationController::class, 'store'])->whereNumber('contract')->middleware('throttle:10,1')->name('contracts.cancellation.store');
+        Route::patch('contracts/{contract}/cancellation', [ContractCancellationController::class, 'update'])->whereNumber('contract')->middleware('throttle:20,1')->name('contracts.cancellation.update');
+        Route::post('contracts/{contract}/cancellation/refund', [ContractCancellationController::class, 'refund'])->whereNumber('contract')->middleware('throttle:20,1')->name('contracts.cancellation.refund');
+        Route::get('contracts/{contract}/files/{file}', [ContractWorkController::class, 'file'])->whereNumber(['contract', 'file'])->name('contracts.file');
         Route::get('finance', FinanceController::class)->name('finance.index');
         Route::get('finance/payments', [FinanceController::class, 'payments'])->name('finance.payments');
         Route::post('contracts/{contract}/payments', [PaymentController::class, 'store'])->whereNumber('contract')->middleware('throttle:20,1')->name('payments.store');
