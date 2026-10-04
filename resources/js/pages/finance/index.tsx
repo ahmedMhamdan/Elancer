@@ -335,16 +335,6 @@ export default function Finance({
                     <ul className="market-muted list-disc space-y-2 ps-6">
                         <li>
                             {t(
-                                'Refunds, which arrive with agreed contract cancellation.',
-                            )}
-                        </li>
-                        <li>
-                            {t(
-                                'Deliveries, revisions and completion after funding.',
-                            )}
-                        </li>
-                        <li>
-                            {t(
                                 'Real payments, payouts and withdrawals are outside this test marketplace.',
                             )}
                         </li>

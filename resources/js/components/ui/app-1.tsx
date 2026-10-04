@@ -17,7 +17,9 @@ import '@/../css/elancer-overview.css';
 const STATUS_LABELS: Record<string, string> = {
     draft: 'Draft', published: 'Published', closed: 'Closed', hired: 'Hired',
     submitted: 'Submitted', withdrawn: 'Withdrawn', declined: 'Declined', reopened: 'Reopened',
-    awaiting_payment: 'Awaiting payment',
+    awaiting_payment: 'Awaiting payment', active: 'Funded and active',
+    revision_requested: 'Revision requested', completed: 'Completed',
+    cancellation_pending: 'Cancellation pending', cancelled: 'Cancelled',
 };
 const CHECK_LABELS = { headline: 'Headline', bio: 'Bio', skills: 'Skills', location: 'Location' };
 

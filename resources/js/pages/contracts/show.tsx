@@ -1,72 +1,148 @@
-import { Link, router, useForm, usePage } from '@inertiajs/react';
-import { useState } from 'react';
-import InputError from '@/components/input-error';
-import Button from '@/components/tailadmin/button';
+import { Link } from '@inertiajs/react';
+import { useRef, useState } from 'react';
 import { useTranslation } from '@/hooks/use-translation';
-import { Money } from '@/pages/discovery/shared';
 import {
     AgreementLayout,
     AgreementTerms,
     ContractStatus,
     OfferTime,
-    PaymentStatus,
-    ProviderOptions,
-    usePaymentReason,
-    useProviderLabel,
     type Contract,
     type Payment,
 } from '@/pages/offers/shared';
+import {
+    CancellationRequest,
+    CancellationStatus,
+    type Cancellation,
+} from './cancellation';
+import { Deliveries, type Submission } from './deliveries';
+import { Funding } from './funding';
+import { Reviews, type ReviewState } from './reviews';
+
+type Activity = { kind: string; at: string; number: number | null };
 
 export default function Show({
     contract,
     payment,
     providers,
     funding_paused,
+    submissions,
+    activity,
+    reviews,
+    cancellation,
 }: {
     contract: Contract;
     payment: Payment | null;
     providers: string[];
     funding_paused: boolean;
+    submissions: Submission[];
+    activity: Activity[];
+    reviews: ReviewState | null;
+    cancellation: Cancellation | null;
 }) {
-    const { t } = useTranslation();
-    const errors = usePage().props.errors as Record<string, string>;
-    const providerLabel = useProviderLabel();
-    const paymentReason = usePaymentReason();
-    // One token per page load: a double click or retry reuses the same attempt.
-    const form = useForm({
-        provider: providers[0] ?? '',
-        client_token: crypto.randomUUID(),
-    });
-    const [busy, setBusy] = useState(false);
-    const act = (path: string, confirmation?: string) => {
-        if (busy || (confirmation && !window.confirm(confirmation))) return;
-        setBusy(true);
-        router.post(
-            `/payments/${payment?.id}/${path}`,
-            {},
-            { preserveScroll: true, onFinish: () => setBusy(false) },
-        );
+    const { t, locale } = useTranslation();
+    const tabs = [
+        { key: 'deliveries', label: t('Deliveries') },
+        { key: 'agreement', label: t('Agreement') },
+        { key: 'payments', label: t('Payments') },
+        { key: 'activity', label: t('Activity') },
+        ...(reviews ? [{ key: 'reviews', label: t('Reviews') }] : []),
+    ];
+    const [tab, setTab] = useState(
+        contract.status === 'awaiting_payment'
+            ? 'payments'
+            : contract.status === 'completed'
+              ? 'reviews'
+              : 'deliveries',
+    );
+    const list = useRef<HTMLDivElement>(null);
+    const move = (step: number) => {
+        const index = tabs.findIndex(({ key }) => key === tab);
+        const next = tabs[(index + step + tabs.length) % tabs.length].key;
+        setTab(next);
+        list.current
+            ?.querySelector<HTMLElement>(`#contract-tab-${next}`)
+            ?.focus();
     };
-    const fund = () => {
-        // Continuing reuses the open attempt's provider.
-        form.transform((data) => ({
-            ...data,
-            provider: pending && payment ? payment.provider : data.provider,
-        }));
-        form.post(`/contracts/${contract.id}/payments`, {
-            preserveScroll: true,
-        });
+    const mine = contract.is_client ? 'client' : 'freelancer';
+    // What this participant should do next, by state and role.
+    const next: Record<string, Record<string, string>> = {
+        awaiting_payment: {
+            client: t('Fund the contract to start the work.'),
+            freelancer: t(
+                'Waiting for the client to fund this contract. The delivery clock has not started.',
+            ),
+        },
+        active: {
+            client: t('The freelancer is working on the first delivery.'),
+            freelancer: t(
+                'Submit the complete delivery before the first delivery date.',
+            ),
+        },
+        submitted: {
+            client: t(
+                'Review the delivery, then approve it or request a revision.',
+            ),
+            freelancer: t('Waiting for the client to review your delivery.'),
+        },
+        revision_requested: {
+            client: t('The freelancer is working on your requested changes.'),
+            freelancer: t(
+                'Read the requested changes and submit a revised delivery.',
+            ),
+        },
+        completed: {
+            client: t('The contract is completed. Leave a review.'),
+            freelancer: t('The contract is completed. Leave a review.'),
+        },
+        cancellation_pending: {
+            client: t('A cancellation request is open. Formal work is paused.'),
+            freelancer: t(
+                'A cancellation request is open. Formal work is paused.',
+            ),
+        },
+        cancelled: {
+            client: t('This contract was cancelled. Nothing further is due.'),
+            freelancer: t(
+                'This contract was cancelled. Nothing further is due.',
+            ),
+        },
     };
-    const awaiting = contract.status === 'awaiting_payment';
-    const pending = payment?.status === 'pending';
+    const cancellable = [
+        'awaiting_payment',
+        'active',
+        'submitted',
+        'revision_requested',
+    ].includes(contract.status);
+    const showCancellation =
+        cancellation &&
+        (['pending', 'accepted'].includes(cancellation.status) ||
+            contract.status === 'cancelled');
+    const events: Record<string, string> = {
+        accepted: t('Final offer accepted'),
+        funded: t('Test payment verified'),
+        delivered: t('Delivery :number submitted'),
+        revision: t('Revision request :number sent'),
+        completed: t('Delivery approved and contract completed'),
+        cancellation_requested: t('Cancellation requested'),
+        cancellation_declined: t('Cancellation request declined'),
+        cancellation_withdrawn: t('Cancellation request withdrawn'),
+        cancellation_accepted: t('Cancellation accepted'),
+        refunded: t('Test payment refunded'),
+        cancelled: t('Contract cancelled'),
+    };
     return (
-        <AgreementLayout title={t('Contract agreement')}>
-            <h2 dir="auto">{contract.agreement.project_title}</h2>
+        <AgreementLayout title={t('Contract')}>
             <section className="market-panel market-stack">
                 <div className="market-actions">
-                    <h2 className="!mb-0">{t('Funding')}</h2>
+                    <h2 className="!mb-0" dir="auto">
+                        {contract.agreement.project_title}
+                    </h2>
                     <ContractStatus status={contract.status} />
-                    <span className="proposal-status">{t('Test mode')}</span>
+                    {contract.overdue && (
+                        <span className="proposal-status contract-overdue">
+                            {t('First delivery overdue')}
+                        </span>
+                    )}
                 </div>
                 <dl className="proposal-terms">
                     <div>
@@ -77,20 +153,6 @@ export default function Show({
                         <dt>{t('Freelancer')}</dt>
                         <dd dir="auto">{contract.agreement.freelancer_name}</dd>
                     </div>
-                    <div>
-                        <dt>{t('Accepted at')}</dt>
-                        <dd>
-                            <OfferTime value={contract.agreement.accepted_at} />
-                        </dd>
-                    </div>
-                    {contract.funded_at && (
-                        <div>
-                            <dt>{t('Funding verified at')}</dt>
-                            <dd>
-                                <OfferTime value={contract.funded_at} />
-                            </dd>
-                        </div>
-                    )}
                     {contract.delivery_due_at && (
                         <div>
                             <dt>{t('First delivery due')}</dt>
@@ -99,131 +161,128 @@ export default function Show({
                             </dd>
                         </div>
                     )}
+                    {contract.completed_at && (
+                        <div>
+                            <dt>{t('Completed at')}</dt>
+                            <dd>
+                                <OfferTime value={contract.completed_at} />
+                            </dd>
+                        </div>
+                    )}
                 </dl>
-                <InputError message={errors.payment ?? errors.provider} />
-                {!awaiting && (
-                    <p>
-                        {t(
-                            'A test payment was verified. The delivery clock is running; deliveries and completion are not available yet.',
-                        )}
-                    </p>
+                <p>
+                    <strong>{t('Next step')}:</strong>{' '}
+                    {next[contract.status]?.[mine]}
+                </p>
+                <div className="market-actions">
+                    <Link
+                        className="market-primary-link"
+                        href={`/messages/${contract.conversation_id}`}
+                    >
+                        {t('Open messages')}
+                    </Link>
+                </div>
+            </section>
+            {showCancellation && (
+                <CancellationStatus
+                    contract={contract}
+                    cancellation={cancellation}
+                />
+            )}
+            <div
+                ref={list}
+                role="tablist"
+                aria-label={t('Contract sections')}
+                className="contract-tabs"
+                onKeyDown={(event) => {
+                    const forward =
+                        document.documentElement.dir === 'rtl'
+                            ? 'ArrowLeft'
+                            : 'ArrowRight';
+                    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight')
+                        move(event.key === forward ? 1 : -1);
+                }}
+            >
+                {tabs.map(({ key, label }) => (
+                    <button
+                        key={key}
+                        type="button"
+                        role="tab"
+                        id={`contract-tab-${key}`}
+                        aria-selected={tab === key}
+                        aria-controls="contract-panel"
+                        tabIndex={tab === key ? 0 : -1}
+                        onClick={() => setTab(key)}
+                    >
+                        {label}
+                    </button>
+                ))}
+            </div>
+            <div
+                id="contract-panel"
+                role="tabpanel"
+                aria-labelledby={`contract-tab-${tab}`}
+                className="market-stack"
+            >
+                {tab === 'deliveries' && (
+                    <Deliveries contract={contract} submissions={submissions} />
                 )}
-                {awaiting && pending && payment && (
+                {tab === 'agreement' && (
                     <>
-                        <p>
-                            {t(
-                                'A payment through :provider is being checked. The contract activates only after the provider confirms it.',
-                                { provider: providerLabel(payment.provider) },
-                            )}
-                        </p>
+                        <AgreementTerms terms={contract.agreement} />
                         <div className="market-actions">
-                            <Button
-                                disabled={busy}
-                                onClick={() => act('check')}
-                            >
-                                {t('Check payment status')}
-                            </Button>
-                            {contract.is_client && (
-                                <>
-                                    <Button
-                                        variant="outline"
-                                        disabled={busy || form.processing}
-                                        onClick={fund}
-                                    >
-                                        {t('Continue payment')}
-                                    </Button>
-                                    <Button
-                                        variant="danger-outline"
-                                        disabled={busy}
-                                        onClick={() =>
-                                            act(
-                                                'cancel',
-                                                t(
-                                                    'Cancel this payment attempt? If the provider already completed it, the contract is funded instead.',
-                                                ),
-                                            )
-                                        }
-                                    >
-                                        {t('Cancel attempt')}
-                                    </Button>
-                                </>
-                            )}
+                            <Link href={`/offers/${contract.offer_id}`}>
+                                {t('View accepted offer')}
+                            </Link>
+                            <Link href={`/jobs/${contract.project_id}`}>
+                                {t('View project')}
+                            </Link>
+                        </div>
+                        {cancellable && (
+                            <CancellationRequest contract={contract} />
+                        )}
+                    </>
+                )}
+                {tab === 'payments' && (
+                    <>
+                        <Funding
+                            contract={contract}
+                            payment={payment}
+                            providers={providers}
+                            funding_paused={funding_paused}
+                        />
+                        <div className="market-actions">
+                            <Link href="/finance">{t('Finance')}</Link>
                         </div>
                     </>
                 )}
-                {awaiting && !pending && (
-                    <>
-                        {payment && (
-                            <p className="market-muted">
-                                {t('Last attempt')}:{' '}
-                                <PaymentStatus status={payment.status} />{' '}
-                                {paymentReason(payment.failure_reason)}
-                            </p>
-                        )}
-                        {funding_paused ? (
-                            <p>
-                                {t(
-                                    'Funding is paused while an account on this contract is restricted.',
-                                )}
-                            </p>
-                        ) : !contract.is_client ? (
-                            <p>
-                                {t(
-                                    'Waiting for the client to fund this contract. The delivery clock has not started.',
-                                )}
-                            </p>
-                        ) : providers.length === 0 ? (
-                            <p>
-                                {t(
-                                    'No payment provider is connected yet, so funding is not available.',
-                                )}
-                            </p>
-                        ) : (
-                            <>
-                                <p>
-                                    {t(
-                                        'Fund the agreed amount to start the work. This is a test payment: no real money moves.',
-                                    )}{' '}
-                                    <Money
-                                        min={contract.agreement.amount}
-                                        max={contract.agreement.amount}
-                                    />
-                                </p>
-                                <ProviderOptions
-                                    providers={providers}
-                                    value={form.data.provider}
-                                    onChange={(provider) =>
-                                        form.setData('provider', provider)
-                                    }
-                                />
-                                <div>
-                                    <Button
-                                        disabled={form.processing}
-                                        onClick={fund}
-                                    >
-                                        {t('Fund contract')}
-                                    </Button>
-                                </div>
-                            </>
-                        )}
-                    </>
+                {tab === 'activity' && (
+                    <section className="market-panel market-stack">
+                        <h2>{t('Activity')}</h2>
+                        <ol className="contract-activity">
+                            {activity.map((event, index) => (
+                                <li key={index}>
+                                    <span>
+                                        {(
+                                            events[event.kind] ?? event.kind
+                                        ).replace(
+                                            ':number',
+                                            (event.number ?? 0).toLocaleString(
+                                                locale,
+                                            ),
+                                        )}
+                                    </span>
+                                    <span className="market-muted">
+                                        <OfferTime value={event.at} />
+                                    </span>
+                                </li>
+                            ))}
+                        </ol>
+                    </section>
                 )}
-            </section>
-            <AgreementTerms terms={contract.agreement} />
-            <div className="market-actions">
-                <Link
-                    className="market-primary-link"
-                    href={`/messages/${contract.conversation_id}`}
-                >
-                    {t('Open messages')}
-                </Link>
-                <Link href="/finance">{t('Finance')}</Link>
-                <Link href={`/offers/${contract.offer_id}`}>
-                    {t('View accepted offer')}
-                </Link>
-                <Link href={`/jobs/${contract.project_id}`}>
-                    {t('View project')}
-                </Link>
+                {tab === 'reviews' && reviews && (
+                    <Reviews contract={contract} reviews={reviews} />
+                )}
             </div>
         </AgreementLayout>
     );

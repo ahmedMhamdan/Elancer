@@ -46,6 +46,10 @@ export type Contract = {
     created_at: string;
     funded_at: string | null;
     delivery_due_at: string | null;
+    completed_at: string | null;
+    cancelled_at: string | null;
+    revisions_used: number;
+    overdue: boolean;
     is_client: boolean;
     agreement: Terms & {
         project_title: string;
@@ -71,13 +75,18 @@ export function ContractStatus({ status }: { status: string }) {
     const labels: Record<string, string> = {
         awaiting_payment: t('Awaiting funding'),
         active: t('Funded and active'),
+        submitted: t('Delivered, awaiting review'),
+        revision_requested: t('Revision requested'),
+        completed: t('Completed'),
+        cancellation_pending: t('Cancellation pending'),
+        cancelled: t('Cancelled'),
     };
     return (
         <span
             className={
-                status === 'active'
-                    ? 'proposal-status proposal-status-submitted'
-                    : 'proposal-status'
+                ['awaiting_payment', 'cancelled'].includes(status)
+                    ? 'proposal-status'
+                    : 'proposal-status proposal-status-submitted'
             }
         >
             {labels[status] ?? status}
@@ -92,6 +101,7 @@ export function PaymentStatus({ status }: { status: string }) {
         failed: t('Not completed'),
         cancelled: t('Cancelled'),
         unapplied: t('Verified, needs review'),
+        refunded: t('Refunded'),
     };
     return (
         <span
