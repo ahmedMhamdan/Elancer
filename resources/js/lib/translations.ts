@@ -1666,4 +1666,175 @@ export const arabic: Record<string, string> = {
         'جميع محاولات الدفع التجريبية على عقودك، من الأحدث إلى الأقدم.',
     'sent you a message about': 'أرسل لك رسالة بخصوص',
     Open: 'فتح',
+    'submitted a delivery for': 'سلّم العمل في مشروع',
+    'requested a revision for': 'طلب تعديلًا على',
+    'approved your delivery and completed': 'وافق على تسليمك وأكمل',
+    'left you a review for': 'كتب لك تقييمًا عن',
+    'Submit this formal delivery? It cannot be edited afterwards.':
+        'هل تريد إرسال هذا التسليم الرسمي؟ لا يمكن تعديله بعد الإرسال.',
+    'Submit the revised delivery': 'إرسال التسليم المعدَّل',
+    'Submit a delivery': 'إرسال تسليم',
+    'A formal delivery contains every named deliverable. Share partial progress in Messages instead.':
+        'التسليم الرسمي يشمل جميع المخرجات المتفق عليها. شارك التقدّم الجزئي في الرسائل.',
+    'Delivery message': 'رسالة التسليم',
+    'Describe what you are delivering and how to check it.':
+        'اشرح ما تسلّمه وكيف يمكن مراجعته.',
+    Links: 'الروابط',
+    'One link per line, up to 5.': 'رابط واحد في كل سطر، بحد أقصى 5.',
+    Files: 'الملفات',
+    'Up to 3 files, 5 MB each: JPG, PNG, WebP, PDF, TXT or ZIP. Only you and the client can download them.':
+        'حتى 3 ملفات، 5 ميغابايت لكل ملف: JPG أو PNG أو WebP أو PDF أو TXT أو ZIP. لا يستطيع تنزيلها إلا أنت والعميل.',
+    'This delivery includes every named deliverable.':
+        'هذا التسليم يشمل جميع المخرجات المتفق عليها.',
+    'Submit delivery': 'إرسال التسليم',
+    'Your decision': 'قرارك',
+    'Check the delivery against the named deliverables. Nothing is approved automatically.':
+        'راجع التسليم مقابل المخرجات المتفق عليها. لا تتم الموافقة على أي شيء تلقائيًا.',
+    'Approve this delivery and complete the contract? This cannot be undone.':
+        'هل تريد الموافقة على هذا التسليم وإكمال العقد؟ لا يمكن التراجع عن ذلك.',
+    'Approve and complete': 'موافقة وإكمال العقد',
+    'Send this revision request? It uses one included revision round.':
+        'هل تريد إرسال طلب التعديل؟ سيُحتسب جولة واحدة من جولات التعديل المتفق عليها.',
+    'List every change you need in this one request.':
+        'اذكر كل التعديلات التي تحتاجها في هذا الطلب.',
+    'Group all changes into one request: each request uses one round, however many changes it lists.':
+        'اجمع كل التعديلات في طلب واحد: كل طلب يُحتسب جولة واحدة مهما كان عدد التعديلات فيه.',
+    'Request revision': 'طلب تعديل',
+    'Every included revision round has been used. You can approve this delivery or keep discussing it in Messages.':
+        'استُخدمت جميع جولات التعديل المتفق عليها. يمكنك الموافقة على هذا التسليم أو متابعة النقاش في الرسائل.',
+    'Revision rounds used: :used of :total':
+        'جولات التعديل المستخدمة: :used من :total',
+    'Deliveries open once funding is verified.':
+        'يُتاح التسليم بعد التحقق من التمويل.',
+    'Delivery :number': 'التسليم :number',
+    Download: 'تنزيل',
+    'Revision request :number': 'طلب التعديل :number',
+    'No delivery has been submitted yet.': 'لم يُرسل أي تسليم بعد.',
+    'A test payment through :provider was verified.':
+        'تم التحقق من دفعة تجريبية عبر :provider.',
+    'Elancer does not hold or move real money, so completion releases no payout.':
+        'إيلانسر لا يحتفظ بأموال حقيقية ولا يحوّلها، لذلك لا يترتب على إكمال العقد صرف أي مبلغ.',
+    ':rating out of 5': ':rating من 5',
+    Reviews: 'التقييمات',
+    'Reviews for this contract are published.': 'تقييمات هذا العقد منشورة.',
+    'Reviews stay hidden until both of you have submitted one. Otherwise they publish on:':
+        'تبقى التقييمات مخفية إلى أن يرسل كل منكما تقييمه، وإلا فستُنشر في:',
+    'Your rating of :name': 'تقييمك لـ :name',
+    'Your review': 'تقييمك',
+    'Describe how the work and communication went.':
+        'صف كيف سار العمل والتواصل.',
+    'Your review is saved and hidden. You can edit it until reviews are published.':
+        'تقييمك محفوظ ومخفي. يمكنك تعديله إلى أن تُنشر التقييمات.',
+    'Reviews are already published, so yours appears at once and cannot be edited.':
+        'التقييمات منشورة بالفعل، لذلك سيظهر تقييمك فورًا ولا يمكن تعديله.',
+    'You can edit your review until reviews are published.':
+        'يمكنك تعديل تقييمك إلى أن تُنشر التقييمات.',
+    'Update review': 'تحديث التقييم',
+    'Submit review': 'إرسال التقييم',
+    'Review from :name': 'تقييم :name',
+    ':name has submitted a review. It appears when reviews are published.':
+        'أرسل :name تقييمًا، وسيظهر عند نشر التقييمات.',
+    ':name has not submitted a review yet.': 'لم يرسل :name تقييمًا بعد.',
+    Deliveries: 'التسليمات',
+    Payments: 'المدفوعات',
+    Activity: 'النشاط',
+    'Fund the contract to start the work.': 'موّل العقد ليبدأ العمل.',
+    'The freelancer is working on the first delivery.':
+        'المستقل يعمل على التسليم الأول.',
+    'Submit the complete delivery before the first delivery date.':
+        'أرسل التسليم الكامل قبل موعد التسليم الأول.',
+    'Review the delivery, then approve it or request a revision.':
+        'راجع التسليم ثم وافق عليه أو اطلب تعديلًا.',
+    'Waiting for the client to review your delivery.':
+        'بانتظار مراجعة العميل لتسليمك.',
+    'The freelancer is working on your requested changes.':
+        'المستقل يعمل على التعديلات التي طلبتها.',
+    'Read the requested changes and submit a revised delivery.':
+        'اقرأ التعديلات المطلوبة وأرسل تسليمًا معدَّلًا.',
+    'The contract is completed. Leave a review.': 'اكتمل العقد. اكتب تقييمك.',
+    'Final offer accepted': 'قُبل العرض النهائي',
+    'Test payment verified': 'تم التحقق من الدفعة التجريبية',
+    'Delivery :number submitted': 'أُرسل التسليم :number',
+    'Revision request :number sent': 'أُرسل طلب التعديل :number',
+    'Delivery approved and contract completed':
+        'تمت الموافقة على التسليم واكتمل العقد',
+    'First delivery overdue': 'تأخر التسليم الأول',
+    'Completed at': 'تاريخ الإكمال',
+    'Next step': 'الخطوة التالية',
+    'Contract sections': 'أقسام العقد',
+    'No published reviews yet.': 'لا توجد تقييمات منشورة بعد.',
+    'Delivered, awaiting review': 'تم التسليم، بانتظار المراجعة',
+    'Revision requested': 'طُلب تعديل',
+    Completed: 'مكتمل',
+    'asked to cancel the contract for': 'طلب إلغاء عقد',
+    'accepted cancelling the contract for': 'وافق على إلغاء عقد',
+    'declined cancelling the contract for': 'رفض إلغاء عقد',
+    'withdrew the request to cancel the contract for': 'سحب طلب إلغاء عقد',
+    'cancelled the unfunded contract for': 'ألغى العقد غير المموَّل لمشروع',
+    'The test payment was refunded and the contract cancelled for':
+        'أُعيدت الدفعة التجريبية وأُلغي عقد',
+    'The provider declined the refund.': 'رفض مزوّد الدفع عملية الاسترداد.',
+    'The provider could not be reached.': 'تعذّر الوصول إلى مزوّد الدفع.',
+    'The provider reported a refund that does not match this contract.':
+        'أبلغ مزوّد الدفع عن استرداد لا يطابق هذا العقد.',
+    Cancellation: 'الإلغاء',
+    'You asked to cancel this contract.': 'طلبتَ إلغاء هذا العقد.',
+    ':name asked to cancel this contract.': 'طلب :name إلغاء هذا العقد.',
+    'Deliveries, revisions and approval are paused until this request is answered. Messages stay open.':
+        'التسليم والتعديلات والموافقة متوقفة إلى أن يُرد على هذا الطلب. الرسائل تبقى متاحة.',
+    'Withdraw request': 'سحب الطلب',
+    'Accept the cancellation? The test payment is refunded and the contract ends.':
+        'هل توافق على الإلغاء؟ ستُعاد الدفعة التجريبية وينتهي العقد.',
+    'Accept and refund': 'موافقة واسترداد',
+    'Decline and resume work': 'رفض ومتابعة العمل',
+    'The cancellation was accepted, but the test refund did not go through. The contract stays paused until it does.':
+        'تمت الموافقة على الإلغاء، لكن استرداد الدفعة التجريبية لم يكتمل. يبقى العقد متوقفًا إلى أن يكتمل.',
+    'The cancellation was accepted. The provider is still processing the test refund; the contract ends when it confirms.':
+        'تمت الموافقة على الإلغاء. ما زال مزوّد الدفع يعالج استرداد الدفعة التجريبية، وينتهي العقد عند تأكيده.',
+    'Retry refund': 'إعادة محاولة الاسترداد',
+    'Check refund status': 'التحقق من حالة الاسترداد',
+    'The test payment was refunded and the contract is cancelled.':
+        'أُعيدت الدفعة التجريبية وأُلغي العقد.',
+    'The contract was cancelled before any funding.':
+        'أُلغي العقد قبل أي تمويل.',
+    'Cancel this contract': 'إلغاء هذا العقد',
+    'Send this cancellation request? Formal work pauses until it is answered.':
+        'هل تريد إرسال طلب الإلغاء؟ يتوقف العمل الرسمي إلى أن يُرد عليه.',
+    'Cancel this contract now? This cannot be undone.':
+        'هل تريد إلغاء هذا العقد الآن؟ لا يمكن التراجع عن ذلك.',
+    'A funded contract is cancelled only if the other participant agrees. The test payment is then refunded in full.':
+        'لا يُلغى العقد المموَّل إلا بموافقة الطرف الآخر، وعندها تُعاد الدفعة التجريبية كاملة.',
+    'This contract is not funded yet, so either participant can cancel it at once.':
+        'هذا العقد غير مموَّل بعد، لذلك يستطيع أي من الطرفين إلغاءه فورًا.',
+    'Reason for cancelling': 'سبب الإلغاء',
+    'Explain why the contract should end.': 'اشرح سبب إنهاء العقد.',
+    'Request cancellation': 'طلب الإلغاء',
+    'Cancel contract': 'إلغاء العقد',
+    'A cancellation request is open. Formal work is paused.':
+        'يوجد طلب إلغاء مفتوح. العمل الرسمي متوقف.',
+    'This contract was cancelled. Nothing further is due.':
+        'أُلغي هذا العقد. لا يوجد أي إجراء مطلوب.',
+    'Cancellation requested': 'طُلب الإلغاء',
+    'Cancellation request declined': 'رُفض طلب الإلغاء',
+    'Cancellation request withdrawn': 'سُحب طلب الإلغاء',
+    'Cancellation accepted': 'تمت الموافقة على الإلغاء',
+    'Test payment refunded': 'أُعيدت الدفعة التجريبية',
+    'Contract cancelled': 'أُلغي العقد',
+    'Cancellation pending': 'بانتظار الرد على الإلغاء',
+    Refunded: 'مُستردّة',
+    'View all notifications': 'عرض كل الإشعارات',
+    'Email preferences': 'إعدادات البريد',
+    'Offers and contracts': 'العروض النهائية والعقود',
+    'Offers, funding, deliveries, revision requests, completion, reviews and cancellations.':
+        'العروض النهائية والتمويل والتسليمات وطلبات التعديل وإكمال العقود والتقييمات والإلغاء.',
+    'Invitations and proposals': 'الدعوات والعروض',
+    'Invitations to apply and proposals on your projects.':
+        'دعوات التقديم والعروض المرسلة إلى مشاريعك.',
+    'One email per conversation with unread messages, not one per message.':
+        'رسالة بريد واحدة لكل محادثة فيها رسائل غير مقروءة، لا رسالة لكل رسالة.',
+    'Notification settings': 'إعدادات الإشعارات',
+    'Email notifications': 'إشعارات البريد الإلكتروني',
+    'Choose which updates are also sent to your email. The bell always shows every update, and security emails are always sent.':
+        'اختر التحديثات التي تُرسل إلى بريدك أيضًا. يعرض الجرس كل التحديثات دائمًا، ورسائل الأمان تُرسل دائمًا.',
+    'Save preferences': 'حفظ الإعدادات',
 };
