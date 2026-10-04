@@ -32,6 +32,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property WorkspaceRole|null $workspace_role
  * @property AccountStatus $status
  * @property string $locale
+ * @property array<string, bool>|null $email_preferences
  * @property bool $is_super_admin
  * @property bool $is_admin
  * @property string|null $password
@@ -77,6 +78,7 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
             'onboarding_completed_at' => 'immutable_datetime',
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
+            'email_preferences' => 'array',
         ];
     }
 
@@ -91,6 +93,18 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
     public function preferredLocale(): string
     {
         return in_array($this->locale, ['en', 'ar'], true) ? $this->locale : 'en';
+    }
+
+    /**
+     * Q30: contract-action email is on unless switched off; hiring and message email is opt-in.
+     *
+     * @return array{contracts: bool, hiring: bool, messages: bool}
+     */
+    public function emailPreferences(): array
+    {
+        $saved = $this->email_preferences ?? [];
+
+        return ['contracts' => (bool) ($saved['contracts'] ?? true), 'hiring' => (bool) ($saved['hiring'] ?? false), 'messages' => (bool) ($saved['messages'] ?? false)];
     }
 
     public function isAdministrator(): bool

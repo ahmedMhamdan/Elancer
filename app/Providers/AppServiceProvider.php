@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Events\WorkspaceSignal;
 use App\Models\User;
 use App\Notifications\WorkspaceEvent;
+use App\Notifications\WorkspaceEventMail;
 use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -36,6 +37,12 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(function (NotificationSent $event): void {
             if ($event->notification instanceof WorkspaceEvent && $event->channel === 'database' && $event->notifiable instanceof User) {
                 WorkspaceSignal::send($event->notifiable->id, $event->notification->id, $event->notification->conversation);
+                // Q30: email follows the recipient's category preference and never blocks the action.
+                $stored = $event->notification;
+                $recipient = $event->notifiable;
+                if ($recipient->hasVerifiedEmail() && $recipient->emailPreferences()[$stored->category()]) {
+                    rescue(fn () => $recipient->notify(new WorkspaceEventMail($stored->kind, $stored->href, $stored->title, $stored->actor)));
+                }
             }
         });
         RateLimiter::for('profile-photos', function (Request $request) {
