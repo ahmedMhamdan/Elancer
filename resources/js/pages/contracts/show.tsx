@@ -1,5 +1,6 @@
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { useRef, useState } from 'react';
+import Button from '@/components/tailadmin/button';
 import { useTranslation } from '@/hooks/use-translation';
 import {
     AgreementLayout,
@@ -9,6 +10,12 @@ import {
     type Contract,
     type Payment,
 } from '@/pages/offers/shared';
+import {
+    AmendmentHistory,
+    AmendmentRequest,
+    AmendmentStatus,
+    type Amendment,
+} from './amendments';
 import {
     CancellationRequest,
     CancellationStatus,
@@ -29,6 +36,7 @@ export default function Show({
     activity,
     reviews,
     cancellation,
+    amendments,
 }: {
     contract: Contract;
     payment: Payment | null;
@@ -38,6 +46,7 @@ export default function Show({
     activity: Activity[];
     reviews: ReviewState | null;
     cancellation: Cancellation | null;
+    amendments: Amendment[];
 }) {
     const { t, locale } = useTranslation();
     const tabs = [
@@ -63,6 +72,11 @@ export default function Show({
             ?.querySelector<HTMLElement>(`#contract-tab-${next}`)
             ?.focus();
     };
+    const [reposting, setReposting] = useState(false);
+    const pending = amendments.find(({ status }) => status === 'pending');
+    const amendable = ['active', 'submitted', 'revision_requested'].includes(
+        contract.status,
+    );
     const mine = contract.is_client ? 'client' : 'freelancer';
     // What this participant should do next, by state and role.
     const next: Record<string, Record<string, string>> = {
@@ -129,6 +143,10 @@ export default function Show({
         cancellation_accepted: t('Cancellation accepted'),
         refunded: t('Test payment refunded'),
         cancelled: t('Contract cancelled'),
+        amendment_proposed: t('Change to the contract proposed'),
+        amendment_accepted: t('Proposed change accepted'),
+        amendment_declined: t('Proposed change declined'),
+        amendment_withdrawn: t('Proposed change withdrawn'),
     };
     return (
         <AgreementLayout title={t('Contract')}>
@@ -141,6 +159,11 @@ export default function Show({
                     {contract.overdue && (
                         <span className="proposal-status contract-overdue">
                             {t('First delivery overdue')}
+                        </span>
+                    )}
+                    {contract.revision_overdue && (
+                        <span className="proposal-status contract-overdue">
+                            {t('Revision overdue')}
                         </span>
                     )}
                 </div>
@@ -161,6 +184,17 @@ export default function Show({
                             </dd>
                         </div>
                     )}
+                    {contract.status === 'revision_requested' &&
+                        contract.revision_due_at && (
+                            <div>
+                                <dt>{t('Revision due')}</dt>
+                                <dd>
+                                    <OfferTime
+                                        value={contract.revision_due_at}
+                                    />
+                                </dd>
+                            </div>
+                        )}
                     {contract.completed_at && (
                         <div>
                             <dt>{t('Completed at')}</dt>
@@ -181,8 +215,34 @@ export default function Show({
                     >
                         {t('Open messages')}
                     </Link>
+                    {contract.status === 'cancelled' && contract.is_client && (
+                        <Button
+                            variant="outline"
+                            disabled={reposting}
+                            onClick={() => {
+                                setReposting(true);
+                                router.post(
+                                    `/contracts/${contract.id}/repost`,
+                                    {},
+                                    { onFinish: () => setReposting(false) },
+                                );
+                            }}
+                        >
+                            {t('Post this project again')}
+                        </Button>
+                    )}
                 </div>
+                {contract.status === 'cancelled' && contract.is_client && (
+                    <p className="market-muted">
+                        {t(
+                            'Posting again copies the brief into a new private draft for you to review. This project and contract stay as history.',
+                        )}
+                    </p>
+                )}
             </section>
+            {pending && (
+                <AmendmentStatus contract={contract} amendment={pending} />
+            )}
             {showCancellation && (
                 <CancellationStatus
                     contract={contract}
@@ -238,6 +298,10 @@ export default function Show({
                                 {t('View project')}
                             </Link>
                         </div>
+                        <AmendmentHistory amendments={amendments} />
+                        {amendable && !pending && (
+                            <AmendmentRequest contract={contract} />
+                        )}
                         {cancellable && (
                             <CancellationRequest contract={contract} />
                         )}

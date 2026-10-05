@@ -158,8 +158,7 @@ function Decision({
     const errors = usePage().props.errors as Record<string, string>;
     const form = useForm({ submission: submission.id, changes: '' });
     const [busy, setBusy] = useState(false);
-    const remaining =
-        contract.agreement.revision_rounds - contract.revisions_used;
+    const remaining = contract.revision_rounds - contract.revisions_used;
     return (
         <div className="market-stack">
             <h3>{t('Your decision')}</h3>
@@ -250,7 +249,7 @@ function Decision({
             ) : (
                 <p>
                     {t(
-                        'Every included revision round has been used. You can approve this delivery or keep discussing it in Messages.',
+                        'Every revision round has been used. You can approve this delivery, keep discussing it in Messages, or propose extra rounds under Agreement.',
                     )}
                 </p>
             )}
@@ -301,9 +300,7 @@ export function Deliveries({
                 <p className="market-muted">
                     {t('Revision rounds used: :used of :total', {
                         used: contract.revisions_used.toLocaleString(locale),
-                        total: contract.agreement.revision_rounds.toLocaleString(
-                            locale,
-                        ),
+                        total: contract.revision_rounds.toLocaleString(locale),
                     })}
                 </p>
                 {contract.status === 'awaiting_payment' && (

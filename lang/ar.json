@@ -312,5 +312,15 @@
     "Elancer: :title": "إيلانسر: :title",
     "workspace update": "تحديث في مساحة العمل",
     "Open in Elancer": "فتح في إيلانسر",
-    "You can choose which emails you receive under Settings, Notifications.": "يمكنك اختيار الرسائل التي تصلك من الإعدادات ثم الإشعارات."
+    "You can choose which emails you receive under Settings, Notifications.": "يمكنك اختيار الرسائل التي تصلك من الإعدادات ثم الإشعارات.",
+    "This contract cannot be changed right now. Reload to see its current status.": "لا يمكن تعديل هذا العقد الآن. أعد تحميل الصفحة لمعرفة حالته الحالية.",
+    "Another proposed change is still awaiting an answer.": "هناك تعديل مقترح آخر ما زال بانتظار الرد.",
+    "A new date can be proposed only while a delivery or a revision is being worked on.": "يمكن اقتراح موعد جديد فقط أثناء العمل على تسليم أو تعديل.",
+    "A contract can have at most :count revision rounds.": "لا يمكن أن يتجاوز عدد جولات التعديل في العقد :count.",
+    "This proposed change is no longer awaiting an answer. Reload to see the current status.": "لم يعد هذا التعديل المقترح بانتظار الرد. أعد تحميل الصفحة لمعرفة الحالة الحالية.",
+    "The work has moved on since this date was proposed. Decline it so a new change can be proposed.": "تقدّم العمل منذ اقتراح هذا الموعد. ارفضه ليمكن اقتراح تعديل جديد.",
+    "proposed a change to the contract for": "اقترح تعديلًا على عقد",
+    "accepted your proposed change to the contract for": "وافق على تعديلك المقترح على عقد",
+    "declined your proposed change to the contract for": "رفض تعديلك المقترح على عقد",
+    "withdrew a proposed change to the contract for": "سحب تعديلًا مقترحًا على عقد"
 }

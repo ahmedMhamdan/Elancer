@@ -1,0 +1,183 @@
+@import 'flatpickr/dist/flatpickr.css';
+/* Adapted from the flatpickr rules in TailAdmin/src/index.css (MIT) with Elancer tokens, fluid width and RTL. */
+.date-picker .flatpickr-wrapper {
+    display: block;
+    width: 100%;
+}
+.date-picker .flatpickr-calendar {
+    width: min(332px, 100%);
+    margin-top: 8px;
+    padding: 16px;
+    border: 1px solid var(--el-border);
+    border-radius: 12px;
+    background: var(--el-surface);
+    color: var(--el-muted);
+    box-shadow: var(--el-shadow);
+    font-family: inherit;
+}
+.date-picker .flatpickr-calendar.static {
+    inset-inline-start: 0;
+    inset-inline-end: auto;
+}
+.date-picker .flatpickr-calendar::before,
+.date-picker .flatpickr-calendar::after {
+    display: none;
+}
+.date-picker .flatpickr-months {
+    align-items: center;
+    margin-bottom: 12px;
+}
+.date-picker .flatpickr-months .flatpickr-month {
+    height: 36px;
+    background: none;
+    color: var(--el-text);
+    fill: var(--el-text);
+}
+.date-picker .flatpickr-current-month {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 36px;
+    padding: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+.date-picker .flatpickr-current-month .cur-month,
+.date-picker .flatpickr-current-month input.cur-year {
+    margin: 0;
+    padding: 0;
+    color: var(--el-text);
+    font-weight: 600;
+}
+.date-picker .flatpickr-current-month .cur-month:hover,
+.date-picker .numInputWrapper:hover {
+    background: none;
+}
+.date-picker .flatpickr-months .flatpickr-prev-month,
+.date-picker .flatpickr-months .flatpickr-next-month {
+    position: static;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: 8px;
+    color: var(--el-muted);
+    fill: var(--el-muted);
+}
+.date-picker .flatpickr-months .flatpickr-prev-month:hover,
+.date-picker .flatpickr-months .flatpickr-next-month:hover {
+    background: var(--el-surface-soft);
+}
+.date-picker .flatpickr-months .flatpickr-prev-month:hover svg,
+.date-picker .flatpickr-months .flatpickr-next-month:hover svg {
+    fill: var(--el-accent);
+}
+.date-picker[dir='rtl'] .flatpickr-prev-month svg,
+.date-picker[dir='rtl'] .flatpickr-next-month svg {
+    transform: scaleX(-1);
+}
+.date-picker .flatpickr-innerContainer,
+.date-picker .flatpickr-rContainer,
+.date-picker .flatpickr-days,
+.date-picker .dayContainer {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    border: 0;
+}
+.date-picker .flatpickr-weekdays {
+    height: auto;
+    margin-bottom: 8px;
+    background: none;
+}
+.date-picker span.flatpickr-weekday {
+    background: none;
+    color: var(--el-muted);
+    font-size: 13px;
+    font-weight: 500;
+}
+.date-picker .dayContainer {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+.date-picker .flatpickr-day {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: none;
+    height: 38px;
+    margin: 0;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: var(--el-text);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1;
+}
+.date-picker .flatpickr-day.prevMonthDay,
+.date-picker .flatpickr-day.nextMonthDay {
+    color: var(--el-subtle);
+    opacity: 0.6;
+}
+.date-picker .flatpickr-day.flatpickr-disabled,
+.date-picker .flatpickr-day.flatpickr-disabled:hover {
+    background: none;
+    border-color: transparent;
+    color: var(--el-muted);
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+.date-picker .flatpickr-day.today {
+    border-color: var(--el-border-strong);
+}
+.date-picker .flatpickr-day:hover,
+.date-picker .flatpickr-day:focus {
+    border-color: var(--el-soft);
+    background: var(--el-soft);
+    color: var(--el-text);
+}
+.date-picker .flatpickr-day:focus-visible {
+    outline: 2px solid var(--el-accent);
+    outline-offset: 1px;
+}
+.date-picker .flatpickr-day.selected,
+.date-picker .flatpickr-day.selected:hover,
+.date-picker .flatpickr-day.selected:focus {
+    border-color: var(--el-accent);
+    background: var(--el-accent);
+    color: var(--el-surface);
+}
+.date-picker .flatpickr-time {
+    margin-top: 12px;
+    border-top: 1px solid var(--el-border);
+}
+.date-picker .flatpickr-time input,
+.date-picker .flatpickr-time .flatpickr-time-separator {
+    color: var(--el-text);
+}
+.date-picker .flatpickr-time input:hover,
+.date-picker .flatpickr-time input:focus {
+    background: var(--el-surface-soft);
+}
+.date-picker .numInputWrapper span {
+    border-color: var(--el-border);
+}
+.date-picker .numInputWrapper span.arrowUp::after {
+    border-bottom-color: var(--el-muted);
+}
+.date-picker .numInputWrapper span.arrowDown::after {
+    border-top-color: var(--el-muted);
+}
+/* flatpickr forces left-to-right; Arabic needs the grid, the arrows and the anchor side mirrored. */
+.date-picker[dir='rtl'] .flatpickr-calendar {
+    direction: rtl;
+}
+/* Clock times read hours first in both languages. */
+.date-picker[dir='rtl'] .flatpickr-time {
+    direction: ltr;
+}

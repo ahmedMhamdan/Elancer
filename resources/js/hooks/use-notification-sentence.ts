@@ -28,6 +28,16 @@ export function useNotificationSentence() {
         contract_refunded: t(
             'The test payment was refunded and the contract cancelled for',
         ),
+        amendment_proposed: t('proposed a change to the contract for'),
+        amendment_accepted: t(
+            'accepted your proposed change to the contract for',
+        ),
+        amendment_declined: t(
+            'declined your proposed change to the contract for',
+        ),
+        amendment_withdrawn: t(
+            'withdrew a proposed change to the contract for',
+        ),
     };
     return (kind: string | null) =>
         sentences[kind ?? ''] ?? t('Workspace update for');

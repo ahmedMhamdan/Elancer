@@ -49,7 +49,10 @@ export type Contract = {
     completed_at: string | null;
     cancelled_at: string | null;
     revisions_used: number;
+    revision_rounds: number;
+    revision_due_at: string | null;
     overdue: boolean;
+    revision_overdue: boolean;
     is_client: boolean;
     agreement: Terms & {
         project_title: string;

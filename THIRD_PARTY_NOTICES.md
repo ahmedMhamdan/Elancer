@@ -186,3 +186,19 @@ Recharts (MIT), https://github.com/recharts/recharts, and Radix Progress retain 
 ## Finance and notifications (2026-10-03)
 
 resources/js/pages/finance/index.tsx adapts local TailAdmin src/components/ecommerce/EcommerceMetrics.tsx (icon tile and metric block) and RecentOrders.tsx (bordered table card) with the existing Elancer table adaptation; demo trends, images and filters are replaced by the member's own contracts and payment attempts. resources/js/components/notification-dropdown.tsx extends the existing adaptation of src/components/header/NotificationDropdown.tsx with its unread dot and actor/text/meta item rows. The TailAdmin MIT notice above applies.
+
+## Date picker (2026-10-05)
+
+resources/js/components/tailadmin/date-picker.tsx and resources/css/elancer-datepicker.css adapt
+these files from the TailAdmin free React dashboard (local copy inspected 2026-10-05):
+
+- src/components/form/date-picker.tsx
+- the flatpickr rules in src/index.css
+- src/icons/calender-line.svg
+
+The demo structure and calendar icon are retained. Adaptations make the field controlled, load the
+calendar only in the browser, use Elancer theme tokens and a fluid width, add Arabic month and
+weekday names with a mirrored layout, and add an optional time. The MIT license above applies.
+
+The calendar itself is flatpickr 4.6 (https://github.com/flatpickr/flatpickr), MIT License,
+Copyright (c) 2017 Gregory Petrosyan.

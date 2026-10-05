@@ -1700,8 +1700,6 @@ export const arabic: Record<string, string> = {
     'Group all changes into one request: each request uses one round, however many changes it lists.':
         'اجمع كل التعديلات في طلب واحد: كل طلب يُحتسب جولة واحدة مهما كان عدد التعديلات فيه.',
     'Request revision': 'طلب تعديل',
-    'Every included revision round has been used. You can approve this delivery or keep discussing it in Messages.':
-        'استُخدمت جميع جولات التعديل المتفق عليها. يمكنك الموافقة على هذا التسليم أو متابعة النقاش في الرسائل.',
     'Revision rounds used: :used of :total':
         'جولات التعديل المستخدمة: :used من :total',
     'Deliveries open once funding is verified.':
@@ -1837,4 +1835,50 @@ export const arabic: Record<string, string> = {
     'Choose which updates are also sent to your email. The bell always shows every update, and security emails are always sent.':
         'اختر التحديثات التي تُرسل إلى بريدك أيضًا. يعرض الجرس كل التحديثات دائمًا، ورسائل الأمان تُرسل دائمًا.',
     'Save preferences': 'حفظ الإعدادات',
+    'proposed a change to the contract for': 'اقترح تعديلًا على عقد',
+    'accepted your proposed change to the contract for':
+        'وافق على تعديلك المقترح على عقد',
+    'declined your proposed change to the contract for':
+        'رفض تعديلك المقترح على عقد',
+    'withdrew a proposed change to the contract for':
+        'سحب تعديلًا مقترحًا على عقد',
+    'Proposed revision date': 'موعد التعديل المقترح',
+    'Proposed first delivery date': 'موعد التسليم الأول المقترح',
+    'Date when proposed': 'الموعد وقت تقديم المقترح',
+    'No date agreed': 'لا يوجد موعد متفق عليه',
+    'Extra revision rounds': 'جولات تعديل إضافية',
+    'Proposed change': 'تعديل مقترح',
+    'You proposed a change to this contract.': 'اقترحتَ تعديلًا على هذا العقد.',
+    ':name proposed a change to this contract.':
+        'اقترح :name تعديلًا على هذا العقد.',
+    'Nothing changes unless the other participant accepts. The contract price stays the same.':
+        'لا يتغير شيء ما لم يوافق الطرف الآخر. يبقى سعر العقد كما هو.',
+    'Accept change': 'قبول التعديل',
+    'Decline change': 'رفض التعديل',
+    'Propose a new date or extra revision rounds':
+        'اقتراح موعد جديد أو جولات تعديل إضافية',
+    'A change applies only if the other participant accepts it. The contract price stays the same, and one proposal can be open at a time.':
+        'لا يُطبَّق التعديل إلا إذا وافق عليه الطرف الآخر. يبقى سعر العقد كما هو، ولا يمكن فتح أكثر من مقترح واحد في الوقت نفسه.',
+    'New revision date': 'موعد التعديل الجديد',
+    'New first delivery date': 'موعد التسليم الأول الجديد',
+    'Leave empty to keep the current allowance.':
+        'اتركه فارغًا للإبقاء على عدد الجولات الحالي.',
+    'Reason for the change': 'سبب التعديل',
+    'Explain why this change is needed.': 'اشرح سبب الحاجة إلى هذا التعديل.',
+    'Send proposal': 'إرسال المقترح',
+    'Closed unanswered': 'أُغلق دون رد',
+    'Changes after acceptance': 'التعديلات بعد قبول العرض',
+    'Change to the contract proposed': 'اقتُرح تعديل على العقد',
+    'Proposed change accepted': 'قُبل التعديل المقترح',
+    'Proposed change declined': 'رُفض التعديل المقترح',
+    'Proposed change withdrawn': 'سُحب التعديل المقترح',
+    'Revision overdue': 'تأخر تسليم التعديل',
+    'Revision due': 'موعد تسليم التعديل',
+    'Post this project again': 'نشر هذا المشروع من جديد',
+    'Posting again copies the brief into a new private draft for you to review. This project and contract stay as history.':
+        'النشر من جديد ينسخ وصف المشروع إلى مسودة خاصة جديدة لتراجعها. يبقى هذا المشروع والعقد محفوظين في السجل.',
+    'Every revision round has been used. You can approve this delivery, keep discussing it in Messages, or propose extra rounds under Agreement.':
+        'استُخدمت جميع جولات التعديل. يمكنك اعتماد هذا التسليم أو متابعة النقاش في الرسائل أو اقتراح جولات إضافية من تبويب الاتفاق.',
+    'Withdraw proposed change': 'سحب التعديل المقترح',
+    'Choose a date': 'اختر تاريخًا',
 };

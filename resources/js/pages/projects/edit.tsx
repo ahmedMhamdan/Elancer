@@ -3,6 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import Button from '@/components/tailadmin/button';
+import DatePicker from '@/components/tailadmin/date-picker';
 import Input from '@/components/tailadmin/input';
 import { useTranslation } from '@/hooks/use-translation';
 import { Money } from '../discovery/shared';
@@ -694,15 +695,14 @@ export default function EditProject({
                                 <label htmlFor="project-cutoff">
                                     {t('Application cutoff')}
                                 </label>
-                                <Input
+                                <DatePicker
                                     id="project-cutoff"
-                                    type="datetime-local"
+                                    time
+                                    min="today"
+                                    placeholder={t('Choose a date')}
                                     value={form.application_closes_at}
-                                    onChange={(e) =>
-                                        change(
-                                            'application_closes_at',
-                                            e.target.value,
-                                        )
+                                    onChange={(value) =>
+                                        change('application_closes_at', value)
                                     }
                                 />
                                 <small>
