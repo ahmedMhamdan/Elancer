@@ -17,8 +17,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $status
  * @property array<string, mixed> $agreement
  * @property int $revisions_used
+ * @property int $extra_rounds
  * @property CarbonImmutable|null $funded_at
  * @property CarbonImmutable|null $delivery_due_at
+ * @property CarbonImmutable|null $revision_due_at
  * @property CarbonImmutable|null $completed_at
  * @property CarbonImmutable|null $cancelled_at
  */
@@ -28,8 +30,8 @@ class Contract extends Model
 
     protected function casts(): array
     {
-        return ['agreement' => 'array', 'revisions_used' => 'integer', 'funded_at' => 'immutable_datetime',
-            'delivery_due_at' => 'immutable_datetime', 'completed_at' => 'immutable_datetime', 'cancelled_at' => 'immutable_datetime'];
+        return ['agreement' => 'array', 'revisions_used' => 'integer', 'extra_rounds' => 'integer', 'funded_at' => 'immutable_datetime',
+            'delivery_due_at' => 'immutable_datetime', 'revision_due_at' => 'immutable_datetime', 'completed_at' => 'immutable_datetime', 'cancelled_at' => 'immutable_datetime'];
     }
 
     protected static function booted(): void
@@ -39,6 +41,12 @@ class Contract extends Model
                 throw new \LogicException('Accepted agreement attribution and terms are immutable.');
             }
         });
+    }
+
+    /** Q50: the agreed allowance plus any rounds both participants added later. */
+    public function revisionRounds(): int
+    {
+        return (int) $this->agreement['revision_rounds'] + $this->extra_rounds;
     }
 
     public function contains(int $user): bool

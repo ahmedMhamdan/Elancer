@@ -62,6 +62,10 @@ class WorkspaceEventMail extends Notification implements ShouldQueue
             'cancellation_withdrawn' => __('withdrew the request to cancel the contract for'),
             'contract_cancelled' => __('cancelled the unfunded contract for'),
             'contract_refunded' => __('The test payment was refunded and the contract cancelled for'),
+            'amendment_proposed' => __('proposed a change to the contract for'),
+            'amendment_accepted' => __('accepted your proposed change to the contract for'),
+            'amendment_declined' => __('declined your proposed change to the contract for'),
+            'amendment_withdrawn' => __('withdrew a proposed change to the contract for'),
             default => __('Workspace update for'),
         };
     }

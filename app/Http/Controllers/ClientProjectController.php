@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Contract;
 use App\Models\Project;
 use App\Models\Skill;
 use Illuminate\Http\JsonResponse;
@@ -44,6 +45,25 @@ class ClientProjectController extends Controller
         $this->eligible($request);
         $project = new Project;
         $project->forceFill(['user_id' => $request->user()->id, 'application_closes_at' => now()->addDays(7)])->save();
+
+        return to_route('projects.edit', $project);
+    }
+
+    /** Q79: a cancelled contract's brief becomes a new private draft; the original project and contract stay as history. */
+    public function repost(Request $request, Contract $contract): RedirectResponse
+    {
+        $this->eligible($request);
+        abort_unless($contract->client_id === $request->user()->id, 404);
+        abort_unless($contract->status === 'cancelled', 409);
+        $source = Project::withTrashed()->with(['category', 'skills'])->findOrFail($contract->project_id);
+        $project = DB::transaction(function () use ($request, $source): Project {
+            $project = new Project;
+            $project->forceFill(['user_id' => $request->user()->id, 'application_closes_at' => now()->addDays(7), 'category_id' => $source->category?->id,
+                ...$source->only(['title', 'description', 'budget_min', 'budget_max', 'screening_questions'])])->save();
+            $project->skills()->sync($source->skills->modelKeys());
+
+            return $project;
+        });
 
         return to_route('projects.edit', $project);
     }

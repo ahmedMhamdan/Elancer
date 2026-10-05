@@ -85,7 +85,8 @@ class CancelContract
         } else {
             try {
                 // After a failure the provider is asked afresh rather than about the failed refund.
-                $result = $this->gateways->for($attempt->provider)->refund($attempt, $capture, $request->refund_status === 'failed' ? null : $request->refund_reference);
+                $failed = $request->refund_status === 'failed';
+                $result = $this->gateways->for($attempt->provider)->refund($attempt, $capture, $failed ? null : $request->refund_reference, $failed ? $request->refund_reference : null);
             } catch (\Throwable $exception) {
                 report($exception);
                 $result = Refund::failed('provider_unavailable', $request->refund_reference);
@@ -117,6 +118,7 @@ class CancelContract
             $current->forceFill(['status' => 'refunded', 'refund_status' => 'succeeded', 'refund_failure' => null, 'refund_reference' => $result->reference,
                 'refunded_at' => now(), 'open_contract_id' => null])->save();
             $locked->forceFill(['status' => 'cancelled', 'cancelled_at' => now()])->save();
+            ContractAmendments::close($locked);
             foreach ([$locked->client_id, $locked->freelancer_id] as $recipient) {
                 self::notify($locked, 'contract_refunded', $recipient, null);
             }

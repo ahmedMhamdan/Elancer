@@ -4,6 +4,7 @@ use App\Http\Controllers\AdministratorController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ClientProjectController;
 use App\Http\Controllers\ContactBlockController;
+use App\Http\Controllers\ContractAmendmentController;
 use App\Http\Controllers\ContractCancellationController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\ContractWorkController;
@@ -68,6 +69,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('contracts/{contract}/cancellation', [ContractCancellationController::class, 'store'])->whereNumber('contract')->middleware('throttle:10,1')->name('contracts.cancellation.store');
         Route::patch('contracts/{contract}/cancellation', [ContractCancellationController::class, 'update'])->whereNumber('contract')->middleware('throttle:20,1')->name('contracts.cancellation.update');
         Route::post('contracts/{contract}/cancellation/refund', [ContractCancellationController::class, 'refund'])->whereNumber('contract')->middleware('throttle:20,1')->name('contracts.cancellation.refund');
+        Route::post('contracts/{contract}/amendments', [ContractAmendmentController::class, 'store'])->whereNumber('contract')->middleware('throttle:10,1')->name('contracts.amendments.store');
+        Route::patch('contracts/{contract}/amendments', [ContractAmendmentController::class, 'update'])->whereNumber('contract')->middleware('throttle:20,1')->name('contracts.amendments.update');
+        Route::post('contracts/{contract}/repost', [ClientProjectController::class, 'repost'])->whereNumber('contract')->middleware('throttle:10,1')->name('contracts.repost');
         Route::get('contracts/{contract}/files/{file}', [ContractWorkController::class, 'file'])->whereNumber(['contract', 'file'])->name('contracts.file');
         Route::get('finance', FinanceController::class)->name('finance.index');
         Route::get('finance/payments', [FinanceController::class, 'payments'])->name('finance.payments');

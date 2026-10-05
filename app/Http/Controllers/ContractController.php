@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Contracts\ContractWork;
 use App\Actions\Payments\ContractFunding;
 use App\Models\Contract;
+use App\Models\ContractAmendment;
 use App\Models\ContractCancellation;
 use App\Models\ContractReview;
 use App\Models\ContractSubmission;
@@ -35,6 +36,7 @@ class ContractController extends Controller
         $submissions = $contract->submissions()->with(['files', 'revision'])->get();
         $cancellations = ContractCancellation::query()->where('contract_id', $contract->id)->orderBy('id')->get();
         $cancellation = $cancellations->last();
+        $amendments = ContractAmendment::query()->where('contract_id', $contract->id)->orderBy('id')->get();
 
         return Inertia::render('contracts/show', [
             'contract' => $this->details($contract, $user),
@@ -47,7 +49,11 @@ class ContractController extends Controller
                 'revision' => $submission->revision?->only(['round', 'changes', 'created_at']),
             ])->reverse()->values(),
             'cancellation' => $cancellation ? [...$cancellation->only(['status', 'reason', 'prior_status', 'refund_status', 'refund_failure', 'created_at']), 'mine' => $cancellation->requester_id === $user] : null,
-            'activity' => $this->activity($contract, $submissions, $cancellations),
+            'amendments' => $amendments->map(fn (ContractAmendment $amendment) => [
+                ...$amendment->only(['id', 'status', 'reason', 'date_kind', 'new_due_at', 'previous_due_at', 'extra_rounds', 'created_at', 'decided_at']),
+                'mine' => $amendment->proposer_id === $user,
+            ])->reverse()->values(),
+            'activity' => $this->activity($contract, $submissions, $cancellations, $amendments),
             'reviews' => $this->reviews($contract, $user),
         ]);
     }
@@ -55,9 +61,11 @@ class ContractController extends Controller
     /** @return array<string, mixed> */
     private function details(Contract $contract, int $user): array
     {
-        return [...$contract->only(['id', 'project_id', 'offer_id', 'conversation_id', 'status', 'agreement', 'created_at', 'funded_at', 'delivery_due_at', 'completed_at', 'cancelled_at', 'revisions_used']),
-            // Informational only: a late first delivery changes nothing by itself.
+        return [...$contract->only(['id', 'project_id', 'offer_id', 'conversation_id', 'status', 'agreement', 'created_at', 'funded_at', 'delivery_due_at', 'revision_due_at', 'completed_at', 'cancelled_at', 'revisions_used']),
+            'revision_rounds' => $contract->revisionRounds(),
+            // Informational only: a late delivery changes nothing by itself.
             'overdue' => $contract->status === 'active' && $contract->delivery_due_at?->isPast() === true,
+            'revision_overdue' => $contract->status === 'revision_requested' && $contract->revision_due_at?->isPast() === true,
             'is_client' => $contract->client_id === $user];
     }
 
@@ -66,9 +74,10 @@ class ContractController extends Controller
      *
      * @param  Collection<int, ContractSubmission>  $submissions
      * @param  Collection<int, ContractCancellation>  $cancellations
+     * @param  Collection<int, ContractAmendment>  $amendments
      * @return list<array{kind: string, at: mixed, number: int|null}>
      */
-    private function activity(Contract $contract, Collection $submissions, Collection $cancellations): array
+    private function activity(Contract $contract, Collection $submissions, Collection $cancellations, Collection $amendments): array
     {
         $events = [['kind' => 'accepted', 'at' => $contract->agreement['accepted_at'] ?? $contract->getAttribute('created_at'), 'number' => null]];
         if ($contract->funded_at) {
@@ -92,6 +101,12 @@ class ContractController extends Controller
             }
             if ($cancellation->refunded_at) {
                 $events[] = ['kind' => 'refunded', 'at' => $cancellation->refunded_at, 'number' => null];
+            }
+        }
+        foreach ($amendments as $amendment) {
+            $events[] = ['kind' => 'amendment_proposed', 'at' => $amendment->created_at, 'number' => null];
+            if ($amendment->decided_at && in_array($amendment->status, ['accepted', 'declined', 'withdrawn'], true)) {
+                $events[] = ['kind' => 'amendment_'.$amendment->status, 'at' => $amendment->decided_at, 'number' => null];
             }
         }
         if ($contract->cancelled_at) {

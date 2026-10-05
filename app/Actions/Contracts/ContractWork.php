@@ -73,13 +73,14 @@ class ContractWork
                 return $existing;
             }
             self::current($locked, $submission);
-            if ($locked->revisions_used >= (int) $locked->agreement['revision_rounds']) {
+            if ($locked->revisions_used >= $locked->revisionRounds()) {
                 throw ValidationException::withMessages(['revision' => __('Every included revision round has been used.')]);
             }
             $request = new ContractRevisionRequest;
             $request->forceFill(['contract_id' => $locked->id, 'contract_submission_id' => $submission, 'round' => $locked->revisions_used + 1,
                 'changes' => $changes, 'created_at' => now()])->save();
-            $locked->forceFill(['status' => 'revision_requested', 'revisions_used' => $locked->revisions_used + 1])->save();
+            // Q81: a revision date is agreed per round, so a new round starts without one.
+            $locked->forceFill(['status' => 'revision_requested', 'revisions_used' => $locked->revisions_used + 1, 'revision_due_at' => null])->save();
             self::notify($locked, 'revision_requested', $locked->freelancer_id, $locked->client_id);
 
             return $request;
@@ -96,6 +97,7 @@ class ContractWork
             }
             self::current($locked, $submission);
             $locked->forceFill(['status' => 'completed', 'completed_at' => now()])->save();
+            ContractAmendments::close($locked);
             self::notify($locked, 'contract_completed', $locked->freelancer_id, $locked->client_id);
         }, 3);
     }

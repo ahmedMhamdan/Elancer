@@ -20,7 +20,8 @@ interface PaymentGateway
 
     /**
      * Refund the whole verified capture, or read the state of a refund already started.
-     * Starting is idempotent on the attempt, so a retry never refunds twice.
+     * Starting is idempotent on the attempt, so a retry never refunds twice. A start that follows
+     * a failed refund names it, so the provider does not replay the failed answer.
      */
-    public function refund(PaymentAttempt $attempt, string $capture, ?string $refund = null): Refund;
+    public function refund(PaymentAttempt $attempt, string $capture, ?string $refund = null, ?string $failed = null): Refund;
 }

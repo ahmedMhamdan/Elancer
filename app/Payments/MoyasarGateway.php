@@ -65,7 +65,7 @@ class MoyasarGateway implements PaymentGateway
     }
 
     /** Moyasar refunds the payment inside the invoice; a payment already refunded is reported, not refunded again. */
-    public function refund(PaymentAttempt $attempt, string $capture, ?string $refund = null): Refund
+    public function refund(PaymentAttempt $attempt, string $capture, ?string $refund = null, ?string $failed = null): Refund
     {
         $payments = $this->invoice($attempt)['payments'] ?? [];
         $payment = collect(is_array($payments) ? $payments : [])->first(fn ($item) => in_array($item['status'] ?? null, ['paid', 'captured', 'refunded'], true));

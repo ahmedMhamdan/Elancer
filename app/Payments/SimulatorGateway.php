@@ -44,7 +44,7 @@ class SimulatorGateway implements PaymentGateway
         return SimulatedPayment::query()->where('reference', $attempt->provider_reference)->value('status') !== 'approved';
     }
 
-    public function refund(PaymentAttempt $attempt, string $capture, ?string $refund = null): Refund
+    public function refund(PaymentAttempt $attempt, string $capture, ?string $refund = null, ?string $failed = null): Refund
     {
         SimulatedPayment::query()->where('reference', $capture)->where('status', 'approved')->update(['status' => 'refunded']);
         $payment = SimulatedPayment::query()->where('reference', $capture)->first();
