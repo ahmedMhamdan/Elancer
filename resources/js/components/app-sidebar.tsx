@@ -12,6 +12,7 @@ import {
     CreditCard,
     FileText,
     FolderKanban,
+    GalleryVerticalEnd,
     Handshake,
     LayoutDashboard,
     LayoutGrid,
@@ -163,6 +164,11 @@ export function AppSidebar() {
                     label: t('My profile'),
                     href: '/my-profile',
                     icon: <UserRound size={20} />,
+                },
+                {
+                    label: t('Portfolio'),
+                    href: '/my-portfolio',
+                    icon: <GalleryVerticalEnd size={20} />,
                 },
                 {
                     label: t('Account settings'),

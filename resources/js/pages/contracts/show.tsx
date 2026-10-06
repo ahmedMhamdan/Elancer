@@ -1,4 +1,4 @@
-import { Link, router } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { useRef, useState } from 'react';
 import Button from '@/components/tailadmin/button';
 import { useTranslation } from '@/hooks/use-translation';
@@ -23,6 +23,7 @@ import {
 } from './cancellation';
 import { Deliveries, type Submission } from './deliveries';
 import { Funding } from './funding';
+import { Portfolio, type PortfolioState } from './portfolio';
 import { Reviews, type ReviewState } from './reviews';
 
 type Activity = { kind: string; at: string; number: number | null };
@@ -35,6 +36,7 @@ export default function Show({
     submissions,
     activity,
     reviews,
+    portfolio,
     cancellation,
     amendments,
 }: {
@@ -45,6 +47,7 @@ export default function Show({
     submissions: Submission[];
     activity: Activity[];
     reviews: ReviewState | null;
+    portfolio: PortfolioState | null;
     cancellation: Cancellation | null;
     amendments: Amendment[];
 }) {
@@ -55,13 +58,20 @@ export default function Show({
         { key: 'payments', label: t('Payments') },
         { key: 'activity', label: t('Activity') },
         ...(reviews ? [{ key: 'reviews', label: t('Reviews') }] : []),
+        ...(portfolio ? [{ key: 'portfolio', label: t('Portfolio') }] : []),
     ];
+    // A notification can open a named section, such as a portfolio request.
+    const asked = new URLSearchParams(usePage().url.split('?')[1] ?? '').get(
+        'tab',
+    );
     const [tab, setTab] = useState(
-        contract.status === 'awaiting_payment'
-            ? 'payments'
-            : contract.status === 'completed'
-              ? 'reviews'
-              : 'deliveries',
+        asked && tabs.some(({ key }) => key === asked)
+            ? asked
+            : contract.status === 'awaiting_payment'
+              ? 'payments'
+              : contract.status === 'completed'
+                ? 'reviews'
+                : 'deliveries',
     );
     const list = useRef<HTMLDivElement>(null);
     const move = (step: number) => {
@@ -346,6 +356,9 @@ export default function Show({
                 )}
                 {tab === 'reviews' && reviews && (
                     <Reviews contract={contract} reviews={reviews} />
+                )}
+                {tab === 'portfolio' && portfolio && (
+                    <Portfolio contract={contract} portfolio={portfolio} />
                 )}
             </div>
         </AgreementLayout>

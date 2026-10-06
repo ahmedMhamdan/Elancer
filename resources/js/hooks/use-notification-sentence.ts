@@ -38,6 +38,14 @@ export function useNotificationSentence() {
         amendment_withdrawn: t(
             'withdrew a proposed change to the contract for',
         ),
+        portfolio_requested: t(
+            'asked you to approve a public case study about',
+        ),
+        portfolio_approved: t('approved your case study about'),
+        portfolio_declined: t('declined your case study about'),
+        portfolio_revoked: t(
+            'withdrew permission to publish your case study about',
+        ),
     };
     return (kind: string | null) =>
         sentences[kind ?? ''] ?? t('Workspace update for');

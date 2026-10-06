@@ -1879,4 +1879,96 @@ export const arabic: Record<string, string> = {
         'استُخدمت جميع جولات التعديل. يمكنك اعتماد هذا التسليم أو متابعة النقاش في الرسائل أو اقتراح جولات إضافية من تبويب الاتفاق.',
     'Withdraw proposed change': 'سحب التعديل المقترح',
     'Choose a date': 'اختر تاريخًا',
+    Portfolio: 'معرض الأعمال',
+    'asked you to approve a public case study about':
+        'طلب موافقتك على نشر دراسة حالة عن',
+    'approved your case study about': 'وافق على دراسة الحالة التي كتبتها عن',
+    'declined your case study about': 'رفض دراسة الحالة التي كتبتها عن',
+    'withdrew permission to publish your case study about':
+        'سحب الإذن بنشر دراسة الحالة التي كتبتها عن',
+    'A case study about this work is public only while you allow it. It never shows your name, the price or anything from this contract unless it is written in the text you approve.':
+        'لا تظهر دراسة الحالة عن هذا العمل للعامة إلا ما دمت تسمح بذلك. ولا تعرض اسمك أو السعر أو أي شيء من هذا العقد إلا إذا ورد في النص الذي توافق عليه.',
+    'A case study about this work becomes public only when the client approves the exact text and links.':
+        'لا تصبح دراسة الحالة عن هذا العمل عامة إلا بعد موافقة العميل على النص والروابط كما هي.',
+    'Manage this case study in your portfolio':
+        'إدارة دراسة الحالة هذه من معرض أعمالك',
+    'Write a case study': 'اكتب دراسة حالة',
+    ':name asks to publish this case study. Read it as visitors would see it.':
+        'يطلب :name نشر دراسة الحالة هذه. اقرأها كما سيراها الزوار.',
+    'Waiting for the client to answer your request.':
+        'بانتظار رد العميل على طلبك.',
+    'Awaiting approval': 'بانتظار الموافقة',
+    'Approve and publish': 'وافق وانشر',
+    Decline: 'رفض',
+    'Approved version, currently hidden by the freelancer':
+        'النسخة الموافق عليها، وقد أخفاها المستقل حاليًا',
+    'Approved version, currently public':
+        'النسخة الموافق عليها، وهي منشورة حاليًا',
+    'Withdraw permission? The case study stops being public at once.':
+        'هل تريد سحب الإذن؟ سيتوقف عرض دراسة الحالة للعامة فورًا.',
+    'Withdraw permission': 'سحب الإذن',
+    'Permission was withdrawn. The case study is not public.':
+        'سُحب الإذن. دراسة الحالة غير منشورة.',
+    'Completed on Elancer': 'أُنجز على إيلانسر',
+    'Case study': 'دراسة حالة',
+    'Completed on Elancer and published with the approval of the client.':
+        'أُنجز على إيلانسر ونُشر بموافقة العميل.',
+    'Edit case study': 'تعديل دراسة الحالة',
+    'New case study': 'دراسة حالة جديدة',
+    'Saving keeps this case study private. It becomes public only when the client approves the exact text and links you send them.':
+        'الحفظ يُبقي دراسة الحالة خاصة. ولا تصبح عامة إلا بعد موافقة العميل على النص والروابط التي ترسلها إليه كما هي.',
+    'Saving keeps this case study private. Publishing is a separate step on the portfolio page.':
+        'الحفظ يُبقي دراسة الحالة خاصة. النشر خطوة مستقلة من صفحة معرض الأعمال.',
+    'Completed on Elancer:': 'أُنجز على إيلانسر:',
+    'Do not include the name of the client, the price, messages or delivered files unless the client agrees to them being public.':
+        'لا تذكر اسم العميل أو السعر أو الرسائل أو الملفات المسلَّمة إلا إذا وافق العميل على نشرها.',
+    Title: 'العنوان',
+    'Short summary': 'ملخص قصير',
+    'One or two sentences shown on your profile. 20 to 300 characters.':
+        'جملة أو جملتان تظهران في ملفك. من 20 إلى 300 حرف.',
+    'What you did': 'ما الذي أنجزته',
+    'The problem, your approach and the result. At least 50 characters.':
+        'المشكلة وطريقتك في حلها والنتيجة. 50 حرفًا على الأقل.',
+    'Skills used': 'المهارات المستخدمة',
+    'Add up to five HTTPS links, such as a live site, GitHub or Dribbble.':
+        'أضف حتى خمسة روابط HTTPS، مثل موقع يعمل أو GitHub أو Dribbble.',
+    'Add a link': 'أضف رابطًا',
+    'Save case study': 'حفظ دراسة الحالة',
+    'Back to portfolio': 'العودة إلى معرض الأعمال',
+    'Public version': 'النسخة المنشورة',
+    'Publishing and approval options': 'خيارات النشر والموافقة',
+    'Case studies show clients how you work. A saved case study is private until you publish it.':
+        'دراسات الحالة تُري العملاء طريقة عملك. تبقى دراسة الحالة المحفوظة خاصة إلى أن تنشرها.',
+    'Your freelancer profile is private, so none of your case studies are public right now.':
+        'ملفك كمستقل خاص، لذلك لا تظهر أي من دراسات الحالة للعامة الآن.',
+    'A portfolio can hold at most :count case studies.':
+        'يتسع معرض الأعمال لـ :count دراسة حالة على الأكثر.',
+    'Add a case study': 'أضف دراسة حالة',
+    'Completed work on Elancer': 'أعمال مكتملة على إيلانسر',
+    'You can write a case study about a completed contract. It becomes public only when that client approves the exact text and links.':
+        'يمكنك كتابة دراسة حالة عن عقد مكتمل. ولا تصبح عامة إلا بعد موافقة ذلك العميل على النص والروابط كما هي.',
+    'No case studies yet.': 'لا توجد دراسات حالة بعد.',
+    'The client withdrew permission, so this case study is not public. You can send it for approval again.':
+        'سحب العميل الإذن، لذلك دراسة الحالة هذه غير منشورة. يمكنك إرسالها للموافقة من جديد.',
+    Edit: 'تعديل',
+    'View public page': 'عرض الصفحة العامة',
+    'Publish changes': 'نشر التغييرات',
+    Publish: 'نشر',
+    'Send for client approval': 'أرسل لموافقة العميل',
+    Show: 'إظهار',
+    'Delete this case study? This cannot be undone.':
+        'هل تريد حذف دراسة الحالة هذه؟ لا يمكن التراجع عن ذلك.',
+    Delete: 'حذف',
+    Public: 'منشورة',
+    Hidden: 'مخفية',
+    'Permission withdrawn': 'سُحب الإذن',
+    'Awaiting client approval': 'بانتظار موافقة العميل',
+    'Unpublished changes': 'تغييرات غير منشورة',
+    'Awaiting the client': 'بانتظار العميل',
+    Approved: 'تمت الموافقة',
+    'Approved, then permission withdrawn': 'تمت الموافقة ثم سُحب الإذن',
+    'Closed when permission was withdrawn': 'أُغلق عند سحب الإذن',
+    'Approval history': 'سجل الموافقات',
+    'Saving changes only your private copy. The public version stays as it is until the changes are published or approved.':
+        'الحفظ يغيّر نسختك الخاصة فقط. تبقى النسخة المنشورة كما هي إلى أن تُنشر التغييرات أو تتم الموافقة عليها.',
 };

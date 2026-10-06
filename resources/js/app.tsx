@@ -23,6 +23,7 @@ void createInertiaApp({
             case name.startsWith('contracts/'):
             case name.startsWith('finance/'):
             case name.startsWith('payments/'):
+            case name.startsWith('portfolio/'):
             case name === 'onboarding':
             case name === 'welcome':
             case name === 'auth/register':

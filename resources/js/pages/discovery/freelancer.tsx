@@ -3,6 +3,7 @@ import Button from '@/components/tailadmin/button';
 import { ArrowLeft, ExternalLink, MapPin } from 'lucide-react';
 import { Stars } from '@/pages/contracts/reviews';
 import { DiscoveryLayout, JobDate } from './shared';
+import type { PublicCase } from './portfolio-case';
 import type { Freelancer } from '@/components/freelancer-card';
 import { useTranslation } from '@/hooks/use-translation';
 import '../../../css/elancer-marketplace.css';
@@ -10,8 +11,10 @@ export default function FreelancerProfile({
     freelancer: person,
     canContact,
     reviews,
+    cases,
 }: {
     freelancer: Freelancer;
+    cases: PublicCase[];
     canContact: boolean;
     reviews: {
         id: number;
@@ -107,6 +110,28 @@ export default function FreelancerProfile({
                             {person.bio}
                         </p>
                     </section>
+                    {cases.length > 0 && (
+                        <section className="market-panel market-stack">
+                            <h2 className="!mb-0">{t('Portfolio')}</h2>
+                            {cases.map((item) => (
+                                <article key={item.id}>
+                                    <h3 dir="auto">
+                                        <Link href={`/portfolio/${item.id}`}>
+                                            {item.content.title}
+                                        </Link>
+                                    </h3>
+                                    <p dir="auto" className="break-words">
+                                        {item.content.summary}
+                                    </p>
+                                    {item.elancer_work && (
+                                        <p className="market-muted">
+                                            {t('Completed on Elancer')}
+                                        </p>
+                                    )}
+                                </article>
+                            ))}
+                        </section>
+                    )}
                     <section className="market-panel">
                         <h2>{t('Work and professional links')}</h2>
                         {person.links.length ? (
