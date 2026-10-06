@@ -86,6 +86,10 @@ class WorkspaceEventMail extends Notification implements ShouldQueue
             'amendment_accepted' => __('accepted your proposed change to the contract for'),
             'amendment_declined' => __('declined your proposed change to the contract for'),
             'amendment_withdrawn' => __('withdrew a proposed change to the contract for'),
+            'portfolio_requested' => __('asked you to approve a public case study about'),
+            'portfolio_approved' => __('approved your case study about'),
+            'portfolio_declined' => __('declined your case study about'),
+            'portfolio_revoked' => __('withdrew permission to publish your case study about'),
             default => __('Workspace update for'),
         };
     }

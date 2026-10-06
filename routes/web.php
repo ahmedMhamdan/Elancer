@@ -21,6 +21,7 @@ use App\Http\Controllers\OfferController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PaymentWebhookController;
+use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\ProfilePhotoController;
 use App\Http\Controllers\ProjectDiscoveryController;
 use App\Http\Controllers\ProposalController;
@@ -45,6 +46,7 @@ Route::get('jobs/{project}', [ProjectDiscoveryController::class, 'show'])->where
 Route::get('freelancers', [FreelancerController::class, 'index'])->name('freelancers.index');
 Route::get('freelancers/{profile}', [FreelancerController::class, 'show'])->whereNumber('profile')->name('freelancers.show');
 Route::get('freelancers/{profile}/photo', [FreelancerController::class, 'photo'])->whereNumber('profile')->name('freelancers.photo');
+Route::get('portfolio/{case}', [PortfolioController::class, 'show'])->whereNumber('case')->name('portfolio.show');
 Route::post('payments/webhooks/stripe', [PaymentWebhookController::class, 'stripe'])->middleware('throttle:120,1')->name('payments.webhooks.stripe');
 Route::post('locale', LocaleController::class)->middleware('throttle:60,1')->name('locale.update');
 
@@ -72,6 +74,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('contracts/{contract}/amendments', [ContractAmendmentController::class, 'store'])->whereNumber('contract')->middleware('throttle:10,1')->name('contracts.amendments.store');
         Route::patch('contracts/{contract}/amendments', [ContractAmendmentController::class, 'update'])->whereNumber('contract')->middleware('throttle:20,1')->name('contracts.amendments.update');
         Route::post('contracts/{contract}/repost', [ClientProjectController::class, 'repost'])->whereNumber('contract')->middleware('throttle:10,1')->name('contracts.repost');
+        Route::patch('contracts/{contract}/portfolio', [PortfolioController::class, 'consent'])->whereNumber('contract')->middleware('throttle:20,1')->name('contracts.portfolio');
+        Route::get('my-portfolio', [PortfolioController::class, 'index'])->name('portfolio.index');
+        Route::get('my-portfolio/create', [PortfolioController::class, 'create'])->name('portfolio.create');
+        Route::post('my-portfolio', [PortfolioController::class, 'store'])->middleware('throttle:20,1')->name('portfolio.store');
+        Route::get('my-portfolio/{case}/edit', [PortfolioController::class, 'edit'])->whereNumber('case')->name('portfolio.edit');
+        Route::put('my-portfolio/{case}', [PortfolioController::class, 'update'])->whereNumber('case')->middleware('throttle:60,1')->name('portfolio.update');
+        Route::patch('my-portfolio/{case}', [PortfolioController::class, 'act'])->whereNumber('case')->middleware('throttle:30,1')->name('portfolio.act');
+        Route::delete('my-portfolio/{case}', [PortfolioController::class, 'destroy'])->whereNumber('case')->name('portfolio.destroy');
         Route::get('contracts/{contract}/files/{file}', [ContractWorkController::class, 'file'])->whereNumber(['contract', 'file'])->name('contracts.file');
         Route::get('finance', FinanceController::class)->name('finance.index');
         Route::get('finance/payments', [FinanceController::class, 'payments'])->name('finance.payments');

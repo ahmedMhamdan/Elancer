@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Contracts\ContractWork;
 use App\Models\ContractReview;
+use App\Models\PortfolioCase;
 use App\Models\Profile;
 use App\Models\Skill;
 use Illuminate\Database\Eloquent\Builder;
@@ -65,7 +66,9 @@ class FreelancerController extends Controller
                 'project_title' => $review->contract->agreement['project_title'] ?? null,
             ]);
 
-        return Inertia::render('discovery/freelancer', ['freelancer' => $profile->load(['user', 'skillTags'])->publicDetails(), 'canContact' => $request->user()?->id !== $profile->user_id, 'reviews' => $reviews]);
+        $cases = PortfolioCase::query()->publiclyVisible()->where('user_id', $profile->user_id)->orderByDesc('published_at')->orderByDesc('id')->get()->map(PortfolioController::published(...));
+
+        return Inertia::render('discovery/freelancer', ['freelancer' => $profile->load(['user', 'skillTags'])->publicDetails(), 'canContact' => $request->user()?->id !== $profile->user_id, 'reviews' => $reviews, 'cases' => $cases]);
     }
 
     public function photo(Profile $profile): HttpResponse

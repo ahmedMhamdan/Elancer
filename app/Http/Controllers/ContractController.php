@@ -55,6 +55,7 @@ class ContractController extends Controller
             ])->reverse()->values(),
             'activity' => $this->activity($contract, $submissions, $cancellations, $amendments),
             'reviews' => $this->reviews($contract, $user),
+            'portfolio' => PortfolioController::forContract($contract, $user),
         ]);
     }
 
