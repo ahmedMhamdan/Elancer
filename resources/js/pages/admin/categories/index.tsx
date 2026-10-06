@@ -125,11 +125,10 @@ export default function Categories({ categories, status, notice }: Props) {
                             {categories.data.map((category) => (
                                 <TableRow key={category.id}>
                                     <TableCell className="px-4 py-4 text-start">
-                                        <span
-                                            dir="auto"
-                                            className="block font-medium wrap-anywhere"
-                                        >
-                                            {category.categoryname}
+                                        {/* The line keeps the page direction; only the name is isolated, so an
+                                            English name in Arabic still starts at the leading edge. */}
+                                        <span className="block font-medium wrap-anywhere">
+                                            <bdi>{category.categoryname}</bdi>
                                         </span>
                                     </TableCell>
                                     <TableCell className="w-px px-4 py-4 text-end">

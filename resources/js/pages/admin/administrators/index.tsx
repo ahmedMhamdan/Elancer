@@ -90,17 +90,13 @@ export default function Administrators({ users, search, notice }: Props) {
                             {users.data.map((account) => (
                                 <TableRow key={account.id}>
                                     <TableCell className="px-4 py-4 text-start">
-                                        <span
-                                            dir="auto"
-                                            className="block font-medium wrap-anywhere"
-                                        >
-                                            {account.name}
+                                        {/* Lines keep the page direction; the name and address are isolated
+                                            so they start at the leading edge in Arabic too. */}
+                                        <span className="block font-medium wrap-anywhere">
+                                            <bdi>{account.name}</bdi>
                                         </span>
-                                        <span
-                                            dir="ltr"
-                                            className="text-muted-foreground mt-1 block text-sm wrap-anywhere"
-                                        >
-                                            {account.email}
+                                        <span className="text-muted-foreground mt-1 block text-sm wrap-anywhere">
+                                            <bdi dir="ltr">{account.email}</bdi>
                                         </span>
                                         <p className="text-muted-foreground mt-2 text-sm">
                                             {t[account.status]} ·{' '}
