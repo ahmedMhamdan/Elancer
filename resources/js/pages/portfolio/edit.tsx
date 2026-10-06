@@ -1,6 +1,13 @@
 import { Head, Link, useForm } from '@inertiajs/react';
+import { ImagePlus } from 'lucide-react';
+import { useState } from 'react';
 import InputError from '@/components/input-error';
-import { CaseBody, type CaseContent } from '@/components/portfolio-case';
+import {
+    CaseBody,
+    caseImageUrl,
+    type CaseContent,
+    type CaseImage,
+} from '@/components/portfolio-case';
 import SkillSelect from '@/components/skill-select';
 import Button from '@/components/tailadmin/button';
 import Input from '@/components/tailadmin/input';
@@ -13,6 +20,163 @@ import {
     PortfolioLayout,
     type OwnedCase,
 } from './shared';
+
+// Each image is checked and stored on its own; the case lists it once the case is saved.
+function CaseImages({
+    caseId,
+    images,
+    errors,
+    onChange,
+}: {
+    caseId: number;
+    images: CaseImage[];
+    errors: Record<string, string>;
+    onChange: (images: CaseImage[]) => void;
+}) {
+    const { t } = useTranslation();
+    const [busy, setBusy] = useState(false);
+    const [error, setError] = useState('');
+    async function upload(file: File) {
+        if (busy) return;
+        if (
+            !['image/jpeg', 'image/png', 'image/webp'].includes(file.type) ||
+            file.size > 4 * 1024 * 1024
+        ) {
+            setError(t('Choose a JPG, PNG or WebP image up to 4 MB.'));
+            return;
+        }
+        setBusy(true);
+        setError('');
+        try {
+            const body = new FormData();
+            body.append('image', file);
+            const token = decodeURIComponent(
+                document.cookie
+                    .split('; ')
+                    .find((c) => c.startsWith('XSRF-TOKEN='))
+                    ?.slice(11) ?? '',
+            );
+            const response = await fetch(`/my-portfolio/${caseId}/images`, {
+                method: 'POST',
+                credentials: 'same-origin',
+                body,
+                headers: { Accept: 'application/json', 'X-XSRF-TOKEN': token },
+                signal: AbortSignal.timeout(30000),
+            });
+            if (response.status === 429) {
+                setError(
+                    t(
+                        'Wait before adding another image. Limit: six per minute and thirty per hour.',
+                    ),
+                );
+                return;
+            }
+            if ([401, 403, 419].includes(response.status)) {
+                setError(t('Sign in again to add an image.'));
+                return;
+            }
+            const data = await response.json();
+            if (!response.ok) {
+                setError(
+                    data.errors?.image?.[0] ??
+                        t('We could not save this image. Please try again.'),
+                );
+                return;
+            }
+            onChange([...images, { id: data.id, alt: '' }]);
+        } catch {
+            setError(t('We could not save this image. Please try again.'));
+        } finally {
+            setBusy(false);
+        }
+    }
+    return (
+        <div className="market-stack">
+            <h2 className="!mb-0">{t('Images')}</h2>
+            <p id="case-images-help" className="market-muted">
+                {t(
+                    'Add up to six JPG, PNG or WebP images of 4 MB or less. Each image is sent to Sightengine for a workplace-safe content check before it is stored, and it is kept once you save the case study.',
+                )}
+            </p>
+            {images.map((image, i) => (
+                <div key={image.id} className="market-stack">
+                    <div className="case-image-editor">
+                        <img src={caseImageUrl(image.id)} alt="" />
+                        <label className="market-field">
+                            <span>{t('Image description')}</span>
+                            <Input
+                                dir="auto"
+                                value={image.alt}
+                                maxLength={160}
+                                error={Boolean(errors[`images.${i}.alt`])}
+                                onChange={(event) =>
+                                    onChange(
+                                        images.map((other, j) =>
+                                            j === i
+                                                ? {
+                                                      ...other,
+                                                      alt: event.target.value,
+                                                  }
+                                                : other,
+                                        ),
+                                    )
+                                }
+                            />
+                        </label>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() =>
+                                onChange(images.filter((_, j) => j !== i))
+                            }
+                        >
+                            {t('Remove')}
+                        </Button>
+                    </div>
+                    <InputError
+                        message={
+                            errors[`images.${i}.alt`] ??
+                            errors[`images.${i}.id`]
+                        }
+                    />
+                </div>
+            ))}
+            <InputError message={errors.images} />
+            {images.length < 6 && (
+                <div className="market-field">
+                    <Label
+                        htmlFor="case-image"
+                        className="flex items-center gap-2"
+                    >
+                        <ImagePlus
+                            className="text-primary size-5"
+                            aria-hidden="true"
+                        />
+                        {t('Add an image')}
+                    </Label>
+                    <Input
+                        id="case-image"
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        disabled={busy}
+                        aria-describedby="case-images-help"
+                        onChange={(event) => {
+                            const file = event.target.files?.[0];
+                            event.target.value = '';
+                            if (file) void upload(file);
+                        }}
+                    />
+                </div>
+            )}
+            {error && (
+                <p role="alert" className="market-error">
+                    {error}
+                </p>
+            )}
+            <span role="status">{busy ? t('Checking image…') : ''}</span>
+        </div>
+    );
+}
 
 export default function Edit({
     case: item,
@@ -29,6 +193,7 @@ export default function Edit({
         body: item?.content.body ?? '',
         skills: item?.content.skills ?? [],
         links: item?.content.links ?? [],
+        images: item?.content.images ?? [],
         contract: contract?.id ?? null,
     });
     const errors = form.errors as Record<string, string>;
@@ -67,7 +232,7 @@ export default function Edit({
                               )
                             : linked
                               ? t(
-                                    'Saving keeps this case study private. It becomes public only when the client approves the exact text and links you send them.',
+                                    'Saving keeps this case study private. It becomes public only when the client approves the exact text, images and links you send them.',
                                 )
                               : t(
                                     'Saving keeps this case study private. Publishing is a separate step on the portfolio page.',
@@ -154,6 +319,22 @@ export default function Edit({
                             }
                         />
                     </div>
+                    {item ? (
+                        <CaseImages
+                            caseId={item.id}
+                            images={form.data.images ?? []}
+                            errors={errors}
+                            onChange={(images) =>
+                                form.setData('images', images)
+                            }
+                        />
+                    ) : (
+                        <p className="market-muted">
+                            {t(
+                                'You can add images after saving the case study for the first time.',
+                            )}
+                        </p>
+                    )}
                     <h2 className="!mb-0">{t('Links')}</h2>
                     <p className="market-muted">
                         {t(

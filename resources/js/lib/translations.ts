@@ -1886,10 +1886,10 @@ export const arabic: Record<string, string> = {
     'declined your case study about': 'رفض دراسة الحالة التي كتبتها عن',
     'withdrew permission to publish your case study about':
         'سحب الإذن بنشر دراسة الحالة التي كتبتها عن',
-    'A case study about this work is public only while you allow it. It never shows your name, the price or anything from this contract unless it is written in the text you approve.':
-        'لا تظهر دراسة الحالة عن هذا العمل للعامة إلا ما دمت تسمح بذلك. ولا تعرض اسمك أو السعر أو أي شيء من هذا العقد إلا إذا ورد في النص الذي توافق عليه.',
-    'A case study about this work becomes public only when the client approves the exact text and links.':
-        'لا تصبح دراسة الحالة عن هذا العمل عامة إلا بعد موافقة العميل على النص والروابط كما هي.',
+    'A case study about this work is public only while you allow it. It never shows your name, the price or anything from this contract unless it is in the text or images you approve.':
+        'لا تظهر دراسة الحالة عن هذا العمل للعامة إلا ما دمت تسمح بذلك. ولا تعرض اسمك أو السعر أو أي شيء من هذا العقد إلا إذا ورد في النص أو الصور التي توافق عليها.',
+    'A case study about this work becomes public only when the client approves the exact text, images and links.':
+        'لا تصبح دراسة الحالة عن هذا العمل عامة إلا بعد موافقة العميل على النص والصور والروابط كما هي.',
     'Manage this case study in your portfolio':
         'إدارة دراسة الحالة هذه من معرض أعمالك',
     'Write a case study': 'اكتب دراسة حالة',
@@ -1915,8 +1915,8 @@ export const arabic: Record<string, string> = {
         'أُنجز على إيلانسر ونُشر بموافقة العميل.',
     'Edit case study': 'تعديل دراسة الحالة',
     'New case study': 'دراسة حالة جديدة',
-    'Saving keeps this case study private. It becomes public only when the client approves the exact text and links you send them.':
-        'الحفظ يُبقي دراسة الحالة خاصة. ولا تصبح عامة إلا بعد موافقة العميل على النص والروابط التي ترسلها إليه كما هي.',
+    'Saving keeps this case study private. It becomes public only when the client approves the exact text, images and links you send them.':
+        'الحفظ يُبقي دراسة الحالة خاصة. ولا تصبح عامة إلا بعد موافقة العميل على النص والصور والروابط التي ترسلها إليه كما هي.',
     'Saving keeps this case study private. Publishing is a separate step on the portfolio page.':
         'الحفظ يُبقي دراسة الحالة خاصة. النشر خطوة مستقلة من صفحة معرض الأعمال.',
     'Completed on Elancer:': 'أُنجز على إيلانسر:',
@@ -1945,8 +1945,8 @@ export const arabic: Record<string, string> = {
         'يتسع معرض الأعمال لـ :count دراسة حالة على الأكثر.',
     'Add a case study': 'أضف دراسة حالة',
     'Completed work on Elancer': 'أعمال مكتملة على إيلانسر',
-    'You can write a case study about a completed contract. It becomes public only when that client approves the exact text and links.':
-        'يمكنك كتابة دراسة حالة عن عقد مكتمل. ولا تصبح عامة إلا بعد موافقة ذلك العميل على النص والروابط كما هي.',
+    'You can write a case study about a completed contract. It becomes public only when that client approves the exact text, images and links.':
+        'يمكنك كتابة دراسة حالة عن عقد مكتمل. ولا تصبح عامة إلا بعد موافقة ذلك العميل على النص والصور والروابط كما هي.',
     'No case studies yet.': 'لا توجد دراسات حالة بعد.',
     'The client withdrew permission, so this case study is not public. You can send it for approval again.':
         'سحب العميل الإذن، لذلك دراسة الحالة هذه غير منشورة. يمكنك إرسالها للموافقة من جديد.',
@@ -1971,4 +1971,19 @@ export const arabic: Record<string, string> = {
     'Approval history': 'سجل الموافقات',
     'Saving changes only your private copy. The public version stays as it is until the changes are published or approved.':
         'الحفظ يغيّر نسختك الخاصة فقط. تبقى النسخة المنشورة كما هي إلى أن تُنشر التغييرات أو تتم الموافقة عليها.',
+    Images: 'الصور',
+    'Add up to six JPG, PNG or WebP images of 4 MB or less. Each image is sent to Sightengine for a workplace-safe content check before it is stored, and it is kept once you save the case study.':
+        'أضف حتى ست صور بصيغة JPG أو PNG أو WebP لا يتجاوز حجم كل منها 4 ميغابايت. تُرسل كل صورة إلى Sightengine للتحقق من ملاءمتها لبيئة العمل قبل تخزينها، وتُحفظ مع دراسة الحالة عند حفظها.',
+    'Image description': 'وصف الصورة',
+    'Add an image': 'أضف صورة',
+    'Checking image…': 'جارٍ فحص الصورة…',
+    'Choose a JPG, PNG or WebP image up to 4 MB.':
+        'اختر صورة بصيغة JPG أو PNG أو WebP لا يتجاوز حجمها 4 ميغابايت.',
+    'Wait before adding another image. Limit: six per minute and thirty per hour.':
+        'انتظر قبل إضافة صورة أخرى. الحد: ست صور في الدقيقة وثلاثون في الساعة.',
+    'Sign in again to add an image.': 'سجّل الدخول من جديد لإضافة صورة.',
+    'We could not save this image. Please try again.':
+        'تعذّر حفظ هذه الصورة. حاول مرة أخرى.',
+    'You can add images after saving the case study for the first time.':
+        'يمكنك إضافة الصور بعد حفظ دراسة الحالة لأول مرة.',
 };

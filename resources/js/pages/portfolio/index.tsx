@@ -80,7 +80,7 @@ export default function Index({
                         </h2>
                         <p className="market-muted">
                             {t(
-                                'You can write a case study about a completed contract. It becomes public only when that client approves the exact text and links.',
+                                'You can write a case study about a completed contract. It becomes public only when that client approves the exact text, images and links.',
                             )}
                         </p>
                         <ul className="market-stack">

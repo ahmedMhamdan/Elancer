@@ -224,6 +224,34 @@
     gap: 12px;
     align-items: end;
 }
+.case-images {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+    gap: 12px;
+    align-items: start;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.case-images img,
+.case-image-editor img {
+    display: block;
+    width: 100%;
+    border: 1px solid var(--el-border);
+    border-radius: 8px;
+    background: var(--el-surface-soft);
+}
+/* The gallery shows each image whole; only the editor thumbnail is cropped. */
+.case-image-editor img {
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+}
+.case-image-editor {
+    display: grid;
+    grid-template-columns: 96px 1fr auto;
+    gap: 12px;
+    align-items: end;
+}
 .market-workspace {
     color: var(--el-text);
 }
@@ -323,6 +351,9 @@
     .talent-filters,
     .market-link-editor {
         grid-template-columns: 1fr;
+    }
+    .case-image-editor {
+        grid-template-columns: 96px 1fr;
     }
     .talent-profile-header {
         align-items: flex-start;

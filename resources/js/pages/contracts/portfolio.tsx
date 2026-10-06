@@ -54,10 +54,10 @@ export function Portfolio({
             <p className="market-muted">
                 {contract.is_client
                     ? t(
-                          'A case study about this work is public only while you allow it. It never shows your name, the price or anything from this contract unless it is written in the text you approve.',
+                          'A case study about this work is public only while you allow it. It never shows your name, the price or anything from this contract unless it is in the text or images you approve.',
                       )
                     : t(
-                          'A case study about this work becomes public only when the client approves the exact text and links.',
+                          'A case study about this work becomes public only when the client approves the exact text, images and links.',
                       )}
             </p>
             {errors.portfolio && (
