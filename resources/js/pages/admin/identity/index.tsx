@@ -164,7 +164,7 @@ export default function IdentityReviews({
                 label={t('Identity reviews')}
                 className="border-border bg-card rounded-xl border"
             >
-                <Table>
+                <Table className="w-full">
                     <TableHeader>
                         <TableRow>
                             {['Account', 'Status', 'Review'].map((label) => (
@@ -173,7 +173,7 @@ export default function IdentityReviews({
                                     isHeader
                                     className={
                                         label === 'Review'
-                                            ? 'w-px px-5 py-3 text-end'
+                                            ? 'px-5 py-3 text-end'
                                             : 'px-5 py-3 text-start'
                                     }
                                 >
@@ -188,13 +188,18 @@ export default function IdentityReviews({
                                 key={row.id}
                                 className="border-border border-t"
                             >
+                                {/* A long review reason must not squeeze the account or status columns. */}
                                 <TableCell className="px-5 py-4">
-                                    <p>{row.name}</p>
-                                    <p className="text-muted-foreground text-sm break-all">
-                                        {row.email}
-                                    </p>
+                                    <div className="min-w-56">
+                                        <p className="wrap-anywhere">
+                                            <bdi>{row.name}</bdi>
+                                        </p>
+                                        <p className="text-muted-foreground text-sm wrap-anywhere">
+                                            <bdi dir="ltr">{row.email}</bdi>
+                                        </p>
+                                    </div>
                                 </TableCell>
-                                <TableCell className="px-5 py-4">
+                                <TableCell className="px-5 py-4 whitespace-nowrap first-letter:uppercase">
                                     {t(row.status)}
                                 </TableCell>
                                 <TableCell className="px-5 py-4 text-end">
@@ -202,13 +207,14 @@ export default function IdentityReviews({
                                         <Button
                                             size="sm"
                                             variant="outline"
+                                            className="whitespace-nowrap"
                                             onClick={() => setSelected(row)}
                                         >
                                             {t('Review documents')}
                                         </Button>
                                     ) : (
-                                        <span className="text-muted-foreground text-sm">
-                                            {row.reason}
+                                        <span className="text-muted-foreground inline-block max-w-xl text-sm wrap-anywhere">
+                                            <bdi>{row.reason}</bdi>
                                         </span>
                                     )}
                                 </TableCell>
