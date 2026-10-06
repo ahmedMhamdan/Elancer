@@ -3,15 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Portfolio\PortfolioCases;
+use App\Actions\PrepareProfilePhoto;
 use App\Models\Contract;
 use App\Models\PortfolioApproval;
 use App\Models\PortfolioCase;
+use App\Models\PortfolioImage;
 use App\Models\Profile;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PortfolioController extends Controller
 {
@@ -60,11 +65,40 @@ class PortfolioController extends Controller
     {
         abort_unless($case->user_id === $request->user()->id, 404);
         abort_unless($request->user()->canParticipateInMarketplace(), 403);
-        PortfolioCases::update($case, $this->content($request));
+        PortfolioCases::update($case, $this->content($request, $case));
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Case study saved. The public version is unchanged.')]);
 
         return back();
+    }
+
+    /** The image is checked and stored, but stays private until a saved version lists it. */
+    public function upload(Request $request, PortfolioCase $case, PrepareProfilePhoto $prepare): JsonResponse
+    {
+        abort_unless($case->user_id === $request->user()->id, 404);
+        abort_unless($request->user()->canParticipateInMarketplace(), 403);
+        $request->validate(['image' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096', 'dimensions:max_width=6000,max_height=6000']]);
+
+        return response()->json(['id' => PortfolioCases::addImage($case, $request->file('image'), $prepare)->id]);
+    }
+
+    /**
+     * The one place a portfolio image is read, so Q53 and Q74 hold for direct links too. Visitors
+     * get only images of the public version; the client also sees the request awaiting their answer.
+     */
+    public function image(Request $request, PortfolioImage $image): StreamedResponse
+    {
+        $case = PortfolioCase::query()->findOrFail($image->portfolio_case_id);
+        $user = $request->user()?->id;
+        $listed = fn (?array $content): bool => in_array($image->id, array_column($content['images'] ?? [], 'id'), true);
+        $allowed = $case->user_id === $user
+            || ($listed($case->public_content) && PortfolioCase::query()->publiclyVisible()->whereKey($case->id)->exists());
+        if (! $allowed && $user !== null && $case->contract_id !== null && Contract::query()->whereKey($case->contract_id)->where('client_id', $user)->exists()) {
+            $allowed = $listed($case->public_content) || $listed(PortfolioApproval::query()->where('open_case_id', $case->id)->first()?->content);
+        }
+        abort_unless($allowed && Storage::disk('local')->exists($image->path), 404);
+
+        return Storage::disk('local')->response($image->path, null, ['Cache-Control' => 'private, no-store', 'X-Content-Type-Options' => 'nosniff']);
     }
 
     public function act(Request $request, PortfolioCase $case): RedirectResponse
@@ -175,9 +209,14 @@ class PortfolioController extends Controller
     }
 
     /** @return array<string, mixed> */
-    private function content(Request $request): array
+    private function content(Request $request, ?PortfolioCase $case = null): array
     {
         $data = $request->validate([
+            // Images are uploaded to a saved case, so a version can only list that case's own.
+            'images' => ['sometimes', 'array', 'list', 'max:'.PortfolioCases::MAX_IMAGES],
+            'images.*' => ['array:id,alt'],
+            'images.*.id' => ['required', 'integer', 'distinct', Rule::exists('portfolio_images', 'id')->where('portfolio_case_id', $case->id ?? 0)],
+            'images.*.alt' => ['required', 'string', 'max:160'],
             'title' => ['required', 'string', 'min:5', 'max:120'],
             'summary' => ['required', 'string', 'min:20', 'max:300'],
             'body' => ['required', 'string', 'min:50', 'max:5000'],
@@ -187,8 +226,11 @@ class PortfolioController extends Controller
             'links.*' => ['array:label,url'],
             'links.*.label' => ['required', 'string', 'max:80'],
             'links.*.url' => ['required', 'url:https', 'max:2000'],
-        ]);
+        ], ['images.*.alt.required' => __('Describe each image in a few words.')]);
+        $images = array_map(fn (array $image) => ['id' => (int) $image['id'], 'alt' => $image['alt']], array_values($data['images'] ?? []));
 
-        return ['title' => $data['title'], 'summary' => $data['summary'], 'body' => $data['body'], 'skills' => array_values($data['skills']), 'links' => array_values($data['links'])];
+        // The key is left out when empty, so cases saved before images existed compare as unchanged.
+        return ['title' => $data['title'], 'summary' => $data['summary'], 'body' => $data['body'], 'skills' => array_values($data['skills']), 'links' => array_values($data['links']),
+            ...($images ? ['images' => $images] : [])];
     }
 }

@@ -9,23 +9,34 @@ use Illuminate\Validation\ValidationException;
 
 class PrepareProfilePhoto
 {
-    public function handle(UploadedFile $photo): string
+    /** The field the member's messages are reported on; portfolio images use their own wording. */
+    private string $field = 'photo';
+
+    /** Portfolio case images pass the same normalization and content check at a larger size. */
+    public function image(UploadedFile $image): string
+    {
+        $this->field = 'image';
+
+        return $this->handle($image, 1600);
+    }
+
+    public function handle(UploadedFile $photo, int $side = 512): string
     {
         $bytes = $photo->getContent();
         $size = @getimagesizefromstring($bytes);
         if ($size === false || $size[0] * $size[1] > 16000000) {
-            throw ValidationException::withMessages(['photo' => __('Choose a photo with no more than 16 million pixels.')]);
+            $this->fail(__('Choose a photo with no more than 16 million pixels.'), __('Choose an image with no more than 16 million pixels.'));
         }
         $source = @imagecreatefromstring($bytes);
         if ($source === false) {
-            throw ValidationException::withMessages(['photo' => __('This image could not be opened. Try a different photo.')]);
+            $this->fail(__('This image could not be opened. Try a different photo.'), __('This image could not be opened. Try a different image.'));
         }
-        $ratio = min(1, 512 / max($size[0], $size[1]));
+        $ratio = min(1, $side / max($size[0], $size[1]));
         $width = max(1, (int) round($size[0] * $ratio));
         $height = max(1, (int) round($size[1] * $ratio));
         $image = imagecreatetruecolor($width, $height);
         if ($image === false) {
-            throw ValidationException::withMessages(['photo' => __('We could not save your photo. Please try again.')]);
+            $this->unsaved();
         }
         // The destination is a true-color image; flatten transparency onto white.
         imagefill($image, 0, 0, 0xFFFFFF);
@@ -40,7 +51,7 @@ class PrepareProfilePhoto
             imagedestroy($image);
         }
         if (! is_string($normalized) || $normalized === '') {
-            throw ValidationException::withMessages(['photo' => __('We could not save your photo. Please try again.')]);
+            $this->unsaved();
         }
         $this->moderate($normalized);
 
@@ -56,7 +67,7 @@ class PrepareProfilePhoto
             $this->unavailable();
         }
         try {
-            // Only sanitized profile-photo bytes are shared. No public URL or identity documents.
+            // Only sanitized photo or portfolio-image bytes are shared. No public URL or identity documents.
             $response = Http::connectTimeout(3)->timeout(10)->withoutRedirecting()
                 ->attach('media', $bytes, 'profile.jpg', ['Content-Type' => 'image/jpeg'])
                 ->post('https://api.sightengine.com/1.0/check-workflow.json', [
@@ -70,7 +81,7 @@ class PrepareProfilePhoto
             $this->unavailable();
         }
         if ($response->json('summary.action') === 'reject') {
-            throw ValidationException::withMessages(['photo' => __('This photo did not pass the workplace-safe content check. Choose another photo.')]);
+            $this->fail(__('This photo did not pass the workplace-safe content check. Choose another photo.'), __('This image did not pass the workplace-safe content check. Choose another image.'));
         }
         if ($response->json('summary.action') !== 'accept') {
             $this->unavailable();
@@ -79,6 +90,16 @@ class PrepareProfilePhoto
 
     private function unavailable(): never
     {
-        throw ValidationException::withMessages(['photo' => __('Photo safety checks are unavailable. Your current photo has not changed. Please try again later.')]);
+        $this->fail(__('Photo safety checks are unavailable. Your current photo has not changed. Please try again later.'), __('Image safety checks are unavailable. The image was not added. Please try again later.'));
+    }
+
+    private function unsaved(): never
+    {
+        $this->fail(__('We could not save your photo. Please try again.'), __('We could not save this image. Please try again.'));
+    }
+
+    private function fail(string $photo, string $image): never
+    {
+        throw ValidationException::withMessages([$this->field => $this->field === 'photo' ? $photo : $image]);
     }
 }

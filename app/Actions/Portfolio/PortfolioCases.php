@@ -2,14 +2,20 @@
 
 namespace App\Actions\Portfolio;
 
+use App\Actions\PrepareProfilePhoto;
 use App\Models\Contract;
 use App\Models\PortfolioApproval;
 use App\Models\PortfolioCase;
+use App\Models\PortfolioImage;
 use App\Models\User;
 use App\Notifications\WorkspaceEvent;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Throwable;
 
 /**
  * Q24, Q52, Q53, Q56: a case keeps a private working copy and a public version.
@@ -18,6 +24,12 @@ use Illuminate\Validation\ValidationException;
 class PortfolioCases
 {
     public const MAX_CASES = 12;
+
+    /** Images one version of a case can list. */
+    public const MAX_IMAGES = 6;
+
+    /** Images a case can store, counting those kept for earlier requests. */
+    public const MAX_STORED = 30;
 
     /** @param  array<string, mixed>  $content */
     public static function create(User $owner, array $content, ?int $contract): PortfolioCase
@@ -52,7 +64,65 @@ class PortfolioCases
     /** @param  array<string, mixed>  $content */
     public static function update(PortfolioCase $case, array $content): void
     {
-        DB::transaction(fn () => PortfolioCase::query()->lockForUpdate()->findOrFail($case->id)->forceFill(['content' => $content])->save(), 3);
+        DB::transaction(function () use ($case, $content): void {
+            $locked = PortfolioCase::query()->lockForUpdate()->findOrFail($case->id);
+            $locked->forceFill(['content' => $content])->save();
+            self::prune($locked);
+        }, 3);
+    }
+
+    /**
+     * Stores an image only after it passed the content check. It stays private until a
+     * saved version lists it, and it is never replaced in place (Q52).
+     */
+    public static function addImage(PortfolioCase $case, UploadedFile $file, PrepareProfilePhoto $prepare): PortfolioImage
+    {
+        // Checked before the provider call too, so a refused upload is never sent for checking.
+        self::refuseWhenFull($case->id);
+        $bytes = $prepare->image($file);
+        $size = getimagesizefromstring($bytes) ?: [0, 0];
+        $path = 'portfolio-images/'.$case->id.'/'.Str::uuid().'.jpg';
+        try {
+            return DB::transaction(function () use ($case, $bytes, $size, $path): PortfolioImage {
+                PortfolioCase::query()->lockForUpdate()->findOrFail($case->id);
+                self::refuseWhenFull($case->id);
+                if (! Storage::disk('local')->put($path, $bytes)) {
+                    throw ValidationException::withMessages(['image' => __('We could not save this image. Please try again.')]);
+                }
+                $image = new PortfolioImage;
+                $image->forceFill(['portfolio_case_id' => $case->id, 'path' => $path, 'width' => $size[0], 'height' => $size[1]])->save();
+
+                return $image;
+            }, 3);
+        } catch (Throwable $exception) {
+            Storage::disk('local')->delete($path);
+            throw $exception;
+        }
+    }
+
+    private static function refuseWhenFull(int $case): void
+    {
+        if (PortfolioImage::query()->where('portfolio_case_id', $case)->count() >= self::MAX_STORED) {
+            throw ValidationException::withMessages(['image' => __('This case study stores too many images. Save it to clear the ones you removed, then try again.')]);
+        }
+    }
+
+    /**
+     * Removes images that the working copy, the public version and every request no longer
+     * list. Images named by a past request stay as private history. Call inside the case lock.
+     */
+    private static function prune(PortfolioCase $case): void
+    {
+        $kept = PortfolioApproval::query()->where('portfolio_case_id', $case->id)->get()->map(fn (PortfolioApproval $approval) => $approval->content)
+            ->push($case->content, $case->public_content)
+            ->flatMap(fn (?array $content) => array_column($content['images'] ?? [], 'id'))->all();
+        $unused = PortfolioImage::query()->where('portfolio_case_id', $case->id)->whereNotIn('id', $kept)->get();
+        if ($unused->isEmpty()) {
+            return;
+        }
+        PortfolioImage::query()->whereKey($unused->modelKeys())->delete();
+        $paths = $unused->pluck('path')->all();
+        DB::afterCommit(fn () => rescue(fn () => Storage::disk('local')->delete($paths)));
     }
 
     /** The owner's own actions. Client-owned work is never published from here. */
@@ -71,6 +141,7 @@ class PortfolioCases
                     throw ValidationException::withMessages(['case' => __('Work completed on Elancer is published by its client\'s approval.')]);
                 }
                 $locked->forceFill(['public_content' => $locked->content, 'published_at' => now()])->save();
+                self::prune($locked);
 
                 return;
             }
@@ -140,6 +211,7 @@ class PortfolioCases
                 throw ValidationException::withMessages(['case' => __('A case study that was sent to a client is kept as history. You can hide it instead.')]);
             }
             $locked->delete();
+            DB::afterCommit(fn () => rescue(fn () => Storage::disk('local')->deleteDirectory('portfolio-images/'.$locked->id)));
         }, 3);
     }
 

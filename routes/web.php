@@ -47,6 +47,7 @@ Route::get('freelancers', [FreelancerController::class, 'index'])->name('freelan
 Route::get('freelancers/{profile}', [FreelancerController::class, 'show'])->whereNumber('profile')->name('freelancers.show');
 Route::get('freelancers/{profile}/photo', [FreelancerController::class, 'photo'])->whereNumber('profile')->name('freelancers.photo');
 Route::get('portfolio/{case}', [PortfolioController::class, 'show'])->whereNumber('case')->name('portfolio.show');
+Route::get('portfolio/images/{image}', [PortfolioController::class, 'image'])->whereNumber('image')->name('portfolio.image');
 Route::post('payments/webhooks/stripe', [PaymentWebhookController::class, 'stripe'])->middleware('throttle:120,1')->name('payments.webhooks.stripe');
 Route::post('locale', LocaleController::class)->middleware('throttle:60,1')->name('locale.update');
 
@@ -80,6 +81,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('my-portfolio', [PortfolioController::class, 'store'])->middleware('throttle:20,1')->name('portfolio.store');
         Route::get('my-portfolio/{case}/edit', [PortfolioController::class, 'edit'])->whereNumber('case')->name('portfolio.edit');
         Route::put('my-portfolio/{case}', [PortfolioController::class, 'update'])->whereNumber('case')->middleware('throttle:60,1')->name('portfolio.update');
+        Route::post('my-portfolio/{case}/images', [PortfolioController::class, 'upload'])->whereNumber('case')->middleware('throttle:portfolio-images')->name('portfolio.images.store');
         Route::patch('my-portfolio/{case}', [PortfolioController::class, 'act'])->whereNumber('case')->middleware('throttle:30,1')->name('portfolio.act');
         Route::delete('my-portfolio/{case}', [PortfolioController::class, 'destroy'])->whereNumber('case')->name('portfolio.destroy');
         Route::get('contracts/{contract}/files/{file}', [ContractWorkController::class, 'file'])->whereNumber(['contract', 'file'])->name('contracts.file');

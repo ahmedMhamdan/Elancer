@@ -53,6 +53,12 @@ class AppServiceProvider extends ServiceProvider
 
             return [Limit::perMinute(1)->by('photo-minute:'.$user), Limit::perHour(3)->by('photo-hour:'.$user)];
         });
+        // Each portfolio image costs one content check, like a profile photo.
+        RateLimiter::for('portfolio-images', function (Request $request) {
+            $user = $request->user()->id ?? $request->ip();
+
+            return [Limit::perMinute(6)->by('portfolio-image-minute:'.$user), Limit::perHour(30)->by('portfolio-image-hour:'.$user)];
+        });
     }
 
     /**
