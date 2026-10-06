@@ -107,6 +107,15 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
         return ['contracts' => (bool) ($saved['contracts'] ?? true), 'hiring' => (bool) ($saved['hiring'] ?? false), 'messages' => (bool) ($saved['messages'] ?? false)];
     }
 
+    /** Demo and placeholder accounts use reserved domains (RFC 2606) that can only bounce, so they are never emailed. */
+    public function hasDeliverableEmail(): bool
+    {
+        $domain = strtolower((string) substr((string) strrchr((string) $this->email, '@'), 1));
+
+        return $domain !== '' && ! in_array($domain, ['example.com', 'example.net', 'example.org'], true)
+            && ! in_array(substr((string) strrchr($domain, '.'), 1), ['test', 'example', 'invalid', 'localhost'], true);
+    }
+
     public function isAdministrator(): bool
     {
         return $this->is_admin || $this->is_super_admin;

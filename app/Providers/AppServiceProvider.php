@@ -40,7 +40,7 @@ class AppServiceProvider extends ServiceProvider
                 // Q30: email follows the recipient's category preference and never blocks the action.
                 $stored = $event->notification;
                 $recipient = $event->notifiable;
-                if ($recipient->hasVerifiedEmail() && $recipient->emailPreferences()[$stored->category()]) {
+                if ($recipient->hasVerifiedEmail() && $recipient->hasDeliverableEmail() && $recipient->emailPreferences()[$stored->category()]) {
                     rescue(fn () => $recipient->notify(new WorkspaceEventMail($stored->kind, $stored->href, $stored->title, $stored->actor)));
                 }
             }

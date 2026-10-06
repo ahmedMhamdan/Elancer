@@ -40,7 +40,7 @@ class NotificationDeliveryTest extends TestCase
                 $sent[] = $event->notifiable->id;
             }
         });
-        $member = User::factory()->create(['onboarding_completed_at' => now()]);
+        $member = User::factory()->create(['onboarding_completed_at' => now(), 'email' => 'member@elancer.app']);
         $this->actingAs($member)->get('/settings/notifications')->assertInertia(fn (Assert $page) => $page
             ->where('preferences', ['contracts' => true, 'hiring' => false, 'messages' => false]));
         // Defaults: contract actions are emailed; hiring and message updates are not.
@@ -64,6 +64,13 @@ class NotificationDeliveryTest extends TestCase
         $unverified->notify(new WorkspaceEvent('delivery_submitted', '/contracts/1', 'Project', 'Sara'));
         $this->assertCount(3, $sent);
         $this->assertSame(1, $unverified->notifications()->count());
+        // Demo and placeholder addresses can only bounce, so they keep the bell and get no email.
+        foreach (['client-01@demo.elancer.test', 'someone@example.com'] as $address) {
+            $demo = User::factory()->create(['email' => $address]);
+            $demo->notify(new WorkspaceEvent('delivery_submitted', '/contracts/1', 'Project', 'Sara'));
+            $this->assertSame(1, $demo->notifications()->count());
+        }
+        $this->assertCount(3, $sent);
     }
 
     public function test_the_email_uses_the_recipients_language_and_a_local_link(): void
