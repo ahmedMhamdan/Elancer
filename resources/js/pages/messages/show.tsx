@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import InputError from '@/components/input-error';
+import ReportDialog from '@/components/report-dialog';
 import Button from '@/components/tailadmin/button';
 import Pagination from '@/components/tailadmin/pagination';
 import TextArea from '@/components/tailadmin/textarea';
@@ -115,8 +116,18 @@ function MessageItem({
                     </time>
                     {message.edited_at && <span>{t('Edited')}</span>}
                 </div>
-                {(message.can_edit || message.revisions.length > 0) && (
+                {(message.can_edit ||
+                    !message.mine ||
+                    message.revisions.length > 0) && (
                     <div className="chat-message-actions">
+                        {!message.mine && (
+                            <ReportDialog
+                                type="message"
+                                id={message.id}
+                                label={t('Report message')}
+                                className="!text-xs"
+                            />
+                        )}
                         {message.can_edit && !editing && (
                             <button
                                 type="button"

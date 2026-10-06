@@ -1,4 +1,5 @@
 import { Head, Link, usePage, router } from '@inertiajs/react';
+import ReportDialog from '@/components/report-dialog';
 import Button from '@/components/tailadmin/button';
 import { ArrowLeft, ExternalLink, MapPin } from 'lucide-react';
 import { Stars } from '@/pages/contracts/reviews';
@@ -99,6 +100,13 @@ export default function FreelancerProfile({
                         >
                             {t('Block account')}
                         </Button>
+                    )}
+                    {auth.user && (
+                        <ReportDialog
+                            type="profile"
+                            id={person.id}
+                            label={t('Report this profile')}
+                        />
                     )}
                 </div>
             )}

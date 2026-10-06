@@ -1,6 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, BadgeCheck } from 'lucide-react';
 import { CaseBody, type CaseContent } from '@/components/portfolio-case';
+import ReportDialog from '@/components/report-dialog';
 import { useTranslation } from '@/hooks/use-translation';
 import { DiscoveryLayout } from './shared';
 import '../../../css/elancer-marketplace.css';
@@ -15,8 +16,10 @@ export type PublicCase = {
 export default function PortfolioCase({
     case: item,
     freelancer,
+    canReport,
 }: {
     case: PublicCase;
+    canReport: boolean;
     freelancer: { id: number; name: string; headline: string | null };
 }) {
     const { t } = useTranslation();
@@ -62,6 +65,13 @@ export default function PortfolioCase({
                         >
                             {t('View profile')}
                         </Link>
+                        {canReport && (
+                            <ReportDialog
+                                type="case"
+                                id={item.id}
+                                label={t('Report this case study')}
+                            />
+                        )}
                     </section>
                 </aside>
             </div>

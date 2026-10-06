@@ -11,6 +11,7 @@ import {
     Compass,
     CreditCard,
     FileText,
+    Flag,
     FolderKanban,
     GalleryVerticalEnd,
     Handshake,
@@ -131,6 +132,11 @@ export function AppSidebar() {
                     href: '/blocked-accounts',
                     icon: <UserRoundX size={20} />,
                 },
+                {
+                    label: t('My reports'),
+                    href: '/my-reports',
+                    icon: <Flag size={20} />,
+                },
             ],
         },
         {
@@ -188,6 +194,11 @@ export function AppSidebar() {
                               label: t('Categories'),
                               href: '/admin/categories',
                               icon: <LayoutGrid size={20} />,
+                          },
+                          {
+                              label: t('Reports'),
+                              href: '/admin/reports',
+                              icon: <Flag size={20} />,
                           },
                           ...(auth.user.is_super_admin === true
                               ? [

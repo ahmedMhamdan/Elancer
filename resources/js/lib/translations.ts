@@ -1986,4 +1986,121 @@ export const arabic: Record<string, string> = {
         'تعذّر حفظ هذه الصورة. حاول مرة أخرى.',
     'You can add images after saving the case study for the first time.':
         'يمكنك إضافة الصور بعد حفظ دراسة الحالة لأول مرة.',
+    'My reports': 'بلاغاتي',
+    Reports: 'البلاغات',
+    Report: 'البلاغ',
+    'Send a report': 'إرسال بلاغ',
+    'The Elancer team reviews every report. The member you report is not told who sent it.':
+        'يراجع فريق إيلانسر كل بلاغ. لن يعرف العضو الذي تبلّغ عنه من أرسل البلاغ.',
+    Reason: 'السبب',
+    'What happened?': 'ماذا حدث؟',
+    'Write 10 to 2,000 characters. Leave out passwords and payment details.':
+        'اكتب من ١٠ إلى ٢٬٠٠٠ حرف. لا تذكر كلمات المرور أو بيانات الدفع.',
+    'A report does not complete, cancel or refund a contract. Those stay between you and the other member.':
+        'البلاغ لا يُكمل العقد ولا يلغيه ولا يسترد قيمته. هذه الأمور تبقى بينك وبين العضو الآخر.',
+    'Send report': 'إرسال البلاغ',
+    'Freelancer profile': 'ملف مستقل',
+    'Spam or scam': 'رسائل مزعجة أو احتيال',
+    'Harassment or abuse': 'مضايقة أو إساءة',
+    'Inappropriate content': 'محتوى غير لائق',
+    'Asking to pay or talk outside Elancer': 'طلب الدفع أو التواصل خارج إيلانسر',
+    'Fake or misleading identity': 'هوية مزيفة أو مضللة',
+    Other: 'سبب آخر',
+    'In review': 'قيد المراجعة',
+    Resolved: 'تمت المعالجة',
+    'We reviewed your report and took action.': 'راجعنا بلاغك واتخذنا إجراءً.',
+    'We reviewed your report and found no breach of the Elancer rules.':
+        'راجعنا بلاغك ولم نجد مخالفة لقواعد إيلانسر.',
+    'We could not confirm the problem from the information available.':
+        'لم نتمكن من التأكد من المشكلة بالمعلومات المتوفرة.',
+    'This was already handled through another report.':
+        'تمت معالجة هذا الأمر من خلال بلاغ آخر.',
+    'Report a problem': 'الإبلاغ عن مشكلة',
+    'Report this profile': 'الإبلاغ عن هذا الملف',
+    'Report this project': 'الإبلاغ عن هذا المشروع',
+    'Report this case study': 'الإبلاغ عن دراسة الحالة',
+    'Report message': 'الإبلاغ عن الرسالة',
+    'Reports you sent to the Elancer team and where each one stands.':
+        'البلاغات التي أرسلتها إلى فريق إيلانسر وحالة كل منها.',
+    Sent: 'تاريخ الإرسال',
+    'What you wrote': 'ما كتبته',
+    'You have not sent any reports. Use Report on a project, profile, case study, message or contract when something is wrong.':
+        'لم ترسل أي بلاغ. استخدم خيار الإبلاغ في صفحة المشروع أو الملف أو دراسة الحالة أو الرسالة أو العقد عند وجود مشكلة.',
+    'Reported conversation': 'المحادثة المبلّغ عنها',
+    'Back to report #:id': 'العودة إلى البلاغ رقم :id',
+    'Opening this page was recorded in the audit log. Read only what the report needs.':
+        'سُجّل فتح هذه الصفحة في سجل التدقيق. اقرأ ما يحتاجه البلاغ فقط.',
+    'Reported message': 'الرسالة المبلّغ عنها',
+    'Reports from members. Open reports are listed oldest first.':
+        'بلاغات الأعضاء. تظهر البلاغات المفتوحة من الأقدم إلى الأحدث.',
+    'Reported by': 'المبلّغ',
+    'Reported member': 'العضو المبلّغ عنه',
+    'Closed account': 'حساب مغلق',
+    'Open report': 'فتح البلاغ',
+    'Open reports': 'البلاغات المفتوحة',
+    'Resolved reports': 'البلاغات المعالجة',
+    'No open reports.': 'لا توجد بلاغات مفتوحة.',
+    'No resolved reports yet.': 'لا توجد بلاغات معالجة بعد.',
+    'The report changed or the request failed. Reload the page.':
+        'تغيّر البلاغ أو تعذّر تنفيذ الطلب. أعد تحميل الصفحة.',
+    'Review started. The reporter now sees In review.':
+        'بدأت المراجعة. يرى المبلّغ الآن أن البلاغ قيد المراجعة.',
+    'Report resolved.': 'تمت معالجة البلاغ.',
+    'Note added.': 'أُضيفت الملاحظة.',
+    'Action taken': 'اتُّخذ إجراء',
+    'No breach found': 'لا توجد مخالفة',
+    'Could not be confirmed': 'تعذّر التأكد',
+    'Duplicate of another report': 'مكرر لبلاغ آخر',
+    'Review started': 'بدأت المراجعة',
+    'Review taken over': 'انتقلت المراجعة إلى مراجع آخر',
+    'Note added': 'أُضيفت ملاحظة',
+    'Conversation read': 'قُرئت المحادثة',
+    'Report #:id': 'البلاغ رقم :id',
+    'Back to reports': 'العودة إلى البلاغات',
+    'What the member reported': 'ما أبلغ عنه العضو',
+    Suspended: 'موقوف',
+    Deactivated: 'معطّل',
+    'Other reports about this member: :count':
+        'بلاغات أخرى عن هذا العضو: :count',
+    'Reported content': 'المحتوى المبلّغ عنه',
+    'Contract files, payment details and identity documents are never shown here.':
+        'لا تظهر هنا ملفات العقود أو تفاصيل الدفع أو وثائق الهوية.',
+    'When it was reported': 'عند الإبلاغ',
+    'This content is no longer available.': 'هذا المحتوى لم يعد متاحًا.',
+    'Agreed amount': 'المبلغ المتفق عليه',
+    'Agreed scope': 'نطاق العمل المتفق عليه',
+    'Review by the :role': 'تقييم من :role',
+    'As it is now': 'كما هو الآن',
+    'Open the public page': 'فتح الصفحة العامة',
+    'It is not public right now.': 'ليس منشورًا للعامة حاليًا.',
+    'Resolving records an outcome for the reporter. It never completes, cancels or refunds a contract.':
+        'المعالجة تسجّل نتيجة يراها المبلّغ. لا تُكمل عقدًا ولا تلغيه ولا تسترد قيمته.',
+    ':name is reviewing this report. Take it over only if they cannot finish it.':
+        ':name يراجع هذا البلاغ. لا تتولَّ المراجعة إلا إذا تعذّر عليه إكمالها.',
+    'Start review': 'بدء المراجعة',
+    'Take over the review': 'تولّي المراجعة',
+    'The reported conversation can be read once you are the reviewer.':
+        'يمكنك قراءة المحادثة المبلّغ عنها بعد أن تصبح مراجع البلاغ.',
+    'Read the reported conversation': 'قراءة المحادثة المبلّغ عنها',
+    'Every time you open it, the read is recorded in the audit log.':
+        'تُسجَّل كل مرة تفتحها في سجل التدقيق.',
+    'Resolve this report? The reporter will see the outcome.':
+        'هل تريد معالجة هذا البلاغ؟ سيرى المبلّغ النتيجة.',
+    Outcome: 'النتيجة',
+    'The reporter will read:': 'سيقرأ المبلّغ:',
+    'Internal reason (kept in the audit log)':
+        'السبب الداخلي (يُحفظ في سجل التدقيق)',
+    'Resolve report': 'معالجة البلاغ',
+    'Internal notes': 'ملاحظات داخلية',
+    'Only administrators see these. They are never shown to the reporter or the reported member.':
+        'يراها المشرفون فقط. لا تظهر للمبلّغ ولا للعضو المبلّغ عنه.',
+    'No notes yet.': 'لا توجد ملاحظات بعد.',
+    'Add a note': 'إضافة ملاحظة',
+    'Save note': 'حفظ الملاحظة',
+    'Audit log': 'سجل التدقيق',
+    'Nothing has been done on this report yet.':
+        'لم يُتخذ أي إجراء على هذا البلاغ بعد.',
+    'Earlier versions (:count)': 'النسخ السابقة (:count)',
+    'The report could not be sent. If you sent several reports just now, wait a minute and try again.':
+        'تعذّر إرسال البلاغ. إذا أرسلت عدة بلاغات للتو، انتظر دقيقة ثم حاول مرة أخرى.',
 };

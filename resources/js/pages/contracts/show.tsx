@@ -1,5 +1,6 @@
 import { Link, router, usePage } from '@inertiajs/react';
 import { useRef, useState } from 'react';
+import ReportDialog from '@/components/report-dialog';
 import Button from '@/components/tailadmin/button';
 import { useTranslation } from '@/hooks/use-translation';
 import {
@@ -241,6 +242,11 @@ export default function Show({
                             {t('Post this project again')}
                         </Button>
                     )}
+                    <ReportDialog
+                        type="contract"
+                        id={contract.id}
+                        label={t('Report a problem')}
+                    />
                 </div>
                 {contract.status === 'cancelled' && contract.is_client && (
                     <p className="market-muted">

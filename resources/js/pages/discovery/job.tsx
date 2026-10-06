@@ -1,5 +1,6 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
+import ReportDialog from '@/components/report-dialog';
 import { useTranslation } from '@/hooks/use-translation';
 import { DiscoveryLayout, JobDate, Money } from './shared';
 import type { Job } from './shared';
@@ -155,6 +156,13 @@ export default function JobDetails({
                                 )}
                             </Link>
                         )
+                    )}
+                    {auth.user && !application.owner && (
+                        <ReportDialog
+                            type="project"
+                            id={project.id}
+                            label={t('Report this project')}
+                        />
                     )}
                 </aside>
             </div>
