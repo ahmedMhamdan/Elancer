@@ -30,12 +30,32 @@ class WorkspaceEventMail extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         $sentence = trim(implode(' ', array_filter([$this->actor, self::sentence($this->kind), $this->title])));
+        $subject = __('Elancer: :title', ['title' => $this->title ?? __('workspace update')]);
 
+        // Same layout as the verification email (resources/views/mail/verify-email.blade.php).
         return (new MailMessage)
-            ->subject(__('Elancer: :title', ['title' => $this->title ?? __('workspace update')]))
+            ->subject($subject)
             ->line($sentence)
             ->action(__('Open in Elancer'), url($this->href))
-            ->line(__('You can choose which emails you receive under Settings, Notifications.'));
+            ->line(__('You can choose which emails you receive under Settings, Notifications.'))
+            ->view(['html' => 'mail.workspace-event', 'text' => 'mail.workspace-event-text'], [
+                'subject' => $subject,
+                'label' => match ((new WorkspaceEvent($this->kind, $this->href))->category()) {
+                    'messages' => __('New message'),
+                    'hiring' => __('Hiring update'),
+                    default => __('Contract update'),
+                },
+                'title' => $this->title ?? __('workspace update'),
+                'recipientName' => $notifiable->name ?? '',
+                'sentence' => $sentence,
+                'actor' => $this->actor,
+                'fragment' => self::sentence($this->kind),
+                'project' => $this->title,
+                'actionText' => __('Open in Elancer'),
+                'actionUrl' => url($this->href),
+                'preferencesUrl' => route('notification-preferences.edit'),
+                'homeUrl' => route('home'),
+            ]);
     }
 
     /** The same wording as the bell, kept as translatable fragments. */
