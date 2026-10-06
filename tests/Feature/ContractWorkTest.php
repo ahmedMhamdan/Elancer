@@ -13,6 +13,7 @@ use App\Models\Proposal;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -160,6 +161,10 @@ class ContractWorkTest extends TestCase
         $this->put('/contracts/'.$contract->id.'/review', $review)->assertSessionHasNoErrors();
         // Hidden: the author may edit; the counterpart learns only that one exists.
         $this->put('/contracts/'.$contract->id.'/review', [...$review, 'rating' => 4])->assertSessionHasNoErrors();
+        // The replaced version is kept privately; saving the same review again adds nothing.
+        $this->put('/contracts/'.$contract->id.'/review', [...$review, 'rating' => 4])->assertSessionHasNoErrors();
+        $this->assertSame([5], DB::table('contract_review_revisions')->pluck('rating')->all());
+        $this->get('/contracts/'.$contract->id)->assertInertia(fn (Assert $page) => $page->where('reviews.mine', ['rating' => 4, 'body' => $review['body']]));
         $this->actingAs($freelancer)->get('/contracts/'.$contract->id)->assertInertia(fn (Assert $page) => $page
             ->where('reviews.published', false)->where('reviews.theirs', null)->where('reviews.theirs_submitted', true)->where('reviews.mine', null));
         $profile = $freelancer->profile()->create(['headline' => 'Laravel developer', 'bio' => 'I build bilingual web applications.']);
