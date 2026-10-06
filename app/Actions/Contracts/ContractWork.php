@@ -117,6 +117,10 @@ class ContractWork
             $subject = $author === $locked->client_id ? $locked->freelancer_id : $locked->client_id;
             $new = $review === null;
             $review ??= new ContractReview;
+            // The replaced version is kept privately; saving the same review again stores nothing.
+            if (! $new && ($review->rating !== $rating || $review->body !== $body)) {
+                DB::table('contract_review_revisions')->insert(['contract_review_id' => $review->id, 'rating' => $review->rating, 'body' => $review->body, 'created_at' => $review->updated_at]);
+            }
             $review->forceFill(['contract_id' => $locked->id, 'author_id' => $author, 'subject_id' => $subject, 'rating' => $rating, 'body' => $body])->save();
             if ($new) {
                 self::notify($locked, 'review_received', $subject, $author);
