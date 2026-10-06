@@ -3,9 +3,9 @@
 return [
 
     /*
-    | Every provider here is a test provider. No live endpoint or live credential
-    | path exists: PayPal is pinned to its sandbox host. Real money is outside
-    | Elancer's scope.
+    | Every provider here is a test provider. No live credential path exists:
+    | Stripe and Moyasar accept test keys only. Real money is outside Elancer's
+    | scope.
     |
     | The simulator is an offline stand-in for automated tests. It stays off
     | unless explicitly enabled, so members only ever see real test providers.
@@ -25,14 +25,6 @@ return [
     'moyasar' => [
         // Moyasar test secret key (sk_test_...); anything else leaves Moyasar switched off.
         'secret' => env('MOYASAR_TEST_SECRET_KEY'),
-    ],
-
-    'paypal' => [
-        'base_url' => 'https://api-m.sandbox.paypal.com',
-        'client_id' => env('PAYPAL_SANDBOX_CLIENT_ID'),
-        'secret' => env('PAYPAL_SANDBOX_SECRET'),
-        // Optional: the sandbox business account expected to receive the payment.
-        'merchant_id' => env('PAYPAL_SANDBOX_MERCHANT_ID'),
     ],
 
 ];

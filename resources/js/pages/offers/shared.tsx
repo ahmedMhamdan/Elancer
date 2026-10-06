@@ -6,7 +6,6 @@ import {
     CreditCard,
     FlaskConical,
     Landmark,
-    WalletCards,
     type LucideIcon,
 } from 'lucide-react';
 import type { ReactNode } from 'react';
@@ -123,7 +122,6 @@ export function useProviderLabel() {
     const labels: Record<string, string> = {
         stripe: t('Stripe (test mode)'),
         moyasar: t('Moyasar (test mode)'),
-        paypal: t('PayPal (test mode)'),
         simulator: t('Offline test simulator'),
     };
     return (provider: string) => labels[provider] ?? provider;
@@ -133,7 +131,6 @@ export function useProviderHint() {
     const hints: Record<string, string> = {
         stripe: t('Pay by card on Stripe’s secure page.'),
         moyasar: t('mada, cards and Apple Pay on Moyasar’s secure page.'),
-        paypal: t('Pay with a PayPal test account.'),
         simulator: t('Stand-in used for automated testing.'),
     };
     return (provider: string) => hints[provider] ?? '';
@@ -142,7 +139,6 @@ export function useProviderHint() {
 const MARKS: Record<string, { color: string; Icon: LucideIcon }> = {
     stripe: { color: '#635bff', Icon: CreditCard },
     moyasar: { color: '#1e9e63', Icon: Landmark },
-    paypal: { color: '#003087', Icon: WalletCards },
     simulator: { color: '#626f60', Icon: FlaskConical },
 };
 export function ProviderMark({ provider }: { provider: string }) {

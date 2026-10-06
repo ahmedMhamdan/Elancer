@@ -29,7 +29,7 @@ class ContractAmendmentTest extends TestCase
         Storage::fake('local');
         // Real keys in a developer's .env must never reach the tests.
         config(['payments.simulator.enabled' => true, 'payments.stripe.secret' => null, 'payments.stripe.webhook_secret' => null,
-            'payments.moyasar.secret' => null, 'payments.paypal.client_id' => null, 'payments.paypal.secret' => null]);
+            'payments.moyasar.secret' => null]);
     }
 
     /** @return array{User, User, Contract} */

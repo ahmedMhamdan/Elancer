@@ -27,7 +27,7 @@ class ContractFundingTest extends TestCase
     {
         parent::setUp();
         // Real keys in a developer's .env must never reach the tests.
-        config(['payments.simulator.enabled' => true, 'payments.stripe.secret' => null, 'payments.moyasar.secret' => null, 'payments.paypal.client_id' => null, 'payments.paypal.secret' => null]);
+        config(['payments.simulator.enabled' => true, 'payments.stripe.secret' => null, 'payments.moyasar.secret' => null]);
     }
 
     /** @return array{User, User, Contract} */
@@ -195,35 +195,14 @@ class ContractFundingTest extends TestCase
         config(['payments.simulator.enabled' => false]);
         $this->actingAs($client)->post('/contracts/'.$contract->id.'/payments', ['provider' => 'simulator', 'client_token' => (string) Str::uuid()])->assertSessionHasErrors('provider');
         $this->get('/contracts/'.$contract->id)->assertInertia(fn (Assert $page) => $page->has('providers', 0));
-        config(['payments.paypal.client_id' => 'id', 'payments.paypal.secret' => 'secret']);
+        config(['payments.stripe.secret' => 'sk_test_example']);
         Http::fake(['*' => Http::response([], 503)]);
-        $this->post('/contracts/'.$contract->id.'/payments', ['provider' => 'paypal', 'client_token' => (string) Str::uuid()])->assertSessionHasErrors('payment');
+        $this->post('/contracts/'.$contract->id.'/payments', ['provider' => 'stripe', 'client_token' => (string) Str::uuid()])->assertSessionHasErrors('payment');
         $attempt = PaymentAttempt::query()->firstOrFail();
         $this->assertSame(['failed', 'provider_unavailable', null], [$attempt->status, $attempt->failure_reason, $attempt->open_contract_id]);
-        Http::assertSent(fn ($request) => str_starts_with($request->url(), 'https://api-m.sandbox.paypal.com/'));
-    }
-
-    public function test_paypal_sandbox_order_is_captured_and_checked_before_activation(): void
-    {
-        config(['payments.paypal.client_id' => 'id', 'payments.paypal.secret' => 'secret']);
-        [$client, , $contract] = $this->contract();
-        $order = fn (string $status, array $extra = []) => ['id' => 'ORDER-1', 'status' => $status, 'links' => [['rel' => 'payer-action', 'href' => 'https://www.sandbox.paypal.com/checkoutnow?token=ORDER-1']], ...$extra];
-        Http::fake(['*/v1/oauth2/token' => Http::response(['access_token' => 'token']),
-            '*/v2/checkout/orders' => Http::response($order('PAYER_ACTION_REQUIRED')),
-            '*/v2/checkout/orders/ORDER-1' => Http::sequence()->push($order('PAYER_ACTION_REQUIRED'))->push($order('APPROVED')),
-            '*/v2/checkout/orders/ORDER-1/capture' => fn () => Http::response($order('COMPLETED', ['purchase_units' => [['payments' => ['captures' => [[
-                'id' => 'CAPTURE-1', 'status' => 'COMPLETED', 'custom_id' => PaymentAttempt::query()->value('reference'),
-                'amount' => ['currency_code' => 'USD', 'value' => '750.25']]]]]]])),
-        ]);
-        $this->actingAs($client)->post('/contracts/'.$contract->id.'/payments', ['provider' => 'paypal', 'client_token' => (string) Str::uuid()])
-            ->assertRedirect('https://www.sandbox.paypal.com/checkoutnow?token=ORDER-1');
-        $attempt = PaymentAttempt::query()->firstOrFail();
-        $this->assertSame('ORDER-1', $attempt->provider_reference);
-        $this->get('/payments/'.$attempt->id.'/return');
-        $this->assertSame('awaiting_payment', $contract->fresh()->status);
-        $this->get('/payments/'.$attempt->id.'/return');
-        $this->assertSame('active', $contract->fresh()->status);
-        $this->assertDatabaseHas('payment_events', ['provider' => 'paypal', 'event_reference' => 'CAPTURE-1', 'amount_minor' => 75025]);
+        Http::assertSent(fn ($request) => str_starts_with($request->url(), 'https://api.stripe.com/'));
+        // A provider that was removed can no longer be chosen.
+        $this->post('/contracts/'.$contract->id.'/payments', ['provider' => 'paypal', 'client_token' => (string) Str::uuid()])->assertSessionHasErrors('provider');
     }
 
     public function test_stripe_test_session_must_be_paid_and_not_live_before_activation(): void
