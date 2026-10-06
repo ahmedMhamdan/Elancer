@@ -357,5 +357,9 @@
     "Image safety checks are unavailable. The image was not added. Please try again later.": "فحص سلامة الصور غير متاح حاليًا. لم تُضف الصورة. حاول لاحقًا.",
     "We could not save this image. Please try again.": "تعذّر حفظ هذه الصورة. حاول مرة أخرى.",
     "This case study stores too many images. Save it to clear the ones you removed, then try again.": "تخزّن دراسة الحالة هذه عددًا كبيرًا من الصور. احفظها لإزالة الصور التي حذفتها ثم حاول من جديد.",
-    "Describe each image in a few words.": "صِف كل صورة بكلمات قليلة."
+    "Describe each image in a few words.": "صِف كل صورة بكلمات قليلة.",
+    "You cannot report your own content.": "لا يمكنك الإبلاغ عن محتواك.",
+    "You already have an open report about this. Follow it under My reports.": "لديك بلاغ مفتوح عن هذا الأمر. تابعه في صفحة بلاغاتي.",
+    "This report changed. Reload before continuing.": "تغيّر هذا البلاغ. أعد تحميل الصفحة قبل المتابعة.",
+    "Report sent. You can follow it under My reports.": "أُرسل البلاغ. يمكنك متابعته في صفحة بلاغاتي."
 }

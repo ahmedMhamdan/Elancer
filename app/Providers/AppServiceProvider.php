@@ -59,6 +59,12 @@ class AppServiceProvider extends ServiceProvider
 
             return [Limit::perMinute(6)->by('portfolio-image-minute:'.$user), Limit::perHour(30)->by('portfolio-image-hour:'.$user)];
         });
+        // A report reaches a person, so a member cannot flood the queue.
+        RateLimiter::for('reports', function (Request $request) {
+            $user = $request->user()->id ?? $request->ip();
+
+            return [Limit::perMinute(5)->by('report-minute:'.$user), Limit::perDay(30)->by('report-day:'.$user)];
+        });
     }
 
     /**

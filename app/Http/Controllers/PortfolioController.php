@@ -138,7 +138,7 @@ class PortfolioController extends Controller
         return back();
     }
 
-    public function show(PortfolioCase $case): Response
+    public function show(Request $request, PortfolioCase $case): Response
     {
         abort_unless(PortfolioCase::query()->publiclyVisible()->whereKey($case->id)->exists(), 404);
         $profile = Profile::query()->where('user_id', $case->user_id)->with('user')->firstOrFail();
@@ -146,6 +146,7 @@ class PortfolioController extends Controller
         return Inertia::render('discovery/portfolio-case', [
             'case' => self::published($case),
             'freelancer' => ['id' => $profile->id, 'name' => $profile->user->name, 'headline' => $profile->headline],
+            'canReport' => $request->user() !== null && $request->user()->id !== $case->user_id,
         ]);
     }
 

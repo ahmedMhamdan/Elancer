@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdministratorController;
+use App\Http\Controllers\AdminReportController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ClientProjectController;
 use App\Http\Controllers\ContactBlockController;
@@ -25,6 +26,7 @@ use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\ProfilePhotoController;
 use App\Http\Controllers\ProjectDiscoveryController;
 use App\Http\Controllers\ProposalController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SkillController;
 use App\Http\Controllers\SocialAuthController;
 use App\Http\Controllers\UpdateProfilePhotoController;
@@ -108,6 +110,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('freelancers/{profile}/invite', [InvitationController::class, 'store'])->middleware('throttle:20,1')->name('invitations.store');
         Route::get('invitations/{invitation}', [InvitationController::class, 'show'])->name('invitations.show');
         Route::patch('invitations/{invitation}', [InvitationController::class, 'update'])->middleware('throttle:30,1')->name('invitations.update');
+        Route::get('my-reports', [ReportController::class, 'index'])->name('reports.index');
+        Route::post('reports', [ReportController::class, 'store'])->middleware('throttle:reports')->name('reports.store');
         Route::get('blocked-accounts', [ContactBlockController::class, 'index'])->name('contacts.blocked');
         Route::post('freelancers/{profile}/block', [ContactBlockController::class, 'store'])->middleware('throttle:20,1')->name('contacts.block');
         Route::delete('blocked-accounts/{block}', [ContactBlockController::class, 'destroy'])->whereNumber('block')->name('contacts.unblock');
@@ -151,6 +155,16 @@ Route::middleware(['auth', 'verified', EnsureCategoryAdministrator::class])
         Route::delete('{category}', [CategoryController::class, 'destroy'])->name('destroy');
         Route::delete('{category}/permanent', [CategoryController::class, 'forceDestroy'])->withTrashed()->name('force-destroy');
         Route::post('{category}/restore', [CategoryController::class, 'restore'])->withTrashed()->name('restore');
+    });
+
+// Regular and super administrators, behind the same active, verified and current-session 2FA gate.
+Route::middleware(['auth', 'verified', EnsureCategoryAdministrator::class])
+    ->prefix('admin/reports')->name('admin.reports.')->group(function () {
+        Route::get('/', [AdminReportController::class, 'index'])->name('index');
+        Route::get('{report}', [AdminReportController::class, 'show'])->whereNumber('report')->name('show');
+        Route::patch('{report}', [AdminReportController::class, 'update'])->whereNumber('report')->middleware('throttle:30,1')->name('update');
+        Route::post('{report}/notes', [AdminReportController::class, 'note'])->whereNumber('report')->middleware('throttle:30,1')->name('notes');
+        Route::get('{report}/conversation', [AdminReportController::class, 'conversation'])->whereNumber('report')->middleware('throttle:60,1')->name('conversation');
     });
 
 Route::middleware(['auth', 'verified', EnsureSuperAdministrator::class])
