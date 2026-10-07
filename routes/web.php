@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminAccountController;
 use App\Http\Controllers\AdministratorController;
 use App\Http\Controllers\AdminReportController;
 use App\Http\Controllers\CategoryController;
@@ -165,6 +166,14 @@ Route::middleware(['auth', 'verified', EnsureCategoryAdministrator::class])
         Route::patch('{report}', [AdminReportController::class, 'update'])->whereNumber('report')->middleware('throttle:30,1')->name('update');
         Route::post('{report}/notes', [AdminReportController::class, 'note'])->whereNumber('report')->middleware('throttle:30,1')->name('notes');
         Route::get('{report}/conversation', [AdminReportController::class, 'conversation'])->whereNumber('report')->middleware('throttle:60,1')->name('conversation');
+    });
+
+// Q69: suspending and reinstating ordinary members is open to regular administrators too.
+Route::middleware(['auth', 'verified', EnsureCategoryAdministrator::class])
+    ->prefix('admin/accounts')->name('admin.accounts.')->group(function () {
+        Route::get('/', [AdminAccountController::class, 'index'])->name('index');
+        Route::get('{user}', [AdminAccountController::class, 'show'])->whereNumber('user')->name('show');
+        Route::patch('{user}', [AdminAccountController::class, 'update'])->whereNumber('user')->middleware('throttle:20,1')->name('update');
     });
 
 Route::middleware(['auth', 'verified', EnsureSuperAdministrator::class])

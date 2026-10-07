@@ -102,7 +102,10 @@ class ProjectDiscoveryController extends Controller
 
     public function show(Request $request, Project $project): Response
     {
-        abort_unless(Project::query()->visible()->whereKey($project->id)->exists(), 404);
+        // Q64: a suspended client's projects leave public pages, but the client still reads their own brief.
+        $own = $request->user()?->id === $project->user_id && $request->user()->keepsExistingAccess()
+            && in_array($project->status, ['published', 'closed', 'hired'], true) && $project->category !== null;
+        abort_unless($own || Project::query()->visible()->whereKey($project->id)->exists(), 404);
         $project->load(['category', 'skills', 'user.profile']);
         $project->loadCount(['proposals as proposals_received' => fn (Builder $q) => $q->whereNotNull('submitted_at')]);
 

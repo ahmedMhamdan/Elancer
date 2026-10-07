@@ -54,7 +54,7 @@ class AdminReportController extends Controller
             'report' => [
                 ...$report->only(['id', 'target_type', 'target_id', 'reason', 'explanation', 'status', 'outcome', 'snapshot', 'created_at', 'resolved_at']),
                 'reporter' => $report->reporter?->only(['name', 'email']),
-                'subject' => $report->subject ? [...$report->subject->only(['name', 'email']), 'status' => $report->subject->status->value] : null,
+                'subject' => $report->subject ? [...$report->subject->only(['id', 'name', 'email']), 'status' => $report->subject->status->value] : null,
                 'handler' => $report->handler?->name,
                 // Other reports about the same member, so a pattern is visible without browsing accounts.
                 'subject_reports' => $report->subject_id === null ? 0 : $this->queue($actor)->where('subject_id', $report->subject_id)->whereKeyNot($report->id)->count(),

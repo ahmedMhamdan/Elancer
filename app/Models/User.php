@@ -31,6 +31,8 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property CarbonImmutable|null $onboarding_completed_at
  * @property WorkspaceRole|null $workspace_role
  * @property AccountStatus $status
+ * @property string|null $suspension_reason
+ * @property Carbon|null $suspended_at
  * @property string $locale
  * @property array<string, bool>|null $email_preferences
  * @property bool $is_super_admin
@@ -78,6 +80,7 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
             'onboarding_completed_at' => 'immutable_datetime',
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
+            'suspended_at' => 'datetime',
             'email_preferences' => 'array',
         ];
     }
@@ -124,6 +127,12 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
     public function canParticipateInMarketplace(): bool
     {
         return $this->status === AccountStatus::Active && $this->hasVerifiedEmail();
+    }
+
+    /** Q64: a suspended member still reads and handles what already exists; a deactivated one does not. */
+    public function keepsExistingAccess(): bool
+    {
+        return in_array($this->status, [AccountStatus::Active, AccountStatus::Suspended], true) && $this->hasVerifiedEmail();
     }
 
     public function save(array $options = []): bool

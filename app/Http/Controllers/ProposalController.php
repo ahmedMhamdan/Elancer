@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Conversations\HiringAccess;
 use App\Actions\Invitations\InvitationLifecycle;
 use App\Actions\Offers\OfferLifecycle;
+use App\Models\Contract;
 use App\Models\Conversation;
 use App\Models\Offer;
 use App\Models\Profile;
@@ -163,7 +164,10 @@ class ProposalController extends Controller
 
     public function show(Request $request, Proposal $proposal): Response
     {
-        $this->eligible($request);
+        // Q64: a suspended member still reads the proposal behind an existing contract; nothing on it is actionable.
+        if (! ($request->user()->keepsExistingAccess() && Contract::query()->where('proposal_id', $proposal->id)->exists())) {
+            $this->eligible($request);
+        }
         $author = $proposal->user_id === $request->user()->id;
         abort_unless($author || ($proposal->project->user_id === $request->user()->id && $proposal->submitted_at), 404);
 

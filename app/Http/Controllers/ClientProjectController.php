@@ -30,14 +30,16 @@ class ClientProjectController extends Controller
 
     public function index(Request $request): Response
     {
-        $this->eligible($request);
+        // Q64: a suspended client still reads their own list; every change below stays refused.
+        $readOnly = ! $request->user()->canParticipateInMarketplace();
+        abort_unless($request->user()->keepsExistingAccess() && $request->user()->onboarding_completed_at !== null, 403);
         $trash = $request->query('status') === 'trash';
         $query = Project::query()->where('user_id', $request->user()->id);
         if ($trash) {
             $query->onlyTrashed();
         }
 
-        return Inertia::render('projects/index', ['projects' => $query->orderByDesc('updated_at')->orderByDesc('id')->paginate(20)->withQueryString(), 'trash' => $trash]);
+        return Inertia::render('projects/index', ['projects' => $query->orderByDesc('updated_at')->orderByDesc('id')->paginate(20)->withQueryString(), 'trash' => $trash, 'readOnly' => $readOnly]);
     }
 
     public function store(Request $request): RedirectResponse
