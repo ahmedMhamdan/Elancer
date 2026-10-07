@@ -2103,4 +2103,61 @@ export const arabic: Record<string, string> = {
     'Earlier versions (:count)': 'النسخ السابقة (:count)',
     'The report could not be sent. If you sent several reports just now, wait a minute and try again.':
         'تعذّر إرسال البلاغ. إذا أرسلت عدة بلاغات للتو، انتظر دقيقة ثم حاول مرة أخرى.',
+    'Your account is suspended': 'حسابك موقوف',
+    'Reason given:': 'السبب المذكور:',
+    'You can still open your existing contracts and their conversations, deliver and review work, and request a cancellation. You cannot post projects, apply, invite, send or accept offers, or fund a contract.':
+        'ما زال بإمكانك فتح عقودك الحالية ومحادثاتها، وتسليم العمل ومراجعته، وطلب الإلغاء. لا يمكنك نشر مشاريع أو التقدّم لها أو إرسال دعوات أو إرسال عروض أو قبولها أو تمويل عقد.',
+    'Help with a suspended account': 'مساعدة بخصوص حساب موقوف',
+    Accounts: 'الحسابات',
+    'All accounts': 'كل الحسابات',
+    'Suspended accounts': 'الحسابات الموقوفة',
+    Active: 'نشط',
+    'Find a member to see their account status, suspend them or reinstate them.':
+        'ابحث عن عضو لمعرفة حالة حسابه أو إيقافه أو إعادة تفعيله.',
+    'Name or email address': 'الاسم أو البريد الإلكتروني',
+    'Find account': 'بحث',
+    Role: 'الدور',
+    'Super administrator': 'مشرف عام',
+    Administrator: 'مشرف',
+    Member: 'عضو',
+    'Email not verified': 'البريد الإلكتروني غير مؤكّد',
+    'Open account': 'فتح الحساب',
+    'No accounts match.': 'لا توجد حسابات مطابقة.',
+    'Account suspended. Their pending offers were closed and they now see the reason.':
+        'أُوقف الحساب. أُغلقت عروضه المعلّقة ويرى العضو السبب الآن.',
+    'Account reinstated. Offers closed by the suspension stay closed.':
+        'أُعيد تفعيل الحساب. العروض التي أغلقها الإيقاف تبقى مغلقة.',
+    'Account suspended': 'أُوقف الحساب',
+    'Account reinstated': 'أُعيد تفعيل الحساب',
+    'The account changed or the request failed. Reload the page.':
+        'تغيّر الحساب أو تعذّر تنفيذ الطلب. أعد تحميل الصفحة.',
+    'Back to accounts': 'العودة إلى الحسابات',
+    Joined: 'تاريخ الانضمام',
+    'Contracts in progress': 'العقود الجارية',
+    'Reports about this member': 'البلاغات عن هذا العضو',
+    'Suspended since': 'موقوف منذ',
+    'Reason shown to the member': 'السبب الذي يراه العضو',
+    'Suspend this account': 'إيقاف هذا الحساب',
+    'Reinstate this account': 'إعادة تفعيل هذا الحساب',
+    'The member keeps their existing contracts and conversations. They can no longer post projects, apply, invite, send or accept offers, or fund a contract, and their pending offers are closed. No contract is completed, cancelled or refunded.':
+        'يحتفظ العضو بعقوده الحالية ومحادثاتها. لن يستطيع نشر مشاريع أو التقدّم لها أو إرسال دعوات أو إرسال عروض أو قبولها أو تمويل عقد، وتُغلق عروضه المعلّقة. لا يُكمَل أي عقد ولا يُلغى ولا تُستردّ قيمته.',
+    'The member can use the marketplace again. Offers closed by the suspension are not reopened.':
+        'يستطيع العضو استخدام المنصة من جديد. العروض التي أغلقها الإيقاف لا تُفتح مجددًا.',
+    'Suspend this account? The member will see the reason you wrote for them.':
+        'هل تريد إيقاف هذا الحساب؟ سيرى العضو السبب الذي كتبته له.',
+    'Reinstate this account?': 'هل تريد إعادة تفعيل هذا الحساب؟',
+    'This will be recorded against report #:id.':
+        'سيُسجَّل هذا الإجراء على البلاغ رقم :id.',
+    'Suspend account': 'إيقاف الحساب',
+    'Reinstate account': 'إعادة تفعيل الحساب',
+    Suspension: 'الإيقاف',
+    'This account is deactivated, so there is nothing to suspend.':
+        'هذا الحساب معطّل، فلا يوجد ما يمكن إيقافه.',
+    'Administrator accounts cannot be suspended or reinstated here.':
+        'لا يمكن إيقاف حسابات المشرفين أو إعادة تفعيلها من هنا.',
+    'Status history': 'سجل الحالة',
+    'Shown to the member:': 'ما يراه العضو:',
+    'Internal:': 'داخلي:',
+    'This account has never been suspended.': 'لم يُوقف هذا الحساب من قبل.',
+    'Open their account': 'فتح حسابه',
 };

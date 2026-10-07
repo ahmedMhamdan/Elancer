@@ -27,6 +27,7 @@ import {
     ShieldCheck,
     UserRound,
     UserRoundX,
+    UsersRound,
     type LucideIcon,
 } from 'lucide-react';
 import ElancerWordmark from '@/components/elancer-wordmark';
@@ -199,6 +200,11 @@ export function AppSidebar() {
                               label: t('Reports'),
                               href: '/admin/reports',
                               icon: <Flag size={20} />,
+                          },
+                          {
+                              label: t('Accounts'),
+                              href: '/admin/accounts',
+                              icon: <UsersRound size={20} />,
                           },
                           ...(auth.user.is_super_admin === true
                               ? [

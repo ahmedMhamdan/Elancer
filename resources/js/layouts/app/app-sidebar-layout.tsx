@@ -2,6 +2,7 @@ import { AppContent } from '@/components/app-content';
 import { AppShell } from '@/components/app-shell';
 import { AppSidebar } from '@/components/app-sidebar';
 import { AppSidebarHeader } from '@/components/app-sidebar-header';
+import SuspensionBanner from '@/components/suspension-banner';
 import type { AppLayoutProps } from '@/types';
 
 export default function AppSidebarLayout({
@@ -16,6 +17,7 @@ export default function AppSidebarLayout({
                 className="workspace-content min-w-0 overflow-x-clip"
             >
                 <AppSidebarHeader breadcrumbs={breadcrumbs} />
+                <SuspensionBanner />
                 {children}
             </AppContent>
         </AppShell>

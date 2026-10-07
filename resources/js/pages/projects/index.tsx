@@ -24,9 +24,12 @@ type Project = {
 export default function MyProjects({
     projects,
     trash,
+    readOnly,
 }: {
     projects: Page<Project>;
     trash: boolean;
+    // A suspended client reads the list; nothing on it can be changed.
+    readOnly: boolean;
 }) {
     const { t } = useTranslation();
     const [pending, setPending] = useState(false);
@@ -50,13 +53,15 @@ export default function MyProjects({
                             )}
                         </p>
                     </div>
-                    <Button
-                        onClick={create}
-                        disabled={pending}
-                        startIcon={<Plus size={16} />}
-                    >
-                        {t('Post a project')}
-                    </Button>
+                    {!readOnly && (
+                        <Button
+                            onClick={create}
+                            disabled={pending}
+                            startIcon={<Plus size={16} />}
+                        >
+                            {t('Post a project')}
+                        </Button>
+                    )}
                 </header>
                 <nav
                     className="mb-6 flex gap-5"
@@ -96,7 +101,17 @@ export default function MyProjects({
                                 </span>
                             </div>
                             <div className="flex flex-wrap gap-3">
-                                {trash ? (
+                                {readOnly ? (
+                                    project.status !== 'draft' &&
+                                    !trash && (
+                                        <Link
+                                            className="job-post-link"
+                                            href={`/jobs/${project.id}`}
+                                        >
+                                            {t('View project')}
+                                        </Link>
+                                    )
+                                ) : trash ? (
                                     <>
                                         <Button
                                             variant="outline"
@@ -166,7 +181,7 @@ export default function MyProjects({
                                     : 'Create a clear brief and tell freelancers what you need.',
                             )}
                         </p>
-                        {!trash && (
+                        {!trash && !readOnly && (
                             <Button onClick={create} disabled={pending}>
                                 {t('Create a project')}
                             </Button>

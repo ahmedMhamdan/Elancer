@@ -13,7 +13,7 @@ import TextArea from '@/components/tailadmin/textarea';
 import { useReportLabels } from '@/hooks/use-report-labels';
 import { useTranslation } from '@/hooks/use-translation';
 
-type Person = { name: string; email: string; status?: string };
+type Person = { id?: number; name: string; email: string; status?: string };
 type Revision = { body: string; created_at: string; rating?: number };
 type Target = {
     title?: string;
@@ -134,6 +134,8 @@ export default function ReportPage({
         resolved: t('Resolved'),
         note_added: t('Note added'),
         conversation_read: t('Conversation read'),
+        account_suspended: t('Account suspended'),
+        account_reinstated: t('Account reinstated'),
     };
     const person = (value: Person | null) =>
         value ? (
@@ -205,6 +207,14 @@ export default function ReportPage({
                                     )}
                                 </span>
                             )}
+                        {report.subject?.id !== undefined && (
+                            <Link
+                                href={`/admin/accounts/${report.subject.id}?report=${report.id}`}
+                                className="text-primary flex min-h-11 items-center text-sm font-medium underline underline-offset-4"
+                            >
+                                {t('Open their account')}
+                            </Link>
+                        )}
                     </Fact>
                     <Fact label={t('Reason')}>{reasons[report.reason]}</Fact>
                     <Fact label={t('Sent')}>
