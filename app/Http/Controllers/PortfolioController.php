@@ -108,6 +108,12 @@ class PortfolioController extends Controller
         // Hiding and withdrawing a request only ever reduce what is shared.
         abort_unless(in_array($action, ['hide', 'withdraw'], true) || $request->user()->canParticipateInMarketplace(), 403);
         PortfolioCases::act($case, $action);
+        // Q68: nothing the owner does shows a case that moderation hid.
+        if (in_array($action, ['publish', 'show'], true) && $case->refresh()->moderated_at !== null) {
+            Inertia::flash('toast', ['type' => 'success', 'message' => __('Saved. This case study stays hidden by moderation.')]);
+
+            return back();
+        }
 
         Inertia::flash('toast', ['type' => 'success', 'message' => [
             'publish' => __('Case study published.'), 'hide' => __('Case study hidden.'), 'show' => __('Case study is no longer hidden.'),
@@ -183,6 +189,7 @@ class PortfolioController extends Controller
             'pending' => $pending ? ['id' => $pending->id, 'content' => $pending->content, 'created_at' => $pending->created_at] : null,
             'public' => $case?->public_content,
             'hidden' => $case?->hidden_at !== null,
+            'moderated' => $case?->moderated_at !== null,
             'revoked_at' => $case?->revoked_at,
             'history' => self::history($case),
         ];
@@ -196,6 +203,7 @@ class PortfolioController extends Controller
         return [
             ...$case->only(['id', 'content', 'public_content', 'published_at', 'hidden_at', 'revoked_at']),
             'changed' => $case->public_content !== null && $case->public_content != $case->content,
+            'moderated' => $case->moderated_at !== null,
             'contract' => $case->contract ? ['id' => $case->contract->id, 'title' => $case->contract->agreement['project_title'] ?? ''] : null,
             'pending' => $pending !== null,
             'history' => self::history($case),

@@ -60,7 +60,8 @@ class BuildOverview
         $activity = (clone $messages)->with(['conversation.client', 'conversation.freelancer', 'conversation.proposal.project'])
             ->latest('created_at')->latest('id')->limit(6)->get()->map(fn (ConversationMessage $message) => [
                 'id' => 'message-'.$message->id, 'kind' => 'message', 'actor' => $message->sender_id === $user->id ? null : ($message->sender_id === $message->conversation->client_id ? $message->conversation->client->name : $message->conversation->freelancer->name),
-                'title' => $message->conversation->proposal->project->title, 'preview' => Str::limit($message->body, 140),
+                'title' => $message->conversation->proposal->project->title, // Q68: a message hidden by moderation gives no preview.
+                'preview' => $message->moderated_at === null ? Str::limit($message->body, 140) : null,
                 'href' => '/messages/'.$message->conversation_id, 'created_at' => $message->created_at->toISOString(),
             ])->all();
 

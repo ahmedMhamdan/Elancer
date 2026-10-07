@@ -32,7 +32,9 @@ class ProposalController extends Controller
 
     private function canEdit(Project $project, ?Proposal $proposal): bool
     {
-        if ($project->status !== 'published' || ! Project::query()->visible()->whereKey($project->id)->exists()) {
+        // A project hidden by moderation takes no new applications; a proposal already submitted keeps working.
+        $open = in_array($proposal?->status, ['submitted', 'reopened'], true) ? Project::query()->listable() : Project::query()->visible();
+        if ($project->status !== 'published' || ! $open->whereKey($project->id)->exists()) {
             return false;
         }
         if ($proposal && Offer::query()->where('proposal_id', $proposal->id)->where('status', 'pending')->where('expires_at', '>', now())->exists()) {

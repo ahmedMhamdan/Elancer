@@ -25,6 +25,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $status
  * @property CarbonImmutable|null $published_at
  * @property CarbonImmutable|null $application_closes_at
+ * @property CarbonImmutable|null $moderated_at
+ * @property int|null $moderated_by
  * @property-read Category|null $category
  * @property-read User $user
  */
@@ -35,9 +37,12 @@ class Project extends Model
     // Publication and ownership are set only by server actions.
     protected $guarded = ['*'];
 
+    // The owner learns that moderation hid a project, never which administrator did it.
+    protected $hidden = ['moderated_by'];
+
     protected function casts(): array
     {
-        return ['screening_questions' => 'array', 'version' => 'integer', 'budget_min' => 'decimal:2', 'budget_max' => 'decimal:2', 'published_at' => 'immutable_datetime', 'application_closes_at' => 'immutable_datetime'];
+        return ['screening_questions' => 'array', 'version' => 'integer', 'budget_min' => 'decimal:2', 'budget_max' => 'decimal:2', 'published_at' => 'immutable_datetime', 'application_closes_at' => 'immutable_datetime', 'moderated_at' => 'immutable_datetime'];
     }
 
     /** @return BelongsTo<User, $this> */
@@ -64,8 +69,23 @@ class Project extends Model
         return $this->hasMany(Proposal::class);
     }
 
-    /** @param Builder<Project> $query */
+    /**
+     * Q68: the public boundary. A project hidden by moderation leaves public pages and lists.
+     *
+     * @param  Builder<Project>  $query
+     */
     public function scopeVisible(Builder $query): void
+    {
+        $query->listable()->whereNull('moderated_at');
+    }
+
+    /**
+     * Everything public visibility needs except moderation, so hiring already under way
+     * continues on a project that moderation hid.
+     *
+     * @param  Builder<Project>  $query
+     */
+    public function scopeListable(Builder $query): void
     {
         $query->whereIn('status', ['published', 'closed', 'hired'])
             ->whereNotNull('published_at')->where('published_at', '<=', now())

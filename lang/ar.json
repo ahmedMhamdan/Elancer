@@ -362,5 +362,7 @@
     "You already have an open report about this. Follow it under My reports.": "لديك بلاغ مفتوح عن هذا الأمر. تابعه في صفحة بلاغاتي.",
     "This report changed. Reload before continuing.": "تغيّر هذا البلاغ. أعد تحميل الصفحة قبل المتابعة.",
     "Report sent. You can follow it under My reports.": "أُرسل البلاغ. يمكنك متابعته في صفحة بلاغاتي.",
-    "This account changed. Reload before continuing.": "تغيّر هذا الحساب. أعد تحميل الصفحة قبل المتابعة."
+    "This account changed. Reload before continuing.": "تغيّر هذا الحساب. أعد تحميل الصفحة قبل المتابعة.",
+    "This message was hidden by moderation.": "أخفى الإشراف هذه الرسالة.",
+    "Saved. This case study stays hidden by moderation.": "تم الحفظ. تبقى دراسة الحالة هذه مخفية من الإشراف."
 }

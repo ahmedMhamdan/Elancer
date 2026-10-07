@@ -15,6 +15,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $version
  * @property CarbonImmutable $created_at
  * @property CarbonImmutable|null $edited_at
+ * @property CarbonImmutable|null $moderated_at
+ * @property int|null $moderated_by
  * @property-read Conversation $conversation
  */
 class ConversationMessage extends Model
@@ -23,7 +25,7 @@ class ConversationMessage extends Model
 
     protected function casts(): array
     {
-        return ['version' => 'integer', 'created_at' => 'immutable_datetime', 'edited_at' => 'immutable_datetime'];
+        return ['version' => 'integer', 'created_at' => 'immutable_datetime', 'edited_at' => 'immutable_datetime', 'moderated_at' => 'immutable_datetime'];
     }
 
     /** @return BelongsTo<Conversation, $this> */

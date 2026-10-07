@@ -74,8 +74,13 @@ class ConversationController extends Controller
             'conversations' => $this->inbox($user, $filters)->paginate(20, ['*'], 'list_page')->withQueryString()->through(fn (Conversation $item) => $this->summary($item, $user)),
             'filters' => $filters,
             'conversation' => $this->summary($conversation, $user), 'writable' => $writable, 'visibleThrough' => $visibleThrough,
-            'messages' => $messages->through(fn (ConversationMessage $message) => [
+            // Q68: a message hidden by moderation reaches neither participant; only a notice does.
+            'messages' => $messages->through(fn (ConversationMessage $message) => $message->moderated_at !== null ? [
+                ...$message->only(['id', 'version', 'created_at']),
+                'body' => null, 'edited_at' => null, 'hidden' => true, 'mine' => $message->sender_id === $user, 'can_edit' => false, 'revisions' => [],
+            ] : [
                 ...$message->only(['id', 'body', 'version', 'created_at', 'edited_at']),
+                'hidden' => false,
                 'mine' => $message->sender_id === $user,
                 'can_edit' => $writable && $message->sender_id === $user && $message->created_at->addMinutes(15)->isFuture(),
                 'revisions' => ($revisions->get($message->id) ?? collect())->map(fn ($revision) => ['body' => $revision->body, 'version' => $revision->version, 'created_at' => $revision->created_at])->values(),
@@ -103,6 +108,7 @@ class ConversationController extends Controller
         DB::transaction(function () use ($message, $data): void {
             $this->lockWritable($message->conversation);
             $locked = ConversationMessage::query()->lockForUpdate()->findOrFail($message->id);
+            abort_if($locked->moderated_at !== null, 409, __('This message was hidden by moderation.'));
             abort_unless($locked->created_at->addMinutes(15)->isFuture(), 409, __('The message correction window has ended.'));
             abort_unless($locked->version === (int) $data['version'], 409, __('This message changed. Reload before correcting it.'));
             if ($locked->body === $data['body']) {
@@ -257,7 +263,8 @@ class ConversationController extends Controller
             'proposal_id' => $conversation->proposal_id,
             'contract_id' => Contract::query()->where('proposal_id', $conversation->proposal_id)->value('id'),
             'counterpart' => $user === $conversation->client_id ? $conversation->freelancer->name : $conversation->client->name,
-            'preview' => Str::limit($conversation->latestMessage->body ?? '', 120),
+            'preview' => $conversation->latestMessage?->moderated_at === null ? Str::limit($conversation->latestMessage->body ?? '', 120) : '',
+            'preview_hidden' => $conversation->latestMessage?->moderated_at !== null,
             'archived' => (bool) $conversation->getAttribute($conversation->archiveColumn($user)),
             'unread' => $conversation->messages()->where('sender_id', '!=', $user)->where('id', '>', $conversation->getAttribute($conversation->readColumn($user)))->count(),
             'updated_at' => $conversation->updated_at,

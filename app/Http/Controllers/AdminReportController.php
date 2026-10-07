@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Reports\ContentModeration;
 use App\Actions\Reports\Reports;
 use App\Models\Contract;
 use App\Models\ContractReview;
@@ -49,6 +50,7 @@ class AdminReportController extends Controller
         $people = User::query()->whereIn('id', DB::table('report_notes')->where('report_id', $report->id)->pluck('author_id')
             ->merge(DB::table('moderation_events')->where('report_id', $report->id)->pluck('actor_id'))->filter()->unique())->pluck('name', 'id');
         $mine = $report->status === 'in_review' && $report->handler_id === $actor->id;
+        $content = ContentModeration::target($report);
 
         return Inertia::render('admin/reports/show', [
             'report' => [
@@ -60,6 +62,11 @@ class AdminReportController extends Controller
                 'subject_reports' => $report->subject_id === null ? 0 : $this->queue($actor)->where('subject_id', $report->subject_id)->whereKeyNot($report->id)->count(),
             ],
             'target' => $this->target($report),
+            // Q68: whether the reported message, project or case study is hidden right now, and by whom.
+            'moderation' => $content === null ? null : [
+                'hidden' => $content->moderated_at !== null, 'at' => $content->moderated_at,
+                'by' => $content->moderated_by === null ? null : User::query()->whereKey($content->moderated_by)->value('name'),
+            ],
             'notes' => DB::table('report_notes')->where('report_id', $report->id)->orderBy('id')->get()
                 ->map(fn ($note) => ['id' => $note->id, 'body' => $note->body, 'author' => $people->get($note->author_id), 'created_at' => $this->iso($note->created_at)]),
             'events' => DB::table('moderation_events')->where('report_id', $report->id)->orderByDesc('id')->limit(50)->get()
@@ -69,6 +76,8 @@ class AdminReportController extends Controller
                 'take' => $report->status === 'in_review' && ! $mine,
                 'resolve' => $mine,
                 'conversation' => $mine && $report->conversation_id !== null,
+                'hide' => $content !== null && $content->moderated_at === null && ContentModeration::canHide($actor, $report),
+                'restore' => $content !== null && $content->moderated_at !== null && ContentModeration::canRestore($actor, $report),
             ],
             'notice' => $request->session()->get('report_notice'),
         ]);
@@ -77,15 +86,18 @@ class AdminReportController extends Controller
     public function update(Request $request, Report $report): RedirectResponse
     {
         $data = $request->validate([
-            'action' => ['required', Rule::in(['start', 'resolve'])],
+            'action' => ['required', Rule::in(['start', 'resolve', 'hide', 'restore'])],
             'outcome' => ['required_if:action,resolve', 'nullable', Rule::in(Report::OUTCOMES)],
-            'reason' => ['required_if:action,resolve', 'nullable', 'string', 'min:5', 'max:1000'],
+            'reason' => ['required_if:action,resolve,hide,restore', 'nullable', 'string', 'min:5', 'max:1000'],
         ]);
-        $data['action'] === 'start'
-            ? Reports::start($request->user(), $report)
-            : Reports::resolve($request->user(), $report, (string) $data['outcome'], (string) $data['reason']);
+        match ($data['action']) {
+            'start' => Reports::start($request->user(), $report),
+            'resolve' => Reports::resolve($request->user(), $report, (string) $data['outcome'], (string) $data['reason']),
+            'hide' => ContentModeration::hide($request->user(), $report, (string) $data['reason']),
+            default => ContentModeration::restore($request->user(), $report, (string) $data['reason']),
+        };
 
-        return to_route('admin.reports.show', $report)->with('report_notice', $data['action'] === 'start' ? 'started' : 'resolved');
+        return to_route('admin.reports.show', $report)->with('report_notice', ['start' => 'started', 'resolve' => 'resolved', 'hide' => 'hidden', 'restore' => 'restored'][$data['action']]);
     }
 
     public function note(Request $request, Report $report): RedirectResponse
@@ -110,6 +122,7 @@ class AdminReportController extends Controller
             'conversation' => ['project' => $conversation->proposal->project->title, 'client' => $conversation->client->name, 'freelancer' => $conversation->freelancer->name],
             'messages' => $messages->through(fn (ConversationMessage $message) => [
                 ...$message->only(['id', 'body', 'created_at', 'edited_at']),
+                'hidden' => $message->moderated_at !== null,
                 'sender' => $message->sender_id === $conversation->client_id ? 'client' : 'freelancer',
                 'revisions' => $revisions[$message->id] ?? [],
             ]),
@@ -150,15 +163,17 @@ class AdminReportController extends Controller
         }
         if ($report->target_type === 'case') {
             // Only ever the public version: the private working copy is not part of what was reported.
-            $case = PortfolioCase::query()->publiclyVisible()->find($id);
+            // A case hidden by moderation still shows that version here, so a restore is an informed one.
+            $case = PortfolioCase::query()->whereKey($id)->whereNotNull('public_content')->first();
+            $public = PortfolioCase::query()->publiclyVisible()->whereKey($id)->exists();
 
-            return $case ? ['title' => $case->public_content['title'] ?? '', 'summary' => $case->public_content['summary'] ?? '',
-                'text' => $case->public_content['body'] ?? '', 'href' => '/portfolio/'.$id] : null;
+            return $case && ($public || $case->moderated_at !== null) ? ['title' => $case->public_content['title'] ?? '', 'summary' => $case->public_content['summary'] ?? '',
+                'text' => $case->public_content['body'] ?? '', 'href' => $public ? '/portfolio/'.$id : null] : null;
         }
         if ($report->target_type === 'message') {
             $message = ConversationMessage::query()->with('conversation')->find($id);
 
-            return $message ? ['text' => $message->body, 'created_at' => $message->created_at, 'edited_at' => $message->edited_at,
+            return $message ? ['text' => $message->body, 'hidden' => $message->moderated_at !== null, 'created_at' => $message->created_at, 'edited_at' => $message->edited_at,
                 'sender' => $message->sender_id === $message->conversation->client_id ? 'client' : 'freelancer',
                 'revisions' => $this->revisions([$message->id])[$message->id] ?? []] : null;
         }

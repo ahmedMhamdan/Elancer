@@ -111,6 +111,8 @@ class ProjectDiscoveryController extends Controller
 
         return Inertia::render('discovery/job', [
             'project' => [...$this->summary($project), 'description' => $project->description, 'screening_questions' => $project->screening_questions ?? []],
+            // Only the owner can be here while moderation hides the project.
+            'moderated' => $project->moderated_at !== null,
             'returnUrl' => '/jobs'.(is_string($request->query('search')) && strlen($request->query('search')) <= 4000 && $request->query('search') !== '' ? '?'.$request->query('search') : ''),
             'application' => [
                 'owner' => $request->user()?->id === $project->user_id,
@@ -135,7 +137,8 @@ class ProjectDiscoveryController extends Controller
             'published_at' => $project->published_at?->toIso8601String(),
             'application_closes_at' => $project->application_closes_at?->toIso8601String(),
             'proposals_received' => (int) $project->getAttribute('proposals_received'),
-            'open' => $project->status === 'published' && $project->application_closes_at?->isFuture(),
+            // A project hidden by moderation takes no new applications, so its owner is not told it is open.
+            'open' => $project->moderated_at === null && $project->status === 'published' && $project->application_closes_at?->isFuture(),
         ];
     }
 

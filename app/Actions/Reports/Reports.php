@@ -127,7 +127,8 @@ class Reports
         }
         if ($type === 'message') {
             $message = ConversationMessage::query()->with('conversation.proposal.project')->whereKey($id)->first();
-            if (! $message || ! $message->conversation->contains($user)) {
+            // A message hidden by moderation is no longer something a participant can see.
+            if (! $message || ! $message->conversation->contains($user) || $message->moderated_at !== null) {
                 return null;
             }
 

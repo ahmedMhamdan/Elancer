@@ -18,6 +18,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property CarbonImmutable|null $published_at
  * @property CarbonImmutable|null $hidden_at
  * @property CarbonImmutable|null $revoked_at
+ * @property CarbonImmutable|null $moderated_at
+ * @property int|null $moderated_by
  * @property CarbonImmutable $created_at
  * @property-read Contract|null $contract
  * @property-read Collection<int, PortfolioApproval> $approvals
@@ -29,18 +31,18 @@ class PortfolioCase extends Model
     protected function casts(): array
     {
         return ['content' => 'array', 'public_content' => 'array', 'published_at' => 'immutable_datetime',
-            'hidden_at' => 'immutable_datetime', 'revoked_at' => 'immutable_datetime', 'created_at' => 'immutable_datetime'];
+            'hidden_at' => 'immutable_datetime', 'revoked_at' => 'immutable_datetime', 'moderated_at' => 'immutable_datetime', 'created_at' => 'immutable_datetime'];
     }
 
     /**
      * Q74: the one public boundary. A case needs a public version, must not be hidden by its
-     * owner, and its owner's profile must be publicly visible. Withdrawn permission removes the public version.
+     * owner or by moderation, and its owner's profile must be publicly visible. Withdrawn permission removes the public version.
      *
      * @param  Builder<PortfolioCase>  $query
      */
     public function scopePubliclyVisible(Builder $query): void
     {
-        $query->whereNotNull('public_content')->whereNull('hidden_at')
+        $query->whereNotNull('public_content')->whereNull('hidden_at')->whereNull('moderated_at')
             ->whereIn('user_id', Profile::query()->publiclyVisible()->select('user_id'));
     }
 
