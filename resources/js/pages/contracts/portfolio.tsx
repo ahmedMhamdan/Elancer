@@ -11,6 +11,7 @@ export type PortfolioState = {
     pending: { id: number; content: CaseContent; created_at: string } | null;
     public: CaseContent | null;
     hidden: boolean;
+    moderated: boolean;
     revoked_at: string | null;
     history: Approval[];
 };
@@ -126,11 +127,15 @@ export function Portfolio({
                 <>
                     <Preview
                         title={
-                            portfolio.hidden
+                            portfolio.moderated
                                 ? t(
-                                      'Approved version, currently hidden by the freelancer',
+                                      'Approved version, currently hidden by moderation',
                                   )
-                                : t('Approved version, currently public')
+                                : portfolio.hidden
+                                  ? t(
+                                        'Approved version, currently hidden by the freelancer',
+                                    )
+                                  : t('Approved version, currently public')
                         }
                         content={portfolio.public}
                     />

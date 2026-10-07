@@ -20,6 +20,8 @@ export type OwnedCase = {
     hidden_at: string | null;
     revoked_at: string | null;
     changed: boolean;
+    // Hidden by an administrator: not public whatever the owner does.
+    moderated: boolean;
     contract: { id: number; title: string } | null;
     pending: boolean;
     history: Approval[];
@@ -51,16 +53,19 @@ export function PortfolioLayout({
 // The one state a visitor would experience, then what is waiting behind it.
 export function CaseStatus({ item }: { item: OwnedCase }) {
     const { t } = useTranslation();
-    const state = item.public_content
-        ? item.hidden_at
-            ? 'hidden'
-            : 'public'
-        : item.revoked_at
-          ? 'revoked'
-          : 'draft';
+    const state = item.moderated
+        ? 'moderated'
+        : item.public_content
+          ? item.hidden_at
+              ? 'hidden'
+              : 'public'
+          : item.revoked_at
+            ? 'revoked'
+            : 'draft';
     const labels: Record<string, string> = {
         public: t('Public'),
         hidden: t('Hidden'),
+        moderated: t('Hidden by moderation'),
         revoked: t('Permission withdrawn'),
         draft: t('Draft'),
     };

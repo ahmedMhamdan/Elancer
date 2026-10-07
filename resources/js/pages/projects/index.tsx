@@ -20,6 +20,7 @@ type Project = {
     status: string;
     updated_at: string;
     deleted_at: string | null;
+    moderated_at: string | null;
 };
 export default function MyProjects({
     projects,
@@ -94,9 +95,11 @@ export default function MyProjects({
                                 </h2>
                                 <span className="job-muted">
                                     {t(
-                                        project.status === 'draft'
-                                            ? 'Draft'
-                                            : 'Published',
+                                        project.moderated_at
+                                            ? 'Hidden by moderation'
+                                            : project.status === 'draft'
+                                              ? 'Draft'
+                                              : 'Published',
                                     )}
                                 </span>
                             </div>

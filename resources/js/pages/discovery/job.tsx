@@ -9,8 +9,11 @@ export default function JobDetails({
     client,
     returnUrl,
     application,
+    moderated,
 }: {
     project: Job;
+    // Only the owner reaches this page while moderation hides the project.
+    moderated: boolean;
     client: {
         name: string;
         country: string | null;
@@ -31,6 +34,16 @@ export default function JobDetails({
                 <ArrowLeft size={18} className="rtl:rotate-180" />
                 {t('Back to results')}
             </Link>
+            {moderated && (
+                <p
+                    role="status"
+                    className="border-border bg-card mb-6 rounded-xl border p-4"
+                >
+                    {t(
+                        'This project was hidden by moderation. It is not on public pages or in search, and only you can open this page. Proposals and contracts already under way keep working.',
+                    )}
+                </p>
+            )}
             <header className="jobs-heading">
                 <div>
                     <Link

@@ -128,6 +128,13 @@ export default function Index({
                                 </Link>
                             </p>
                         )}
+                        {item.moderated && (
+                            <p role="status" className="market-muted">
+                                {t(
+                                    'An administrator hid this case study. It is not public and you cannot show it again yourself. You can still edit your private copy.',
+                                )}
+                            </p>
+                        )}
                         {item.revoked_at && !item.public_content && (
                             <p className="market-muted">
                                 {t(
@@ -141,6 +148,7 @@ export default function Index({
                             </Link>
                             {item.public_content &&
                                 !item.hidden_at &&
+                                !item.moderated &&
                                 profilePublic && (
                                     <Link href={`/portfolio/${item.id}`}>
                                         {t('View public page')}
@@ -176,7 +184,7 @@ export default function Index({
                                     {t('Withdraw request')}
                                 </Button>
                             )}
-                            {item.public_content && (
+                            {item.public_content && !item.moderated && (
                                 <Button
                                     variant="outline"
                                     disabled={busy}

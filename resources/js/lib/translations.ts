@@ -2160,4 +2160,31 @@ export const arabic: Record<string, string> = {
     'Internal:': 'داخلي:',
     'This account has never been suspended.': 'لم يُوقف هذا الحساب من قبل.',
     'Open their account': 'فتح حسابه',
+    'Message hidden by moderation': 'رسالة أخفاها الإشراف',
+    'This message was hidden by moderation.': 'أخفى الإشراف هذه الرسالة.',
+    'Hidden by moderation': 'أخفاه الإشراف',
+    'Content hidden.': 'أُخفي المحتوى.',
+    'Content restored as it was.': 'أُعيد المحتوى كما كان.',
+    'Both participants see a notice in place of the message. Its text and correction history stay here as evidence, and it can no longer be corrected.':
+        'يرى الطرفان إشعارًا مكان الرسالة. يبقى نصها وسجل تصحيحاتها هنا كدليل، ولا يمكن تصحيحها بعد الآن.',
+    'The project leaves public pages and lists, direct links included. Its owner sees that it was hidden. Proposals and contracts already under way keep working.':
+        'يختفي المشروع من الصفحات والقوائم العامة، بما فيها الروابط المباشرة. يرى صاحبه أنه أُخفي. العروض والعقود الجارية تستمر كما هي.',
+    'The case study leaves public pages, direct links included. Its owner sees that it was hidden and cannot show it again.':
+        'تختفي دراسة الحالة من الصفحات العامة، بما فيها الروابط المباشرة. يرى صاحبها أنها أُخفيت ولا يستطيع إظهارها من جديد.',
+    'Content hidden': 'أُخفي المحتوى',
+    'Content restored': 'أُعيد المحتوى',
+    'Hide or restore': 'الإخفاء والاستعادة',
+    'Not hidden': 'غير مخفي',
+    'Hide this content?': 'هل تريد إخفاء هذا المحتوى؟',
+    'Restore this content as it was?': 'هل تريد استعادة هذا المحتوى كما كان؟',
+    'Hide content': 'إخفاء المحتوى',
+    'Restore content': 'استعادة المحتوى',
+    'Only the administrator reviewing this report can hide or restore its content.':
+        'لا يستطيع إخفاء محتوى هذا البلاغ أو استعادته إلا المشرف الذي يراجعه.',
+    'This project was hidden by moderation. It is not on public pages or in search, and only you can open this page. Proposals and contracts already under way keep working.':
+        'أخفى الإشراف هذا المشروع. لا يظهر في الصفحات العامة ولا في البحث، وأنت وحدك تستطيع فتح هذه الصفحة. العروض والعقود الجارية تستمر كما هي.',
+    'An administrator hid this case study. It is not public and you cannot show it again yourself. You can still edit your private copy.':
+        'أخفى أحد المشرفين دراسة الحالة هذه. ليست منشورة للعامة ولا تستطيع إظهارها بنفسك. ما زال بإمكانك تعديل نسختك الخاصة.',
+    'Approved version, currently hidden by moderation':
+        'النسخة المعتمدة، يخفيها الإشراف حاليًا',
 };

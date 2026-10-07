@@ -44,7 +44,42 @@ function MessageItem({
 }) {
     const { t, locale } = useTranslation();
     const [editing, setEditing] = useState(false);
-    const form = useForm({ body: message.body, version: message.version });
+    const form = useForm({
+        body: message.body ?? '',
+        version: message.version,
+    });
+    const sent = (
+        <div className="chat-message-meta">
+            <span>{message.mine ? t('You') : counterpart}</span>
+            <time dateTime={message.created_at}>
+                {new Date(message.created_at).toLocaleString(locale, {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                })}
+            </time>
+            {message.edited_at && <span>{t('Edited')}</span>}
+        </div>
+    );
+    // Q68: a notice stands in for a message that moderation hid, with nothing to correct or report.
+    if (message.hidden)
+        return (
+            <article
+                className={cn(
+                    'chat-message',
+                    message.mine && 'chat-message-mine',
+                )}
+                aria-label={message.mine ? t('You') : counterpart}
+            >
+                <div className="chat-bubble">
+                    <p className="text-sm leading-7 italic">
+                        {t('This message was hidden by moderation.')}
+                    </p>
+                    {sent}
+                </div>
+            </article>
+        );
     return (
         <article
             className={cn('chat-message', message.mine && 'chat-message-mine')}
@@ -104,18 +139,7 @@ function MessageItem({
                         {message.body}
                     </p>
                 )}
-                <div className="chat-message-meta">
-                    <span>{message.mine ? t('You') : counterpart}</span>
-                    <time dateTime={message.created_at}>
-                        {new Date(message.created_at).toLocaleString(locale, {
-                            month: 'short',
-                            day: 'numeric',
-                            hour: 'numeric',
-                            minute: '2-digit',
-                        })}
-                    </time>
-                    {message.edited_at && <span>{t('Edited')}</span>}
-                </div>
+                {sent}
                 {(message.can_edit ||
                     !message.mine ||
                     message.revisions.length > 0) && (
@@ -133,7 +157,7 @@ function MessageItem({
                                 type="button"
                                 onClick={() => {
                                     form.setData({
-                                        body: message.body,
+                                        body: message.body ?? '',
                                         version: message.version,
                                     });
                                     setEditing(true);

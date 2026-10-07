@@ -12,13 +12,17 @@ export type ConversationSummary = {
     contract_id: number | null;
     counterpart: string;
     preview: string;
+    // The latest message was hidden by moderation, so there is no text to preview.
+    preview_hidden: boolean;
     archived: boolean;
     unread: number;
     updated_at: string;
 };
 export type Message = {
     id: number;
-    body: string;
+    // Null when moderation hid the message: participants receive a notice, never the text.
+    body: string | null;
+    hidden: boolean;
     version: number;
     created_at: string;
     edited_at: string | null;

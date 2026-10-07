@@ -20,6 +20,7 @@ type Target = {
     summary?: string | null;
     text?: string | null;
     href?: string | null;
+    hidden?: boolean;
     sender?: 'client' | 'freelancer';
     created_at?: string;
     edited_at?: string | null;
@@ -70,13 +71,20 @@ type Props = {
         reason: string | null;
         created_at: string;
     }[];
+    moderation: {
+        hidden: boolean;
+        at: string | null;
+        by: string | null;
+    } | null;
     can: {
         start: boolean;
         take: boolean;
         resolve: boolean;
         conversation: boolean;
+        hide: boolean;
+        restore: boolean;
     };
-    notice: 'started' | 'resolved' | 'noted' | null;
+    notice: 'started' | 'resolved' | 'noted' | 'hidden' | 'restored' | null;
 };
 
 function Fact({ label, children }: { label: string; children: ReactNode }) {
@@ -101,6 +109,7 @@ export default function ReportPage({
     target,
     notes,
     events,
+    moderation,
     can,
     notice,
 }: Props) {
@@ -110,6 +119,7 @@ export default function ReportPage({
     const [busy, setBusy] = useState(false);
     const resolve = useForm({ outcome: '', reason: '' });
     const note = useForm({ body: '' });
+    const moderate = useForm({ reason: '' });
     const failed = () => {
         setError(
             t('The report changed or the request failed. Reload the page.'),
@@ -121,6 +131,20 @@ export default function ReportPage({
         started: t('Review started. The reporter now sees In review.'),
         resolved: t('Report resolved.'),
         noted: t('Note added.'),
+        hidden: t('Content hidden.'),
+        restored: t('Content restored as it was.'),
+    };
+    // What hiding does, in the words of the thing that was reported.
+    const effects: Record<string, string> = {
+        message: t(
+            'Both participants see a notice in place of the message. Its text and correction history stay here as evidence, and it can no longer be corrected.',
+        ),
+        project: t(
+            'The project leaves public pages and lists, direct links included. Its owner sees that it was hidden. Proposals and contracts already under way keep working.',
+        ),
+        case: t(
+            'The case study leaves public pages, direct links included. Its owner sees that it was hidden and cannot show it again.',
+        ),
     };
     const choices: Record<string, string> = {
         action_taken: t('Action taken'),
@@ -134,6 +158,8 @@ export default function ReportPage({
         resolved: t('Resolved'),
         note_added: t('Note added'),
         conversation_read: t('Conversation read'),
+        content_hidden: t('Content hidden'),
+        content_restored: t('Content restored'),
         account_suspended: t('Account suspended'),
         account_reinstated: t('Account reinstated'),
     };
@@ -343,6 +369,100 @@ export default function ReportPage({
                     </section>
                 )}
             </ComponentCard>
+            {moderation && (
+                <ComponentCard
+                    title={t('Hide or restore')}
+                    desc={effects[report.target_type]}
+                >
+                    <p className="font-medium">
+                        {moderation.hidden
+                            ? t('Hidden by moderation')
+                            : t('Not hidden')}
+                        {moderation.hidden && moderation.at && (
+                            <span className="text-muted-foreground text-sm font-normal">
+                                {' · '}
+                                <bdi>
+                                    {moderation.by ?? t('Closed account')}
+                                </bdi>
+                                {' · '}
+                                <time dateTime={moderation.at}>
+                                    {time(moderation.at)}
+                                </time>
+                            </span>
+                        )}
+                    </p>
+                    {can.hide || can.restore ? (
+                        <form
+                            className="space-y-5"
+                            onSubmit={(event) => {
+                                event.preventDefault();
+                                if (
+                                    !window.confirm(
+                                        can.hide
+                                            ? t('Hide this content?')
+                                            : t(
+                                                  'Restore this content as it was?',
+                                              ),
+                                    )
+                                )
+                                    return;
+                                setError('');
+                                moderate.transform((data) => ({
+                                    ...data,
+                                    action: can.hide ? 'hide' : 'restore',
+                                }));
+                                moderate.patch(`/admin/reports/${report.id}`, {
+                                    preserveScroll: true,
+                                    onSuccess: () => moderate.reset(),
+                                    onHttpException: failed,
+                                });
+                            }}
+                        >
+                            <div>
+                                <Label htmlFor="moderation-reason">
+                                    {t(
+                                        'Internal reason (kept in the audit log)',
+                                    )}
+                                </Label>
+                                <TextArea
+                                    id="moderation-reason"
+                                    rows={3}
+                                    required
+                                    minLength={5}
+                                    maxLength={1000}
+                                    dir="auto"
+                                    placeholder=""
+                                    value={moderate.data.reason}
+                                    onChange={(value) =>
+                                        moderate.setData('reason', value)
+                                    }
+                                />
+                                <InputError message={moderate.errors.reason} />
+                            </div>
+                            <Button
+                                type="submit"
+                                variant={can.hide ? 'danger' : 'primary'}
+                                disabled={
+                                    moderate.processing ||
+                                    moderate.data.reason.trim().length < 5
+                                }
+                            >
+                                {can.hide
+                                    ? t('Hide content')
+                                    : t('Restore content')}
+                            </Button>
+                        </form>
+                    ) : (
+                        report.status !== 'resolved' && (
+                            <p className="text-muted-foreground text-sm">
+                                {t(
+                                    'Only the administrator reviewing this report can hide or restore its content.',
+                                )}
+                            </p>
+                        )
+                    )}
+                </ComponentCard>
+            )}
             {report.status !== 'resolved' ? (
                 <ComponentCard
                     title={t('Review')}

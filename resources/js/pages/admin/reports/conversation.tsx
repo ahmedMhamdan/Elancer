@@ -13,6 +13,7 @@ type Entry = {
     body: string;
     created_at: string;
     edited_at: string | null;
+    hidden: boolean;
     sender: 'client' | 'freelancer';
     revisions: { body: string; version: number; created_at: string }[];
 };
@@ -79,6 +80,12 @@ export default function ReportedConversation({
                                 {time(message.created_at)}
                             </time>
                             {message.edited_at && <> · {t('Edited')}</>}
+                            {message.hidden && (
+                                <strong>
+                                    {' · '}
+                                    {t('Hidden by moderation')}
+                                </strong>
+                            )}
                             {message.id === report.reported_message && (
                                 <strong className="text-red-700 dark:text-red-300">
                                     {' · '}

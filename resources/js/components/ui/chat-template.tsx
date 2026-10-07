@@ -173,7 +173,7 @@ function ConversationList({ conversations, filters, selected }: {
                             </div>
                             <p className="text-muted-foreground mt-1 truncate text-xs" dir="auto">{conversation.project.title}</p>
                             <div className="mt-2 flex items-center gap-2">
-                                <p className="text-muted-foreground min-w-0 flex-1 truncate text-sm" dir="auto">{conversation.preview}</p>
+                                <p className="text-muted-foreground min-w-0 flex-1 truncate text-sm" dir="auto">{conversation.preview_hidden ? t('Message hidden by moderation') : conversation.preview}</p>
                                 {conversation.unread > 0 && <span className="bg-primary text-primary-foreground min-w-5 rounded-full px-1.5 py-0.5 text-center text-xs font-semibold"><span aria-hidden="true">{conversation.unread}</span><span className="sr-only">{t(':count unread', { count: conversation.unread })}</span></span>}
                             </div>
                         </div>

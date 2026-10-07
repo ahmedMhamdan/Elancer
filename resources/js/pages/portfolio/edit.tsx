@@ -225,6 +225,13 @@ export default function Edit({
                             <CaseStatus item={item} />
                         </div>
                     )}
+                    {item?.moderated && (
+                        <p role="status" className="market-muted">
+                            {t(
+                                'An administrator hid this case study. It is not public and you cannot show it again yourself. You can still edit your private copy.',
+                            )}
+                        </p>
+                    )}
                     <p className="market-muted">
                         {item?.public_content
                             ? t(
