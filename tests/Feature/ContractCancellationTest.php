@@ -77,7 +77,7 @@ class ContractCancellationTest extends TestCase
         $this->actingAs($freelancer)->post('/contracts/'.$contract->id.'/cancellation', $reason)->assertSessionHasNoErrors();
         $this->assertSame('cancelled', $contract->fresh()->status);
         $this->assertNotNull($contract->fresh()->cancelled_at);
-        $this->assertSame(1, $client->notifications()->where('data->kind', 'contract_cancelled')->count());
+        $this->assertSame(1, $client->notifications()->get()->where('data.kind', 'contract_cancelled')->count());
         // Nothing can be funded or cancelled again afterwards.
         $this->actingAs($client)->post('/contracts/'.$contract->id.'/payments', ['provider' => 'simulator', 'client_token' => (string) Str::uuid()])->assertSessionHasErrors('payment');
         $this->post('/contracts/'.$contract->id.'/cancellation', $reason)->assertSessionHasErrors('cancellation');
@@ -91,7 +91,7 @@ class ContractCancellationTest extends TestCase
         $this->actingAs($freelancer)->post('/contracts/'.$contract->id.'/deliveries', [...$delivery, 'client_token' => (string) Str::uuid()])->assertSessionHasNoErrors();
         $this->actingAs($client)->post('/contracts/'.$contract->id.'/cancellation', ['reason' => 'We no longer need this work.'])->assertSessionHasNoErrors();
         $this->assertSame('cancellation_pending', $contract->fresh()->status);
-        $this->assertSame(1, $freelancer->notifications()->where('data->kind', 'cancellation_requested')->count());
+        $this->assertSame(1, $freelancer->notifications()->get()->where('data.kind', 'cancellation_requested')->count());
         // One unresolved request at a time; the requester cannot answer their own request.
         $this->actingAs($freelancer)->post('/contracts/'.$contract->id.'/cancellation', ['reason' => 'A second request while one is open.'])->assertSessionHasErrors('cancellation');
         $this->actingAs($client)->patch('/contracts/'.$contract->id.'/cancellation', ['action' => 'accept'])->assertForbidden();
@@ -135,8 +135,8 @@ class ContractCancellationTest extends TestCase
         $this->assertSame('refunded', PaymentAttempt::query()->value('status'));
         $this->assertSame(1, PaymentEvent::query()->where('type', 'refund')->where('amount_minor', 75025)->count());
         $this->assertSame(['refunded', 'succeeded'], [ContractCancellation::query()->value('status'), ContractCancellation::query()->value('refund_status')]);
-        $this->assertSame(1, $client->notifications()->where('data->kind', 'contract_refunded')->count());
-        $this->assertSame(1, $freelancer->notifications()->where('data->kind', 'contract_refunded')->count());
+        $this->assertSame(1, $client->notifications()->get()->where('data.kind', 'contract_refunded')->count());
+        $this->assertSame(1, $freelancer->notifications()->get()->where('data.kind', 'contract_refunded')->count());
         $this->assertSame(0, ContractFunding::summary($client->id)['client']['funded']['count']);
         $this->get('/contracts/'.$contract->id)->assertInertia(fn (Assert $page) => $page->where('contract.status', 'cancelled')
             ->where('activity.0.kind', 'cancelled')->where('reviews', null));

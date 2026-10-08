@@ -294,7 +294,7 @@ class PortfolioTest extends TestCase
         $this->actingAs($freelancer)->patch('/my-portfolio/'.$case->id, ['action' => 'request'])->assertSessionHasNoErrors();
         $this->patch('/my-portfolio/'.$case->id, ['action' => 'request'])->assertSessionHasErrors('case');
         $first = PortfolioApproval::query()->firstOrFail();
-        $this->assertSame(1, $client->notifications()->where('data->kind', 'portfolio_requested')->count());
+        $this->assertSame(1, $client->notifications()->get()->where('data.kind', 'portfolio_requested')->count());
         $this->get($public)->assertNotFound();
         // Only the client answers.
         $this->patch($consent, ['action' => 'approve', 'approval' => $first->id])->assertForbidden();
@@ -307,7 +307,7 @@ class PortfolioTest extends TestCase
             ->where('portfolio.pending.id', $first->id)->where('portfolio.pending.content.title', 'Bilingual booking platform')->where('portfolio.case_id', null)->where('portfolio.public', null));
         $this->patch($consent, ['action' => 'approve', 'approval' => $first->id + 1])->assertSessionHasErrors('portfolio');
         $this->patch($consent, ['action' => 'approve', 'approval' => $first->id])->assertSessionHasNoErrors();
-        $this->assertSame(1, $freelancer->notifications()->where('data->kind', 'portfolio_approved')->count());
+        $this->assertSame(1, $freelancer->notifications()->get()->where('data.kind', 'portfolio_approved')->count());
         $response = $this->get($public)->assertInertia(fn (Assert $page) => $page->where('case.content.title', 'Bilingual booking platform')->where('case.elancer_work', true));
         // Nothing from the contract is public.
         $props = $response->viewData('page')['props'];
@@ -321,7 +321,7 @@ class PortfolioTest extends TestCase
         $this->get($public)->assertInertia(fn (Assert $page) => $page->where('case.content.title', 'Bilingual booking platform'));
         $this->actingAs($client)->patch($consent, ['action' => 'decline', 'approval' => $second->id])->assertSessionHasNoErrors();
         $this->get($public)->assertInertia(fn (Assert $page) => $page->where('case.content.title', 'Bilingual booking platform'));
-        $this->assertSame(1, $freelancer->notifications()->where('data->kind', 'portfolio_declined')->count());
+        $this->assertSame(1, $freelancer->notifications()->get()->where('data.kind', 'portfolio_declined')->count());
 
         // Q53: withdrawing permission hides the case at once and closes an open request.
         $this->actingAs($freelancer)->patch('/my-portfolio/'.$case->id, ['action' => 'request'])->assertSessionHasNoErrors();
@@ -330,7 +330,7 @@ class PortfolioTest extends TestCase
         $this->get($public)->assertNotFound();
         $this->patch($consent, ['action' => 'approve', 'approval' => $third->id])->assertSessionHasErrors('portfolio');
         $this->assertSame(['revoked', 'declined', 'closed'], PortfolioApproval::query()->orderBy('id')->pluck('status')->all());
-        $this->assertSame(1, $freelancer->notifications()->where('data->kind', 'portfolio_revoked')->count());
+        $this->assertSame(1, $freelancer->notifications()->get()->where('data.kind', 'portfolio_revoked')->count());
         // Nothing the owner can do alone brings it back, and the history is kept.
         $this->actingAs($freelancer)->patch('/my-portfolio/'.$case->id, ['action' => 'show']);
         $this->patch('/my-portfolio/'.$case->id, ['action' => 'publish'])->assertSessionHasErrors('case');

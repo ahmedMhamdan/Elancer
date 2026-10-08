@@ -78,7 +78,7 @@ class ContractAmendmentTest extends TestCase
         $this->post($path, ['reason' => 'One more round is needed.', 'extra_rounds' => 1])->assertSessionHasNoErrors();
         $this->post($path, ['reason' => 'A second proposal while one is open.', 'extra_rounds' => 1])->assertSessionHasErrors('amendment');
         $amendment = ContractAmendment::query()->firstOrFail();
-        $this->assertSame(1, $freelancer->notifications()->where('data->kind', 'amendment_proposed')->count());
+        $this->assertSame(1, $freelancer->notifications()->get()->where('data.kind', 'amendment_proposed')->count());
         // Proposing changes nothing; the proposer cannot answer and the counterpart cannot withdraw.
         $this->post('/contracts/'.$contract->id.'/revisions', $revision)->assertSessionHasErrors('revision');
         $this->patch($path, ['amendment' => $amendment->id, 'action' => 'accept'])->assertForbidden();
@@ -92,7 +92,7 @@ class ContractAmendmentTest extends TestCase
 
         $fresh = $contract->fresh();
         $this->assertSame([1, 0, '750.25'], [$fresh->extra_rounds, $fresh->agreement['revision_rounds'], $fresh->agreement['amount']]);
-        $this->assertSame(1, $client->notifications()->where('data->kind', 'amendment_accepted')->count());
+        $this->assertSame(1, $client->notifications()->get()->where('data.kind', 'amendment_accepted')->count());
         $this->actingAs($client)->post('/contracts/'.$contract->id.'/revisions', $revision)->assertSessionHasNoErrors();
         $this->assertSame(['revision_requested', 1], [$contract->fresh()->status, $contract->fresh()->revisions_used]);
         $this->get('/contracts/'.$contract->id)->assertInertia(fn (Assert $page) => $page->where('contract.revision_rounds', 1)

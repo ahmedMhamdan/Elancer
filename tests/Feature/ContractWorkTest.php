@@ -78,7 +78,7 @@ class ContractWorkTest extends TestCase
         $this->actingAs($freelancer)->post('/contracts/'.$contract->id.'/deliveries', $this->delivery(['complete' => false]))->assertSessionHasErrors('complete');
         $this->post('/contracts/'.$contract->id.'/deliveries', $this->delivery(['links' => ['javascript:alert(1)']]))->assertSessionHasErrors('links.0');
         $this->assertSame(0, ContractSubmission::query()->count());
-        $this->assertSame(0, $client->notifications()->where('data->kind', 'delivery_submitted')->count());
+        $this->assertSame(0, $client->notifications()->get()->where('data.kind', 'delivery_submitted')->count());
     }
 
     public function test_a_delivery_is_recorded_once_with_private_files(): void
@@ -91,7 +91,7 @@ class ContractWorkTest extends TestCase
         $this->assertSame(1, ContractSubmission::query()->count());
         $this->assertSame(1, ContractSubmissionFile::query()->count());
         $this->assertSame('submitted', $contract->fresh()->status);
-        $this->assertSame(1, $client->notifications()->where('data->kind', 'delivery_submitted')->count());
+        $this->assertSame(1, $client->notifications()->get()->where('data.kind', 'delivery_submitted')->count());
         // A second delivery cannot be stacked on one awaiting review.
         $this->post('/contracts/'.$contract->id.'/deliveries', $this->delivery())->assertSessionHasErrors('delivery');
 
@@ -119,7 +119,7 @@ class ContractWorkTest extends TestCase
         $this->post('/contracts/'.$contract->id.'/revisions', $payload)->assertSessionHasNoErrors();
         $this->assertSame(1, ContractRevisionRequest::query()->count());
         $this->assertSame(['revision_requested', 1], [$contract->fresh()->status, $contract->fresh()->revisions_used]);
-        $this->assertSame(1, $freelancer->notifications()->where('data->kind', 'revision_requested')->count());
+        $this->assertSame(1, $freelancer->notifications()->get()->where('data.kind', 'revision_requested')->count());
         // Approval is not possible while a revision is outstanding.
         $this->post('/contracts/'.$contract->id.'/complete', ['submission' => $first->id])->assertSessionHasErrors('delivery');
 
@@ -144,7 +144,7 @@ class ContractWorkTest extends TestCase
         $this->post('/contracts/'.$contract->id.'/complete', ['submission' => $second->id])->assertSessionHasNoErrors();
         $this->assertSame('completed', $contract->fresh()->status);
         $this->assertNotNull($contract->fresh()->completed_at);
-        $this->assertSame(1, $freelancer->notifications()->where('data->kind', 'contract_completed')->count());
+        $this->assertSame(1, $freelancer->notifications()->get()->where('data.kind', 'contract_completed')->count());
         // Nothing further is accepted on a completed contract.
         $this->actingAs($freelancer)->post('/contracts/'.$contract->id.'/deliveries', $this->delivery())->assertSessionHasErrors('delivery');
         $this->actingAs($client)->post('/contracts/'.$contract->id.'/revisions', ['submission' => $second->id, 'changes' => 'A late request after completion.'])->assertSessionHasErrors('delivery');
@@ -171,7 +171,7 @@ class ContractWorkTest extends TestCase
         $profile->syncSkillTags(['Laravel']);
         $profile->forceFill(['published_at' => now()])->save();
         $this->get('/freelancers/'.$profile->id)->assertInertia(fn (Assert $page) => $page->has('reviews', 0));
-        $this->assertSame(1, $freelancer->notifications()->where('data->kind', 'review_received')->count());
+        $this->assertSame(1, $freelancer->notifications()->get()->where('data.kind', 'review_received')->count());
 
         $this->put('/contracts/'.$contract->id.'/review', ['rating' => 5, 'body' => 'A precise brief and quick answers.'])->assertSessionHasNoErrors();
         // Both exist: published and locked for both authors.

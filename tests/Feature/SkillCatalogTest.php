@@ -72,19 +72,18 @@ class SkillCatalogTest extends TestCase
     {
         $profile = User::factory()->create()->profile()->create([]);
         $profile->forceFill(['skills' => ['Legacy Craft', 'Laravel']])->save();
-        // Roll back newer dependents before rebuilding the historical skill catalog.
-        $proposalMigration = require database_path('migrations/2026_09_18_180000_create_proposals_and_public_profiles.php');
-        $invitationMigration = require database_path('migrations/2026_09_24_200000_create_invitations_and_user_blocks.php');
-        $conversationMigration = require database_path('migrations/2026_09_25_090000_create_hiring_conversations.php');
-        $offerMigration = require database_path('migrations/2026_09_27_120000_create_offers_and_contracts.php');
-        $offerMigration->down();
-        $conversationMigration->down();
-        $invitationMigration->down();
-        $proposalMigration->down();
-        $projectMigration = require database_path('migrations/2026_09_15_160000_create_projects_table.php');
-        $projectMigration->down();
+        // Roll back every newer migration, newest first, before rebuilding the historical skill catalog.
+        // PostgreSQL refuses to drop a table that a later table still references.
+        $catalog = '2026_09_13_100000_create_skill_catalog.php';
+        // Left in place: its rollback rebuilds the users table, and SQLite inside the test transaction
+        // would cascade that rebuild into deleting the profile under test. The catalog does not depend on it.
+        $accountOnly = ['2026_09_26_090000_add_social_identities_and_nullable_passwords.php'];
+        $newer = collect(glob(database_path('migrations/*.php')))->sort()->values()
+            ->filter(fn (string $path) => basename($path) > $catalog && ! in_array(basename($path), $accountOnly, true))
+            ->map(fn (string $path) => require $path)->values();
+        $newer->reverse()->each(fn ($later) => $later->down());
 
-        $migration = require database_path('migrations/2026_09_13_100000_create_skill_catalog.php');
+        $migration = require database_path('migrations/'.$catalog);
         $migration->down();
         $migration->up();
         $this->assertSame(['Legacy Craft', 'Laravel'], $profile->fresh()->skills);
@@ -93,10 +92,6 @@ class SkillCatalogTest extends TestCase
         $migration->down();
         $this->assertSame(['Legacy Craft', 'Laravel'], $profile->fresh()->skills);
         $migration->up();
-        $projectMigration->up();
-        $proposalMigration->up();
-        $invitationMigration->up();
-        $conversationMigration->up();
-        $offerMigration->up();
+        $newer->each(fn ($later) => $later->up());
     }
 }
