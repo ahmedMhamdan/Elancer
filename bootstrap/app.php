@@ -22,6 +22,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
         // Provider callbacks carry a signature instead of a session token.
         $middleware->validateCsrfTokens(except: ['payments/webhooks/*']);
+        // The host ends HTTPS in front of the container, so its forwarded scheme is trusted. The forwarded
+        // client address and host are not: a visitor could set them and slip past per-address limits.
+        $middleware->trustProxies(at: '*', headers: Request::HEADER_X_FORWARDED_PROTO);
 
         $middleware->web(append: [
             HandleAppearance::class,
