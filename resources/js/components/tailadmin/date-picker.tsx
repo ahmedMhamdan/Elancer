@@ -2,7 +2,7 @@
 // Demo structure and calendar icon retained; made a controlled field with Elancer theme tokens,
 // Arabic month and weekday names, RTL layout and an optional time. See THIRD_PARTY_NOTICES.md.
 import type flatpickr from 'flatpickr';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from '@/hooks/use-translation';
 import '../../../css/elancer-datepicker.css';
 
@@ -31,6 +31,9 @@ export default function DatePicker({
     changed.current = onChange;
     const current = useRef(value);
     current.current = value;
+    // flatpickr hides this field and shows its own. React rewrites an input's type on every render,
+    // so the hidden state is given to React too; otherwise a re-render shows both fields.
+    const [enhanced, setEnhanced] = useState(false);
     const rtl = locale === 'ar';
 
     useEffect(() => {
@@ -62,19 +65,29 @@ export default function DatePicker({
                 instance.altInput.id = id;
             }
             picker.current = instance;
+            setEnhanced(true);
         });
         return () => {
             cancelled = true;
             picker.current = null;
             instance?.destroy();
             input.current?.setAttribute('id', id);
+            setEnhanced(false);
         };
     }, [id, time, min, rtl]);
 
     useEffect(() => {
         const instance = picker.current;
-        if (instance && instance.input.value !== value)
-            instance.setDate(value || '', false);
+        if (!instance) return;
+        // Compared with the picker's own selection: a hidden input's value simply mirrors what React
+        // just wrote to it, so it cannot tell whether the visible field is out of date.
+        const shown = instance.selectedDates[0]
+            ? instance.formatDate(
+                  instance.selectedDates[0],
+                  instance.config.dateFormat,
+              )
+            : '';
+        if (shown !== value) instance.setDate(value || '', false);
     }, [value]);
 
     return (
@@ -82,6 +95,7 @@ export default function DatePicker({
             <input
                 ref={input}
                 id={id}
+                type={enhanced ? 'hidden' : 'text'}
                 defaultValue={value}
                 readOnly
                 placeholder={placeholder}
