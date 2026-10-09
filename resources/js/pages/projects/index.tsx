@@ -21,7 +21,15 @@ type Project = {
     updated_at: string;
     deleted_at: string | null;
     moderated_at: string | null;
+    application_closes_at: string | null;
 };
+// The cutoff is a time, not a stored status, so a published project is open until that time passes.
+function isOpen(project: Project) {
+    return (
+        !!project.application_closes_at &&
+        new Date(project.application_closes_at) > new Date()
+    );
+}
 export default function MyProjects({
     projects,
     trash,
@@ -99,7 +107,11 @@ export default function MyProjects({
                                             ? 'Hidden by moderation'
                                             : project.status === 'draft'
                                               ? 'Draft'
-                                              : 'Published',
+                                              : project.status === 'hired'
+                                                ? 'Hired'
+                                                : isOpen(project)
+                                                  ? 'Open for applications'
+                                                  : 'Applications closed',
                                     )}
                                 </span>
                             </div>
@@ -162,6 +174,15 @@ export default function MyProjects({
                                         >
                                             {t('Review applicants')}
                                         </Link>
+                                        {project.status === 'published' &&
+                                            !project.moderated_at && (
+                                                <Link
+                                                    className="job-post-link"
+                                                    href={`/jobs/${project.id}#project-updates`}
+                                                >
+                                                    {t('Clarify or extend')}
+                                                </Link>
+                                            )}
                                     </>
                                 )}
                             </div>

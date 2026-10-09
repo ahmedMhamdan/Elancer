@@ -1,19 +1,154 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
+import type { FormEvent } from 'react';
 import ReportDialog from '@/components/report-dialog';
+import Button from '@/components/tailadmin/button';
+import DatePicker from '@/components/tailadmin/date-picker';
+import TextArea from '@/components/tailadmin/textarea';
 import { useTranslation } from '@/hooks/use-translation';
 import { DiscoveryLayout, JobDate, Money } from './shared';
 import type { Job } from './shared';
+
+// Q06/Q61: what the owner may still do to a published project. The brief itself is never edited.
+function OwnerUpdates({
+    project,
+    can,
+}: {
+    project: Job;
+    can: { extend: boolean; clarify: boolean };
+}) {
+    const { t } = useTranslation();
+    const note = useForm({ body: '' });
+    const cutoff = useForm({ application_closes_at: '' });
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    function clarify(event: FormEvent) {
+        event.preventDefault();
+        if (
+            !window.confirm(
+                t(
+                    'Publish this clarification? It is public, people who applied are notified, and it cannot be edited or removed.',
+                ),
+            )
+        )
+            return;
+        note.post(`/my-projects/${project.id}/clarifications`, {
+            preserveScroll: true,
+            onSuccess: () => note.reset(),
+        });
+    }
+    function extend(event: FormEvent) {
+        event.preventDefault();
+        const chosen = new Date(cutoff.data.application_closes_at);
+        cutoff.transform(() => ({
+            application_closes_at: Number.isNaN(chosen.getTime())
+                ? ''
+                : chosen.toISOString(),
+        }));
+        cutoff.patch(`/my-projects/${project.id}/cutoff`, {
+            preserveScroll: true,
+            onSuccess: () => cutoff.reset(),
+        });
+    }
+    return (
+        <section
+            id="project-updates"
+            className="job-card mt-6"
+            aria-labelledby="project-updates-heading"
+        >
+            <h2 id="project-updates-heading">{t('Update this project')}</h2>
+            <p className="text-muted-foreground">
+                {t(
+                    'The brief, budget and screening questions stay as published. You can add a clarification or move the application cutoff later.',
+                )}
+            </p>
+            {can.clarify && (
+                <form onSubmit={clarify} className="mt-5 grid gap-2">
+                    <label htmlFor="clarification-body">
+                        {t('Add a clarification')}
+                    </label>
+                    <TextArea
+                        id="clarification-body"
+                        rows={4}
+                        maxLength={2000}
+                        dir="auto"
+                        placeholder={t(
+                            'Answer a question several applicants asked, or add a detail the brief missed.',
+                        )}
+                        value={note.data.body}
+                        onChange={(value) => note.setData('body', value)}
+                        error={!!note.errors.body}
+                        aria-invalid={!!note.errors.body}
+                        aria-describedby="clarification-help"
+                    />
+                    <small id="clarification-help">
+                        {note.errors.body ??
+                            t(
+                                'Shown under the brief with today’s date. Between 10 and 2000 characters.',
+                            )}
+                    </small>
+                    <div>
+                        <Button type="submit" disabled={note.processing}>
+                            {t('Publish clarification')}
+                        </Button>
+                    </div>
+                </form>
+            )}
+            {can.extend && (
+                // The picker keeps its own hour and minute fields inside this form; a typed minute such as 18
+                // fails their five-minute step and would block the submit silently, so the server validates.
+                <form onSubmit={extend} noValidate className="mt-6 grid gap-2">
+                    <label htmlFor="extend-cutoff">
+                        {t('Extend the application cutoff')}
+                    </label>
+                    <DatePicker
+                        id="extend-cutoff"
+                        time
+                        min="today"
+                        placeholder={t('Choose a date')}
+                        value={cutoff.data.application_closes_at}
+                        onChange={(value) =>
+                            cutoff.setData('application_closes_at', value)
+                        }
+                    />
+                    <small>
+                        {cutoff.errors.application_closes_at ??
+                            t(
+                                'Choose a time later than the current cutoff. A later cutoff reopens applications.',
+                            )}
+                    </small>
+                    <small>{t('Times shown in :timezone', { timezone })}</small>
+                    <div>
+                        <Button
+                            type="submit"
+                            variant="outline"
+                            disabled={
+                                cutoff.processing ||
+                                !cutoff.data.application_closes_at
+                            }
+                        >
+                            {t('Extend cutoff')}
+                        </Button>
+                    </div>
+                </form>
+            )}
+        </section>
+    );
+}
+
 export default function JobDetails({
     project,
     client,
     returnUrl,
     application,
     moderated,
+    clarifications,
+    can,
 }: {
     project: Job;
     // Only the owner reaches this page while moderation hides the project.
     moderated: boolean;
+    clarifications: { id: number; body: string; created_at: string }[];
+    can: { extend: boolean; clarify: boolean };
     client: {
         name: string;
         country: string | null;
@@ -72,6 +207,27 @@ export default function JobDetails({
                     <p className="job-description" dir="auto">
                         {project.description}
                     </p>
+                    {clarifications.length > 0 && (
+                        <>
+                            <h2>{t('Clarifications from the client')}</h2>
+                            <ol className="grid gap-4">
+                                {clarifications.map((note) => (
+                                    <li key={note.id}>
+                                        <p className="text-muted-foreground text-sm">
+                                            {t('Added')}{' '}
+                                            <JobDate value={note.created_at} />
+                                        </p>
+                                        <p
+                                            dir="auto"
+                                            className="mt-1 break-words whitespace-pre-wrap"
+                                        >
+                                            {note.body}
+                                        </p>
+                                    </li>
+                                ))}
+                            </ol>
+                        </>
+                    )}
                     <h2>{t('Required skills')}</h2>
                     <div className="job-skills">
                         {project.skills.map((s) => (
@@ -179,6 +335,9 @@ export default function JobDetails({
                     )}
                 </aside>
             </div>
+            {(can.extend || can.clarify) && (
+                <OwnerUpdates project={project} can={can} />
+            )}
         </DiscoveryLayout>
     );
 }

@@ -6,6 +6,7 @@ export function useNotificationSentence() {
     const sentences: Record<string, string> = {
         invitation_received: t('invited you to apply to'),
         proposal_received: t('sent a proposal for'),
+        project_clarified: t('added a clarification to'),
         offer_received: t('sent you a final offer for'),
         offer_accepted: t('accepted your offer for'),
         offer_declined: t('declined your offer for'),

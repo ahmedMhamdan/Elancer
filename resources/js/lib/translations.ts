@@ -2187,4 +2187,22 @@ export const arabic: Record<string, string> = {
         'أخفى أحد المشرفين دراسة الحالة هذه. ليست منشورة للعامة ولا تستطيع إظهارها بنفسك. ما زال بإمكانك تعديل نسختك الخاصة.',
     'Approved version, currently hidden by moderation':
         'النسخة المعتمدة، يخفيها الإشراف حاليًا',
+    'Clarify or extend': 'توضيح أو تمديد',
+    'Update this project': 'تحديث هذا المشروع',
+    'The brief, budget and screening questions stay as published. You can add a clarification or move the application cutoff later.':
+        'تبقى تفاصيل المشروع والميزانية وأسئلة المتقدمين كما نُشرت. يمكنك إضافة توضيح أو تأجيل آخر موعد للتقديم.',
+    'Add a clarification': 'أضف توضيحًا',
+    'Answer a question several applicants asked, or add a detail the brief missed.':
+        'أجب عن سؤال تكرر من المتقدمين، أو أضف تفصيلًا لم يرد في تفاصيل المشروع.',
+    'Shown under the brief with today’s date. Between 10 and 2000 characters.':
+        'يظهر تحت تفاصيل المشروع بتاريخ اليوم. من 10 إلى 2000 حرف.',
+    'Publish clarification': 'نشر التوضيح',
+    'Publish this clarification? It is public, people who applied are notified, and it cannot be edited or removed.':
+        'هل تريد نشر هذا التوضيح؟ سيظهر للجميع، ويصل إشعار به إلى المتقدمين، ولا يمكن تعديله أو حذفه بعد النشر.',
+    'Extend the application cutoff': 'تمديد آخر موعد للتقديم',
+    'Choose a time later than the current cutoff. A later cutoff reopens applications.':
+        'اختر موعدًا بعد الموعد الحالي. تمديد الموعد يعيد فتح باب التقديم.',
+    'Extend cutoff': 'تمديد الموعد',
+    'Clarifications from the client': 'توضيحات من صاحب المشروع',
+    'added a clarification to': 'أضاف توضيحًا لمشروع',
 };
