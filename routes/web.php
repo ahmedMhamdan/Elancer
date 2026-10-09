@@ -198,9 +198,8 @@ Route::middleware(['auth', 'verified', EnsureOnboardingIsComplete::class])->pref
     Route::get('{project}/edit', [$controller, 'edit'])->name('edit');
     Route::patch('{project}', [$controller, 'update'])->middleware('throttle:120,1')->name('update');
     Route::post('{project}/publish', [$controller, 'publish'])->middleware('throttle:10,1')->name('publish');
-    // The third argument gives each action its own counter instead of the member's shared one.
-    Route::patch('{project}/cutoff', [$controller, 'extend'])->middleware('throttle:10,1,project-cutoff')->name('extend');
-    Route::post('{project}/clarifications', [$controller, 'clarify'])->middleware('throttle:10,1,project-clarify')->name('clarify');
+    Route::patch('{project}/cutoff', [$controller, 'extend'])->middleware('throttle:10,1')->name('extend');
+    Route::post('{project}/clarifications', [$controller, 'clarify'])->middleware('throttle:10,1')->name('clarify');
     Route::delete('{project}', [$controller, 'destroy'])->name('destroy');
     Route::post('{project}/restore', [$controller, 'restore'])->withTrashed()->name('restore');
     Route::delete('{project}/permanent', [$controller, 'forceDestroy'])->withTrashed()->name('force-destroy');

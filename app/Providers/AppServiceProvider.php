@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Events\WorkspaceSignal;
+use App\Http\Middleware\ThrottleRequestsPerRoute;
 use App\Models\User;
 use App\Notifications\WorkspaceEvent;
 use App\Notifications\WorkspaceEventMail;
@@ -10,6 +11,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Events\NotificationSent;
+use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -24,7 +26,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Plain throttle:N,M rules count per route instead of sharing one counter per member.
+        $this->app->bind(ThrottleRequests::class, ThrottleRequestsPerRoute::class);
     }
 
     /**
