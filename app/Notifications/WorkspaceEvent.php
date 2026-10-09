@@ -29,7 +29,7 @@ class WorkspaceEvent extends Notification
     {
         return match ($this->kind) {
             'message_received' => 'messages',
-            'invitation_received', 'proposal_received' => 'hiring',
+            'invitation_received', 'proposal_received', 'project_clarified' => 'hiring',
             default => 'contracts',
         };
     }

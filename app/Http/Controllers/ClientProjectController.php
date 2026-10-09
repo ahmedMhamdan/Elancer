@@ -2,16 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Invitations\InvitationLifecycle;
 use App\Models\Category;
 use App\Models\Contract;
 use App\Models\Project;
+use App\Models\ProjectClarification;
+use App\Models\Proposal;
 use App\Models\Skill;
+use App\Models\User;
+use App\Notifications\WorkspaceEvent;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -149,6 +157,57 @@ class ClientProjectController extends Controller
 
             return response()->json(['project' => $locked->load('skills'), 'url' => $publish ? route('jobs.show', $locked) : null]);
         });
+    }
+
+    /** A published project that is still hiring; an accepted offer and moderation both stop owner changes. */
+    private function changeable(Request $request, Project $project): Project
+    {
+        $locked = Project::query()->whereKey($project->id)->lockForUpdate()->firstOrFail();
+        $this->owner($request, $locked);
+        abort_unless($locked->status === 'published', 409, __('This project can no longer be changed.'));
+        abort_if($locked->moderated_at !== null, 409, __('This project is hidden by moderation and cannot be changed.'));
+
+        return $locked;
+    }
+
+    /** Q06: a later cutoff reopens applications. The brief, budget and terms stay as published. */
+    public function extend(Request $request, Project $project): RedirectResponse
+    {
+        $this->owner($request, $project);
+        $data = $request->validate(['application_closes_at' => ['required', 'date', 'after:now']], ['application_closes_at.after' => __('Choose a future application cutoff.')]);
+        DB::transaction(function () use ($request, $project, $data): void {
+            $locked = $this->changeable($request, $project);
+            $cutoff = CarbonImmutable::parse($data['application_closes_at']);
+            if ($locked->application_closes_at !== null && $cutoff->lessThanOrEqualTo($locked->application_closes_at)) {
+                throw ValidationException::withMessages(['application_closes_at' => __('Choose a cutoff later than the current one.')]);
+            }
+            $locked->forceFill(['application_closes_at' => $cutoff, 'version' => $locked->version + 1])->save();
+        });
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Application cutoff extended.')]);
+
+        return back();
+    }
+
+    /** Q61: the published brief stays as written; the owner appends a dated public note and current applicants are told. */
+    public function clarify(Request $request, Project $project): RedirectResponse
+    {
+        $this->owner($request, $project);
+        $data = $request->validate(['body' => ['required', 'string', 'min:10', 'max:2000']]);
+        DB::transaction(function () use ($request, $project, $data): void {
+            $locked = $this->changeable($request, $project);
+            abort_if($locked->clarifications()->count() >= ProjectClarification::LIMIT, 409, __('This project already has the most clarifications it can carry.'));
+            (new ProjectClarification)->forceFill(['project_id' => $locked->id, 'body' => $data['body']])->save();
+            // Q18: the client is named the way the public brief names them.
+            $owner = $request->user();
+            $name = $owner->profile?->company ?: Str::before($owner->name, ' ');
+            $applicants = Proposal::query()->where('project_id', $locked->id)->whereIn('status', ['submitted', 'reopened'])->pluck('user_id')
+                ->reject(fn (int $applicant) => InvitationLifecycle::blocked($owner->id, $applicant))->values();
+            DB::afterCommit(fn () => User::query()->whereKey($applicants)->get()
+                ->each(fn (User $applicant) => $applicant->notify(new WorkspaceEvent('project_clarified', '/jobs/'.$locked->id, $locked->title, $name))));
+        });
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Clarification published.')]);
+
+        return back();
     }
 
     public function destroy(Request $request, Project $project): RedirectResponse

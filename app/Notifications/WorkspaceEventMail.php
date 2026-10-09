@@ -64,6 +64,7 @@ class WorkspaceEventMail extends Notification implements ShouldQueue
         return match ($kind) {
             'invitation_received' => __('invited you to apply to'),
             'proposal_received' => __('sent a proposal for'),
+            'project_clarified' => __('added a clarification to'),
             'offer_received' => __('sent you a final offer for'),
             'offer_accepted' => __('accepted your offer for'),
             'offer_declined' => __('declined your offer for'),

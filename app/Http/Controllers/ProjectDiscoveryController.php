@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Project;
+use App\Models\ProjectClarification;
 use App\Models\Skill;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -108,9 +109,16 @@ class ProjectDiscoveryController extends Controller
         abort_unless($own || Project::query()->visible()->whereKey($project->id)->exists(), 404);
         $project->load(['category', 'skills', 'user.profile']);
         $project->loadCount(['proposals as proposals_received' => fn (Builder $q) => $q->whereNotNull('submitted_at')]);
+        $clarifications = $project->clarifications()->orderBy('id')->get();
+        // Q06/Q61: the owner changes a published project only while it is still hiring and not hidden.
+        $changeable = $request->user()?->id === $project->user_id && $request->user()->canParticipateInMarketplace()
+            && $project->status === 'published' && $project->moderated_at === null;
 
         return Inertia::render('discovery/job', [
             'project' => [...$this->summary($project), 'description' => $project->description, 'screening_questions' => $project->screening_questions ?? []],
+            // Q61: dated public notes under the brief, oldest first; the brief itself is never rewritten.
+            'clarifications' => $clarifications->map(fn (ProjectClarification $note) => ['id' => $note->id, 'body' => $note->body, 'created_at' => $note->created_at->toIso8601String()]),
+            'can' => ['extend' => $changeable, 'clarify' => $changeable && $clarifications->count() < ProjectClarification::LIMIT],
             // Only the owner can be here while moderation hides the project.
             'moderated' => $project->moderated_at !== null,
             'returnUrl' => '/jobs'.(is_string($request->query('search')) && strlen($request->query('search')) <= 4000 && $request->query('search') !== '' ? '?'.$request->query('search') : ''),

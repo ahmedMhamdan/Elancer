@@ -364,5 +364,12 @@
     "Report sent. You can follow it under My reports.": "أُرسل البلاغ. يمكنك متابعته في صفحة بلاغاتي.",
     "This account changed. Reload before continuing.": "تغيّر هذا الحساب. أعد تحميل الصفحة قبل المتابعة.",
     "This message was hidden by moderation.": "أخفى الإشراف هذه الرسالة.",
-    "Saved. This case study stays hidden by moderation.": "تم الحفظ. تبقى دراسة الحالة هذه مخفية من الإشراف."
+    "Saved. This case study stays hidden by moderation.": "تم الحفظ. تبقى دراسة الحالة هذه مخفية من الإشراف.",
+    "This project can no longer be changed.": "لم يعد بالإمكان تغيير هذا المشروع.",
+    "This project is hidden by moderation and cannot be changed.": "أخفى الإشراف هذا المشروع ولا يمكن تغييره.",
+    "Choose a cutoff later than the current one.": "اختر موعدًا بعد الموعد الحالي.",
+    "Application cutoff extended.": "تم تمديد آخر موعد للتقديم.",
+    "This project already has the most clarifications it can carry.": "بلغ هذا المشروع الحد الأقصى من التوضيحات.",
+    "Clarification published.": "نُشر التوضيح.",
+    "added a clarification to": "أضاف توضيحًا لمشروع"
 }

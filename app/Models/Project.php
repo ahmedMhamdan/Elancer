@@ -69,6 +69,12 @@ class Project extends Model
         return $this->hasMany(Proposal::class);
     }
 
+    /** @return HasMany<ProjectClarification, $this> */
+    public function clarifications(): HasMany
+    {
+        return $this->hasMany(ProjectClarification::class);
+    }
+
     /**
      * Q68: the public boundary. A project hidden by moderation leaves public pages and lists.
      *
