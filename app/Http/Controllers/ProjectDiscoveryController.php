@@ -17,6 +17,9 @@ use Inertia\Response;
 
 class ProjectDiscoveryController extends Controller
 {
+    /** Q75 received-proposal presets (plan 003 section 15): the lowest count and, where bounded, the first count above the range. */
+    private const RECEIVED = ['0-4' => [0, 5], '5-9' => [5, 10], '10-19' => [10, 20], '20' => [20, null]];
+
     public function filters(): JsonResponse
     {
         return response()->json([
@@ -46,9 +49,11 @@ class ProjectDiscoveryController extends Controller
             'category' => ['nullable', 'string', Rule::exists('categories', 'slug')->whereNull('deleted_at')],
             'skills' => ['nullable', 'array', 'max:15'],
             'skills.*' => ['required', 'integer', 'distinct', Rule::exists('skills', 'id')],
+            'skill_mode' => ['nullable', Rule::in(['any', 'all'])],
             'budget_min' => ['nullable', 'numeric', 'min:1', 'max:1000000', 'decimal:0,2'],
             'budget_max' => ['nullable', 'numeric', 'min:1', 'max:1000000', 'decimal:0,2'],
             'posted' => ['nullable', Rule::in(['any', '1', '7', '30'])],
+            'proposals' => ['nullable', Rule::in(['any', ...array_keys(self::RECEIVED)])],
             'status' => ['nullable', Rule::in(['open', 'all'])],
             'sort' => ['nullable', Rule::in(['match', 'newest'])],
             'page' => ['nullable', 'integer', 'min:1', 'max:100000'],
@@ -60,12 +65,14 @@ class ProjectDiscoveryController extends Controller
         $profileSkills = $request->user()?->profile?->skillTags()->pluck('skills.id')->all() ?? [];
         $filters = [
             'q' => trim($data['q'] ?? ''), 'category' => $data['category'] ?? '',
-            'skills' => array_map('intval', $data['skills'] ?? []),
+            'skills' => array_map('intval', $data['skills'] ?? []), 'skill_mode' => $data['skill_mode'] ?? 'any',
             'budget_min' => $data['budget_min'] ?? '', 'budget_max' => $data['budget_max'] ?? '',
-            'posted' => $data['posted'] ?? 'any', 'status' => $data['status'] ?? 'open',
+            'posted' => $data['posted'] ?? 'any', 'proposals' => $data['proposals'] ?? 'any', 'status' => $data['status'] ?? 'open',
             'sort' => $data['sort'] ?? ($profileSkills ? 'match' : 'newest'),
         ];
-        $query = Project::query()->visible()->with(['category', 'skills'])->withCount(['proposals as proposals_received' => fn (Builder $q) => $q->whereNotNull('submitted_at')]);
+        // Q60: the public number counts submitted proposals only; the Q75 filter below uses the same count.
+        $received = fn (Builder $q) => $q->whereNotNull('submitted_at');
+        $query = Project::query()->visible()->with(['category', 'skills'])->withCount(['proposals as proposals_received' => $received]);
         if ($filters['q'] !== '') {
             $pattern = $this->pattern($filters['q']);
             $query->where(fn (Builder $q) => $q->whereRaw("LOWER(title) LIKE ? ESCAPE '!'", [$pattern])->orWhereRaw("LOWER(description) LIKE ? ESCAPE '!'", [$pattern]));
@@ -73,8 +80,13 @@ class ProjectDiscoveryController extends Controller
         if ($filters['category'] !== '') {
             $query->whereHas('category', fn (Builder $q) => $q->where('slug', $filters['category']));
         }
-        foreach ($filters['skills'] as $id) {
-            $query->whereHas('skills', fn (Builder $q) => $q->where('skills.id', $id));
+        // Q58: any selected skill matches unless the All switch requires every one.
+        if ($filters['skill_mode'] === 'all') {
+            foreach ($filters['skills'] as $id) {
+                $query->whereHas('skills', fn (Builder $q) => $q->where('skills.id', $id));
+            }
+        } elseif ($filters['skills']) {
+            $query->whereHas('skills', fn (Builder $q) => $q->whereIn('skills.id', $filters['skills']));
         }
         if ($filters['budget_min'] !== '') {
             $query->where('budget_max', '>=', $filters['budget_min']);
@@ -84,6 +96,15 @@ class ProjectDiscoveryController extends Controller
         }
         if ($filters['posted'] !== 'any') {
             $query->where('published_at', '>=', now()->subDays((int) $filters['posted']));
+        }
+        if ($filters['proposals'] !== 'any') {
+            [$from, $below] = self::RECEIVED[$filters['proposals']];
+            if ($from > 0) {
+                $query->whereHas('proposals', $received, '>=', $from);
+            }
+            if ($below !== null) {
+                $query->whereHas('proposals', $received, '<', $below);
+            }
         }
         if ($filters['status'] === 'open') {
             $query->where('status', 'published')->where('application_closes_at', '>', now());
