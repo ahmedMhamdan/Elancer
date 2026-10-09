@@ -21,6 +21,7 @@ const empty = {
     budget_min: '',
     budget_max: '',
     posted: 'any',
+    proposals: 'any',
     status: 'open',
     availability: '',
 };
@@ -117,6 +118,7 @@ export default function ElancerSpotlight() {
                 'budget_min',
                 'budget_max',
                 'posted',
+                'proposals',
                 'status',
             ] as const) {
                 if (filters[key] !== '') data[key] = filters[key];
@@ -341,6 +343,34 @@ export default function ElancerSpotlight() {
                                             </option>
                                             <option value="30">
                                                 {t('Last 30 days')}
+                                            </option>
+                                        </select>
+                                    </label>
+                                    <label>
+                                        <span>{t('Proposals received')}</span>
+                                        <select
+                                            value={filters.proposals}
+                                            onChange={(event) =>
+                                                update(
+                                                    'proposals',
+                                                    event.target.value,
+                                                )
+                                            }
+                                        >
+                                            <option value="any">
+                                                {t('Any number')}
+                                            </option>
+                                            <option value="0-4">
+                                                {t('Fewer than 5')}
+                                            </option>
+                                            <option value="5-9">
+                                                {t('5 to 9')}
+                                            </option>
+                                            <option value="10-19">
+                                                {t('10 to 19')}
+                                            </option>
+                                            <option value="20">
+                                                {t('20 or more')}
                                             </option>
                                         </select>
                                     </label>

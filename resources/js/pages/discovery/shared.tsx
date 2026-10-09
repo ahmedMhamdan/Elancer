@@ -120,13 +120,20 @@ export function JobCard({ job, search }: { job: Job; search: string }) {
                     </strong>
                     <span className="job-muted">{t('Fixed-price budget')}</span>
                 </div>
-                <span className={job.open ? 'job-open' : 'job-muted'}>
-                    {t(
-                        job.open
-                            ? 'Open for applications'
-                            : 'Applications closed',
-                    )}
-                </span>
+                <div className="job-card-status">
+                    <span className={job.open ? 'job-open' : 'job-muted'}>
+                        {t(
+                            job.open
+                                ? 'Open for applications'
+                                : 'Applications closed',
+                        )}
+                    </span>
+                    <span className="job-muted">
+                        {t(':count proposals received', {
+                            count: job.proposals_received,
+                        })}
+                    </span>
+                </div>
             </div>
         </article>
     );

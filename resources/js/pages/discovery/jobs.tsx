@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import Button from '@/components/tailadmin/button';
 import Input from '@/components/tailadmin/input';
 import Pagination from '@/components/tailadmin/pagination';
+import Radio from '@/components/tailadmin/radio';
 import {
     Sheet,
     SheetContent,
@@ -20,9 +21,11 @@ type Filters = {
     q: string;
     category: string;
     skills: number[];
+    skill_mode: string;
     budget_min: string;
     budget_max: string;
     posted: string;
+    proposals: string;
     status: string;
     sort: string;
 };
@@ -37,12 +40,22 @@ const empty: Filters = {
     q: '',
     category: '',
     skills: [],
+    skill_mode: 'any',
     budget_min: '',
     budget_max: '',
     posted: 'any',
+    proposals: 'any',
     status: 'open',
     sort: 'newest',
 };
+// Q75 presets for the public received-proposal count (plan 003 section 15).
+const received = [
+    ['any', 'Any number'],
+    ['0-4', 'Fewer than 5'],
+    ['5-9', '5 to 9'],
+    ['10-19', '10 to 19'],
+    ['20', '20 or more'],
+];
 export default function Jobs(props: Props) {
     const { url } = usePage();
     return <SearchPage key={url} {...props} />;
@@ -178,7 +191,29 @@ function SearchPage({
                             </label>
                         ))}
                 </div>
-                <small>{t('Projects must include all selected skills.')}</small>
+                {/* Q58: any selected skill matches unless All is chosen. */}
+                <div
+                    className="job-skill-mode"
+                    role="radiogroup"
+                    aria-label={t('Skill matching')}
+                >
+                    <Radio
+                        id="job-skill-mode-any"
+                        name="skill_mode"
+                        value="any"
+                        label={t('Any selected skill')}
+                        checked={draft.skill_mode !== 'all'}
+                        onChange={(value) => field('skill_mode', value)}
+                    />
+                    <Radio
+                        id="job-skill-mode-all"
+                        name="skill_mode"
+                        value="all"
+                        label={t('All selected skills')}
+                        checked={draft.skill_mode === 'all'}
+                        onChange={(value) => field('skill_mode', value)}
+                    />
+                </div>
             </fieldset>
             <fieldset>
                 <legend>{t('Budget (USD)')}</legend>
@@ -237,6 +272,18 @@ function SearchPage({
                     </option>
                 ))}
             </select>
+            <label htmlFor="job-proposals">{t('Proposals received')}</label>
+            <select
+                id="job-proposals"
+                value={draft.proposals}
+                onChange={(e) => field('proposals', e.target.value)}
+            >
+                {received.map(([value, label]) => (
+                    <option key={value} value={value}>
+                        {t(label)}
+                    </option>
+                ))}
+            </select>
             <label htmlFor="job-status">{t('Availability')}</label>
             <select
                 id="job-status"
@@ -270,6 +317,11 @@ function SearchPage({
             },
         }),
     );
+    if (filters.skill_mode === 'all' && filters.skills.length > 1)
+        chips.push({
+            label: t('Requires all selected skills'),
+            next: { ...filters, skill_mode: 'any' },
+        });
     if (filters.budget_min || filters.budget_max)
         chips.push({
             label: `${t('Budget (USD)')}: ${filters.budget_min || '0'} – ${filters.budget_max || '∞'}`,
@@ -285,6 +337,11 @@ function SearchPage({
                       : 'Last 30 days',
             ),
             next: { ...filters, posted: 'any' },
+        });
+    if (filters.proposals !== 'any')
+        chips.push({
+            label: `${t('Proposals received')}: ${t(received.find(([value]) => value === filters.proposals)?.[1] ?? filters.proposals)}`,
+            next: { ...filters, proposals: 'any' },
         });
     if (filters.status === 'all')
         chips.push({
