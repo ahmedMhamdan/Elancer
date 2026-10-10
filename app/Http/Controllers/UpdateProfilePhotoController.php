@@ -27,7 +27,7 @@ class UpdateProfilePhotoController extends Controller
                 abort_unless($user->canParticipateInMarketplace(), 403);
                 $profile = $user->profile()->firstOrNew();
                 $newPath = 'profile-photos/'.$user->id.'/'.Str::uuid().'.jpg';
-                if (! Storage::disk('local')->put($newPath, $bytes)) {
+                if (! Storage::disk('uploads')->put($newPath, $bytes)) {
                     throw ValidationException::withMessages(['photo' => __('We could not save your photo. Please try again.')]);
                 }
                 $oldPath = $profile->photo_path;
@@ -36,13 +36,13 @@ class UpdateProfilePhotoController extends Controller
             });
         } catch (Throwable $exception) {
             if ($newPath !== null) {
-                Storage::disk('local')->delete($newPath);
+                Storage::disk('uploads')->delete($newPath);
             }
             throw $exception;
         }
         if ($oldPath !== null && $oldPath !== $newPath) {
             try {
-                Storage::disk('local')->delete($oldPath);
+                Storage::disk('uploads')->delete($oldPath);
             } catch (Throwable) {
                 report(new RuntimeException('An unused profile photo could not be removed.'));
             }

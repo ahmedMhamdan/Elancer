@@ -86,7 +86,7 @@ class PortfolioCases
             return DB::transaction(function () use ($case, $bytes, $size, $path): PortfolioImage {
                 PortfolioCase::query()->lockForUpdate()->findOrFail($case->id);
                 self::refuseWhenFull($case->id);
-                if (! Storage::disk('local')->put($path, $bytes)) {
+                if (! Storage::disk('uploads')->put($path, $bytes)) {
                     throw ValidationException::withMessages(['image' => __('We could not save this image. Please try again.')]);
                 }
                 $image = new PortfolioImage;
@@ -95,7 +95,7 @@ class PortfolioCases
                 return $image;
             }, 3);
         } catch (Throwable $exception) {
-            Storage::disk('local')->delete($path);
+            Storage::disk('uploads')->delete($path);
             throw $exception;
         }
     }
@@ -122,7 +122,7 @@ class PortfolioCases
         }
         PortfolioImage::query()->whereKey($unused->modelKeys())->delete();
         $paths = $unused->pluck('path')->all();
-        DB::afterCommit(fn () => rescue(fn () => Storage::disk('local')->delete($paths)));
+        DB::afterCommit(fn () => rescue(fn () => Storage::disk('uploads')->delete($paths)));
     }
 
     /** The owner's own actions. Client-owned work is never published from here. */
@@ -211,7 +211,7 @@ class PortfolioCases
                 throw ValidationException::withMessages(['case' => __('A case study that was sent to a client is kept as history. You can hide it instead.')]);
             }
             $locked->delete();
-            DB::afterCommit(fn () => rescue(fn () => Storage::disk('local')->deleteDirectory('portfolio-images/'.$locked->id)));
+            DB::afterCommit(fn () => rescue(fn () => Storage::disk('uploads')->deleteDirectory('portfolio-images/'.$locked->id)));
         }, 3);
     }
 

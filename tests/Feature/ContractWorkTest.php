@@ -26,7 +26,7 @@ class ContractWorkTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        Storage::fake('local');
+        Storage::fake('uploads');
     }
 
     /** @return array{User, User, Contract} */
@@ -96,7 +96,7 @@ class ContractWorkTest extends TestCase
         $this->post('/contracts/'.$contract->id.'/deliveries', $this->delivery())->assertSessionHasErrors('delivery');
 
         $file = ContractSubmissionFile::query()->firstOrFail();
-        Storage::disk('local')->assertExists($file->path);
+        Storage::disk('uploads')->assertExists($file->path);
         $this->get('/contracts/'.$contract->id.'/files/'.$file->id)->assertOk()->assertDownload('handover.pdf');
         $this->actingAs($client)->get('/contracts/'.$contract->id.'/files/'.$file->id)->assertOk();
         $this->get('/contracts/'.$contract->id)->assertInertia(fn (Assert $page) => $page->where('contract.status', 'submitted')

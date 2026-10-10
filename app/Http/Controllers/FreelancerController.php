@@ -73,9 +73,9 @@ class FreelancerController extends Controller
 
     public function photo(Profile $profile): HttpResponse
     {
-        abort_unless(Profile::query()->publiclyVisible()->whereKey($profile->id)->exists() && $profile->photo_path && Storage::disk('local')->exists($profile->photo_path), 404);
+        abort_unless(Profile::query()->publiclyVisible()->whereKey($profile->id)->exists() && $profile->photo_path && Storage::disk('uploads')->exists($profile->photo_path), 404);
 
-        return Storage::disk('local')->response($profile->photo_path, null, ['Cache-Control' => 'private, no-store', 'X-Content-Type-Options' => 'nosniff']);
+        return Storage::disk('uploads')->response($profile->photo_path, null, ['Cache-Control' => 'private, no-store', 'X-Content-Type-Options' => 'nosniff']);
     }
 
     public function publication(Request $request): RedirectResponse

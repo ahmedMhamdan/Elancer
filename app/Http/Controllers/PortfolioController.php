@@ -96,9 +96,9 @@ class PortfolioController extends Controller
         if (! $allowed && $user !== null && $case->contract_id !== null && Contract::query()->whereKey($case->contract_id)->where('client_id', $user)->exists()) {
             $allowed = $listed($case->public_content) || $listed(PortfolioApproval::query()->where('open_case_id', $case->id)->first()?->content);
         }
-        abort_unless($allowed && Storage::disk('local')->exists($image->path), 404);
+        abort_unless($allowed && Storage::disk('uploads')->exists($image->path), 404);
 
-        return Storage::disk('local')->response($image->path, null, ['Cache-Control' => 'private, no-store', 'X-Content-Type-Options' => 'nosniff']);
+        return Storage::disk('uploads')->response($image->path, null, ['Cache-Control' => 'private, no-store', 'X-Content-Type-Options' => 'nosniff']);
     }
 
     public function act(Request $request, PortfolioCase $case): RedirectResponse

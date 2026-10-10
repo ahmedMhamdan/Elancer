@@ -92,7 +92,7 @@ class PortfolioTest extends TestCase
 
     public function test_case_images_are_checked_before_storage_and_are_public_only_through_a_visible_public_version(): void
     {
-        Storage::fake('local');
+        Storage::fake('uploads');
         $freelancer = $this->freelancer();
         $visitor = User::factory()->create(['onboarding_completed_at' => now()]);
         $this->actingAs($freelancer)->post('/my-portfolio', $this->content())->assertSessionHasNoErrors();
@@ -105,14 +105,14 @@ class PortfolioTest extends TestCase
         $this->moderation(null);
         $this->upload($case)->assertUnprocessable()->assertJsonValidationErrors('image');
         $this->assertSame(0, PortfolioImage::query()->count());
-        $this->assertSame([], Storage::disk('local')->allFiles());
+        $this->assertSame([], Storage::disk('uploads')->allFiles());
 
         $this->moderation('accept');
         $first = $this->upload($case)->assertOk()->json('id');
         $second = $this->upload($case)->assertOk()->json('id');
         $stored = PortfolioImage::query()->findOrFail($first);
         $this->assertStringStartsWith('portfolio-images/'.$case->id.'/', $stored->path);
-        $size = getimagesizefromstring(Storage::disk('local')->get($stored->path));
+        $size = getimagesizefromstring(Storage::disk('uploads')->get($stored->path));
         $this->assertSame(['image/jpeg', 1600, 80], [$size['mime'], $size[0], $size[1]]);
 
         // Another member cannot add to the case, read its image or list it in a case of their own.
@@ -126,7 +126,7 @@ class PortfolioTest extends TestCase
         $this->actingAs($freelancer)->put('/my-portfolio/'.$case->id, $this->content(['images' => [['id' => $first, 'alt' => '']]]))->assertSessionHasErrors('images.0.alt');
         $this->save($case, [$first])->assertSessionHasNoErrors();
         $this->assertNull(PortfolioImage::query()->find($second));
-        $this->assertCount(1, Storage::disk('local')->allFiles());
+        $this->assertCount(1, Storage::disk('uploads')->allFiles());
         // The owner reads a draft's image; nobody else does.
         $this->get($url($first))->assertOk()->assertHeader('X-Content-Type-Options', 'nosniff');
         $this->actingAs($visitor)->get($url($first))->assertNotFound();
@@ -166,12 +166,12 @@ class PortfolioTest extends TestCase
         $this->save($case, PortfolioImage::query()->limit(7)->pluck('id')->all())->assertSessionHasErrors('images');
 
         $this->delete('/my-portfolio/'.$case->id)->assertSessionHasNoErrors();
-        $this->assertSame([], Storage::disk('local')->allFiles('portfolio-images/'.$case->id));
+        $this->assertSame([], Storage::disk('uploads')->allFiles('portfolio-images/'.$case->id));
     }
 
     public function test_the_client_approves_the_exact_images_and_withdrawing_permission_stops_their_direct_links(): void
     {
-        Storage::fake('local');
+        Storage::fake('uploads');
         $this->moderation('accept');
         $freelancer = $this->freelancer();
         [$client, $contract] = $this->contract($freelancer);

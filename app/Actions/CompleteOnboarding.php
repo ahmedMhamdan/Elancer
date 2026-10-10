@@ -45,7 +45,7 @@ class CompleteOnboarding
                 if ($photoBytes !== null) {
                     $path = 'profile-photos/'.$account->id.'/'.Str::uuid().'.jpg';
                     $newPhotoPath = $path;
-                    if (! Storage::disk('local')->put($path, $photoBytes)) {
+                    if (! Storage::disk('uploads')->put($path, $photoBytes)) {
                         throw ValidationException::withMessages([
                             'photo' => __('We could not save your photo. Please try again.'),
                         ]);
@@ -92,7 +92,7 @@ class CompleteOnboarding
     private function deletePhoto(string $path): void
     {
         try {
-            if (! Storage::disk('local')->delete($path)) {
+            if (! Storage::disk('uploads')->delete($path)) {
                 report(new RuntimeException('An unused profile photo could not be removed.'));
             }
         } catch (Throwable $exception) {

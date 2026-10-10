@@ -19,7 +19,7 @@ class ProfilePhotoUpdateTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        Storage::fake('local');
+        Storage::fake('uploads');
         config(['services.sightengine.user' => 'test-user', 'services.sightengine.secret' => 'test-secret', 'services.sightengine.workflow' => 'test-workflow']);
         Http::preventStrayRequests();
         $this->moderation('accept');
@@ -37,7 +37,7 @@ class ProfilePhotoUpdateTest extends TestCase
         $user = User::factory()->create(['onboarding_completed_at' => now()]);
         $profile = $user->profile()->create(['headline' => 'Keep my headline']);
         $profile->forceFill(['photo_path' => 'profile-photos/'.$user->id.'/old.jpg'])->save();
-        Storage::disk('local')->put($profile->photo_path, 'old image');
+        Storage::disk('uploads')->put($profile->photo_path, 'old image');
 
         return $user;
     }
@@ -52,8 +52,8 @@ class ProfilePhotoUpdateTest extends TestCase
         $profile = $user->profile->fresh();
         $this->assertSame('Keep my headline', $profile->headline);
         $this->assertNull($profile->published_at);
-        Storage::disk('local')->assertMissing($old);
-        $bytes = Storage::disk('local')->get($profile->photo_path);
+        Storage::disk('uploads')->assertMissing($old);
+        $bytes = Storage::disk('uploads')->get($profile->photo_path);
         $this->assertStringNotContainsString('private metadata', $bytes);
         $this->assertSame('image/jpeg', getimagesizefromstring($bytes)['mime']);
         $this->assertSame(512, getimagesizefromstring($bytes)[0]);
@@ -87,7 +87,7 @@ class ProfilePhotoUpdateTest extends TestCase
             $old = $user->profile->photo_path;
             $this->actingAs($user)->postJson('/my-profile/photo', ['photo' => UploadedFile::fake()->image('unsafe.jpg')])->assertUnprocessable()->assertJsonValidationErrors('photo');
             $this->assertSame($old, $user->profile->fresh()->photo_path);
-            Storage::disk('local')->assertExists($old);
+            Storage::disk('uploads')->assertExists($old);
         }
         Http::swap(new Factory);
         Http::preventStrayRequests();
@@ -112,7 +112,7 @@ class ProfilePhotoUpdateTest extends TestCase
             $old = $user->profile->photo_path;
             $this->actingAs($user)->postJson('/my-profile/photo', ['photo' => UploadedFile::fake()->image('photo.jpg')])->assertUnprocessable()->assertJsonValidationErrors('photo');
             $this->assertSame($old, $user->profile->fresh()->photo_path);
-            $this->assertSame([$old], Storage::disk('local')->allFiles('profile-photos/'.$user->id));
+            $this->assertSame([$old], Storage::disk('uploads')->allFiles('profile-photos/'.$user->id));
         }
     }
 
@@ -145,6 +145,6 @@ class ProfilePhotoUpdateTest extends TestCase
         });
         $this->actingAs($user)->postJson('/my-profile/photo', ['photo' => UploadedFile::fake()->image('rollback.jpg')])->assertServerError();
         $this->assertSame($old, $user->profile->fresh()->photo_path);
-        $this->assertSame([$old], Storage::disk('local')->allFiles('profile-photos/'.$user->id));
+        $this->assertSame([$old], Storage::disk('uploads')->allFiles('profile-photos/'.$user->id));
     }
 }

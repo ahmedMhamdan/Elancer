@@ -28,7 +28,7 @@ class SuspendedMemberTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        Storage::fake('local');
+        Storage::fake('uploads');
         config(['payments.simulator.enabled' => true, 'payments.stripe.secret' => null, 'payments.moyasar.secret' => null]);
     }
 

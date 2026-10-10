@@ -69,11 +69,11 @@ class ProfileController extends Controller
         Auth::logout();
 
         if ($photoPath !== null) {
-            Storage::disk('local')->delete($photoPath);
+            Storage::disk('uploads')->delete($photoPath);
         }
         // The case rows went with the account; their image files are removed here.
         foreach ($portfolio as $case) {
-            rescue(fn () => Storage::disk('local')->deleteDirectory('portfolio-images/'.$case));
+            rescue(fn () => Storage::disk('uploads')->deleteDirectory('portfolio-images/'.$case));
         }
 
         $request->session()->invalidate();

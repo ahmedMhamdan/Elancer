@@ -22,7 +22,7 @@ class CompleteOnboardingTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        Storage::fake('local');
+        Storage::fake('uploads');
         config(['services.sightengine.user' => 'test-user', 'services.sightengine.secret' => 'test-secret', 'services.sightengine.workflow' => 'test-workflow']);
         Http::preventStrayRequests();
         Http::fake(['api.sightengine.com/*' => Http::response(['status' => 'success', 'summary' => ['action' => 'accept'], 'workflow' => ['id' => 'test-workflow']])]);
@@ -37,7 +37,7 @@ class CompleteOnboardingTest extends TestCase
         ])->assertSessionHasErrors('photo');
         $this->assertNull($user->fresh()->onboarding_completed_at);
         $this->assertNull($user->fresh()->profile);
-        $this->assertSame([], Storage::disk('local')->allFiles());
+        $this->assertSame([], Storage::disk('uploads')->allFiles());
         Http::assertNothingSent();
     }
 
@@ -69,7 +69,7 @@ class CompleteOnboardingTest extends TestCase
         $this->assertSame('Hebron, Palestine', $profile->location);
         $this->assertNull($profile->published_at);
         $this->assertNull($profile->company);
-        Storage::disk('local')->assertExists($profile->photo_path);
+        Storage::disk('uploads')->assertExists($profile->photo_path);
         $this->get(route('dashboard'))->assertInertia(fn (Assert $page) => $page
             ->component('dashboard')
             ->where('profile.skills', ['Laravel', 'PHP'])
@@ -118,7 +118,7 @@ class CompleteOnboardingTest extends TestCase
         $this->assertSame($name, $user->fresh()->name);
         $this->assertNull($user->fresh()->onboarding_completed_at);
         $this->assertDatabaseCount('profiles', 0);
-        $this->assertSame([], Storage::disk('local')->allFiles());
+        $this->assertSame([], Storage::disk('uploads')->allFiles());
     }
 
     #[DataProvider('protectedFields')]
@@ -154,7 +154,7 @@ class CompleteOnboardingTest extends TestCase
             ])->assertSessionHasErrors('photo');
         }
         $this->assertNull($user->fresh()->onboarding_completed_at);
-        $this->assertSame([], Storage::disk('local')->allFiles());
+        $this->assertSame([], Storage::disk('uploads')->allFiles());
     }
 
     public function test_guests_unverified_and_suspended_accounts_cannot_save(): void
@@ -181,7 +181,7 @@ class CompleteOnboardingTest extends TestCase
         $this->assertSame(WorkspaceRole::Freelancer, $user->fresh()->workspace_role);
         $this->assertTrue($completed->equalTo($user->fresh()->onboarding_completed_at));
         $this->assertDatabaseCount('profiles', 1);
-        $this->assertSame([], Storage::disk('local')->allFiles());
+        $this->assertSame([], Storage::disk('uploads')->allFiles());
     }
 
     public function test_failed_account_save_rolls_back_profile_and_removes_new_photo(): void
@@ -205,21 +205,21 @@ class CompleteOnboardingTest extends TestCase
         $this->assertSame($name, $user->fresh()->name);
         $this->assertNull($user->fresh()->onboarding_completed_at);
         $this->assertDatabaseCount('profiles', 0);
-        $this->assertSame([], Storage::disk('local')->allFiles());
+        $this->assertSame([], Storage::disk('uploads')->allFiles());
     }
 
     public function test_replaced_photo_is_removed_only_after_success_and_photo_is_owner_scoped(): void
     {
         $user = User::factory()->create();
-        Storage::disk('local')->put('profile-photos/old.jpg', 'old');
+        Storage::disk('uploads')->put('profile-photos/old.jpg', 'old');
         $profile = $user->profile()->create([]);
         $profile->photo_path = 'profile-photos/old.jpg';
         $profile->save();
         $this->actingAs($user)->post(route('onboarding.store'), [
             ...$this->freelancerData(), 'photo' => UploadedFile::fake()->image('new.jpg'),
         ])->assertRedirect(route('dashboard'));
-        Storage::disk('local')->assertMissing('profile-photos/old.jpg');
-        Storage::disk('local')->assertExists($profile->fresh()->photo_path);
+        Storage::disk('uploads')->assertMissing('profile-photos/old.jpg');
+        Storage::disk('uploads')->assertExists($profile->fresh()->photo_path);
         $this->actingAs(User::factory()->create())
             ->get(route('profile.photo', ['user_id' => $user->id]))->assertNotFound();
     }
@@ -232,6 +232,6 @@ class CompleteOnboardingTest extends TestCase
         ])->assertRedirect(route('dashboard'));
         $photo = $user->fresh()->profile->photo_path;
         $this->delete(route('profile.destroy'), ['password' => 'password'])->assertRedirect('/');
-        Storage::disk('local')->assertMissing($photo);
+        Storage::disk('uploads')->assertMissing($photo);
     }
 }

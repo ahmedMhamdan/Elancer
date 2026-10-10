@@ -44,7 +44,7 @@ class ContractWork
                     'client_token' => $data['client_token'], 'message' => $data['message'], 'links' => array_values($data['links'] ?? []), 'created_at' => now()])->save();
                 foreach ($files as $file) {
                     $path = 'deliveries/'.$locked->id.'/'.Str::uuid();
-                    if (! Storage::disk('local')->put($path, $file->getContent())) {
+                    if (! Storage::disk('uploads')->put($path, $file->getContent())) {
                         throw new \RuntimeException('A delivery file could not be stored.');
                     }
                     $stored[] = $path;
@@ -58,7 +58,7 @@ class ContractWork
                 return $submission;
             }, 3);
         } catch (\Throwable $exception) {
-            Storage::disk('local')->delete($stored);
+            Storage::disk('uploads')->delete($stored);
             throw $exception;
         }
     }

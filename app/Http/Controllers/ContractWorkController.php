@@ -60,9 +60,9 @@ class ContractWorkController extends Controller
     /** Delivery files are private to the two participants. */
     public function file(Request $request, Contract $contract, ContractSubmissionFile $file): Response
     {
-        abort_unless($contract->contains($request->user()->id) && $file->submission->contract_id === $contract->id && Storage::disk('local')->exists($file->path), 404);
+        abort_unless($contract->contains($request->user()->id) && $file->submission->contract_id === $contract->id && Storage::disk('uploads')->exists($file->path), 404);
 
-        return Storage::disk('local')->download($file->path, $file->name, ['Content-Type' => 'application/octet-stream', 'Cache-Control' => 'private, no-store', 'X-Content-Type-Options' => 'nosniff']);
+        return Storage::disk('uploads')->download($file->path, $file->name, ['Content-Type' => 'application/octet-stream', 'Cache-Control' => 'private, no-store', 'X-Content-Type-Options' => 'nosniff']);
     }
 
     private function participant(Request $request, Contract $contract, int $role): void

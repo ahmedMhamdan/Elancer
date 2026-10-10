@@ -86,9 +86,9 @@ class FreelancerProposalTest extends TestCase
 
     public function test_photo_visibility_and_links_validation_follow_publication(): void
     {
-        Storage::fake('local');
+        Storage::fake('uploads');
         $user = $this->member();
-        Storage::disk('local')->put('profile-photos/example.jpg', 'synthetic');
+        Storage::disk('uploads')->put('profile-photos/example.jpg', 'synthetic');
         $user->profile->forceFill(['photo_path' => 'profile-photos/example.jpg'])->save();
         $this->get('/freelancers/'.$user->profile->id.'/photo')->assertOk()->assertHeader('Cache-Control', 'no-store, private');
         $this->actingAs($user)->patch('/my-profile', ['professional_links' => [['label' => 'Bad link', 'url' => 'javascript:alert(1)']]])->assertSessionHasErrors('professional_links.0.url');

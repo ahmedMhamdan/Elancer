@@ -26,7 +26,7 @@ class ContractAmendmentTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        Storage::fake('local');
+        Storage::fake('uploads');
         // Real keys in a developer's .env must never reach the tests.
         config(['payments.simulator.enabled' => true, 'payments.stripe.secret' => null, 'payments.stripe.webhook_secret' => null,
             'payments.moyasar.secret' => null]);
