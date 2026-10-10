@@ -1,7 +1,7 @@
 #!/bin/sh
 # Container start on Render: prepare the writable folders, cache the configuration from the service's
-# environment, report whether the mail relay and the database answer, then run the site with the
-# queue worker and the scheduler beside it.
+# environment, report whether the mail relay, the database and the file buckets answer, then run the
+# site with the queue worker and the scheduler beside it.
 set -eu
 cd /var/www/html
 

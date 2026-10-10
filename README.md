@@ -75,7 +75,7 @@ It is a portfolio project in active development. Payments run in provider test m
 
 ### Why Supabase
 
-Laravel does not need Supabase. It runs on any MySQL or PostgreSQL server, and this application uses Supabase only as a managed PostgreSQL database, reached through Laravel's ordinary database connection. Supabase Auth, Storage and the Data API are not used: sign-in, permissions and files all stay in Laravel.
+Laravel does not need Supabase. It runs on any MySQL or PostgreSQL server, and this application uses Supabase as a managed PostgreSQL database, reached through Laravel's ordinary database connection, and on the hosted site as private file storage, reached through Laravel's S3 storage driver. Supabase Auth and the Data API are not used: sign-in and permissions stay in Laravel, and every uploaded file is handed out by the application after it has checked who is asking.
 
 Supabase was chosen so the author could learn it, and PostgreSQL with it, on a real project: private schemas, separate roles for migrations and for the running application, verified TLS connections, and moving existing data from MySQL without losing it.
 
@@ -114,6 +114,7 @@ Everything below is optional. Without it the related feature stays off, and the 
 | Stripe test payments  | `STRIPE_TEST_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`                                | Only `sk_test_` keys are accepted. The webhook at `/payments/webhooks/stripe` is off without a secret. |
 | Moyasar test payments | `MOYASAR_TEST_SECRET_KEY`                                                        | Only `sk_test_` keys are accepted.                                                                     |
 | Photo safety check    | `SIGHTENGINE_API_USER`, `SIGHTENGINE_API_SECRET`, `SIGHTENGINE_PROFILE_WORKFLOW` | Without these, photo and portfolio image uploads are refused. Onboarding without a photo still works.  |
+| File storage          | `UPLOADS_DRIVER`, `AWS_*`                                                        | Kept in `storage/app` by default. Set the driver to `s3` for two private S3-compatible buckets.        |
 
 Pending payments and refunds are rechecked with the providers every five minutes by `payments:reconcile`. Run `php artisan schedule:work` locally to have that happen.
 
