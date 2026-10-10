@@ -67,13 +67,11 @@ async function connect(config: RealtimeConfig, id: number) {
                   cluster: config.cluster ?? 'mt1',
                   forceTLS: true,
               });
-    echo.private('workspace.' + id).listen('.signal', emit);
-    // Anything sent while the connection was down is picked up on reconnection.
-    let connected = false;
-    echo.connector.pusher.connection.bind('connected', () => {
-        if (connected) emit({ notification: null, conversation: null });
-        connected = true;
-    });
+    echo.private('workspace.' + id)
+        .listen('.signal', emit)
+        // The page read its data before the channel was ready, and a dropped connection misses
+        // signals as well, so every completed subscription asks again for what the member may see.
+        .subscribed(() => emit({ notification: null, conversation: null }));
     disconnect = () => echo.disconnect();
 }
 
