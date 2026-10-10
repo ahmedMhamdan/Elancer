@@ -58,6 +58,24 @@ class RealtimeTest extends TestCase
         $this->actingAs($other)->post('/broadcasting/auth', ['socket_id' => '1234.5678', 'channel_name' => 'private-workspace.'.$member->id])->assertForbidden();
     }
 
+    /** The hosted site uses the "pusher" connection: the page gets the public key and cluster, never the secret. */
+    public function test_the_pusher_connection_reaches_the_page_and_signs_only_the_members_own_channel(): void
+    {
+        $member = User::factory()->create(['onboarding_completed_at' => now()]);
+        $other = User::factory()->create(['onboarding_completed_at' => now()]);
+        config(['broadcasting.default' => 'pusher', 'broadcasting.connections.pusher' => ['driver' => 'pusher', 'key' => 'public-key', 'secret' => 'private-secret',
+            'app_id' => '1234567', 'options' => ['cluster' => 'eu', 'host' => 'api-eu.pusher.com', 'port' => 443, 'scheme' => 'https', 'encrypted' => true, 'useTLS' => true],
+            'client_options' => ['connect_timeout' => 1, 'timeout' => 1]]]);
+        require base_path('routes/channels.php');
+
+        $this->actingAs($member)->get('/dashboard')->assertInertia(fn (Assert $page) => $page->where('realtime.driver', 'pusher')->where('realtime.key', 'public-key')
+            ->where('realtime.cluster', 'eu')->where('realtime.host', null)->where('realtime.secure', true)->missing('realtime.secret'));
+        $channel = 'private-workspace.'.$member->id;
+        $this->post('/broadcasting/auth', ['socket_id' => '1234.5678', 'channel_name' => $channel])->assertOk()
+            ->assertExactJson(['auth' => 'public-key:'.hash_hmac('sha256', '1234.5678:'.$channel, 'private-secret')]);
+        $this->post('/broadcasting/auth', ['socket_id' => '1234.5678', 'channel_name' => 'private-workspace.'.$other->id])->assertForbidden();
+    }
+
     public function test_messages_signal_only_the_counterpart_and_keep_one_unread_bell_entry(): void
     {
         [$client, $freelancer, $conversation] = $this->conversation();
