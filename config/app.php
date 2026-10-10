@@ -56,6 +56,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Visitor Address Header
+    |--------------------------------------------------------------------------
+    |
+    | Behind a hosting proxy every request arrives from the proxy's address.
+    | Name the header in which the host's edge itself reports the visitor,
+    | for example CF-Connecting-IP, and per-address limits count each one.
+    | Leave it empty when visitors connect to the application directly.
+    |
+    */
+
+    'client_address_header' => env('CLIENT_ADDRESS_HEADER'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |

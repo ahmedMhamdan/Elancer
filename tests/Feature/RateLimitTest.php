@@ -43,4 +43,18 @@ class RateLimitTest extends TestCase
         $this->postJson('/auth/complete')->assertTooManyRequests();
         $this->getJson('/search/filters')->assertOk();
     }
+
+    public function test_behind_the_hosts_proxy_each_visitor_has_their_own_guest_counter(): void
+    {
+        config(['app.client_address_header' => 'CF-Connecting-IP']);
+        $finish = fn (string $visitor, array $headers = []) => $this->postJson('/auth/complete', [], ['CF-Connecting-IP' => $visitor, ...$headers]);
+
+        for ($i = 1; $i <= 6; $i++) {
+            $finish('198.51.100.7')->assertStatus(419);
+        }
+        // One visitor reaching the limit no longer refuses the next visitor, and a forwarded chain written by the first does not free them.
+        $finish('198.51.100.7')->assertTooManyRequests();
+        $finish('198.51.100.7', ['X-Forwarded-For' => '203.0.113.9'])->assertTooManyRequests();
+        $finish('203.0.113.9')->assertStatus(419);
+    }
 }

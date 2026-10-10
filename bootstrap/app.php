@@ -4,11 +4,13 @@ use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\ProtectPasswordlessAccount;
 use App\Http\Middleware\SetLocale;
+use App\Http\Middleware\TrustHostProxy;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
+use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -24,7 +26,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: ['payments/webhooks/*']);
         // The host ends HTTPS in front of the container, so its forwarded scheme is trusted. The forwarded
         // client address and host are not: a visitor could set them and slip past per-address limits.
+        // TrustHostProxy takes the visitor's address from the host's own header where one is configured.
         $middleware->trustProxies(at: '*', headers: Request::HEADER_X_FORWARDED_PROTO);
+        $middleware->replace(TrustProxies::class, TrustHostProxy::class);
 
         $middleware->web(append: [
             HandleAppearance::class,
