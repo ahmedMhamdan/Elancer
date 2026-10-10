@@ -10,6 +10,10 @@ $bucket = [
     'region' => env('AWS_DEFAULT_REGION'),
     'endpoint' => env('AWS_ENDPOINT'),
     'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+    // Checksum headers only where S3 requires them: the optional ones the AWS library now adds
+    // by default are not in Supabase's list of supported headers.
+    'request_checksum_calculation' => 'when_required',
+    'response_checksum_validation' => 'when_required',
 ];
 
 return [
