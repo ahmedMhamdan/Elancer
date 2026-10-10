@@ -1,5 +1,17 @@
 <?php
 
+// Member files stay in this machine's storage folder unless UPLOADS_DRIVER=s3 moves them to
+// private buckets. The hosted site needs that: its own disk is emptied on every restart.
+$buckets = env('UPLOADS_DRIVER', 'local') === 's3';
+$bucket = [
+    'driver' => 's3',
+    'key' => env('AWS_ACCESS_KEY_ID'),
+    'secret' => env('AWS_SECRET_ACCESS_KEY'),
+    'region' => env('AWS_DEFAULT_REGION'),
+    'endpoint' => env('AWS_ENDPOINT'),
+    'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+];
+
 return [
 
     /*
@@ -29,11 +41,29 @@ return [
     */
 
     'disks' => [
-        'identity' => [
+        // Identity documents, encrypted by the application before they are written.
+        'identity' => $buckets ? $bucket + [
+            'bucket' => env('AWS_IDENTITY_BUCKET'),
+            'throw' => true,
+        ] : [
             'driver' => 'local',
             'root' => storage_path('app/identity-private'),
             'serve' => false,
             'throw' => true,
+        ],
+
+        // Profile photos, portfolio images and delivery files. Private: only the
+        // application's own routes hand them out, after checking who is asking.
+        'uploads' => $buckets ? $bucket + [
+            'bucket' => env('AWS_BUCKET'),
+            'throw' => false,
+            'report' => true,
+        ] : [
+            'driver' => 'local',
+            'root' => storage_path('app/private'),
+            'serve' => false,
+            'throw' => false,
+            'report' => false,
         ],
 
         'local' => [
@@ -49,19 +79,6 @@ return [
             'root' => storage_path('app/public'),
             'url' => rtrim((string) env('APP_URL', 'http://localhost'), '/').'/storage',
             'visibility' => 'public',
-            'throw' => false,
-            'report' => false,
-        ],
-
-        's3' => [
-            'driver' => 's3',
-            'key' => env('AWS_ACCESS_KEY_ID'),
-            'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'region' => env('AWS_DEFAULT_REGION'),
-            'bucket' => env('AWS_BUCKET'),
-            'url' => env('AWS_URL'),
-            'endpoint' => env('AWS_ENDPOINT'),
-            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => false,
             'report' => false,
         ],
