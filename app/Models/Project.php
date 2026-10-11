@@ -75,6 +75,12 @@ class Project extends Model
         return $this->hasMany(ProjectClarification::class);
     }
 
+    /** @return HasMany<ProjectAttachment, $this> */
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(ProjectAttachment::class);
+    }
+
     /**
      * Q68: the public boundary. A project hidden by moderation leaves public pages and lists.
      *

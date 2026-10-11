@@ -26,6 +26,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PaymentWebhookController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\ProfilePhotoController;
+use App\Http\Controllers\ProjectAttachmentController;
 use App\Http\Controllers\ProjectDiscoveryController;
 use App\Http\Controllers\ProposalController;
 use App\Http\Controllers\ReportController;
@@ -62,6 +63,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('onboarding', OnboardingController::class)->name('onboarding');
     Route::post('onboarding', [OnboardingController::class, 'store'])->middleware(['throttle:10,1', 'throttle:profile-photos'])->name('onboarding.store');
     Route::get('account/profile-photo', ProfilePhotoController::class)->name('profile.photo');
+    // Q11 names an active account and a verified email, so onboarding is not asked for here.
+    Route::get('jobs/{project}/attachments/{attachment}', [ProjectAttachmentController::class, 'download'])->whereNumber(['project', 'attachment'])->middleware('throttle:60,1')->name('jobs.attachment');
     Route::middleware(EnsureOnboardingIsComplete::class)->group(function () {
         Route::post('invitations/{invitation}/block', [ContactBlockController::class, 'fromInvitation'])->middleware('throttle:20,1')->name('invitations.block');
         Route::get('offers', [OfferController::class, 'index'])->name('offers.index');
@@ -215,6 +218,8 @@ Route::middleware(['auth', 'verified', EnsureOnboardingIsComplete::class])->pref
     Route::post('{project}/publish', [$controller, 'publish'])->middleware('throttle:10,1')->name('publish');
     Route::patch('{project}/cutoff', [$controller, 'extend'])->middleware('throttle:10,1')->name('extend');
     Route::post('{project}/clarifications', [$controller, 'clarify'])->middleware('throttle:10,1')->name('clarify');
+    Route::post('{project}/attachments', [ProjectAttachmentController::class, 'store'])->whereNumber('project')->middleware('throttle:30,1')->name('attachments.store');
+    Route::delete('{project}/attachments/{attachment}', [ProjectAttachmentController::class, 'destroy'])->whereNumber(['project', 'attachment'])->middleware('throttle:30,1')->name('attachments.destroy');
     Route::delete('{project}', [$controller, 'destroy'])->name('destroy');
     Route::post('{project}/restore', [$controller, 'restore'])->withTrashed()->name('restore');
     Route::delete('{project}/permanent', [$controller, 'forceDestroy'])->withTrashed()->name('force-destroy');

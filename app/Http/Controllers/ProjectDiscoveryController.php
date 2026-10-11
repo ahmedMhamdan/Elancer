@@ -93,7 +93,7 @@ class ProjectDiscoveryController extends Controller
         $filters = self::normalise($data, $profileSkills ? 'match' : 'newest');
         // Q60: the public number counts submitted proposals only; the Q75 filter below uses the same count.
         $received = fn (Builder $q) => $q->whereNotNull('submitted_at');
-        $query = Project::query()->visible()->with(['category', 'skills'])->withCount(['proposals as proposals_received' => $received]);
+        $query = Project::query()->visible()->with(['category', 'skills'])->withCount(['proposals as proposals_received' => $received, 'attachments']);
         if ($filters['q'] !== '') {
             $pattern = $this->pattern($filters['q']);
             $query->where(fn (Builder $q) => $q->whereRaw("LOWER(title) LIKE ? ESCAPE '!'", [$pattern])->orWhereRaw("LOWER(description) LIKE ? ESCAPE '!'", [$pattern]));
@@ -140,7 +140,9 @@ class ProjectDiscoveryController extends Controller
         $saved = $viewer === null ? [] : DB::table('saved_projects')->where('user_id', $viewer)->whereIn('project_id', $page->pluck('id'))->pluck('project_id')->all();
 
         return Inertia::render('discovery/jobs', [
-            'projects' => $page->through(fn (Project $project) => [...self::summary($project), 'saved' => in_array($project->id, $saved, true), 'own' => $project->user_id === $viewer]),
+            // Q11: the number of attached files is public; their names and the files are not.
+            'projects' => $page->through(fn (Project $project) => [...self::summary($project), 'attachments' => (int) $project->getAttribute('attachments_count'),
+                'saved' => in_array($project->id, $saved, true), 'own' => $project->user_id === $viewer]),
             'filters' => $filters,
             'categories' => Category::query()->orderBy('categoryname')->get(['id', 'slug', 'categoryname']),
             'skills' => Skill::query()->orderBy('name')->get(['id', 'name']),
@@ -164,6 +166,9 @@ class ProjectDiscoveryController extends Controller
         return Inertia::render('discovery/job', [
             'project' => [...self::summary($project), 'description' => $project->description, 'screening_questions' => $project->screening_questions ?? []],
             'saved' => $request->user() !== null && DB::table('saved_projects')->where('user_id', $request->user()->id)->where('project_id', $project->id)->exists(),
+            // Q11: everyone learns how many files the brief carries; only a member who may download them gets the list.
+            'attachments' => ['count' => $project->attachments()->count(),
+                'files' => ProjectAttachmentController::downloadable($request->user(), $project) ? ProjectAttachmentController::listing($project) : null],
             // Q61: dated public notes under the brief, oldest first; the brief itself is never rewritten.
             'clarifications' => $clarifications->map(fn (ProjectClarification $note) => ['id' => $note->id, 'body' => $note->body, 'created_at' => $note->created_at->toIso8601String()]),
             'can' => ['extend' => $changeable, 'clarify' => $changeable && $clarifications->count() < ProjectClarification::LIMIT],

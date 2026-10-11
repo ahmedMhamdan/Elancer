@@ -6,6 +6,7 @@ use App\Actions\Invitations\InvitationLifecycle;
 use App\Models\Category;
 use App\Models\Contract;
 use App\Models\Project;
+use App\Models\ProjectAttachment;
 use App\Models\ProjectClarification;
 use App\Models\Proposal;
 use App\Models\Skill;
@@ -16,6 +17,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -84,7 +86,9 @@ class ClientProjectController extends Controller
         abort_unless($project->status === 'draft', 409);
         $project->load('skills');
 
-        return Inertia::render('projects/edit', ['project' => $project, 'categories' => Category::query()->orderBy('categoryname')->get(['id', 'categoryname']), 'skills' => Skill::query()->orderBy('name')->get(['id', 'name'])]);
+        return Inertia::render('projects/edit', ['project' => $project, 'categories' => Category::query()->orderBy('categoryname')->get(['id', 'categoryname']), 'skills' => Skill::query()->orderBy('name')->get(['id', 'name']),
+            // Q11: the draft's files, managed apart from the text and its version.
+            'attachments' => ProjectAttachmentController::listing($project), 'attachmentLimit' => ProjectAttachment::LIMIT]);
     }
 
     /** @return array<string, mixed> */
@@ -242,6 +246,8 @@ class ClientProjectController extends Controller
             abort_unless($locked->trashed() && $locked->status === 'draft', 409);
             $locked->forceDelete();
         });
+        // Q72: the file rows went with the draft; the files themselves are removed here.
+        rescue(fn () => Storage::disk('uploads')->deleteDirectory('project-attachments/'.$project->id));
 
         return to_route('projects.index', ['status' => 'trash']);
     }

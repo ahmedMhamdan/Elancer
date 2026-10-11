@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileDeleteRequest;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
 use App\Models\PortfolioCase;
+use App\Models\Project;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -62,6 +63,7 @@ class ProfileController extends Controller
 
         $photoPath = $user->profile()->first()?->photo_path;
         $portfolio = PortfolioCase::query()->where('user_id', $user->id)->pluck('id');
+        $briefs = Project::withTrashed()->where('user_id', $user->id)->whereHas('attachments')->pluck('id');
         DB::transaction(function () use ($user): void {
             $locked = $user->newQuery()->lockForUpdate()->findOrFail($user->id);
             $locked->delete();
@@ -74,6 +76,10 @@ class ProfileController extends Controller
         // The case rows went with the account; their image files are removed here.
         foreach ($portfolio as $case) {
             rescue(fn () => Storage::disk('uploads')->deleteDirectory('portfolio-images/'.$case));
+        }
+        // Q11: the same for the files attached to the member's briefs.
+        foreach ($briefs as $brief) {
+            rescue(fn () => Storage::disk('uploads')->deleteDirectory('project-attachments/'.$brief));
         }
 
         $request->session()->invalidate();
