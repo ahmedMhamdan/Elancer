@@ -1,7 +1,8 @@
 // Adapted from local TailAdmin UserProfile/UserMetaCard.tsx (MIT).
 // Retains avatar/name/headline grouping; Elancer tokens, RTL and real member data replace demos.
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { MapPin } from 'lucide-react';
+import SaveToggle from '@/components/save-toggle';
 import { useTranslation } from '@/hooks/use-translation';
 export type WorkLink = { label: string; url: string };
 export type Freelancer = {
@@ -15,6 +16,9 @@ export type Freelancer = {
     member_since: string | null;
     skills: { id: number; name: string }[];
     links: WorkLink[];
+    // Q36: present only where the viewer's own saved state is known.
+    saved?: boolean;
+    own?: boolean;
 };
 export default function FreelancerCard({
     person,
@@ -24,6 +28,7 @@ export default function FreelancerCard({
     compact?: boolean;
 }) {
     const { t } = useTranslation();
+    const { auth } = usePage().props;
     return (
         <article className="talent-card">
             <div className="talent-person">
@@ -77,12 +82,22 @@ export default function FreelancerCard({
                     </span>
                 ))}
             </div>
-            <Link
-                className="talent-profile-link"
-                href={`/freelancers/${person.id}`}
-            >
-                {t('View profile')}
-            </Link>
+            <div className="talent-card-actions">
+                <Link
+                    className="talent-profile-link"
+                    href={`/freelancers/${person.id}`}
+                >
+                    {t('View profile')}
+                </Link>
+                {auth.user && person.saved !== undefined && !person.own && (
+                    <SaveToggle
+                        url={`/freelancers/${person.id}/save`}
+                        saved={person.saved}
+                        name={person.name}
+                        only={['freelancers']}
+                    />
+                )}
+            </div>
         </article>
     );
 }

@@ -91,6 +91,24 @@
     text-decoration: underline;
     text-underline-offset: 4px;
 }
+/* Q08/Q36: the card's profile link shares its last row with the Save control. */
+.talent-card-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: auto;
+}
+.talent-card-actions .talent-profile-link {
+    margin-top: 0;
+}
+.saved-nav a[aria-current='page'] {
+    color: var(--el-accent);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
 .talent-filters {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr auto;

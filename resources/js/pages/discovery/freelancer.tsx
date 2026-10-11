@@ -1,5 +1,6 @@
 import { Head, Link, usePage, router } from '@inertiajs/react';
 import ReportDialog from '@/components/report-dialog';
+import SaveToggle from '@/components/save-toggle';
 import Button from '@/components/tailadmin/button';
 import { ArrowLeft, ExternalLink, MapPin } from 'lucide-react';
 import { Stars } from '@/pages/contracts/reviews';
@@ -13,8 +14,11 @@ export default function FreelancerProfile({
     canContact,
     reviews,
     cases,
+    saved,
 }: {
     freelancer: Freelancer;
+    // Q36: the viewer's own save; never anyone else's.
+    saved: boolean;
     cases: PublicCase[];
     canContact: boolean;
     reviews: {
@@ -82,6 +86,14 @@ export default function FreelancerProfile({
                     >
                         {t('Invite to a project')}
                     </Link>
+                    {auth.user && (
+                        <SaveToggle
+                            url={`/freelancers/${person.id}/save`}
+                            saved={saved}
+                            name={person.name}
+                            only={['saved']}
+                        />
+                    )}
                     {auth.user && (
                         <Button
                             variant="danger-outline"

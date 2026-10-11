@@ -6,6 +6,7 @@ import { useId, useState, type ReactNode } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
     Banknote,
+    Bookmark,
     BriefcaseBusiness,
     ChevronDown,
     Compass,
@@ -159,6 +160,11 @@ export function AppSidebar() {
                     label: t('Categories'),
                     href: '/categories',
                     icon: <LayoutGrid size={20} />,
+                },
+                {
+                    label: t('Saved items'),
+                    href: '/saved',
+                    icon: <Bookmark size={20} />,
                 },
             ],
         },

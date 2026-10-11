@@ -2,6 +2,7 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import type { FormEvent } from 'react';
 import ReportDialog from '@/components/report-dialog';
+import SaveToggle from '@/components/save-toggle';
 import Button from '@/components/tailadmin/button';
 import DatePicker from '@/components/tailadmin/date-picker';
 import TextArea from '@/components/tailadmin/textarea';
@@ -143,8 +144,11 @@ export default function JobDetails({
     moderated,
     clarifications,
     can,
+    saved,
 }: {
     project: Job;
+    // Q08: the viewer's own save; never anyone else's.
+    saved: boolean;
     // Only the owner reaches this page while moderation hides the project.
     moderated: boolean;
     clarifications: { id: number; body: string; created_at: string }[];
@@ -325,6 +329,14 @@ export default function JobDetails({
                                 )}
                             </Link>
                         )
+                    )}
+                    {auth.user && !application.owner && !moderated && (
+                        <SaveToggle
+                            url={`/jobs/${project.id}/save`}
+                            saved={saved}
+                            name={project.title}
+                            only={['saved']}
+                        />
                     )}
                     {auth.user && !application.owner && (
                         <ReportDialog

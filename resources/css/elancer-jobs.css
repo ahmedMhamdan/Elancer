@@ -149,6 +149,17 @@
     color: var(--el-muted);
     font-size: 13px;
 }
+/* Q17: saving the applied filters sits beside the result count. */
+.job-saved-search {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 13px;
+}
+.job-saved-search a {
+    color: var(--el-accent);
+}
 .job-sort select {
     width: auto;
 }

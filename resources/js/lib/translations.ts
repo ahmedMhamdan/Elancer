@@ -2212,4 +2212,41 @@ export const arabic: Record<string, string> = {
     'Extend cutoff': 'تمديد الموعد',
     'Clarifications from the client': 'توضيحات من صاحب المشروع',
     'added a clarification to': 'أضاف توضيحًا لمشروع',
+    'Saved items': 'المحفوظات',
+    'Saved projects': 'المشاريع المحفوظة',
+    'Saved searches': 'عمليات البحث المحفوظة',
+    'Saved freelancers': 'المستقلون المحفوظون',
+    'Save :name': 'حفظ :name',
+    'Remove :name from saved items': 'إزالة :name من المحفوظات',
+    'Saved on': 'حُفظ في',
+    'Projects you saved to come back to. Only you can see this list.':
+        'مشاريع حفظتها للعودة إليها لاحقًا. هذه القائمة تظهر لك وحدك.',
+    'No saved projects yet.': 'لا توجد مشاريع محفوظة بعد.',
+    'Save a project from the search results or its page and it appears here.':
+        'احفظ مشروعًا من نتائج البحث أو من صفحته وسيظهر هنا.',
+    'This project is no longer available.': 'هذا المشروع لم يعد متاحًا.',
+    'Freelancers you saved. Only you can see this list.':
+        'مستقلون حفظتهم. هذه القائمة تظهر لك وحدك.',
+    'No saved freelancers yet.': 'لا يوجد مستقلون محفوظون بعد.',
+    'Save a freelancer from the directory or their profile and they appear here.':
+        'احفظ مستقلًا من الدليل أو من ملفه الشخصي وسيظهر هنا.',
+    'This profile is no longer public.': 'هذا الملف الشخصي لم يعد عامًّا.',
+    'Named sets of job filters. Opening one always shows current results.':
+        'مجموعات مسمّاة من فلاتر البحث عن المشاريع. فتح أي منها يعرض النتائج الحالية دائمًا.',
+    'No saved searches yet.': 'لا توجد عمليات بحث محفوظة بعد.',
+    'Set your filters on Find jobs, then choose Save this search.':
+        'اضبط الفلاتر في صفحة البحث عن المشاريع ثم اختر «حفظ هذا البحث».',
+    'A filter in this search is no longer available.':
+        'أحد فلاتر هذا البحث لم يعد متاحًا.',
+    'All open projects': 'جميع المشاريع المفتوحة',
+    'Save this search': 'حفظ هذا البحث',
+    'It keeps the filters you see now and always opens with current results.':
+        'يحتفظ بالفلاتر الظاهرة الآن ويُفتح دائمًا بالنتائج الحالية.',
+    'Search name': 'اسم البحث',
+    'Save search': 'حفظ البحث',
+    Rename: 'إعادة تسمية',
+    'Open :name': 'فتح :name',
+    'Rename :name': 'إعادة تسمية :name',
+    'Delete :name': 'حذف :name',
+    'Delete this saved search?': 'هل تريد حذف هذا البحث المحفوظ؟',
 };

@@ -1,7 +1,8 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 import ElancerSiteHeader from '@/components/elancer-site-header';
 import HoverFooter from '@/components/hover-footer';
+import SaveToggle from '@/components/save-toggle';
 import { useTranslation } from '@/hooks/use-translation';
 import type { PaginationData } from '@/components/tailadmin/pagination';
 import '../../../css/elancer-jobs.css';
@@ -28,6 +29,9 @@ export type Job = {
     open: boolean;
     proposals_received: number;
     screening_questions?: string[];
+    // Q08: present only where the viewer's own saved state is known.
+    saved?: boolean;
+    own?: boolean;
 };
 export function DiscoveryLayout({ children }: { children: ReactNode }) {
     return (
@@ -68,6 +72,7 @@ export function JobDate({ value }: { value: string }) {
 }
 export function JobCard({ job, search }: { job: Job; search: string }) {
     const { t } = useTranslation();
+    const { auth } = usePage().props;
     return (
         <article className="job-card">
             <div className="job-card-top">
@@ -81,6 +86,14 @@ export function JobCard({ job, search }: { job: Job; search: string }) {
                 <span className="job-muted">
                     {t('Posted')} <JobDate value={job.published_at} />
                 </span>
+                {auth.user && job.saved !== undefined && !job.own && (
+                    <SaveToggle
+                        url={`/jobs/${job.id}/save`}
+                        saved={job.saved}
+                        name={job.title}
+                        only={['projects']}
+                    />
+                )}
             </div>
             <h2>
                 <Link

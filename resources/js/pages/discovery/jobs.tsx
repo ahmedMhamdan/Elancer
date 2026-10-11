@@ -1,9 +1,11 @@
 // Filter controls adapt local TailAdmin form-elements/DefaultInputs.tsx and MultiSelect.tsx.
-import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { BookmarkPlus, Search, SlidersHorizontal, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import Button from '@/components/tailadmin/button';
 import Input from '@/components/tailadmin/input';
+import Label from '@/components/tailadmin/label';
+import Modal from '@/components/tailadmin/modal';
 import Pagination from '@/components/tailadmin/pagination';
 import Radio from '@/components/tailadmin/radio';
 import {
@@ -75,6 +77,9 @@ function SearchPage({
     const [mobile, setMobile] = useState(false);
     const [busy, setBusy] = useState(false);
     const [skillQuery, setSkillQuery] = useState('');
+    const [naming, setNaming] = useState(false);
+    // The applied filters from the server, not the unsent choices in the side panel.
+    const search = useForm({ name: '', filters });
     useEffect(() => {
         try {
             const stored = sessionStorage.getItem('elancer-search-position');
@@ -413,6 +418,26 @@ function SearchPage({
                         <h2 aria-live="polite">
                             {t(':count projects', { count: projects.total })}
                         </h2>
+                        {auth.user?.status === 'active' && (
+                            // Q17: a named copy of the filters shown above, never of the results.
+                            <div className="job-saved-search">
+                                <Button
+                                    variant="outline"
+                                    startIcon={
+                                        <BookmarkPlus
+                                            size={16}
+                                            aria-hidden="true"
+                                        />
+                                    }
+                                    onClick={() => setNaming(true)}
+                                >
+                                    {t('Save this search')}
+                                </Button>
+                                <Link href="/saved/searches">
+                                    {t('Saved searches')}
+                                </Link>
+                            </div>
+                        )}
                         {mobile && (
                             <Sheet open={drawer} onOpenChange={setDrawer}>
                                 <SheetTrigger asChild>
@@ -486,6 +511,60 @@ function SearchPage({
                     <Pagination data={projects} />
                 </section>
             </div>
+            <Modal
+                open={naming}
+                onClose={() => setNaming(false)}
+                title={t('Save this search')}
+                description={t(
+                    'It keeps the filters you see now and always opens with current results.',
+                )}
+            >
+                <form
+                    className="grid gap-3"
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        search.post('/saved/searches', {
+                            preserveScroll: true,
+                            preserveState: true,
+                            onSuccess: () => {
+                                setNaming(false);
+                                search.reset('name');
+                            },
+                        });
+                    }}
+                >
+                    <Label htmlFor="saved-search-name">
+                        {t('Search name')}
+                    </Label>
+                    <Input
+                        id="saved-search-name"
+                        value={search.data.name}
+                        maxLength={80}
+                        required
+                        aria-invalid={!!search.errors.name}
+                        aria-describedby="saved-search-error"
+                        onChange={(e) => search.setData('name', e.target.value)}
+                    />
+                    <p
+                        id="saved-search-error"
+                        role="alert"
+                        className="text-destructive text-sm"
+                    >
+                        {search.errors.name}
+                    </p>
+                    <div className="flex flex-wrap gap-3">
+                        <Button type="submit" disabled={search.processing}>
+                            {t('Save search')}
+                        </Button>
+                        <Button
+                            variant="outline"
+                            onClick={() => setNaming(false)}
+                        >
+                            {t('Cancel')}
+                        </Button>
+                    </div>
+                </form>
+            </Modal>
         </DiscoveryLayout>
     );
 }
