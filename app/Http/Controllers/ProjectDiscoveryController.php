@@ -9,6 +9,7 @@ use App\Models\Skill;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -42,9 +43,14 @@ class ProjectDiscoveryController extends Controller
         ]);
     }
 
-    public function index(Request $request): Response
+    /**
+     * The filters /jobs accepts. A saved search (Q17) is checked against the same rules, so it can hold nothing else.
+     *
+     * @return array<string, array<int, mixed>>
+     */
+    public static function rules(): array
     {
-        $validator = Validator::make($request->query(), [
+        return [
             'q' => ['nullable', 'string', 'max:100'],
             'category' => ['nullable', 'string', Rule::exists('categories', 'slug')->whereNull('deleted_at')],
             'skills' => ['nullable', 'array', 'max:15'],
@@ -56,20 +62,35 @@ class ProjectDiscoveryController extends Controller
             'proposals' => ['nullable', Rule::in(['any', ...array_keys(self::RECEIVED)])],
             'status' => ['nullable', Rule::in(['open', 'all'])],
             'sort' => ['nullable', Rule::in(['match', 'newest'])],
-            'page' => ['nullable', 'integer', 'min:1', 'max:100000'],
-        ]);
+        ];
+    }
+
+    /**
+     * Validated filters in the one shape the page, the address and a saved search share.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    public static function normalise(array $data, string $sort = 'newest'): array
+    {
+        return [
+            'q' => trim($data['q'] ?? ''), 'category' => $data['category'] ?? '',
+            'skills' => array_map('intval', $data['skills'] ?? []), 'skill_mode' => $data['skill_mode'] ?? 'any',
+            'budget_min' => $data['budget_min'] ?? '', 'budget_max' => $data['budget_max'] ?? '',
+            'posted' => $data['posted'] ?? 'any', 'proposals' => $data['proposals'] ?? 'any', 'status' => $data['status'] ?? 'open',
+            'sort' => $data['sort'] ?? $sort,
+        ];
+    }
+
+    public function index(Request $request): Response
+    {
+        $validator = Validator::make($request->query(), [...self::rules(), 'page' => ['nullable', 'integer', 'min:1', 'max:100000']]);
         // Invalid shared URLs must never silently broaden a search or redirect in a loop.
         abort_if($validator->fails(), 422, __('The search filters are invalid.'));
         $data = $validator->validated();
         abort_if(isset($data['budget_min'], $data['budget_max']) && $data['budget_max'] < $data['budget_min'], 422, __('The maximum budget must be at least the minimum budget.'));
         $profileSkills = $request->user()?->profile?->skillTags()->pluck('skills.id')->all() ?? [];
-        $filters = [
-            'q' => trim($data['q'] ?? ''), 'category' => $data['category'] ?? '',
-            'skills' => array_map('intval', $data['skills'] ?? []), 'skill_mode' => $data['skill_mode'] ?? 'any',
-            'budget_min' => $data['budget_min'] ?? '', 'budget_max' => $data['budget_max'] ?? '',
-            'posted' => $data['posted'] ?? 'any', 'proposals' => $data['proposals'] ?? 'any', 'status' => $data['status'] ?? 'open',
-            'sort' => $data['sort'] ?? ($profileSkills ? 'match' : 'newest'),
-        ];
+        $filters = self::normalise($data, $profileSkills ? 'match' : 'newest');
         // Q60: the public number counts submitted proposals only; the Q75 filter below uses the same count.
         $received = fn (Builder $q) => $q->whereNotNull('submitted_at');
         $query = Project::query()->visible()->with(['category', 'skills'])->withCount(['proposals as proposals_received' => $received]);
@@ -113,8 +134,13 @@ class ProjectDiscoveryController extends Controller
             $query->withCount(['skills as matching_skills_count' => fn (Builder $q) => $q->whereIn('skills.id', $profileSkills)])->orderByDesc('matching_skills_count');
         }
 
+        $page = $query->orderByDesc('published_at')->orderByDesc('id')->paginate(20)->withQueryString();
+        // Q08: only the viewer's own saves are marked, and no one else can learn of them.
+        $viewer = $request->user()?->id;
+        $saved = $viewer === null ? [] : DB::table('saved_projects')->where('user_id', $viewer)->whereIn('project_id', $page->pluck('id'))->pluck('project_id')->all();
+
         return Inertia::render('discovery/jobs', [
-            'projects' => $query->orderByDesc('published_at')->orderByDesc('id')->paginate(20)->withQueryString()->through(fn (Project $project) => $this->summary($project)),
+            'projects' => $page->through(fn (Project $project) => [...self::summary($project), 'saved' => in_array($project->id, $saved, true), 'own' => $project->user_id === $viewer]),
             'filters' => $filters,
             'categories' => Category::query()->orderBy('categoryname')->get(['id', 'slug', 'categoryname']),
             'skills' => Skill::query()->orderBy('name')->get(['id', 'name']),
@@ -136,7 +162,8 @@ class ProjectDiscoveryController extends Controller
             && $project->status === 'published' && $project->moderated_at === null;
 
         return Inertia::render('discovery/job', [
-            'project' => [...$this->summary($project), 'description' => $project->description, 'screening_questions' => $project->screening_questions ?? []],
+            'project' => [...self::summary($project), 'description' => $project->description, 'screening_questions' => $project->screening_questions ?? []],
+            'saved' => $request->user() !== null && DB::table('saved_projects')->where('user_id', $request->user()->id)->where('project_id', $project->id)->exists(),
             // Q61: dated public notes under the brief, oldest first; the brief itself is never rewritten.
             'clarifications' => $clarifications->map(fn (ProjectClarification $note) => ['id' => $note->id, 'body' => $note->body, 'created_at' => $note->created_at->toIso8601String()]),
             'can' => ['extend' => $changeable, 'clarify' => $changeable && $clarifications->count() < ProjectClarification::LIMIT],
@@ -156,7 +183,7 @@ class ProjectDiscoveryController extends Controller
     }
 
     /** @return array<string, mixed> */
-    private function summary(Project $project): array
+    public static function summary(Project $project): array
     {
         return [
             'id' => $project->id, 'title' => $project->title, 'excerpt' => Str::limit($project->description ?? '', 260),

@@ -46,8 +46,13 @@ class FreelancerController extends Controller
             $query->where('availability', $filters['availability']);
         }
 
+        $page = $query->orderByDesc('published_at')->orderBy('id')->paginate(12)->withQueryString();
+        // Q36: only the viewer's own saves are marked.
+        $viewer = $request->user()?->id;
+        $saved = $viewer === null ? [] : DB::table('saved_profiles')->where('user_id', $viewer)->whereIn('profile_id', $page->pluck('id'))->pluck('profile_id')->all();
+
         return Inertia::render('discovery/freelancers', [
-            'freelancers' => $query->orderByDesc('published_at')->orderBy('id')->paginate(12)->withQueryString()->through(fn (Profile $profile) => $profile->publicDetails()),
+            'freelancers' => $page->through(fn (Profile $profile) => [...$profile->publicDetails(), 'saved' => in_array($profile->id, $saved, true), 'own' => $profile->user_id === $viewer]),
             'filters' => ['q' => $filters['q'] ?? '', 'skill' => $filters['skill'] ?? '', 'availability' => $filters['availability'] ?? ''],
             'skills' => Skill::query()->orderBy('name')->get(['id', 'name']),
         ]);
@@ -68,7 +73,8 @@ class FreelancerController extends Controller
 
         $cases = PortfolioCase::query()->publiclyVisible()->where('user_id', $profile->user_id)->orderByDesc('published_at')->orderByDesc('id')->get()->map(PortfolioController::published(...));
 
-        return Inertia::render('discovery/freelancer', ['freelancer' => $profile->load(['user', 'skillTags'])->publicDetails(), 'canContact' => $request->user()?->id !== $profile->user_id, 'reviews' => $reviews, 'cases' => $cases]);
+        return Inertia::render('discovery/freelancer', ['freelancer' => $profile->load(['user', 'skillTags'])->publicDetails(), 'canContact' => $request->user()?->id !== $profile->user_id, 'reviews' => $reviews, 'cases' => $cases,
+            'saved' => $request->user() !== null && DB::table('saved_profiles')->where('user_id', $request->user()->id)->where('profile_id', $profile->id)->exists()]);
     }
 
     public function photo(Profile $profile): HttpResponse

@@ -371,5 +371,10 @@
     "Application cutoff extended.": "تم تمديد آخر موعد للتقديم.",
     "This project already has the most clarifications it can carry.": "بلغ هذا المشروع الحد الأقصى من التوضيحات.",
     "Clarification published.": "نُشر التوضيح.",
-    "added a clarification to": "أضاف توضيحًا لمشروع"
+    "added a clarification to": "أضاف توضيحًا لمشروع",
+    "Search saved.": "تم حفظ البحث.",
+    "You already have a saved search with this name.": "لديك بحث محفوظ بهذا الاسم.",
+    "You can keep up to :count saved searches. Delete one to save another.": "يمكنك الاحتفاظ بما لا يزيد على :count من عمليات البحث المحفوظة. احذف واحدة لحفظ أخرى.",
+    "You can save up to :count projects. Remove one to save another.": "يمكنك حفظ ما لا يزيد على :count من المشاريع. أزل واحدًا لحفظ آخر.",
+    "You can save up to :count freelancers. Remove one to save another.": "يمكنك حفظ ما لا يزيد على :count من المستقلين. أزل واحدًا لحفظ آخر."
 }
