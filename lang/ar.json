@@ -376,5 +376,7 @@
     "You already have a saved search with this name.": "لديك بحث محفوظ بهذا الاسم.",
     "You can keep up to :count saved searches. Delete one to save another.": "يمكنك الاحتفاظ بما لا يزيد على :count من عمليات البحث المحفوظة. احذف واحدة لحفظ أخرى.",
     "You can save up to :count projects. Remove one to save another.": "يمكنك حفظ ما لا يزيد على :count من المشاريع. أزل واحدًا لحفظ آخر.",
-    "You can save up to :count freelancers. Remove one to save another.": "يمكنك حفظ ما لا يزيد على :count من المستقلين. أزل واحدًا لحفظ آخر."
+    "You can save up to :count freelancers. Remove one to save another.": "يمكنك حفظ ما لا يزيد على :count من المستقلين. أزل واحدًا لحفظ آخر.",
+    "You are now in the Client workspace.": "أنت الآن في مساحة عمل صاحب المشاريع.",
+    "You are now in the Freelancer workspace.": "أنت الآن في مساحة عمل المستقل."
 }

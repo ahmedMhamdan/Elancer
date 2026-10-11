@@ -32,6 +32,7 @@ use App\Http\Controllers\SavedItemController;
 use App\Http\Controllers\SkillController;
 use App\Http\Controllers\SocialAuthController;
 use App\Http\Controllers\UpdateProfilePhotoController;
+use App\Http\Controllers\WorkspaceController;
 use App\Http\Middleware\EnsureCategoryAdministrator;
 use App\Http\Middleware\EnsureOnboardingIsComplete;
 use App\Http\Middleware\EnsureSuperAdministrator;
@@ -142,6 +143,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::patch('my-profile', MarketplaceProfileController::class)->name('marketplace-profile.update');
         Route::get('dashboard', DashboardController::class)->name('dashboard');
         Route::patch('dashboard/profile', MarketplaceProfileController::class)->name('dashboard.profile.update');
+        Route::patch('workspace', WorkspaceController::class)->middleware('throttle:30,1')->name('workspace.update');
     });
 });
 
