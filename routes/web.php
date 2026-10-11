@@ -14,6 +14,7 @@ use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\FreelancerController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\IdentityVerificationController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\LocaleController;
@@ -38,7 +39,7 @@ use App\Http\Middleware\EnsureOnboardingIsComplete;
 use App\Http\Middleware\EnsureSuperAdministrator;
 use Illuminate\Support\Facades\Route;
 
-Route::inertia('/', 'welcome')->name('home');
+Route::get('/', HomeController::class)->name('home');
 
 foreach (['how-it-works', 'project-guides', 'inspiration', 'why-elancer', 'resources'] as $guide) {
     Route::inertia('learn/'.$guide, 'learn/show', ['guide' => $guide])->name('learn.'.$guide);
