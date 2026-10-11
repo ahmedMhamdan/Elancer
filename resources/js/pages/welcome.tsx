@@ -9,13 +9,29 @@ import {
     Sparkles,
 } from 'lucide-react';
 import ElancerSiteHeader from '@/components/elancer-site-header';
-import HomeMarketplace from '@/components/home/home-marketplace';
+import HomeCategories from '@/components/home/home-categories';
 import HomePaths from '@/components/home/home-paths';
+import HomeProjects from '@/components/home/home-projects';
+import type { HomeProject } from '@/components/home/home-projects';
+import HomeTalent from '@/components/home/home-talent';
+import type { HomeFreelancer } from '@/components/home/home-talent';
 import HoverFooter from '@/components/hover-footer';
 import Hero from '@/components/ui/animated-shader-hero';
+import type { Category } from '@/pages/discovery/shared';
 import { dashboard, register } from '@/routes';
 
-export default function Welcome() {
+// Q33: every record below is a real public one; the server reads them through the public lists' own rules.
+export default function Welcome({
+    projects,
+    categories,
+    freelancers,
+    totals,
+}: {
+    projects: HomeProject[];
+    categories: Category[];
+    freelancers: HomeFreelancer[];
+    totals: { projects: number; freelancers: number; categories: number };
+}) {
     const { t } = useTranslation();
 
     const { auth } = usePage().props;
@@ -157,7 +173,20 @@ export default function Welcome() {
                         </div>
                     </section>
 
-                    <HomeMarketplace />
+                    <HomeProjects
+                        projects={projects}
+                        total={totals.projects}
+                        destination={destination}
+                    />
+                    <HomeCategories
+                        categories={categories}
+                        total={totals.categories}
+                    />
+                    <HomeTalent
+                        freelancers={freelancers}
+                        total={totals.freelancers}
+                        destination={destination}
+                    />
                     <HomePaths destination={destination} />
 
                     <section

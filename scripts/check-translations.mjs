@@ -91,27 +91,6 @@ for (const entry of fs.readdirSync(sourceRoot, { recursive: true })) {
         });
     });
 }
-// These profiles are authored site examples, not member content.
-visit(parse(path.join(sourceRoot, 'data/home-samples.ts')), (node) => {
-    if (
-        ts.isPropertyAssignment(node) &&
-        ts.isIdentifier(node.name) &&
-        [
-            'title',
-            'description',
-            'role',
-            'intro',
-            'project',
-            'projectDescription',
-        ].includes(node.name.text) &&
-        ts.isStringLiteral(node.initializer)
-    ) {
-        assert.ok(
-            catalog.has(node.initializer.text),
-            `Untranslated sample content: ${node.initializer.text}`,
-        );
-    }
-});
 console.log(
-    `Arabic coverage passed: ${catalog.size} messages, ${calls} literal uses, matching placeholders and sample copy.`,
+    `Arabic coverage passed: ${catalog.size} messages, ${calls} literal uses and matching placeholders.`,
 );

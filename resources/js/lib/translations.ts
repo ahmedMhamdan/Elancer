@@ -2251,4 +2251,28 @@ export const arabic: Record<string, string> = {
     'Delete this saved search?': 'هل تريد حذف هذا البحث المحفوظ؟',
     'Client workspace': 'مساحة عمل صاحب المشاريع',
     'Freelancer workspace': 'مساحة عمل المستقل',
+    'Open right now': 'متاحة الآن',
+    'Fresh projects, open for proposals.': 'مشاريع جديدة تستقبل العروض.',
+    'Open projects: :count': 'المشاريع المفتوحة: :count',
+    'Posted by clients on Elancer, newest first.':
+        'نشرها أصحاب المشاريع على Elancer، الأحدث أولًا.',
+    'No open projects right now.': 'لا توجد مشاريع مفتوحة الآن.',
+    'New projects appear here as soon as a client publishes one.':
+        'تظهر المشاريع الجديدة هنا فور نشرها.',
+    'Apply by': 'آخر موعد للتقديم',
+    'Browse all projects': 'تصفح جميع المشاريع',
+    'Plans that hold together': 'خطط متماسكة',
+    'Ideas drawn to scale': 'أفكار مرسومة بدقة',
+    'Browse projects': 'تصفح المشاريع',
+    'Freelancers on Elancer': 'مستقلون على Elancer',
+    'Public profiles: :count': 'الملفات العامة: :count',
+    'Profiles published by freelancers on Elancer.':
+        'ملفات نشرها مستقلون على Elancer.',
+    'No public freelancer profiles yet.': 'لا توجد ملفات مستقلين عامة بعد.',
+    'Profiles appear here once a freelancer publishes theirs.':
+        'تظهر الملفات هنا عندما ينشرها أصحابها.',
+    'Browse all freelancers': 'تصفح جميع المستقلين',
+    'No proposals yet': 'لا عروض بعد',
+    '1 proposal received': 'عرض واحد مستلم',
+    'Good work of every kind': 'عمل متقن من كل نوع',
 };

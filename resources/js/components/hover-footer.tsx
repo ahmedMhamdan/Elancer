@@ -45,7 +45,7 @@ export default function HoverFooter({
                             </li>
                             <li>
                                 <a href="#featured-freelancers">
-                                    {t('Sample talent')}
+                                    {t('Freelancers')}
                                 </a>
                             </li>
                             <li>
