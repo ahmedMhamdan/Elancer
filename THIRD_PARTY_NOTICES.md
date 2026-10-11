@@ -202,3 +202,7 @@ weekday names with a mirrored layout, and add an optional time. The MIT license 
 
 The calendar itself is flatpickr 4.6 (https://github.com/flatpickr/flatpickr), MIT License,
 Copyright (c) 2017 Gregory Petrosyan.
+
+## Workspace switch (2026-10-11)
+
+resources/js/components/workspace-switch.tsx adapts local TailAdmin src/components/common/ChartTab.tsx: the segmented pair of buttons is kept, with Elancer tokens, a pressed state, Arabic/RTL and a server save. The TailAdmin MIT notice above applies.

@@ -2,7 +2,7 @@ import { useTranslation } from '@/hooks/use-translation';
 // Preserve Ahmed's supplied sidebar primitive. Grouped item disclosure adapts
 // TailAdmin src/layout/AppSidebar.tsx (MIT); see THIRD_PARTY_NOTICES.md.
 import { Link, router, usePage } from '@inertiajs/react';
-import { useId, useState, type ReactNode } from 'react';
+import { Fragment, useId, useState, type ReactNode } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
     Banknote,
@@ -39,6 +39,7 @@ import {
     SidebarLink,
     useSidebar,
 } from '@/components/ui/sidebar';
+import WorkspaceSwitch from '@/components/workspace-switch';
 import { useInitials } from '@/hooks/use-initials';
 import { dashboard, logout } from '@/routes';
 import { edit } from '@/routes/profile';
@@ -58,6 +59,17 @@ export function AppSidebar() {
     const [expanded, setExpanded] = useState<Record<string, boolean>>({});
     const active = (href: string, exact = false) =>
         path === href || (!exact && path.startsWith(href + '/'));
+    const client = auth.user.workspace_role === 'client';
+    const projects = {
+        label: t('My projects'),
+        href: '/my-projects',
+        icon: <FolderKanban size={20} />,
+    };
+    const proposals = {
+        label: t('My proposals'),
+        href: '/my-proposals',
+        icon: <FileText size={20} />,
+    };
     const groups: {
         id: string;
         label: string;
@@ -67,6 +79,8 @@ export function AppSidebar() {
             href: string;
             icon: ReactNode;
             exact?: boolean;
+            // A short line above the link, naming the workspace it belongs to.
+            heading?: string;
         }[];
     }[] = [
         {
@@ -74,16 +88,7 @@ export function AppSidebar() {
             label: t('My work'),
             icon: BriefcaseBusiness,
             links: [
-                {
-                    label: t('My projects'),
-                    href: '/my-projects',
-                    icon: <FolderKanban size={20} />,
-                },
-                {
-                    label: t('My proposals'),
-                    href: '/my-proposals',
-                    icon: <FileText size={20} />,
-                },
+                client ? projects : proposals,
                 {
                     label: t('Offers'),
                     href: '/offers',
@@ -94,6 +99,10 @@ export function AppSidebar() {
                     href: '/contracts',
                     icon: <Handshake size={20} />,
                 },
+                // Q25: the other workspace's list stays one click away, so switching hides no open work.
+                client
+                    ? { ...proposals, heading: t('Freelancer workspace') }
+                    : { ...projects, heading: t('Client workspace') },
             ],
         },
         {
@@ -322,17 +331,25 @@ export function AppSidebar() {
                                 className="overflow-hidden"
                             >
                                 <div className="sidebar-group-links">
-                                    {group.links.map(({ exact, ...link }) => (
-                                        <SidebarLink
-                                            key={link.href}
-                                            link={link}
-                                            aria-current={
-                                                active(link.href, exact)
-                                                    ? 'page'
-                                                    : undefined
-                                            }
-                                        />
-                                    ))}
+                                    {group.links.map(
+                                        ({ exact, heading, ...link }) => (
+                                            <Fragment key={link.href}>
+                                                {heading && (
+                                                    <p className="sidebar-group-caption">
+                                                        {heading}
+                                                    </p>
+                                                )}
+                                                <SidebarLink
+                                                    link={link}
+                                                    aria-current={
+                                                        active(link.href, exact)
+                                                            ? 'page'
+                                                            : undefined
+                                                    }
+                                                />
+                                            </Fragment>
+                                        ),
+                                    )}
                                 </div>
                             </motion.div>
                         </div>
@@ -340,6 +357,7 @@ export function AppSidebar() {
                 })}
             </nav>
             <div className="border-sidebar-border flex shrink-0 flex-col gap-2 border-t pt-3">
+                <WorkspaceSwitch />
                 <SidebarLink
                     link={{
                         label: t('Log out'),

@@ -688,6 +688,78 @@
 .sidebar-group-links a {
     margin-top: 2px;
 }
+.sidebar-group-caption {
+    margin-top: 8px;
+    padding: 4px 12px 0;
+    color: var(--el-muted);
+    font-size: 13px;
+}
+/* Q25 workspace switch: TailAdmin ChartTab's segmented pair on Elancer tokens. */
+.workspace-switch {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    padding-inline: 12px 0;
+}
+.workspace-switch-icon {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+}
+.workspace-switch-options {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 2px;
+    min-width: 0;
+    padding: 2px;
+    border-radius: 8px;
+    background: var(--sidebar-accent);
+    transition: opacity 0.15s;
+}
+.workspace-switch[data-expanded='false'] .workspace-switch-options {
+    opacity: 0;
+    pointer-events: none;
+}
+.workspace-switch-options button {
+    flex: 1;
+    min-width: 0;
+    min-height: 40px;
+    padding: 8px 12px;
+    overflow: hidden;
+    border-radius: 6px;
+    color: var(--el-muted);
+    font-size: 14px;
+    font-weight: 500;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+}
+.workspace-switch-options button:hover {
+    color: var(--sidebar-foreground);
+}
+.workspace-switch-options button[aria-pressed='true'] {
+    color: var(--sidebar-foreground);
+    background: var(--sidebar);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
+    font-weight: 600;
+    cursor: default;
+}
+.workspace-switch-options button[aria-disabled='true'] {
+    cursor: progress;
+}
+.workspace-switch-options button:focus-visible {
+    outline: 2px solid var(--el-muted);
+    outline-offset: -2px;
+}
+@media (prefers-reduced-motion: reduce) {
+    .workspace-switch-options {
+        transition: none;
+    }
+}
 .sidebar-group-trigger:focus-visible,
 .sidebar-brand:focus-visible,
 .sidebar-account:focus-visible {

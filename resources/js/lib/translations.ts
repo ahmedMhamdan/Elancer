@@ -2249,4 +2249,6 @@ export const arabic: Record<string, string> = {
     'Rename :name': 'إعادة تسمية :name',
     'Delete :name': 'حذف :name',
     'Delete this saved search?': 'هل تريد حذف هذا البحث المحفوظ؟',
+    'Client workspace': 'مساحة عمل صاحب المشاريع',
+    'Freelancer workspace': 'مساحة عمل المستقل',
 };
