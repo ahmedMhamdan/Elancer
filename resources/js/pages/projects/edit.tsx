@@ -1,13 +1,16 @@
 // Guided form adapts local TailAdmin DefaultInputs.tsx, TextAreaInput.tsx, and MultiSelect.tsx.
+// The file control adapts TailAdmin form/input/FileInput.tsx: the same bordered field, with a label
+// in place of the browser's own button so its wording follows the interface language.
 import { Head, Link, router } from '@inertiajs/react';
+import { Paperclip } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import Button from '@/components/tailadmin/button';
 import DatePicker from '@/components/tailadmin/date-picker';
 import Input from '@/components/tailadmin/input';
 import { useTranslation } from '@/hooks/use-translation';
-import { Money } from '../discovery/shared';
-import type { Skill } from '../discovery/shared';
+import { FileSize, Money } from '../discovery/shared';
+import type { Attachment, Skill } from '../discovery/shared';
 import '../../../css/elancer-jobs.css';
 
 type Project = {
@@ -61,17 +64,32 @@ function csrf() {
             ?.slice(11) ?? '',
     );
 }
+// Q11: what the server accepts on a brief. It checks again; these only save a wasted upload.
+const FILE_TYPES = ['jpg', 'jpeg', 'png', 'webp', 'pdf', 'txt'];
+const FILE_BYTES = 5 * 1024 * 1024;
 export default function EditProject({
     project,
     categories,
     skills,
+    attachments,
+    attachmentLimit,
 }: {
     project: Project;
     categories: { id: number; categoryname: string }[];
     skills: Skill[];
+    attachments: Attachment[];
+    attachmentLimit: number;
 }) {
     const { t } = useTranslation();
     const [form, setForm] = useState(() => fromProject(project));
+    // Files are saved apart from the text: neither waits for the other, and neither's failure is the other's.
+    const [files, setFiles] = useState(attachments);
+    const [fileBusy, setFileBusy] = useState(false);
+    const [fileNote, setFileNote] = useState<{
+        text: string;
+        error: boolean;
+    } | null>(null);
+    const picker = useRef<HTMLInputElement>(null);
     const [step, setStep] = useState(0);
     const [status, setStatus] = useState('Saved');
     const [errors, setErrors] = useState<Record<string, string[]>>({});
@@ -220,6 +238,104 @@ export default function EditProject({
             stop();
         };
     }, [t]);
+    async function fileRequest(
+        method: 'POST' | 'DELETE',
+        path: string,
+        body: FormData | null,
+        done: string,
+    ) {
+        setFileBusy(true);
+        try {
+            const response = await fetch(
+                `/my-projects/${project.id}/attachments${path}`,
+                {
+                    method,
+                    credentials: 'same-origin',
+                    headers: {
+                        Accept: 'application/json',
+                        'X-XSRF-TOKEN': csrf(),
+                    },
+                    body,
+                },
+            );
+            if (!mounted.current) return;
+            const data = await response.json().catch(() => null);
+            if (response.ok && data?.attachments) {
+                setFiles(data.attachments);
+                setReviewed(false);
+                setFileNote({ text: done, error: false });
+                return;
+            }
+            setFileNote({
+                error: true,
+                text:
+                    response.status === 419 || response.status === 401
+                        ? t(
+                              'Your session expired. Sign in in another tab, then retry here.',
+                          )
+                        : response.status === 413
+                          ? t(
+                                'This file could not be uploaded. It may be larger than this server accepts.',
+                            )
+                          : (data?.errors?.file?.[0] ??
+                            data?.message ??
+                            t(
+                                'The file change did not go through. Your text is not affected.',
+                            )),
+            });
+        } catch {
+            if (mounted.current)
+                setFileNote({
+                    error: true,
+                    text: t(
+                        'The file change did not go through. Check your connection and try again.',
+                    ),
+                });
+        } finally {
+            if (mounted.current) setFileBusy(false);
+        }
+    }
+    function attach(file: File | undefined) {
+        if (picker.current) picker.current.value = '';
+        if (!file) return;
+        const ending = file.name.split('.').pop()?.toLowerCase() ?? '';
+        if (!FILE_TYPES.includes(ending))
+            return setFileNote({
+                error: true,
+                text: t('Attach a JPG, PNG, WebP, PDF or TXT file.'),
+            });
+        if (file.size > FILE_BYTES)
+            return setFileNote({
+                error: true,
+                text: t('Each file can be up to 5 MB.'),
+            });
+        const body = new FormData();
+        body.append('file', file);
+        setFileNote({
+            error: false,
+            text: t('Uploading :name…', { name: file.name }),
+        });
+        void fileRequest(
+            'POST',
+            '',
+            body,
+            t(':name was added.', { name: file.name }),
+        );
+    }
+    function detach(file: Attachment) {
+        if (
+            !window.confirm(
+                t('Remove :name from this brief?', { name: file.name }),
+            )
+        )
+            return;
+        void fileRequest(
+            'DELETE',
+            `/${file.id}`,
+            null,
+            t(':name was removed.', { name: file.name }),
+        );
+    }
     function change<K extends keyof Draft>(key: K, value: Draft[K]) {
         setReviewed(false);
         setStatus('Unsaved changes');
@@ -283,7 +399,7 @@ export default function EditProject({
                         </span>
                         <Button
                             variant="outline"
-                            disabled={busy || !!conflict}
+                            disabled={busy || fileBusy || !!conflict}
                             onClick={() => void flush(true)}
                         >
                             {t('Save and exit')}
@@ -476,6 +592,98 @@ export default function EditProject({
                                     ))}
                                 </select>
                             </div>
+                            <fieldset className="project-attachments">
+                                <legend>
+                                    {t('Attached files (optional)')}
+                                </legend>
+                                {/* Q11: who will see the files is said before the control, not after an upload. */}
+                                <p id="project-attachments-audience">
+                                    {t(
+                                        'Everyone can see how many files a brief carries. Only signed-in members with an active account and a verified email can download them, so attach nothing private.',
+                                    )}
+                                </p>
+                                {files.length > 0 && (
+                                    <ul>
+                                        {files.map((file) => (
+                                            <li key={file.id}>
+                                                <Paperclip
+                                                    size={16}
+                                                    aria-hidden="true"
+                                                />
+                                                <a
+                                                    href={`/jobs/${project.id}/attachments/${file.id}`}
+                                                    download
+                                                >
+                                                    <bdi>{file.name}</bdi>
+                                                </a>
+                                                <span className="job-muted">
+                                                    <FileSize
+                                                        bytes={file.size}
+                                                    />
+                                                </span>
+                                                <Button
+                                                    variant="outline"
+                                                    disabled={
+                                                        fileBusy || !!conflict
+                                                    }
+                                                    aria-label={t(
+                                                        'Remove :name',
+                                                        { name: file.name },
+                                                    )}
+                                                    onClick={() => detach(file)}
+                                                >
+                                                    {t('Remove')}
+                                                </Button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                                <div className="project-file-field">
+                                    <input
+                                        ref={picker}
+                                        id="project-attachment"
+                                        type="file"
+                                        className="sr-only"
+                                        accept={FILE_TYPES.map(
+                                            (type) => `.${type}`,
+                                        ).join(',')}
+                                        disabled={
+                                            fileBusy ||
+                                            !!conflict ||
+                                            files.length >= attachmentLimit
+                                        }
+                                        aria-describedby="project-attachments-audience project-attachments-rules"
+                                        onChange={(e) =>
+                                            attach(e.target.files?.[0])
+                                        }
+                                    />
+                                    <label htmlFor="project-attachment">
+                                        {t('Choose a file')}
+                                    </label>
+                                    <span>
+                                        {t(':count of :total files attached', {
+                                            count: files.length,
+                                            total: attachmentLimit,
+                                        })}
+                                    </span>
+                                </div>
+                                <small id="project-attachments-rules">
+                                    {t(
+                                        'Up to :count files, 5 MB each: JPG, PNG, WebP, PDF or TXT. Files cannot be added or removed after you publish.',
+                                        { count: attachmentLimit },
+                                    )}
+                                </small>
+                                <p
+                                    role={fileNote?.error ? 'alert' : 'status'}
+                                    className={
+                                        fileNote?.error
+                                            ? 'project-file-note project-file-error'
+                                            : 'project-file-note'
+                                    }
+                                >
+                                    {fileNote?.text}
+                                </p>
+                            </fieldset>
                         </>
                     )}
                     {step === 1 && (
@@ -749,6 +957,31 @@ export default function EditProject({
                                         </dd>
                                     </div>
                                 ))}
+                                <div>
+                                    <dt className="text-muted-foreground">
+                                        {t('Attached files')}
+                                    </dt>
+                                    <dd>
+                                        {files.length > 0 ? (
+                                            <ul className="project-review-files">
+                                                {files.map((file) => (
+                                                    <li key={file.id}>
+                                                        <bdi>{file.name}</bdi>{' '}
+                                                        <span className="job-muted">
+                                                            <FileSize
+                                                                bytes={
+                                                                    file.size
+                                                                }
+                                                            />
+                                                        </span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        ) : (
+                                            t('Not added yet')
+                                        )}
+                                    </dd>
+                                </div>
                             </dl>
                             {form.budget_min && form.budget_max && (
                                 <Money
@@ -762,6 +995,13 @@ export default function EditProject({
                                     'Publishing makes your brief visible to everyone. Do not include private contact details.',
                                 )}
                             </p>
+                            {files.length > 0 && (
+                                <p>
+                                    {t(
+                                        'The number of attached files will be public. Signed-in members with an active account and a verified email will be able to download them, and they cannot be added or removed after you publish.',
+                                    )}
+                                </p>
+                            )}
                             <label className="flex items-start gap-3">
                                 <input
                                     className="mt-1"
@@ -776,7 +1016,9 @@ export default function EditProject({
                                 )}
                             </label>
                             <Button
-                                disabled={busy || !reviewed || !!conflict}
+                                disabled={
+                                    busy || fileBusy || !reviewed || !!conflict
+                                }
                                 onClick={() => void flush(false, true)}
                             >
                                 {t('Publish project')}

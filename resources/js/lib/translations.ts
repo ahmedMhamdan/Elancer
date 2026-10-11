@@ -2275,4 +2275,36 @@ export const arabic: Record<string, string> = {
     'No proposals yet': 'لا عروض بعد',
     '1 proposal received': 'عرض واحد مستلم',
     'Good work of every kind': 'عمل متقن من كل نوع',
+    '1 attached file': 'ملف مرفق واحد',
+    ':count attached files': ':count ملفات مرفقة',
+    'Attached files': 'الملفات المرفقة',
+    'Attached files (optional)': 'الملفات المرفقة (اختياري)',
+    'These files come from the client. Elancer does not check their content.':
+        'هذه الملفات من صاحب المشروع، ولا يفحص Elancer محتواها.',
+    'Only members with an active account and a verified email can download the files of a brief.':
+        'تنزيل ملفات المشروع متاح فقط للأعضاء أصحاب الحسابات النشطة والبريد الإلكتروني المؤكّد.',
+    'Members with a verified email can download the files of a brief.':
+        'يستطيع الأعضاء أصحاب البريد الإلكتروني المؤكّد تنزيل ملفات المشروع.',
+    'Log in to download': 'سجّل الدخول للتنزيل',
+    'Everyone can see how many files a brief carries. Only signed-in members with an active account and a verified email can download them, so attach nothing private.':
+        'يرى الجميع عدد الملفات المرفقة بالمشروع. لا يستطيع تنزيلها إلا الأعضاء المسجّلون أصحاب الحسابات النشطة والبريد الإلكتروني المؤكّد، فلا ترفق أي ملف خاص.',
+    'Choose a file': 'اختر ملفًا',
+    ':count of :total files attached': ':count من :total ملفات مرفقة',
+    'Up to :count files, 5 MB each: JPG, PNG, WebP, PDF or TXT. Files cannot be added or removed after you publish.':
+        'حتى :count ملفات، 5 ميغابايت لكل ملف: JPG أو PNG أو WebP أو PDF أو TXT. لا يمكن إضافة الملفات أو إزالتها بعد النشر.',
+    'The number of attached files will be public. Signed-in members with an active account and a verified email will be able to download them, and they cannot be added or removed after you publish.':
+        'سيظهر عدد الملفات المرفقة للجميع. سيتمكن الأعضاء المسجّلون أصحاب الحسابات النشطة والبريد الإلكتروني المؤكّد من تنزيلها، ولا يمكن إضافتها أو إزالتها بعد النشر.',
+    'Attach a JPG, PNG, WebP, PDF or TXT file.':
+        'أرفق ملفًا من نوع JPG أو PNG أو WebP أو PDF أو TXT.',
+    'Each file can be up to 5 MB.': 'الحد الأقصى لحجم الملف 5 ميغابايت.',
+    'This file could not be uploaded. It may be larger than this server accepts.':
+        'تعذّر رفع هذا الملف. قد يكون حجمه أكبر مما يقبله الخادم.',
+    'The file change did not go through. Your text is not affected.':
+        'لم يكتمل تغيير الملفات. نص المشروع لم يتأثر.',
+    'The file change did not go through. Check your connection and try again.':
+        'لم يكتمل تغيير الملفات. تحقق من اتصالك ثم حاول مرة أخرى.',
+    'Uploading :name…': 'جارٍ رفع :name…',
+    ':name was added.': 'تمت إضافة :name.',
+    ':name was removed.': 'تمت إزالة :name.',
+    'Remove :name from this brief?': 'هل تريد إزالة :name من هذا المشروع؟',
 };

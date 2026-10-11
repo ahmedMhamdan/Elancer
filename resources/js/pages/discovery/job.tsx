@@ -1,5 +1,5 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Download, Paperclip } from 'lucide-react';
 import type { FormEvent } from 'react';
 import ReportDialog from '@/components/report-dialog';
 import SaveToggle from '@/components/save-toggle';
@@ -7,8 +7,14 @@ import Button from '@/components/tailadmin/button';
 import DatePicker from '@/components/tailadmin/date-picker';
 import TextArea from '@/components/tailadmin/textarea';
 import { useTranslation } from '@/hooks/use-translation';
-import { DiscoveryLayout, JobDate, Money } from './shared';
-import type { Job } from './shared';
+import {
+    AttachmentCount,
+    DiscoveryLayout,
+    FileSize,
+    JobDate,
+    Money,
+} from './shared';
+import type { Attachment, Job } from './shared';
 
 // Q06/Q61: what the owner may still do to a published project. The brief itself is never edited.
 function OwnerUpdates({
@@ -145,8 +151,11 @@ export default function JobDetails({
     clarifications,
     can,
     saved,
+    attachments,
 }: {
     project: Job;
+    // Q11: the list is present only for a viewer who may download.
+    attachments: { count: number; files: Attachment[] | null };
     // Q08: the viewer's own save; never anyone else's.
     saved: boolean;
     // Only the owner reaches this page while moderation hides the project.
@@ -211,6 +220,77 @@ export default function JobDetails({
                     <p className="job-description" dir="auto">
                         {project.description}
                     </p>
+                    {attachments.count > 0 && (
+                        <section
+                            className="job-attachments"
+                            aria-labelledby="job-attachments-heading"
+                        >
+                            <h2 id="job-attachments-heading">
+                                {t('Attached files')}
+                            </h2>
+                            {attachments.files ? (
+                                <>
+                                    <ul>
+                                        {attachments.files.map((file) => (
+                                            <li key={file.id}>
+                                                <a
+                                                    href={`/jobs/${project.id}/attachments/${file.id}`}
+                                                    download
+                                                >
+                                                    <Paperclip
+                                                        size={16}
+                                                        aria-hidden="true"
+                                                    />
+                                                    <span className="job-attachment-name">
+                                                        <bdi>{file.name}</bdi>
+                                                    </span>
+                                                    <span className="job-muted">
+                                                        <FileSize
+                                                            bytes={file.size}
+                                                        />
+                                                    </span>
+                                                    <Download
+                                                        size={16}
+                                                        aria-label={t(
+                                                            'Download',
+                                                        )}
+                                                    />
+                                                </a>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                    <p className="job-muted">
+                                        {t(
+                                            'These files come from the client. Elancer does not check their content.',
+                                        )}
+                                    </p>
+                                </>
+                            ) : (
+                                // Q11: the number is public; the names and the files are for members who may download.
+                                <p className="job-attachments-locked">
+                                    <span>
+                                        <AttachmentCount
+                                            count={attachments.count}
+                                        />
+                                    </span>
+                                    {auth.user ? (
+                                        t(
+                                            'Only members with an active account and a verified email can download the files of a brief.',
+                                        )
+                                    ) : (
+                                        <>
+                                            {t(
+                                                'Members with a verified email can download the files of a brief.',
+                                            )}{' '}
+                                            <Link href="/login">
+                                                {t('Log in to download')}
+                                            </Link>
+                                        </>
+                                    )}
+                                </p>
+                            )}
+                        </section>
+                    )}
                     {clarifications.length > 0 && (
                         <>
                             <h2>{t('Clarifications from the client')}</h2>

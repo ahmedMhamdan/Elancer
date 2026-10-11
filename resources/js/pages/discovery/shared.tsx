@@ -1,4 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
+import { Paperclip } from 'lucide-react';
 import type { ReactNode } from 'react';
 import ElancerSiteHeader from '@/components/elancer-site-header';
 import HoverFooter from '@/components/hover-footer';
@@ -29,6 +30,8 @@ export type Job = {
     open: boolean;
     proposals_received: number;
     screening_questions?: string[];
+    // Q11: how many files the brief carries. The number is public; the files are not.
+    attachments?: number;
     // Q08: present only where the viewer's own saved state is known.
     saved?: boolean;
     own?: boolean;
@@ -68,6 +71,31 @@ export function JobDate({ value }: { value: string }) {
                 timeZone: 'UTC',
             }).format(new Date(value))}
         </time>
+    );
+}
+export type Attachment = { id: number; name: string; size: number };
+export function FileSize({ bytes }: { bytes: number }) {
+    const { locale } = useTranslation();
+    const step = bytes < 1024 ? 0 : bytes < 1048576 ? 1 : 2;
+    return (
+        <bdi>
+            {new Intl.NumberFormat(locale, {
+                style: 'unit',
+                unit: ['byte', 'kilobyte', 'megabyte'][step],
+                maximumFractionDigits: 1,
+            }).format(bytes / 1024 ** step)}
+        </bdi>
+    );
+}
+export function AttachmentCount({ count }: { count: number }) {
+    const { t } = useTranslation();
+    return (
+        <>
+            <Paperclip size={14} aria-hidden="true" />
+            {count === 1
+                ? t('1 attached file')
+                : t(':count attached files', { count })}
+        </>
     );
 }
 export function JobCard({ job, search }: { job: Job; search: string }) {
@@ -146,6 +174,11 @@ export function JobCard({ job, search }: { job: Job; search: string }) {
                             count: job.proposals_received,
                         })}
                     </span>
+                    {!!job.attachments && (
+                        <span className="job-muted job-attachment-count">
+                            <AttachmentCount count={job.attachments} />
+                        </span>
+                    )}
                 </div>
             </div>
         </article>

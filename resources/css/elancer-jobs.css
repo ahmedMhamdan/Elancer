@@ -432,6 +432,129 @@
     overflow-wrap: anywhere;
     font-size: 13px;
 }
+/* Q11: a brief's files. The count is public; the rows appear only for a viewer who may download. */
+.job-attachment-count,
+.job-attachments-locked span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.job-attachments {
+    margin-bottom: 32px;
+}
+.job-attachments ul,
+.project-attachments ul {
+    display: grid;
+    gap: 10px;
+    margin: 14px 0;
+}
+.job-attachments li a,
+.project-attachments li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    padding: 8px 14px;
+    border: 1px solid var(--el-border);
+    border-radius: 8px;
+}
+.job-attachments li a,
+.project-attachments li a {
+    color: var(--el-accent);
+}
+.job-attachments li a:hover {
+    border-color: var(--el-accent);
+}
+/* The name sits in a box that follows the page's direction, so a name in the other script still starts beside the paperclip. */
+.job-attachment-name,
+.project-attachments li a {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+.job-attachments li svg,
+.project-attachments li svg,
+.job-attachments li .job-muted,
+.project-attachments li .job-muted {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+.job-attachments-locked {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 14px;
+    margin-top: 14px;
+    padding: 14px;
+    border: 1px dashed var(--el-border);
+    border-radius: 8px;
+    color: var(--el-muted);
+    font-size: 14px;
+    line-height: 1.7;
+}
+.job-attachments-locked span {
+    color: var(--el-text);
+}
+.job-attachments-locked a {
+    color: var(--el-accent);
+    text-decoration: underline;
+}
+.project-attachments {
+    min-width: 0;
+}
+.project-attachments legend {
+    margin-bottom: 8px;
+}
+.project-attachments > p {
+    color: var(--el-muted);
+    font-size: 14px;
+    line-height: 1.7;
+}
+/* Adapts TailAdmin FileInput: one bordered field with its button at the start. */
+.project-file-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 44px;
+    margin-top: 14px;
+    overflow: hidden;
+    border: 1px solid var(--el-border);
+    border-radius: 8px;
+    color: var(--el-muted);
+    font-size: 14px;
+}
+.project-fields .project-file-field label {
+    margin: 0;
+    padding: 11px 16px;
+    border-inline-end: 1px solid var(--el-border);
+    background: var(--el-surface-soft);
+    color: var(--el-text);
+    white-space: nowrap;
+    cursor: pointer;
+}
+.project-file-field input:focus-visible + label {
+    outline: 2px solid var(--el-accent);
+    outline-offset: -2px;
+}
+.project-file-field input:disabled + label {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+.project-file-note {
+    min-height: 24px;
+    margin-top: 8px;
+    color: var(--el-muted);
+    font-size: 14px;
+}
+.project-file-error {
+    color: var(--el-error);
+}
+.project-review-files {
+    display: grid;
+    gap: 4px;
+    overflow-wrap: anywhere;
+}
 @media (max-width: 1023px) {
     .jobs-grid {
         grid-template-columns: 1fr;

@@ -206,3 +206,7 @@ Copyright (c) 2017 Gregory Petrosyan.
 ## Workspace switch (2026-10-11)
 
 resources/js/components/workspace-switch.tsx adapts local TailAdmin src/components/common/ChartTab.tsx: the segmented pair of buttons is kept, with Elancer tokens, a pressed state, Arabic/RTL and a server save. The TailAdmin MIT notice above applies.
+
+## Brief attachments (2026-10-11)
+
+The file control in resources/js/pages/projects/edit.tsx adapts local TailAdmin src/components/form/input/FileInput.tsx: the bordered field with its button at the start is kept, with a label in place of the browser's own button so its wording follows the interface language, Elancer tokens and Arabic/RTL. The TailAdmin MIT notice above applies.
