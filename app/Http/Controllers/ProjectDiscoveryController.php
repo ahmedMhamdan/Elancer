@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Contracts\PublicReviews;
 use App\Models\Category;
 use App\Models\Project;
 use App\Models\ProjectClarification;
@@ -20,6 +21,8 @@ class ProjectDiscoveryController extends Controller
 {
     /** Q75 received-proposal presets (plan 003 section 15): the lowest count and, where bounded, the first count above the range. */
     private const RECEIVED = ['0-4' => [0, 5], '5-9' => [5, 10], '10-19' => [10, 20], '20' => [20, null]];
+
+    private const CLIENT_REVIEWS = 5;
 
     public function filters(): JsonResponse
     {
@@ -183,6 +186,9 @@ class ProjectDiscoveryController extends Controller
                 'name' => $project->user->profile?->company ?: Str::before($project->user->name, ' '),
                 'country' => $project->user->profile?->country,
                 'member_since' => $project->user->created_at?->format('Y'),
+                // Q18: completed projects and published reviews as a client. Spending and contact details are never sent.
+                ...PublicReviews::record($project->user_id, 'client'),
+                'reviews' => PublicReviews::latest($project->user_id, 'client', self::CLIENT_REVIEWS),
             ],
         ]);
     }

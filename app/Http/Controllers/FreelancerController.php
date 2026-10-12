@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\Contracts\ContractWork;
-use App\Models\ContractReview;
+use App\Actions\Contracts\PublicReviews;
 use App\Models\PortfolioCase;
 use App\Models\Profile;
 use App\Models\Skill;
@@ -13,7 +12,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -22,6 +20,8 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class FreelancerController extends Controller
 {
+    private const REVIEWS = 10;
+
     public function index(Request $request): Response
     {
         $validator = Validator::make($request->query(), [
@@ -50,9 +50,11 @@ class FreelancerController extends Controller
         // Q36: only the viewer's own saves are marked.
         $viewer = $request->user()?->id;
         $saved = $viewer === null ? [] : DB::table('saved_profiles')->where('user_id', $viewer)->whereIn('profile_id', $page->pluck('id'))->pluck('profile_id')->all();
+        $records = PublicReviews::records(array_map(fn (Profile $profile): int => $profile->user_id, $page->items()), 'freelancer');
 
         return Inertia::render('discovery/freelancers', [
-            'freelancers' => $page->through(fn (Profile $profile) => [...$profile->publicDetails(), 'saved' => in_array($profile->id, $saved, true), 'own' => $profile->user_id === $viewer]),
+            'freelancers' => $page->through(fn (Profile $profile) => [...$profile->publicDetails(), 'rating' => $records[$profile->user_id]['rating'],
+                'saved' => in_array($profile->id, $saved, true), 'own' => $profile->user_id === $viewer]),
             'filters' => ['q' => $filters['q'] ?? '', 'skill' => $filters['skill'] ?? '', 'availability' => $filters['availability'] ?? ''],
             'skills' => Skill::query()->orderBy('name')->get(['id', 'name']),
         ]);
@@ -62,18 +64,11 @@ class FreelancerController extends Controller
     {
         abort_unless(Profile::query()->publiclyVisible()->whereKey($profile->id)->exists(), 404);
 
-        // Q18/Q82: published reviews only, with the client's first name and nothing that links to an account.
-        $reviews = ContractReview::query()->with('contract')->where('subject_id', $profile->user_id)->orderByDesc('id')->limit(50)->get()
-            ->filter(fn (ContractReview $review) => $review->contract->freelancer_id === $profile->user_id && ContractWork::reviewsPublished($review->contract))
-            ->take(10)->values()->map(fn (ContractReview $review) => [
-                'id' => $review->id, 'rating' => $review->rating, 'body' => $review->body, 'created_at' => $review->created_at,
-                'author' => Str::before(trim((string) ($review->contract->agreement['client_name'] ?? '')), ' '),
-                'project_title' => $review->contract->agreement['project_title'] ?? null,
-            ]);
-
         $cases = PortfolioCase::query()->publiclyVisible()->where('user_id', $profile->user_id)->orderByDesc('published_at')->orderByDesc('id')->get()->map(PortfolioController::published(...));
 
-        return Inertia::render('discovery/freelancer', ['freelancer' => $profile->load(['user', 'skillTags'])->publicDetails(), 'canContact' => $request->user()?->id !== $profile->user_id, 'reviews' => $reviews, 'cases' => $cases,
+        return Inertia::render('discovery/freelancer', ['freelancer' => $profile->load(['user', 'skillTags'])->publicDetails(), 'canContact' => $request->user()?->id !== $profile->user_id, 'cases' => $cases,
+            // Q18/Q82: published reviews of this member's work only, with the client's first name and nothing that links to an account.
+            'reviews' => PublicReviews::latest($profile->user_id, 'freelancer', self::REVIEWS), 'record' => PublicReviews::record($profile->user_id, 'freelancer'),
             'saved' => $request->user() !== null && DB::table('saved_profiles')->where('user_id', $request->user()->id)->where('profile_id', $profile->id)->exists()]);
     }
 

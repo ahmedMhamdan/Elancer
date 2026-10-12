@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Contracts\PublicReviews;
 use App\Models\Category;
 use App\Models\Profile;
 use App\Models\Project;
@@ -28,6 +29,11 @@ class HomeController extends Controller
     {
         $open = Project::query()->visible()->where('status', 'published')->where('application_closes_at', '>', now());
         $profiles = Profile::query()->publiclyVisible();
+        // A profile with a photo leads; after that the most recently published.
+        $freelancers = (clone $profiles)->with(['user', 'skillTags'])
+            ->orderByRaw('CASE WHEN photo_path IS NULL THEN 1 ELSE 0 END')->orderByDesc('published_at')->orderBy('id')
+            ->limit(self::FREELANCERS)->get();
+        $records = PublicReviews::records($freelancers->map(fn (Profile $profile): int => $profile->user_id)->all(), 'freelancer');
 
         return Inertia::render('welcome', [
             'projects' => (clone $open)->with(['category', 'skills'])
@@ -37,11 +43,8 @@ class HomeController extends Controller
             'categories' => Category::query()->select(['id', 'slug', 'categoryname'])
                 ->withCount(['projects as open_projects_count' => fn (Builder $query) => $query->whereIn('projects.id', (clone $open)->select('id'))])
                 ->orderByDesc('open_projects_count')->orderBy('categoryname')->orderBy('id')->limit(self::CATEGORIES)->get(),
-            // A profile with a photo leads; after that the most recently published.
-            'freelancers' => (clone $profiles)->with(['user', 'skillTags'])
-                ->orderByRaw('CASE WHEN photo_path IS NULL THEN 1 ELSE 0 END')->orderByDesc('published_at')->orderBy('id')
-                ->limit(self::FREELANCERS)->get()
-                ->map(fn (Profile $profile) => [...Arr::except($profile->publicDetails(), ['links']), 'bio' => Str::limit($profile->bio ?? '', 180)]),
+            'freelancers' => $freelancers->map(fn (Profile $profile) => [...Arr::except($profile->publicDetails(), ['links']),
+                'bio' => Str::limit($profile->bio ?? '', 180), 'rating' => $records[$profile->user_id]['rating']]),
             'totals' => ['projects' => (clone $open)->count(), 'freelancers' => (clone $profiles)->count(), 'categories' => Category::query()->count()],
         ]);
     }

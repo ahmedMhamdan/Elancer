@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Contracts\PublicReviews;
 use App\Models\Category;
 use App\Models\Profile;
 use App\Models\Project;
@@ -76,12 +77,15 @@ class SavedItemController extends Controller
     {
         $page = DB::table('saved_profiles')->where('user_id', $request->user()->id)->orderByDesc('id')->paginate(20, ['profile_id', 'created_at']);
         $profiles = Profile::query()->publiclyVisible()->with(['user', 'skillTags'])->whereIn('id', $page->pluck('profile_id'))->get()->keyBy('id');
+        $records = PublicReviews::records($profiles->map(fn (Profile $profile): int => $profile->user_id)->all(), 'freelancer');
 
-        return Inertia::render('saved/freelancers', ['saves' => $page->through(fn (stdClass $save): array => [
-            'id' => $save->profile_id, 'saved_at' => Carbon::parse($save->created_at)->toIso8601String(),
-            // A profile that is no longer public shows none of its earlier details.
-            'freelancer' => $profiles->get($save->profile_id)?->publicDetails(),
-        ])]);
+        return Inertia::render('saved/freelancers', ['saves' => $page->through(function (stdClass $save) use ($profiles, $records): array {
+            $profile = $profiles->get($save->profile_id);
+
+            return ['id' => $save->profile_id, 'saved_at' => Carbon::parse($save->created_at)->toIso8601String(),
+                // A profile that is no longer public shows none of its earlier details.
+                'freelancer' => $profile === null ? null : [...$profile->publicDetails(), 'rating' => $records[$profile->user_id]['rating']]];
+        })]);
     }
 
     public function saveFreelancer(Request $request, Profile $profile): RedirectResponse
