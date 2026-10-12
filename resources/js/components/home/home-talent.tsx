@@ -4,6 +4,7 @@ import { ArrowRight, ArrowUpRight, MapPin } from 'lucide-react';
 import type { Freelancer } from '@/components/freelancer-card';
 import HomeEmpty from '@/components/home/home-empty';
 import { Monogram } from '@/components/home/project-art';
+import RatingSummary from '@/components/rating-summary';
 import { useTranslation } from '@/hooks/use-translation';
 
 export type HomeFreelancer = Omit<Freelancer, 'links'>;
@@ -106,6 +107,11 @@ export default function HomeTalent({
                                                 />
                                                 <bdi>{person.country}</bdi>
                                             </span>
+                                        )}
+                                        {person.rating && (
+                                            <RatingSummary
+                                                rating={person.rating}
+                                            />
                                         )}
                                     </p>
                                     <p

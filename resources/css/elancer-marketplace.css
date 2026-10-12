@@ -552,11 +552,6 @@ td .provider-mark svg {
     color: var(--el-text);
     cursor: pointer;
 }
-.review-stars {
-    display: inline-flex;
-    gap: 2px;
-    color: var(--el-border);
-}
 .review-rating {
     display: flex;
     gap: 4px;
@@ -573,10 +568,6 @@ td .provider-mark svg {
 .review-rating label:has(input:focus-visible) {
     outline: 2px solid var(--el-accent);
     outline-offset: 2px;
-}
-.review-star-on {
-    color: #d97706;
-    fill: #d97706;
 }
 .contract-cancel summary {
     min-height: 44px;

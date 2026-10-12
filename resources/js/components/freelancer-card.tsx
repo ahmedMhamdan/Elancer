@@ -2,6 +2,8 @@
 // Retains avatar/name/headline grouping; Elancer tokens, RTL and real member data replace demos.
 import { Link, usePage } from '@inertiajs/react';
 import { MapPin } from 'lucide-react';
+import RatingSummary from '@/components/rating-summary';
+import type { Rating } from '@/components/rating-summary';
 import SaveToggle from '@/components/save-toggle';
 import { useTranslation } from '@/hooks/use-translation';
 export type WorkLink = { label: string; url: string };
@@ -16,6 +18,8 @@ export type Freelancer = {
     member_since: string | null;
     skills: { id: number; name: string }[];
     links: WorkLink[];
+    // Q82: the published rating of this freelancer's work, where a card or list shows it.
+    rating?: Rating;
     // Q36: present only where the viewer's own saved state is known.
     saved?: boolean;
     own?: boolean;
@@ -69,6 +73,7 @@ export default function FreelancerCard({
                         <bdi>{person.country}</bdi>
                     </span>
                 )}
+                {person.rating && <RatingSummary rating={person.rating} />}
             </div>
             {!compact && (
                 <p className="talent-excerpt" dir="auto">

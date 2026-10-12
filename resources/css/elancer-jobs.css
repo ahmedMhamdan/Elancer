@@ -317,6 +317,24 @@
     gap: 28px;
     align-items: start;
 }
+/* What freelancers wrote about the client follows the facts and the Apply button in the page's order.
+   A wide screen places it under the brief, beside them; the second row takes any height the facts need. */
+@media (min-width: 1024px) {
+    .job-detail-reviewed {
+        grid-template-rows: auto 1fr;
+    }
+    .job-detail-reviewed > .job-detail-meta {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+    }
+    .job-detail-reviewed > .job-client-reviews {
+        grid-column: 1;
+        grid-row: 2;
+    }
+}
+.job-client-reviews-intro {
+    margin-bottom: 24px;
+}
 .job-description {
     white-space: pre-wrap;
     overflow-wrap: anywhere;

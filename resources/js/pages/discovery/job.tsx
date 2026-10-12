@@ -1,6 +1,11 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft, Download, Paperclip } from 'lucide-react';
 import type { FormEvent } from 'react';
+import RatingSummary, {
+    CompletedProjects,
+    ReviewList,
+} from '@/components/rating-summary';
+import type { PublicReview, Rating } from '@/components/rating-summary';
 import ReportDialog from '@/components/report-dialog';
 import SaveToggle from '@/components/save-toggle';
 import Button from '@/components/tailadmin/button';
@@ -166,6 +171,10 @@ export default function JobDetails({
         name: string;
         country: string | null;
         member_since: string | null;
+        // Q18: completed projects and published reviews as a client; never spending or contact details.
+        completed: number;
+        rating: Rating;
+        reviews: PublicReview[];
     };
     returnUrl: string;
     application: {
@@ -214,7 +223,13 @@ export default function JobDetails({
                     )}
                 </span>
             </header>
-            <div className="job-detail-grid">
+            <div
+                className={
+                    client.reviews.length > 0
+                        ? 'job-detail-grid job-detail-reviewed'
+                        : 'job-detail-grid'
+                }
+            >
                 <article className="job-card">
                     <h2>{t('Project brief')}</h2>
                     <p className="job-description" dir="auto">
@@ -372,6 +387,15 @@ export default function JobDetails({
                             })}
                         </p>
                     )}
+                    <p>
+                        <CompletedProjects count={client.completed} />
+                    </p>
+                    <p>
+                        <RatingSummary
+                            rating={client.rating}
+                            empty={t('No reviews yet')}
+                        />
+                    </p>
                     <hr />
                     <p>
                         {t(':count proposals received', {
@@ -426,6 +450,26 @@ export default function JobDetails({
                         />
                     )}
                 </aside>
+                {/* Q18: after the facts and the Apply button in the page's order, so long reviews never push them down a phone; a wide screen places it under the brief. */}
+                {client.reviews.length > 0 && (
+                    <section
+                        className="job-card job-client-reviews"
+                        aria-labelledby="client-reviews-heading"
+                    >
+                        <h2 id="client-reviews-heading">
+                            {t('Reviews from freelancers')}
+                        </h2>
+                        <p className="job-muted job-client-reviews-intro">
+                            {t(
+                                'Written by freelancers after completing a project with this client.',
+                            )}
+                        </p>
+                        <ReviewList
+                            reviews={client.reviews}
+                            total={client.rating.count}
+                        />
+                    </section>
+                )}
             </div>
             {(can.extend || can.clarify) && (
                 <OwnerUpdates project={project} can={can} />

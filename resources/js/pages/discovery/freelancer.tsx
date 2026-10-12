@@ -3,8 +3,12 @@ import ReportDialog from '@/components/report-dialog';
 import SaveToggle from '@/components/save-toggle';
 import Button from '@/components/tailadmin/button';
 import { ArrowLeft, ExternalLink, MapPin } from 'lucide-react';
-import { Stars } from '@/pages/contracts/reviews';
-import { DiscoveryLayout, JobDate } from './shared';
+import RatingSummary, {
+    CompletedProjects,
+    ReviewList,
+} from '@/components/rating-summary';
+import type { PublicReview, Rating } from '@/components/rating-summary';
+import { DiscoveryLayout } from './shared';
 import type { PublicCase } from './portfolio-case';
 import type { Freelancer } from '@/components/freelancer-card';
 import { useTranslation } from '@/hooks/use-translation';
@@ -13,6 +17,7 @@ export default function FreelancerProfile({
     freelancer: person,
     canContact,
     reviews,
+    record,
     cases,
     saved,
 }: {
@@ -21,14 +26,10 @@ export default function FreelancerProfile({
     saved: boolean;
     cases: PublicCase[];
     canContact: boolean;
-    reviews: {
-        id: number;
-        rating: number;
-        body: string;
-        created_at: string;
-        author: string;
-        project_title: string | null;
-    }[];
+    // Q82: the newest published reviews of this freelancer's work.
+    reviews: PublicReview[];
+    // Completed contracts as a freelancer and the rating over every published review of that work.
+    record: { completed: number; rating: Rating };
 }) {
     const { t } = useTranslation();
     const { auth } = usePage().props;
@@ -66,10 +67,15 @@ export default function FreelancerProfile({
                     <p className="talent-headline" dir="auto">
                         {person.headline}
                     </p>
-                    {person.country && (
+                    {(person.country || record.rating.count > 0) && (
                         <p className="talent-meta">
-                            <MapPin size={16} />
-                            <bdi>{person.country}</bdi>
+                            {person.country && (
+                                <span>
+                                    <MapPin size={16} aria-hidden="true" />
+                                    <bdi>{person.country}</bdi>
+                                </span>
+                            )}
+                            <RatingSummary rating={record.rating} />
                         </p>
                     )}
                 </div>
@@ -181,34 +187,17 @@ export default function FreelancerProfile({
                         )}
                     </section>
                     <section className="market-panel market-stack">
-                        <h2>{t('Reviews')}</h2>
+                        <div className="market-actions">
+                            <h2 className="!mb-0">{t('Reviews')}</h2>
+                            <RatingSummary rating={record.rating} />
+                        </div>
                         {reviews.length ? (
-                            reviews.map((review) => (
-                                <article
-                                    key={review.id}
-                                    className="market-stack"
-                                >
-                                    <div className="market-actions">
-                                        <Stars rating={review.rating} />
-                                        <span className="market-muted">
-                                            <bdi>{review.author}</bdi>
-                                            {' · '}
-                                            <JobDate
-                                                value={review.created_at}
-                                            />
-                                        </span>
-                                    </div>
-                                    <h3 dir="auto" className="!mb-0">
-                                        {review.project_title}
-                                    </h3>
-                                    <p
-                                        dir="auto"
-                                        className="market-prose break-words"
-                                    >
-                                        {review.body}
-                                    </p>
-                                </article>
-                            ))
+                            <div>
+                                <ReviewList
+                                    reviews={reviews}
+                                    total={record.rating.count}
+                                />
+                            </div>
                         ) : (
                             <p className="market-muted">
                                 {t('No published reviews yet.')}
@@ -233,6 +222,9 @@ export default function FreelancerProfile({
                             {t('Member since :year', {
                                 year: person.member_since ?? '',
                             })}
+                        </p>
+                        <p>
+                            <CompletedProjects count={record.completed} />
                         </p>
                         <p className="market-muted">
                             {t('A new collaboration starts with a project.')}

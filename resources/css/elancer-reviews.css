@@ -1,0 +1,56 @@
+/* Review stars and a member's published rating, shared by public pages, cards and the contract workroom. */
+.review-stars {
+    display: inline-flex;
+    gap: 2px;
+    color: var(--el-border);
+}
+.review-star-on {
+    color: #d97706;
+    fill: #d97706;
+}
+.rating-summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--el-muted);
+    white-space: nowrap;
+}
+.rating-summary strong {
+    color: var(--el-text);
+    font-weight: 600;
+}
+/* A list of published reviews: stars and who wrote it on one line, then the project and the text. */
+.review-list {
+    display: grid;
+    gap: 24px;
+}
+.review-list > li + li {
+    padding-top: 24px;
+    border-top: 1px solid var(--el-border);
+}
+.review-byline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 12px;
+    color: var(--el-muted);
+    font-size: 14px;
+}
+.review-project {
+    margin-top: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+.review-text {
+    margin-top: 8px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    line-height: 1.8;
+    max-width: 78ch;
+}
+.review-list-note {
+    margin-top: 20px;
+    color: var(--el-muted);
+    font-size: 14px;
+}

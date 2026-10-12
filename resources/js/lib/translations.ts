@@ -2307,4 +2307,16 @@ export const arabic: Record<string, string> = {
     ':name was added.': 'تمت إضافة :name.',
     ':name was removed.': 'تمت إزالة :name.',
     'Remove :name from this brief?': 'هل تريد إزالة :name من هذا المشروع؟',
+    'Rated :rating out of 5': 'التقييم :rating من 5',
+    '1 review': 'تقييم واحد',
+    ':count reviews': 'التقييمات: :count',
+    'No reviews yet': 'لا توجد تقييمات بعد',
+    'No completed projects yet': 'لا توجد مشاريع مكتملة بعد',
+    '1 completed project': 'مشروع مكتمل واحد',
+    ':count completed projects': 'المشاريع المكتملة: :count',
+    'Reviews from freelancers': 'تقييمات المستقلين',
+    'Written by freelancers after completing a project with this client.':
+        'كتبها مستقلون بعد إكمال مشروع مع صاحب المشروع.',
+    'Showing the :shown most recent of :count reviews.':
+        'المعروض هنا أحدث :shown تقييمات من أصل :count.',
 };

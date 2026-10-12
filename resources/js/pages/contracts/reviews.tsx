@@ -1,6 +1,7 @@
 import { useForm } from '@inertiajs/react';
 import { Star } from 'lucide-react';
 import InputError from '@/components/input-error';
+import { Stars } from '@/components/rating-summary';
 import Button from '@/components/tailadmin/button';
 import TextArea from '@/components/tailadmin/textarea';
 import { useTranslation } from '@/hooks/use-translation';
@@ -14,28 +15,6 @@ export type ReviewState = {
     theirs: Review | null;
     theirs_submitted: boolean;
 };
-
-export function Stars({ rating }: { rating: number }) {
-    const { t, locale } = useTranslation();
-    return (
-        <span
-            className="review-stars"
-            role="img"
-            aria-label={t(':rating out of 5', {
-                rating: rating.toLocaleString(locale),
-            })}
-        >
-            {[1, 2, 3, 4, 5].map((star) => (
-                <Star
-                    key={star}
-                    size={18}
-                    aria-hidden="true"
-                    className={star <= rating ? 'review-star-on' : ''}
-                />
-            ))}
-        </span>
-    );
-}
 
 function Shown({ title, review }: { title: string; review: Review }) {
     return (

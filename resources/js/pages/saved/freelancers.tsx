@@ -1,5 +1,6 @@
 import { Link, router } from '@inertiajs/react';
 import type { Freelancer } from '@/components/freelancer-card';
+import RatingSummary from '@/components/rating-summary';
 import Button from '@/components/tailadmin/button';
 import Pagination from '@/components/tailadmin/pagination';
 import { useTranslation } from '@/hooks/use-translation';
@@ -46,6 +47,9 @@ export default function SavedFreelancers({ saves }: { saves: Page<Save> }) {
                                             : 'Available for work',
                                     )}
                                 </span>
+                                {person.rating && (
+                                    <RatingSummary rating={person.rating} />
+                                )}
                                 <span className="market-muted">
                                     {t('Saved on')} <JobDate value={saved_at} />
                                 </span>
