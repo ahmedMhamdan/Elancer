@@ -3,6 +3,7 @@
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\ProtectPasswordlessAccount;
+use App\Http\Middleware\RestrictDemoSession;
 use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\TrustHostProxy;
 use Illuminate\Auth\AuthenticationException;
@@ -35,6 +36,8 @@ return Application::configure(basePath: dirname(__DIR__))
             SetLocale::class,
             ProtectPasswordlessAccount::class,
             HandleInertiaRequests::class,
+            // Inside the Inertia middleware, so a refusal is answered the way an Inertia visit expects.
+            RestrictDemoSession::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);
     })

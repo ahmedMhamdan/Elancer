@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Actions\Auth\DemoAccess;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -40,12 +41,16 @@ class HandleInertiaRequests extends Middleware
             ? route('profile.photo', ['v' => hash('sha256', $user->profile->photo_path)])
             : null;
 
+        $demo = DemoAccess::active($request);
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'locale' => app()->getLocale(),
             'auth' => [
-                'user' => $user === null ? null : [...$user->attributesToArray(), 'avatar' => $avatar, 'has_password' => $user->password !== null],
+                // A demo session reads in the visitor's language, not the shared account's saved one.
+                'user' => $user === null ? null : [...$user->attributesToArray(), ...($demo ? ['locale' => app()->getLocale()] : []), 'avatar' => $avatar, 'has_password' => $user->password !== null],
+                'demo' => $demo,
             ],
             // The recipient's own count only; the list loads when the bell opens.
             'notifications' => ['unread' => $user?->unreadNotifications()->count() ?? 0],

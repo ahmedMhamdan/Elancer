@@ -12,6 +12,7 @@ use App\Http\Controllers\ContractController;
 use App\Http\Controllers\ContractWorkController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DemoSessionController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\FreelancerController;
 use App\Http\Controllers\HomeController;
@@ -155,7 +156,10 @@ Route::middleware('guest')->group(function () {
     Route::get('auth/{provider}/redirect', [SocialAuthController::class, 'redirect'])->whereIn('provider', ['google', 'github'])->middleware('throttle:10,1')->name('social.redirect');
     Route::get('auth/complete', [SocialAuthController::class, 'complete'])->name('social.complete');
     Route::post('auth/complete', [SocialAuthController::class, 'store'])->middleware('throttle:6,1')->name('social.store');
+    // Plan 025: a prepared account for a visitor who does not want to register. The session it opens is view-only.
+    Route::post('demo/{role}', [DemoSessionController::class, 'store'])->whereIn('role', ['client', 'freelancer'])->middleware('throttle:10,1')->name('demo.enter');
 });
+Route::post('demo/leave', [DemoSessionController::class, 'destroy'])->middleware('auth')->name('demo.leave');
 Route::get('auth/{provider}/callback', [SocialAuthController::class, 'callback'])->whereIn('provider', ['google', 'github'])->middleware('throttle:20,1')->name('social.callback');
 Route::middleware('auth')->group(function () {
     Route::post('settings/social/{provider}/confirm', [SocialAuthController::class, 'confirm'])->whereIn('provider', ['google', 'github'])->middleware('throttle:10,1')->name('social.confirm');
