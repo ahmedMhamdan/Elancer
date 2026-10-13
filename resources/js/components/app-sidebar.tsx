@@ -32,6 +32,7 @@ import {
     UserRoundX,
     UsersRound,
     type LucideIcon,
+    FlaskConical,
 } from 'lucide-react';
 import ElancerWordmark from '@/components/elancer-wordmark';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -244,6 +245,11 @@ export function AppSidebar() {
                                         label: t('Background work'),
                                         href: '/admin/operations',
                                         icon: <Activity size={20} />,
+                                    },
+                                    {
+                                        label: t('Demo data'),
+                                        href: '/admin/demo',
+                                        icon: <FlaskConical size={20} />,
                                     },
                                 ]
                               : []),

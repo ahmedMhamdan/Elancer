@@ -2395,4 +2395,71 @@ export const arabic: Record<string, string> = {
     Retry: 'إعادة المحاولة',
     Dismiss: 'تجاهل',
     'Nothing has failed.': 'لم يخفق شيء.',
+    'This account is shared with other visitors and filled with sample data. Try it out: post a project, apply, message, hire and pay with the test provider. It all stays inside the demo and is reset from time to time. Files, the profile and account settings are switched off.':
+        'هذا الحساب مشترك بين الزوار وفيه بيانات تجريبية. جرّبه: انشر مشروعًا، قدّم عرضًا، راسل، وظّف وادفع عبر مزوّد الدفع التجريبي. كل ذلك يبقى داخل العرض التجريبي ويُعاد ضبطه من وقت لآخر. الملفات والملف الشخصي وإعدادات الحساب معطّلة.',
+    'Switch to the demo client': 'انتقل إلى حساب صاحب المشاريع التجريبي',
+    'Switch to the demo freelancer': 'انتقل إلى حساب المستقل التجريبي',
+    'No account needed. Demo accounts are shared with other visitors and filled with sample projects, proposals and contracts. What you do there stays inside the demo and is reset from time to time.':
+        'لا حاجة إلى حساب. الحسابات التجريبية مشتركة بين الزوار وفيها مشاريع وعروض وعقود تجريبية. ما تفعله هناك يبقى داخل العرض التجريبي ويُعاد ضبطه من وقت لآخر.',
+    'This is a sample project from the demo, so it does not take applications from member accounts.':
+        'هذا مشروع تجريبي من العرض التجريبي، لذلك لا يستقبل عروضًا من حسابات الأعضاء.',
+    'This project belongs to a member. A demo account can apply to demo projects only.':
+        'هذا المشروع يخص أحد الأعضاء. الحساب التجريبي يستطيع التقديم على المشاريع التجريبية فقط.',
+    'This is a sample profile from the demo, so member accounts cannot invite it.':
+        'هذا ملف تجريبي من العرض التجريبي، لذلك لا تستطيع حسابات الأعضاء دعوته.',
+    'This freelancer is a member. A demo account can invite demo freelancers only.':
+        'هذا المستقل أحد الأعضاء. الحساب التجريبي يستطيع دعوة المستقلين التجريبيين فقط.',
+    'Demo data': 'بيانات العرض التجريبي',
+    'Visitors enter the demo accounts from the login and register pages. Once a starting point is saved they can act among demo accounts, and a reset returns the demo accounts to it. Nothing here writes to a member’s account or to anything a member owns.':
+        'يدخل الزوار الحسابات التجريبية من صفحتي تسجيل الدخول وإنشاء الحساب. بعد حفظ نقطة البداية يستطيعون التصرف بين الحسابات التجريبية، وإعادة الضبط تعيد الحسابات التجريبية إليها. لا شيء هنا يكتب في حساب عضو أو في أي شيء يملكه عضو.',
+    'The demo accounts as they are now are the starting point.':
+        'الحسابات التجريبية بحالتها الآن هي نقطة البداية.',
+    'The demo was reset to its starting point.':
+        'أُعيد ضبط العرض التجريبي إلى نقطة البداية.',
+    'The last reset was refused.': 'رُفضت آخر إعادة ضبط.',
+    'No starting point has been saved yet.': 'لم تُحفظ نقطة بداية بعد.',
+    'The saved starting point is older than the current structure of the table :table. Save a new starting point.':
+        'نقطة البداية المحفوظة أقدم من البنية الحالية للجدول :table. احفظ نقطة بداية جديدة.',
+    'A row outside the demo depends on a demo row that would be deleted (:parent, through :child), so nothing was reset.':
+        'هناك سجل خارج العرض التجريبي يعتمد على سجل تجريبي كان سيُحذف (:parent عبر :child)، لذلك لم يُعد ضبط شيء.',
+    'The saved starting point does not match the demo accounts in this database, so nothing was written.':
+        'نقطة البداية المحفوظة لا تطابق الحسابات التجريبية في قاعدة البيانات هذه، لذلك لم يُكتب شيء.',
+    'Save the demo accounts as they are now as the starting point? Everything they hold now becomes public and is what every reset returns to.':
+        'هل تريد حفظ الحسابات التجريبية بحالتها الآن كنقطة بداية؟ كل ما فيها الآن يصبح ظاهرًا للجميع، وإليه تعود كل إعادة ضبط.',
+    'Reset the demo now? Everything demo visitors did since the starting point is removed, including for anyone using the demo right now.':
+        'هل تريد إعادة ضبط العرض التجريبي الآن؟ يُحذف كل ما فعله زوار العرض التجريبي منذ نقطة البداية، حتى لمن يستخدمه الآن.',
+    'Starting point': 'نقطة البداية',
+    'Not saved': 'غير محفوظة',
+    ':accounts demo accounts, :rows rows':
+        'الحسابات التجريبية: :accounts، السجلات: :rows',
+    'Saved by :name': 'حفظها :name',
+    'Until one is saved, demo visitors can only look.':
+        'إلى أن تُحفظ نقطة بداية، يستطيع زوار العرض التجريبي التصفح فقط.',
+    'Demo visitors': 'زوار العرض التجريبي',
+    'Cannot enter': 'لا يستطيعون الدخول',
+    'Can act': 'يستطيعون التصرف',
+    'Can only look': 'يتصفحون فقط',
+    'Last change': 'آخر تغيير',
+    ':count demo accounts in this database. Nothing has changed since the starting point.':
+        'عدد الحسابات التجريبية في قاعدة البيانات هذه: :count. لم يتغير شيء منذ نقطة البداية.',
+    ':count demo accounts in this database.':
+        'عدد الحسابات التجريبية في قاعدة البيانات هذه: :count.',
+    'Last reset': 'آخر إعادة ضبط',
+    Never: 'لم تحدث بعد',
+    'A reset runs by itself when a visitor enters a demo that nobody has changed for :minutes minutes, or that has stayed changed for :hours hours.':
+        'تجري إعادة الضبط تلقائيًا عندما يدخل زائر عرضًا تجريبيًا لم يغيّره أحد منذ :minutes دقيقة، أو بقي متغيّرًا مدة :hours ساعة.',
+    'Save the current state as the starting point':
+        'احفظ الحالة الحالية كنقطة بداية',
+    'Reset the demo now': 'أعد ضبط العرض التجريبي الآن',
+    'Latest activity': 'آخر النشاطات',
+    When: 'الوقت',
+    'What happened': 'ما الذي حدث',
+    By: 'بواسطة',
+    'Starting point saved: :rows rows of :accounts demo accounts':
+        'حُفظت نقطة البداية (السجلات: :rows، الحسابات التجريبية: :accounts)',
+    'Reset: :removed rows removed, :returned brought back, :restored set back':
+        'إعادة ضبط: حُذف :removed، أُعيد :returned، صُحّح :restored',
+    'By itself, when a visitor entered': 'تلقائيًا عند دخول زائر',
+    'From the command line': 'من سطر الأوامر',
+    'Nothing has happened yet.': 'لم يحدث شيء بعد.',
 };

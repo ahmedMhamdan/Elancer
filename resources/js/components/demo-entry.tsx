@@ -8,11 +8,16 @@ import InputError from '@/components/input-error';
 import { Spinner } from '@/components/ui/spinner';
 import { useTranslation } from '@/hooks/use-translation';
 
-/** A visitor who does not want to register enters a prepared, view-only account. */
+/** A visitor who does not want to register enters a prepared account. */
 export default function DemoEntry() {
     const { t } = useTranslation();
-    const { demoRoles = [], errors } = usePage<{
+    const {
+        demoRoles = [],
+        demoActs = false,
+        errors,
+    } = usePage<{
         demoRoles?: string[];
+        demoActs?: boolean;
     }>().props;
     const [entering, setEntering] = useState<string | null>(null);
     if (demoRoles.length === 0) return null;
@@ -54,9 +59,13 @@ export default function DemoEntry() {
             </div>
             <InputError message={errors.demo} />
             <p className="registration-provider-notice">
-                {t(
-                    'No account needed. Demo accounts are shared with other visitors and view-only, with sample projects, proposals and contracts.',
-                )}
+                {demoActs
+                    ? t(
+                          'No account needed. Demo accounts are shared with other visitors and filled with sample projects, proposals and contracts. What you do there stays inside the demo and is reset from time to time.',
+                      )
+                    : t(
+                          'No account needed. Demo accounts are shared with other visitors and view-only, with sample projects, proposals and contracts.',
+                      )}
             </p>
         </section>
     );

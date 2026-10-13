@@ -16,6 +16,7 @@ import '../../../css/elancer-marketplace.css';
 export default function FreelancerProfile({
     freelancer: person,
     canContact,
+    apart,
     reviews,
     record,
     cases,
@@ -26,6 +27,8 @@ export default function FreelancerProfile({
     saved: boolean;
     cases: PublicCase[];
     canContact: boolean;
+    // Plan 027: set when the viewer and this freelancer cannot hire each other, with the side the freelancer is on.
+    apart: 'demo' | 'member' | null;
     // Q82: the newest published reviews of this freelancer's work.
     reviews: PublicReview[];
     // Completed contracts as a freelancer and the rating over every published review of that work.
@@ -82,16 +85,28 @@ export default function FreelancerProfile({
             </section>
             {canContact && (
                 <div className="market-actions mb-4">
-                    <Link
-                        className="job-button"
-                        href={
-                            auth.user
-                                ? `/freelancers/${person.id}/invite`
-                                : '/login'
-                        }
-                    >
-                        {t('Invite to a project')}
-                    </Link>
+                    {apart ? (
+                        <p className="job-muted" data-test="demo-apart">
+                            {apart === 'demo'
+                                ? t(
+                                      'This is a sample profile from the demo, so member accounts cannot invite it.',
+                                  )
+                                : t(
+                                      'This freelancer is a member. A demo account can invite demo freelancers only.',
+                                  )}
+                        </p>
+                    ) : (
+                        <Link
+                            className="job-button"
+                            href={
+                                auth.user
+                                    ? `/freelancers/${person.id}/invite`
+                                    : '/login'
+                            }
+                        >
+                            {t('Invite to a project')}
+                        </Link>
+                    )}
                     {auth.user && (
                         <SaveToggle
                             url={`/freelancers/${person.id}/save`}

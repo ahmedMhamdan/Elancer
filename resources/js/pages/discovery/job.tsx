@@ -179,6 +179,8 @@ export default function JobDetails({
     returnUrl: string;
     application: {
         owner: boolean;
+        // Plan 027: set when the viewer and the owner cannot hire each other, with the side the project is on.
+        apart: 'demo' | 'member' | null;
         proposal: { id: number; status: string } | null;
     };
 }) {
@@ -416,6 +418,19 @@ export default function JobDetails({
                         >
                             {t('View your proposal')}
                         </Link>
+                    ) : application.apart ? (
+                        // Plan 027: a demo account and a member look at each other's projects and cannot apply to them.
+                        project.open && (
+                            <p className="job-muted" data-test="demo-apart">
+                                {application.apart === 'demo'
+                                    ? t(
+                                          'This is a sample project from the demo, so it does not take applications from member accounts.',
+                                      )
+                                    : t(
+                                          'This project belongs to a member. A demo account can apply to demo projects only.',
+                                      )}
+                            </p>
+                        )
                     ) : (
                         project.open && (
                             <Link

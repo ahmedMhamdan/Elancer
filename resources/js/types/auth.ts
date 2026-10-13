@@ -14,8 +14,12 @@ export type User = {
 
 export type Auth = {
     user: User;
-    /** True in a view-only session opened from the demo buttons. */
+    /** True in a session opened from the demo buttons. */
     demo?: boolean;
+    /** Plan 027: whether that session may change things among demo accounts. */
+    demoActing?: boolean;
+    /** The other prepared account the banner can move the visitor to. */
+    demoOther?: 'client' | 'freelancer' | null;
 };
 
 export type Passkey = {
