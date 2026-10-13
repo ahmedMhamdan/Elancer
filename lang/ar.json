@@ -385,5 +385,6 @@
     "We could not save this file. Please try again.": "تعذّر حفظ هذا الملف. حاول مرة أخرى.",
     "A brief can carry up to :count files. Remove one to add another.": "يمكن إرفاق ما لا يزيد على :count ملفات بالمشروع. أزل ملفًا لإضافة آخر.",
     "The demo is not available right now. You can still create a free account.": "العرض التجريبي غير متاح الآن. ما زال بإمكانك إنشاء حساب مجاني.",
-    "This is a shared demo account, so changes are switched off. Create your own free account to try it yourself.": "هذا حساب تجريبي مشترك، لذلك التغييرات معطّلة. أنشئ حسابك المجاني لتجرّب بنفسك."
+    "This is a shared demo account, so changes are switched off. Create your own free account to try it yourself.": "هذا حساب تجريبي مشترك، لذلك التغييرات معطّلة. أنشئ حسابك المجاني لتجرّب بنفسك.",
+    "A skill with this name already exists.": "توجد مهارة بهذا الاسم."
 }

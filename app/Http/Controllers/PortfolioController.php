@@ -9,6 +9,7 @@ use App\Models\PortfolioApproval;
 use App\Models\PortfolioCase;
 use App\Models\PortfolioImage;
 use App\Models\Profile;
+use App\Models\Skill;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -230,7 +231,8 @@ class PortfolioController extends Controller
             'summary' => ['required', 'string', 'min:20', 'max:300'],
             'body' => ['required', 'string', 'min:50', 'max:5000'],
             'skills' => ['present', 'array', 'list', 'max:15'],
-            'skills.*' => ['string', 'distinct', Rule::exists('skills', 'name')],
+            // Plan 026: a retired skill cannot be newly chosen; one the case already names may stay.
+            'skills.*' => ['string', 'distinct', Skill::choosable('name', array_values(array_filter((array) ($case?->content['skills'] ?? []), 'is_string')))],
             'links' => ['present', 'array', 'list', 'max:5'],
             'links.*' => ['array:label,url'],
             'links.*.label' => ['required', 'string', 'max:80'],

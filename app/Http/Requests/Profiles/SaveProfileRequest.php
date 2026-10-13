@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Profiles;
 
+use App\Models\Skill;
+
 class SaveProfileRequest extends UpdateProfileRequest
 {
     public function authorize(): bool
@@ -19,7 +21,7 @@ class SaveProfileRequest extends UpdateProfileRequest
         return ['skills.max' => __('validation.max.array')] + parent::messages();
     }
 
-    /** @return array<string, list<string>> */
+    /** @return array<string, array<int, mixed>> */
     public function rules(): array
     {
         return parent::rules() + [
@@ -27,7 +29,8 @@ class SaveProfileRequest extends UpdateProfileRequest
             'city' => ['sometimes', 'nullable', 'string', 'max:100'],
             'company' => ['sometimes', 'nullable', 'string', 'max:120'],
             'skills' => ['sometimes', 'nullable', 'array', 'list', 'max:15'],
-            'skills.*' => ['required', 'string', 'max:50', 'distinct:ignore_case', 'exists:skills,name'],
+            // Plan 026: a retired skill cannot be newly chosen; one the profile already carries may stay.
+            'skills.*' => ['required', 'string', 'max:50', 'distinct:ignore_case', Skill::choosable('name', $this->user()?->profile?->skillTags()->pluck('name')->all() ?? [])],
             'photo_path' => ['missing'],
             'availability' => ['sometimes', 'required', 'in:available,busy'],
             'professional_links' => ['sometimes', 'array', 'list', 'max:5'],

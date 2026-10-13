@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\AdminAccountController;
 use App\Http\Controllers\AdministratorController;
+use App\Http\Controllers\AdminOperationsController;
 use App\Http\Controllers\AdminReportController;
+use App\Http\Controllers\AdminSkillController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ClientProjectController;
 use App\Http\Controllers\ContactBlockController;
@@ -196,6 +198,26 @@ Route::middleware(['auth', 'verified', EnsureCategoryAdministrator::class])
         Route::get('/', [AdminAccountController::class, 'index'])->name('index');
         Route::get('{user}', [AdminAccountController::class, 'show'])->whereNumber('user')->name('show');
         Route::patch('{user}', [AdminAccountController::class, 'update'])->whereNumber('user')->middleware('throttle:20,1')->name('update');
+    });
+
+// Plan 026: the skill catalog is taxonomy, so regular administrators keep it, behind the same gate as categories.
+Route::middleware(['auth', 'verified', EnsureCategoryAdministrator::class])
+    ->prefix('admin/skills')->name('admin.skills.')->group(function () {
+        Route::get('/', [AdminSkillController::class, 'index'])->name('index');
+        Route::get('create', [AdminSkillController::class, 'create'])->name('create');
+        Route::post('/', [AdminSkillController::class, 'store'])->middleware('throttle:30,1')->name('store');
+        Route::get('{skill}/edit', [AdminSkillController::class, 'edit'])->whereNumber('skill')->name('edit');
+        Route::put('{skill}', [AdminSkillController::class, 'update'])->whereNumber('skill')->middleware('throttle:30,1')->name('update');
+        Route::delete('{skill}', [AdminSkillController::class, 'destroy'])->whereNumber('skill')->middleware('throttle:30,1')->name('destroy');
+        Route::post('{skill}/restore', [AdminSkillController::class, 'restore'])->whereNumber('skill')->middleware('throttle:30,1')->name('restore');
+    });
+
+// Failed background work can carry private data in its stored form, so only super administrators reach it.
+Route::middleware(['auth', 'verified', EnsureSuperAdministrator::class])
+    ->prefix('admin/operations')->name('admin.operations.')->group(function () {
+        Route::get('/', [AdminOperationsController::class, 'index'])->name('index');
+        Route::post('{job}/retry', [AdminOperationsController::class, 'retry'])->whereNumber('job')->middleware('throttle:20,1')->name('retry');
+        Route::delete('{job}', [AdminOperationsController::class, 'destroy'])->whereNumber('job')->middleware('throttle:20,1')->name('destroy');
     });
 
 Route::middleware(['auth', 'verified', EnsureSuperAdministrator::class])

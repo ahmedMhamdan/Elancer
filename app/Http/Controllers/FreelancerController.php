@@ -56,7 +56,7 @@ class FreelancerController extends Controller
             'freelancers' => $page->through(fn (Profile $profile) => [...$profile->publicDetails(), 'rating' => $records[$profile->user_id]['rating'],
                 'saved' => in_array($profile->id, $saved, true), 'own' => $profile->user_id === $viewer]),
             'filters' => ['q' => $filters['q'] ?? '', 'skill' => $filters['skill'] ?? '', 'availability' => $filters['availability'] ?? ''],
-            'skills' => Skill::query()->orderBy('name')->get(['id', 'name']),
+            'skills' => Skill::query()->selectable()->orderBy('name')->get(['id', 'name']),
         ]);
     }
 

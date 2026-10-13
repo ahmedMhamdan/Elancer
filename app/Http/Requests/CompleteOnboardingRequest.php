@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Enums\WorkspaceRole;
+use App\Models\Skill;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -34,7 +35,7 @@ class CompleteOnboardingRequest extends FormRequest
             'headline' => ['exclude_unless:role,freelancer', 'required', 'string', 'max:120'],
             'bio' => ['required', 'string', 'max:5000'],
             'skills' => ['exclude_unless:role,freelancer', 'required', 'array', 'list', 'min:1', 'max:15'],
-            'skills.*' => ['required', 'string', 'max:50', 'distinct:ignore_case', 'exists:skills,name'],
+            'skills.*' => ['required', 'string', 'max:50', 'distinct:ignore_case', Skill::choosable('name')],
             'company' => ['exclude_unless:role,client', 'nullable', 'string', 'max:120'],
             'country' => ['required', 'string', 'max:100'],
             'city' => ['required', 'string', 'max:100'],

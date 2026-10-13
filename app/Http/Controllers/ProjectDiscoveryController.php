@@ -28,7 +28,7 @@ class ProjectDiscoveryController extends Controller
     {
         return response()->json([
             'categories' => Category::query()->orderBy('categoryname')->get(['id', 'slug', 'categoryname']),
-            'skills' => Skill::query()->orderBy('name')->get(['id', 'name']),
+            'skills' => Skill::query()->selectable()->orderBy('name')->get(['id', 'name']),
         ]);
     }
 
@@ -148,7 +148,7 @@ class ProjectDiscoveryController extends Controller
                 'saved' => in_array($project->id, $saved, true), 'own' => $project->user_id === $viewer]),
             'filters' => $filters,
             'categories' => Category::query()->orderBy('categoryname')->get(['id', 'slug', 'categoryname']),
-            'skills' => Skill::query()->orderBy('name')->get(['id', 'name']),
+            'skills' => Skill::query()->selectable()->orderBy('name')->get(['id', 'name']),
             'canMatchSkills' => count($profileSkills) > 0,
         ]);
     }

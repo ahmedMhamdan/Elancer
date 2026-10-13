@@ -92,7 +92,7 @@ class ClientProjectController extends Controller
     }
 
     /** @return array<string, mixed> */
-    private function fields(Request $request, bool $publish): array
+    private function fields(Request $request, Project $project, bool $publish): array
     {
         $presence = $publish ? 'required' : 'nullable';
         $rules = [
@@ -101,7 +101,8 @@ class ClientProjectController extends Controller
             'description' => [$presence, 'string', 'max:20000'],
             'category_id' => [$presence, 'integer', Rule::exists('categories', 'id')->whereNull('deleted_at')],
             'skills' => [$presence, 'array', 'list', 'max:15'],
-            'skills.*' => ['required', 'integer', 'distinct', Rule::exists('skills', 'id')],
+            // Plan 026: a retired skill cannot be newly chosen; one the brief already carries may stay.
+            'skills.*' => ['required', 'integer', 'distinct', Skill::choosable('id', $project->skills()->pluck('skills.id')->all())],
             'budget_min' => [$presence, 'numeric', 'min:1', 'max:1000000', 'decimal:0,2'],
             'budget_max' => [$presence, 'numeric', 'min:1', 'max:1000000', 'decimal:0,2'],
             'application_closes_at' => [$presence, 'date'],
@@ -139,7 +140,7 @@ class ClientProjectController extends Controller
     private function save(Request $request, Project $project, bool $publish): JsonResponse
     {
         $this->owner($request, $project);
-        $data = $this->fields($request, $publish);
+        $data = $this->fields($request, $project, $publish);
 
         return DB::transaction(function () use ($request, $project, $data, $publish): JsonResponse {
             $locked = Project::query()->whereKey($project->id)->lockForUpdate()->firstOrFail();

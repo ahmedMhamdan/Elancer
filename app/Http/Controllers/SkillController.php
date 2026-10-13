@@ -15,7 +15,8 @@ class SkillController extends Controller
         $query = trim($data['q'] ?? '');
         // Literal substring search: SQL wildcards supplied by users are not patterns.
         $pattern = '%'.str_replace(['!', '%', '_'], ['!!', '!%', '!_'], mb_strtolower($query)).'%';
-        $matches = Skill::query()->whereRaw("LOWER(name) LIKE ? ESCAPE '!'", [$pattern])
+        // Plan 026: a retired skill is no longer suggested.
+        $matches = Skill::query()->selectable()->whereRaw("LOWER(name) LIKE ? ESCAPE '!'", [$pattern])
             ->orderBy('name')->limit(20)->get(['id', 'name']);
 
         return response()->json(['data' => $matches]);
