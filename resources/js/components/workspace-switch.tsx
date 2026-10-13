@@ -14,6 +14,8 @@ export default function WorkspaceSwitch() {
     const wide = open || isMobile;
     const current =
         auth.user.workspace_role === 'client' ? 'client' : 'freelancer';
+    // A demo session is view-only and each demo button opens its own workspace.
+    if (auth.demo) return null;
     return (
         <div
             className="workspace-switch"

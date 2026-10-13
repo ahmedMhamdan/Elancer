@@ -2319,4 +2319,13 @@ export const arabic: Record<string, string> = {
         'كتبها مستقلون بعد إكمال مشروع مع صاحب المشروع.',
     'Showing the :shown most recent of :count reviews.':
         'المعروض هنا أحدث :shown تقييمات من أصل :count.',
+    'or look around first': 'أو تصفّح أولًا',
+    'Explore as a client': 'تصفّح كصاحب مشاريع',
+    'Explore as a freelancer': 'تصفّح كمستقل',
+    'No account needed. Demo accounts are shared with other visitors and view-only, with sample projects, proposals and contracts.':
+        'لا حاجة إلى حساب. الحسابات التجريبية مشتركة بين الزوار وللعرض فقط، وفيها مشاريع وعروض وعقود تجريبية.',
+    'You are exploring a demo account': 'أنت تتصفّح حسابًا تجريبيًا',
+    'This account is shared with other visitors and filled with sample data. You can open every page; changes are switched off.':
+        'هذا الحساب مشترك بين الزوار وفيه بيانات تجريبية. يمكنك فتح كل الصفحات، لكن التغييرات معطّلة.',
+    'Create your own account': 'أنشئ حسابك الخاص',
 };

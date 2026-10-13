@@ -2,6 +2,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import { Form, Head, Link } from '@inertiajs/react';
 import AuthField from '@/components/auth-field';
 import AuthSocial from '@/components/auth-social';
+import DemoEntry from '@/components/demo-entry';
 import ElancerSiteHeader from '@/components/elancer-site-header';
 import PasskeyVerify from '@/components/passkey-verify';
 import { Spinner } from '@/components/ui/spinner';
@@ -114,6 +115,7 @@ export default function Login({ status, canResetPassword }: Props) {
                         <div className="login-passkey">
                             <PasskeyVerify hideSeparator />
                         </div>
+                        <DemoEntry />
                         <p className="registration-login-note">
                             {t('New to Elancer?')}{' '}
                             <Link href={register()}>

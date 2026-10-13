@@ -14,6 +14,8 @@ export type User = {
 
 export type Auth = {
     user: User;
+    /** True in a view-only session opened from the demo buttons. */
+    demo?: boolean;
 };
 
 export type Passkey = {
