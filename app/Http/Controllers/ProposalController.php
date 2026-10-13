@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Conversations\HiringAccess;
+use App\Actions\Demo\DemoWorld;
 use App\Actions\Invitations\InvitationLifecycle;
 use App\Actions\Offers\OfferLifecycle;
 use App\Models\Contract;
@@ -72,6 +73,8 @@ class ProposalController extends Controller
     {
         $this->eligible($request);
         abort_if($project->user_id === $request->user()->id, 403);
+        // Plan 027: a demo account and a real member never hire each other.
+        abort_if(DemoWorld::apart($request->user()->id, $project->user_id), 403, __('Demo accounts and members work apart, so this is not available between them.'));
         $proposal = Proposal::query()->where('project_id', $project->id)->where('user_id', $request->user()->id)->first();
         abort_unless($this->canEdit($project, $proposal), 409, __('This proposal cannot be edited right now.'));
 
@@ -93,6 +96,7 @@ class ProposalController extends Controller
             abort_unless($user->canParticipateInMarketplace() && $user->onboarding_completed_at, 403);
             $locked = Project::query()->lockForUpdate()->findOrFail($project->id);
             abort_if($locked->user_id === $user->id, 403);
+            abort_if(DemoWorld::apart($user->id, $locked->user_id), 403, __('Demo accounts and members work apart, so this is not available between them.'));
             $proposal = Proposal::query()->where('project_id', $locked->id)->where('user_id', $user->id)->lockForUpdate()->first();
             abort_unless($this->canEdit($locked, $proposal), 409, __('This proposal cannot be edited right now.'));
             if (($proposal->version ?? 0) !== $request->integer('version')) {

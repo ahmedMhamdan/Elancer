@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Auth\SocialProviders;
+use App\Actions\Demo\DemoWorld;
 use App\Models\SocialIdentity;
 use App\Models\User;
 use GuzzleHttp\Client;
@@ -175,7 +176,9 @@ class SocialAuthController extends Controller
     public function store(Request $request): Response
     {
         $signup = $this->pending($request);
-        $data = $request->validate(['name' => ['required', 'string', 'max:255'], 'email' => ['required', 'string', 'email', 'max:255']]);
+        $data = $request->validate(['name' => ['required', 'string', 'max:255'], 'email' => ['required', 'string', 'email', 'max:255',
+            // Plan 027: the demo accounts' address domain is theirs alone.
+            fn (string $attribute, mixed $value, \Closure $fail) => is_string($value) && DemoWorld::address($value) ? $fail(__('This email address cannot be used here.')) : null]]);
 
         return $this->create($request, $signup, $data['name'], Str::lower(trim($data['email'])), false);
     }

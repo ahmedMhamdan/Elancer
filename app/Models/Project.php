@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Actions\Demo\DemoWorld;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -106,5 +107,7 @@ class Project extends Model
             ->where('budget_min', '>=', 1)->whereColumn('budget_max', '>=', 'budget_min')
             ->whereHas('category')
             ->whereHas('user', fn (Builder $owner) => $owner->where('status', 'active')->whereNotNull('email_verified_at'));
+        // Plan 027: a project a demo account created after the saved starting point is listed inside the demo only.
+        DemoWorld::keepInside($query, $query->qualifyColumn('user_id'), $query->qualifyColumn('created_at'));
     }
 }

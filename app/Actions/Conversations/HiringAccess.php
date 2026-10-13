@@ -2,6 +2,7 @@
 
 namespace App\Actions\Conversations;
 
+use App\Actions\Demo\DemoWorld;
 use App\Actions\Invitations\InvitationLifecycle;
 use App\Models\Contract;
 use App\Models\Project;
@@ -28,6 +29,8 @@ class HiringAccess
             && $proposal->project->status === 'published' && Project::query()->listable()->whereKey($proposal->project_id)->exists()
             && User::query()->whereKey($proposal->user_id)->where('status', 'active')->whereNotNull('email_verified_at')->whereNotNull('onboarding_completed_at')->exists()
             && User::query()->whereKey($proposal->project->user_id)->whereNotNull('onboarding_completed_at')->exists()
-            && ! InvitationLifecycle::blocked($proposal->project->user_id, $proposal->user_id);
+            && ! InvitationLifecycle::blocked($proposal->project->user_id, $proposal->user_id)
+            // Plan 027: a proposal that crosses between a demo account and a real member goes no further.
+            && ! DemoWorld::apart($proposal->project->user_id, $proposal->user_id);
     }
 }

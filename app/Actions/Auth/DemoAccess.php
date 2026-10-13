@@ -43,4 +43,16 @@ class DemoAccess
     {
         return $request->hasSession() && $request->session()->get(self::SESSION_KEY) === true && $request->user() !== null;
     }
+
+    /** Plan 027: the other prepared account, which the banner offers so one visitor can play both sides of a hire. */
+    public static function other(?User $user): ?string
+    {
+        foreach (self::ROLES as $role) {
+            if ($user !== null && strcasecmp(trim((string) config('demo.accounts.'.$role)), $user->email) !== 0 && self::account($role) !== null) {
+                return $role;
+            }
+        }
+
+        return null;
+    }
 }

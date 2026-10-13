@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Demo\DemoWorld;
 use App\Actions\Invitations\InvitationLifecycle as Lifecycle;
 use App\Models\Invitation;
 use App\Models\Profile;
@@ -27,6 +28,8 @@ class InvitationController extends Controller
         $this->eligible($request);
         abort_unless(Profile::query()->publiclyVisible()->whereKey($profile->id)->exists(), 404);
         abort_if($profile->user_id === $request->user()->id, 403);
+        // Plan 027: a demo account and a real member never hire each other.
+        abort_if(DemoWorld::apart($request->user()->id, $profile->user_id), 403, __('Demo accounts and members work apart, so this is not available between them.'));
         $blocked = Lifecycle::blocked($profile->user_id, $request->user()->id);
         $projects = Project::query()->visible()->where('user_id', $request->user()->id)->where('status', 'published')->where('application_closes_at', '>', now())
             ->orderByDesc('id')->paginate(20)->through(fn (Project $project) => $project->only(['id', 'title', 'application_closes_at']));
@@ -44,6 +47,7 @@ class InvitationController extends Controller
             $recipient = $users->get($profile->user_id);
             abort_unless($owner?->canParticipateInMarketplace() && $owner->onboarding_completed_at, 403);
             abort_unless($recipient && $recipient->id !== $owner->id && Profile::query()->publiclyVisible()->whereKey($profile->id)->exists(), 422, __('This freelancer is not available for invitations.'));
+            abort_if(DemoWorld::apart($owner->id, $recipient->id), 403, __('Demo accounts and members work apart, so this is not available between them.'));
             $project = Project::query()->where('user_id', $owner->id)->whereKey($data['project_id'])->lockForUpdate()->firstOrFail();
             abort_unless(Lifecycle::open($project) && ! Lifecycle::blocked($owner->id, $recipient->id), 422, __('This invitation cannot be sent right now.'));
             abort_if(Proposal::query()->where('project_id', $project->id)->where('user_id', $recipient->id)->whereNotNull('submitted_at')->exists(), 422, __('This freelancer has already applied.'));
@@ -78,6 +82,7 @@ class InvitationController extends Controller
         $author = $invitation->project->user_id === $request->user()->id;
         abort_unless($author || $invitation->recipient_id === $request->user()->id, 404);
         $available = Lifecycle::open($invitation->project) && ! Lifecycle::blocked($invitation->project->user_id, $invitation->recipient_id)
+            && ! DemoWorld::apart($invitation->project->user_id, $invitation->recipient_id)
             && $invitation->recipient->canParticipateInMarketplace() && Profile::query()->publiclyVisible()->where('user_id', $invitation->recipient_id)->exists();
 
         return Inertia::render('invitations/show', [
@@ -105,6 +110,7 @@ class InvitationController extends Controller
                 $locked->forceFill(['status' => 'declined', 'declined_at' => now()]);
             } else {
                 abort_unless($project->user_id === $actor->id, 404);
+                abort_if(DemoWorld::apart($actor->id, $locked->recipient_id), 403, __('Demo accounts and members work apart, so this is not available between them.'));
                 abort_unless($locked->status === 'declined' && $locked->declined_at?->addHours(168)->lte(now()), 409, __('Wait seven days after decline before sending another invitation.'));
                 abort_unless(Lifecycle::open($project) && ! Lifecycle::blocked($project->user_id, $locked->recipient_id)
                     && Profile::query()->publiclyVisible()->where('user_id', $locked->recipient_id)->exists(), 422, __('This invitation cannot be sent right now.'));

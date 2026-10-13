@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Actions\Auth\DemoAccess;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 
 class ThrottleRequestsPerRoute extends ThrottleRequests
@@ -14,7 +15,9 @@ class ThrottleRequestsPerRoute extends ThrottleRequests
     protected function resolveRequestSignature($request)
     {
         $route = $request->route();
+        // Plan 027: a demo account is shared, so its visitors are counted by address, as guests are.
+        $who = DemoAccess::active($request) ? 'demo|'.$request->ip() : parent::resolveRequestSignature($request);
 
-        return sha1(($route?->getName() ?? $request->method().' '.$route?->uri()).'|'.parent::resolveRequestSignature($request));
+        return sha1(($route?->getName() ?? $request->method().' '.$route?->uri()).'|'.$who);
     }
 }

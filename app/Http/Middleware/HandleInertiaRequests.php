@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Actions\Auth\DemoAccess;
+use App\Actions\Demo\DemoWorld;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -51,6 +52,9 @@ class HandleInertiaRequests extends Middleware
                 // A demo session reads in the visitor's language, not the shared account's saved one.
                 'user' => $user === null ? null : [...$user->attributesToArray(), ...($demo ? ['locale' => app()->getLocale()] : []), 'avatar' => $avatar, 'has_password' => $user->password !== null],
                 'demo' => $demo,
+                // Plan 027: whether this demo session may change things, and the other prepared account it can move to.
+                'demoActing' => $demo && DemoWorld::acting($request),
+                'demoOther' => $demo ? DemoAccess::other($user) : null,
             ],
             // The recipient's own count only; the list loads when the bell opens.
             'notifications' => ['unread' => $user?->unreadNotifications()->count() ?? 0],

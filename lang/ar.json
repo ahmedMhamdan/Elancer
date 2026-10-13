@@ -386,5 +386,10 @@
     "A brief can carry up to :count files. Remove one to add another.": "يمكن إرفاق ما لا يزيد على :count ملفات بالمشروع. أزل ملفًا لإضافة آخر.",
     "The demo is not available right now. You can still create a free account.": "العرض التجريبي غير متاح الآن. ما زال بإمكانك إنشاء حساب مجاني.",
     "This is a shared demo account, so changes are switched off. Create your own free account to try it yourself.": "هذا حساب تجريبي مشترك، لذلك التغييرات معطّلة. أنشئ حسابك المجاني لتجرّب بنفسك.",
-    "A skill with this name already exists.": "توجد مهارة بهذا الاسم."
+    "A skill with this name already exists.": "توجد مهارة بهذا الاسم.",
+    "This part is switched off in the shared demo. Create your own free account to use it.": "هذا الجزء معطّل في العرض التجريبي المشترك. أنشئ حسابك المجاني لتستخدمه.",
+    "Demo accounts and members work apart, so this is not available between them.": "الحسابات التجريبية وحسابات الأعضاء تعمل منفصلة، لذلك هذا غير متاح بينها.",
+    "The other demo account is not available right now.": "الحساب التجريبي الآخر غير متاح الآن.",
+    "This payment went through a test provider the shared demo cannot use.": "تمّ هذا الدفع عبر مزوّد دفع تجريبي لا يستطيع العرض التجريبي المشترك استخدامه.",
+    "This email address cannot be used here.": "لا يمكن استخدام عنوان البريد الإلكتروني هذا هنا."
 }

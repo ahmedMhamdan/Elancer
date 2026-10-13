@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Demo\DemoWorld;
 use App\Actions\Payments\ContractFunding;
 use App\Models\Contract;
 use App\Models\PaymentAttempt;
@@ -91,6 +92,8 @@ class PaymentController extends Controller
 
     private function simulated(Request $request, PaymentAttempt $attempt): void
     {
-        abort_unless($attempt->payer_id === $request->user()->id && $attempt->provider === 'simulator' && config('payments.simulator.enabled'), 404);
+        // Plan 027: the stand-in provider is how a demo session funds a contract, whatever members are offered.
+        abort_unless($attempt->payer_id === $request->user()->id && $attempt->provider === 'simulator'
+            && (config('payments.simulator.enabled') || DemoWorld::acting($request)), 404);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Contracts\PublicReviews;
+use App\Actions\Demo\DemoWorld;
 use App\Models\PortfolioCase;
 use App\Models\Profile;
 use App\Models\Skill;
@@ -66,7 +67,9 @@ class FreelancerController extends Controller
 
         $cases = PortfolioCase::query()->publiclyVisible()->where('user_id', $profile->user_id)->orderByDesc('published_at')->orderByDesc('id')->get()->map(PortfolioController::published(...));
 
-        return Inertia::render('discovery/freelancer', ['freelancer' => $profile->load(['user', 'skillTags'])->publicDetails(), 'canContact' => $request->user()?->id !== $profile->user_id, 'cases' => $cases,
+        // Plan 027: a demo account and a real member look at each other's profiles and cannot invite each other.
+        return Inertia::render('discovery/freelancer', ['freelancer' => $profile->load(['user', 'skillTags'])->publicDetails(), 'canContact' => $request->user()?->id !== $profile->user_id,
+            'apart' => DemoWorld::across($request->user()?->id, $profile->user_id), 'cases' => $cases,
             // Q18/Q82: published reviews of this member's work only, with the client's first name and nothing that links to an account.
             'reviews' => PublicReviews::latest($profile->user_id, 'freelancer', self::REVIEWS), 'record' => PublicReviews::record($profile->user_id, 'freelancer'),
             'saved' => $request->user() !== null && DB::table('saved_profiles')->where('user_id', $request->user()->id)->where('profile_id', $profile->id)->exists()]);

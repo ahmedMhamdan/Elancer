@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Actions\Auth\DemoAccess;
 use App\Actions\Auth\SocialProviders;
+use App\Actions\Demo\DemoWorld;
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
 use App\Http\Responses\OnboardingVerifyEmailResponse;
@@ -80,6 +81,7 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::loginView(fn (Request $request) => Inertia::render('auth/login', [
             'socialProviders' => SocialProviders::availability(),
             'demoRoles' => DemoAccess::roles(),
+            'demoActs' => DemoWorld::open(),
             'canResetPassword' => Features::enabled(Features::resetPasswords()),
             'status' => $request->session()->get('status'),
         ]));
@@ -101,6 +103,7 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::registerView(fn () => Inertia::render('auth/register', [
             'socialProviders' => SocialProviders::availability(),
             'demoRoles' => DemoAccess::roles(),
+            'demoActs' => DemoWorld::open(),
             'passwordRules' => Password::defaults()->toPasswordRulesString(),
         ]));
 

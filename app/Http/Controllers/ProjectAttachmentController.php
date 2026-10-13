@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Auth\DemoAccess;
+use App\Actions\Demo\DemoWorld;
 use App\Models\Project;
 use App\Models\ProjectAttachment;
 use App\Models\User;
@@ -39,8 +40,8 @@ class ProjectAttachmentController extends Controller
         if ($user->id === $project->user_id) {
             return $user->keepsExistingAccess();
         }
-        // Plan 025: the demo buttons must not hand a member's files to anyone who clicks them.
-        if (DemoAccess::active(request())) {
+        // Plans 025 and 027: the demo buttons must not hand a member's files to anyone who clicks them; a demo brief's files stay readable.
+        if (DemoAccess::active(request()) && ! DemoWorld::holds($project->user_id)) {
             return false;
         }
 
@@ -105,7 +106,7 @@ class ProjectAttachmentController extends Controller
         $own = $user->id === $project->user_id && $user->keepsExistingAccess();
         // A draft, a trashed draft and a project hidden by moderation have no files for anyone but their owner.
         abort_unless($own || Project::query()->visible()->whereKey($project->id)->exists(), 404);
-        abort_unless($own || ($user->canParticipateInMarketplace() && ! DemoAccess::active($request)), 403);
+        abort_unless($own || ($user->canParticipateInMarketplace() && (! DemoAccess::active($request) || DemoWorld::holds($project->user_id))), 403);
         abort_unless(Storage::disk('uploads')->exists($attachment->path), 404);
 
         // Always a download under a neutral type, so a file is never shown or run inside the site.

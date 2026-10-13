@@ -1,6 +1,8 @@
 <?php
 
 use App\Actions\Contracts\CancelContract;
+use App\Actions\Demo\DemoBaseline;
+use App\Actions\Demo\DemoResetRefused;
 use App\Actions\Payments\ContractFunding;
 use App\Models\Contract;
 use App\Models\ContractCancellation;
@@ -31,3 +33,38 @@ Artisan::command('payments:reconcile', function (ContractFunding $funding, Cance
 })->purpose('Ask the payment providers about pending payments and refunds');
 
 Schedule::command('payments:reconcile')->everyFiveMinutes()->withoutOverlapping();
+
+// Plan 027: the demo accounts' starting point and the reset to it. Neither touches a row outside the demo.
+Artisan::command('demo:save', function () {
+    try {
+        DemoBaseline::save(null);
+    } catch (DemoResetRefused $refusal) {
+        $this->error('Nothing was saved: '.$refusal->getMessage());
+
+        return 1;
+    }
+    $this->info('The demo accounts as they are now are the starting point.');
+
+    return 0;
+})->purpose('Save the demo accounts as they are now as the starting point a reset returns to');
+
+Artisan::command('demo:reset {--due : Only when the demo has been left changed and quiet, or has stayed changed for long}', function () {
+    if ($this->option('due')) {
+        DemoBaseline::restoreWhenDue();
+
+        return 0;
+    }
+    try {
+        $counts = DemoBaseline::restore(null);
+    } catch (DemoResetRefused $refusal) {
+        $this->error('Nothing was reset: '.$refusal->getMessage());
+
+        return 1;
+    }
+    $this->info('Removed '.$counts['removed'].', returned '.$counts['returned'].', restored '.$counts['restored'].' rows.');
+
+    return 0;
+})->purpose('Return the demo accounts to the saved starting point');
+
+// Covers a host that stays awake; a sleeping one resets when the next visitor enters.
+Schedule::command('demo:reset --due')->everyTenMinutes()->withoutOverlapping();

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminAccountController;
+use App\Http\Controllers\AdminDemoController;
 use App\Http\Controllers\AdministratorController;
 use App\Http\Controllers\AdminOperationsController;
 use App\Http\Controllers\AdminReportController;
@@ -158,10 +159,11 @@ Route::middleware('guest')->group(function () {
     Route::get('auth/{provider}/redirect', [SocialAuthController::class, 'redirect'])->whereIn('provider', ['google', 'github'])->middleware('throttle:10,1')->name('social.redirect');
     Route::get('auth/complete', [SocialAuthController::class, 'complete'])->name('social.complete');
     Route::post('auth/complete', [SocialAuthController::class, 'store'])->middleware('throttle:6,1')->name('social.store');
-    // Plan 025: a prepared account for a visitor who does not want to register. The session it opens is view-only.
+    // Plans 025 and 027: a prepared account for a visitor who does not want to register. RestrictDemoSession decides what the session may do.
     Route::post('demo/{role}', [DemoSessionController::class, 'store'])->whereIn('role', ['client', 'freelancer'])->middleware('throttle:10,1')->name('demo.enter');
 });
 Route::post('demo/leave', [DemoSessionController::class, 'destroy'])->middleware('auth')->name('demo.leave');
+Route::post('demo/switch', [DemoSessionController::class, 'switch'])->middleware(['auth', 'throttle:20,1'])->name('demo.switch');
 Route::get('auth/{provider}/callback', [SocialAuthController::class, 'callback'])->whereIn('provider', ['google', 'github'])->middleware('throttle:20,1')->name('social.callback');
 Route::middleware('auth')->group(function () {
     Route::post('settings/social/{provider}/confirm', [SocialAuthController::class, 'confirm'])->whereIn('provider', ['google', 'github'])->middleware('throttle:10,1')->name('social.confirm');
@@ -218,6 +220,14 @@ Route::middleware(['auth', 'verified', EnsureSuperAdministrator::class])
         Route::get('/', [AdminOperationsController::class, 'index'])->name('index');
         Route::post('{job}/retry', [AdminOperationsController::class, 'retry'])->whereNumber('job')->middleware('throttle:20,1')->name('retry');
         Route::delete('{job}', [AdminOperationsController::class, 'destroy'])->whereNumber('job')->middleware('throttle:20,1')->name('destroy');
+    });
+
+// Plan 027: saving the demo's starting point and resetting to it rewrite many rows at once.
+Route::middleware(['auth', 'verified', EnsureSuperAdministrator::class])
+    ->prefix('admin/demo')->name('admin.demo.')->group(function () {
+        Route::get('/', [AdminDemoController::class, 'index'])->name('index');
+        Route::post('baseline', [AdminDemoController::class, 'store'])->middleware('throttle:6,1')->name('save');
+        Route::post('reset', [AdminDemoController::class, 'restore'])->middleware('throttle:6,1')->name('reset');
     });
 
 Route::middleware(['auth', 'verified', EnsureSuperAdministrator::class])

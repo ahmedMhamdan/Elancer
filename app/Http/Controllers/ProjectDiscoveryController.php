@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Contracts\PublicReviews;
+use App\Actions\Demo\DemoWorld;
 use App\Models\Category;
 use App\Models\Project;
 use App\Models\ProjectClarification;
@@ -161,7 +162,8 @@ class ProjectDiscoveryController extends Controller
         abort_unless($own || Project::query()->visible()->whereKey($project->id)->exists(), 404);
         $project->load(['category', 'skills', 'user.profile']);
         $project->loadCount(['proposals as proposals_received' => fn (Builder $q) => $q->whereNotNull('submitted_at')]);
-        $clarifications = $project->clarifications()->orderBy('id')->get();
+        // Plan 027: a note a demo account added after the saved starting point is read inside the demo only.
+        $clarifications = $project->clarifications()->when(DemoWorld::hides($project->user_id), fn ($notes) => $notes->where('created_at', '<=', DemoWorld::hiddenSince()))->orderBy('id')->get();
         // Q06/Q61: the owner changes a published project only while it is still hiring and not hidden.
         $changeable = $request->user()?->id === $project->user_id && $request->user()->canParticipateInMarketplace()
             && $project->status === 'published' && $project->moderated_at === null;
@@ -180,6 +182,8 @@ class ProjectDiscoveryController extends Controller
             'returnUrl' => '/jobs'.(is_string($request->query('search')) && strlen($request->query('search')) <= 4000 && $request->query('search') !== '' ? '?'.$request->query('search') : ''),
             'application' => [
                 'owner' => $request->user()?->id === $project->user_id,
+                // Plan 027: a demo account and a real member look at each other's projects and cannot apply to them.
+                'apart' => DemoWorld::across($request->user()?->id, $project->user_id),
                 'proposal' => $request->user() ? $project->proposals()->where('user_id', $request->user()->id)->first()?->only(['id', 'status']) : null,
             ],
             'client' => [
