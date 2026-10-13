@@ -2328,4 +2328,71 @@ export const arabic: Record<string, string> = {
     'This account is shared with other visitors and filled with sample data. You can open every page; changes are switched off.':
         'هذا الحساب مشترك بين الزوار وفيه بيانات تجريبية. يمكنك فتح كل الصفحات، لكن التغييرات معطّلة.',
     'Create your own account': 'أنشئ حسابك الخاص',
+    'Background work': 'المهام الخلفية',
+    'Active skills': 'المهارات النشطة',
+    'Retired skills': 'المهارات الموقوفة',
+    'The skill was added.': 'تمت إضافة المهارة.',
+    'The skill was saved.': 'تم حفظ المهارة.',
+    'The skill was retired. It stays on the profiles and projects that already have it.':
+        'تم إيقاف المهارة. ستبقى في الملفات الشخصية والمشاريع التي تحتويها.',
+    'The skill was restored and can be chosen again.':
+        'تمت استعادة المهارة ويمكن اختيارها من جديد.',
+    Renamed: 'تغيّر اسمها',
+    Retired: 'موقوفة',
+    Restored: 'تمت استعادتها',
+    'Retire :name? Members who have it keep it; nobody can newly choose it.':
+        'هل تريد إيقاف :name؟ ستبقى لدى الأعضاء الذين يملكونها، ولن يتمكن أحد من اختيارها من جديد.',
+    'The change could not be saved. Please try again.':
+        'تعذّر حفظ التغيير. حاول مرة أخرى.',
+    'The catalog members choose their skills from. A skill is retired, never deleted, so profiles and projects that carry it stay readable.':
+        'القائمة التي يختار منها الأعضاء مهاراتهم. المهارة تُوقف ولا تُحذف، حتى تبقى الملفات الشخصية والمشاريع التي تحتويها مفهومة.',
+    'Add a skill': 'إضافة مهارة',
+    'Skill name': 'اسم المهارة',
+    'Find skill': 'ابحث عن مهارة',
+    Profiles: 'الملفات الشخصية',
+    Projects: 'المشاريع',
+    Retire: 'إيقاف',
+    'No skills match.': 'لا توجد مهارات مطابقة.',
+    'Latest changes': 'آخر التغييرات',
+    'Removed skill': 'مهارة محذوفة',
+    was: 'كانت',
+    'Rename skill': 'تغيير اسم المهارة',
+    'Back to skills': 'العودة إلى المهارات',
+    'Every profile and project that carries this skill shows the new name at once. Approved case studies and sent proposals keep the name they were written with.':
+        'سيظهر الاسم الجديد فورًا في كل ملف شخصي ومشروع يحتوي هذه المهارة. أما دراسات الحالة المعتمدة والعروض المرسلة فتحتفظ بالاسم الذي كُتبت به.',
+    'Between 2 and 50 characters, in English or Arabic. Members can choose it as soon as it is added.':
+        'من حرفين إلى 50 حرفًا، بالعربية أو الإنجليزية. يستطيع الأعضاء اختيارها فور إضافتها.',
+    'Saving...': 'جارٍ الحفظ...',
+    'Save name': 'حفظ الاسم',
+    'Add skill': 'إضافة المهارة',
+    'Email about a workspace event': 'بريد إلكتروني عن حدث في مساحة العمل',
+    'Live update': 'تحديث مباشر',
+    'Other background work': 'مهمة خلفية أخرى',
+    'The work was put back on the queue. It runs when the worker reaches it.':
+        'أُعيدت المهمة إلى قائمة الانتظار، وستُنفَّذ عندما يحين دورها.',
+    'The work could not be put back on the queue. It is still listed here.':
+        'تعذّرت إعادة المهمة إلى قائمة الانتظار. ما زالت مدرجة هنا.',
+    'The failure was dismissed.': 'تم تجاهل الإخفاق.',
+    'Retry this work? The email is sent now, however long ago it failed.':
+        'هل تريد إعادة المحاولة؟ سيُرسل البريد الآن مهما مضى على إخفاقه.',
+    'Retry this work?': 'هل تريد إعادة المحاولة؟',
+    'Dismiss this failure? The work will not run.':
+        'هل تريد تجاهل هذا الإخفاق؟ لن تُنفَّذ المهمة.',
+    'Emails and live updates that failed after being queued. Only what kind of work it was and one line of the error are shown; the stored content is never displayed.':
+        'رسائل البريد والتحديثات المباشرة التي أخفقت بعد وضعها في قائمة الانتظار. يُعرض نوع المهمة وسطر واحد من الخطأ فقط، ولا يُعرض المحتوى المخزَّن أبدًا.',
+    'Waiting in the queue': 'في قائمة الانتظار',
+    'Oldest since': 'الأقدم منذ',
+    'Nothing is waiting.': 'لا شيء في الانتظار.',
+    Failed: 'أخفقت',
+    'Each stays here until it is retried or dismissed.':
+        'يبقى كل منها هنا إلى أن تُعاد محاولته أو يُتجاهل.',
+    'Background work is running normally.': 'المهام الخلفية تعمل بشكل طبيعي.',
+    'Failed work': 'المهام التي أخفقت',
+    'Failed at': 'وقت الإخفاق',
+    Work: 'المهمة',
+    Error: 'الخطأ',
+    Queue: 'قائمة الانتظار',
+    Retry: 'إعادة المحاولة',
+    Dismiss: 'تجاهل',
+    'Nothing has failed.': 'لم يخفق شيء.',
 };

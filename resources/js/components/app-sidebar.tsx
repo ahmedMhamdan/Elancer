@@ -5,6 +5,7 @@ import { Link, router, usePage } from '@inertiajs/react';
 import { Fragment, useId, useState, type ReactNode } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
+    Activity,
     Banknote,
     Bookmark,
     BriefcaseBusiness,
@@ -26,6 +27,7 @@ import {
     Search,
     Settings,
     ShieldCheck,
+    Tags,
     UserRound,
     UserRoundX,
     UsersRound,
@@ -212,6 +214,11 @@ export function AppSidebar() {
                               icon: <LayoutGrid size={20} />,
                           },
                           {
+                              label: t('Skills'),
+                              href: '/admin/skills',
+                              icon: <Tags size={20} />,
+                          },
+                          {
                               label: t('Reports'),
                               href: '/admin/reports',
                               icon: <Flag size={20} />,
@@ -232,6 +239,11 @@ export function AppSidebar() {
                                         label: t('Identity reviews'),
                                         href: '/admin/identity',
                                         icon: <ShieldCheck size={20} />,
+                                    },
+                                    {
+                                        label: t('Background work'),
+                                        href: '/admin/operations',
+                                        icon: <Activity size={20} />,
                                     },
                                 ]
                               : []),
