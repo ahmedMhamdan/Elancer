@@ -37,7 +37,7 @@ class ProjectDiscoveryController extends Controller
     {
         $q = $request->query('q', '');
         abort_unless(is_string($q) && mb_strlen($q) <= 100, 422);
-        $pattern = $this->pattern(trim($q));
+        $pattern = self::pattern(trim($q));
 
         return Inertia::render('discovery/categories', [
             'q' => $q,
@@ -95,11 +95,37 @@ class ProjectDiscoveryController extends Controller
         abort_if(isset($data['budget_min'], $data['budget_max']) && $data['budget_max'] < $data['budget_min'], 422, __('The maximum budget must be at least the minimum budget.'));
         $profileSkills = $request->user()?->profile?->skillTags()->pluck('skills.id')->all() ?? [];
         $filters = self::normalise($data, $profileSkills ? 'match' : 'newest');
+
+        $page = self::search($filters, $profileSkills)->paginate(20)->withQueryString();
+        // Q08: only the viewer's own saves are marked, and no one else can learn of them.
+        $viewer = $request->user()?->id;
+        $saved = $viewer === null ? [] : DB::table('saved_projects')->where('user_id', $viewer)->whereIn('project_id', $page->pluck('id'))->pluck('project_id')->all();
+
+        return Inertia::render('discovery/jobs', [
+            // Q11: the number of attached files is public; their names and the files are not.
+            'projects' => $page->through(fn (Project $project) => [...self::summary($project), 'attachments' => (int) $project->getAttribute('attachments_count'),
+                'saved' => in_array($project->id, $saved, true), 'own' => $project->user_id === $viewer]),
+            'filters' => $filters,
+            'categories' => Category::query()->orderBy('categoryname')->get(['id', 'slug', 'categoryname']),
+            'skills' => Skill::query()->selectable()->orderBy('name')->get(['id', 'name']),
+            'canMatchSkills' => count($profileSkills) > 0,
+        ]);
+    }
+
+    /**
+     * The public projects that match normalised filters, in the order /jobs lists them. The API (plan 028) lists through the same query.
+     *
+     * @param  array<string, mixed>  $filters
+     * @param  array<int, int>  $profileSkills
+     * @return Builder<Project>
+     */
+    public static function search(array $filters, array $profileSkills): Builder
+    {
         // Q60: the public number counts submitted proposals only; the Q75 filter below uses the same count.
         $received = fn (Builder $q) => $q->whereNotNull('submitted_at');
         $query = Project::query()->visible()->with(['category', 'skills'])->withCount(['proposals as proposals_received' => $received, 'attachments']);
         if ($filters['q'] !== '') {
-            $pattern = $this->pattern($filters['q']);
+            $pattern = self::pattern($filters['q']);
             $query->where(fn (Builder $q) => $q->whereRaw("LOWER(title) LIKE ? ESCAPE '!'", [$pattern])->orWhereRaw("LOWER(description) LIKE ? ESCAPE '!'", [$pattern]));
         }
         if ($filters['category'] !== '') {
@@ -138,20 +164,7 @@ class ProjectDiscoveryController extends Controller
             $query->withCount(['skills as matching_skills_count' => fn (Builder $q) => $q->whereIn('skills.id', $profileSkills)])->orderByDesc('matching_skills_count');
         }
 
-        $page = $query->orderByDesc('published_at')->orderByDesc('id')->paginate(20)->withQueryString();
-        // Q08: only the viewer's own saves are marked, and no one else can learn of them.
-        $viewer = $request->user()?->id;
-        $saved = $viewer === null ? [] : DB::table('saved_projects')->where('user_id', $viewer)->whereIn('project_id', $page->pluck('id'))->pluck('project_id')->all();
-
-        return Inertia::render('discovery/jobs', [
-            // Q11: the number of attached files is public; their names and the files are not.
-            'projects' => $page->through(fn (Project $project) => [...self::summary($project), 'attachments' => (int) $project->getAttribute('attachments_count'),
-                'saved' => in_array($project->id, $saved, true), 'own' => $project->user_id === $viewer]),
-            'filters' => $filters,
-            'categories' => Category::query()->orderBy('categoryname')->get(['id', 'slug', 'categoryname']),
-            'skills' => Skill::query()->selectable()->orderBy('name')->get(['id', 'name']),
-            'canMatchSkills' => count($profileSkills) > 0,
-        ]);
+        return $query->orderByDesc('published_at')->orderByDesc('id');
     }
 
     public function show(Request $request, Project $project): Response
@@ -213,7 +226,7 @@ class ProjectDiscoveryController extends Controller
         ];
     }
 
-    private function pattern(string $text): string
+    private static function pattern(string $text): string
     {
         return '%'.str_replace(['!', '%', '_'], ['!!', '!%', '!_'], mb_strtolower($text)).'%';
     }

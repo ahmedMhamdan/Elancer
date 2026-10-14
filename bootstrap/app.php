@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureApiAccount;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\ProtectPasswordlessAccount;
@@ -13,10 +14,14 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Laravel\Sanctum\Http\Middleware\CheckAbilities;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
+        // Plan 028: /api/v1, signed in by bearer token only.
+        api: __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
         channels: __DIR__.'/../routes/channels.php',
         health: '/up',
@@ -30,6 +35,12 @@ return Application::configure(basePath: dirname(__DIR__))
         // TrustHostProxy takes the visitor's address from the host's own header where one is configured.
         $middleware->trustProxies(at: '*', headers: Request::HEADER_X_FORWARDED_PROTO);
         $middleware->replace(TrustProxies::class, TrustHostProxy::class);
+
+        // Plan 028: what a token may do is checked beside each API route.
+        $middleware->alias(['abilities' => CheckAbilities::class, 'api.account' => EnsureApiAccount::class]);
+        // Both answer before a record is looked up, so a token that may not ask learns nothing about which numbers exist.
+        $middleware->prependToPriorityList(before: SubstituteBindings::class, prepend: EnsureApiAccount::class);
+        $middleware->prependToPriorityList(before: SubstituteBindings::class, prepend: CheckAbilities::class);
 
         $middleware->web(append: [
             HandleAppearance::class,

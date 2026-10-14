@@ -391,5 +391,10 @@
     "Demo accounts and members work apart, so this is not available between them.": "الحسابات التجريبية وحسابات الأعضاء تعمل منفصلة، لذلك هذا غير متاح بينها.",
     "The other demo account is not available right now.": "الحساب التجريبي الآخر غير متاح الآن.",
     "This payment went through a test provider the shared demo cannot use.": "تمّ هذا الدفع عبر مزوّد دفع تجريبي لا يستطيع العرض التجريبي المشترك استخدامه.",
-    "This email address cannot be used here.": "لا يمكن استخدام عنوان البريد الإلكتروني هذا هنا."
+    "This email address cannot be used here.": "لا يمكن استخدام عنوان البريد الإلكتروني هذا هنا.",
+    "This account cannot use the API.": "لا يستطيع هذا الحساب استخدام الواجهة البرمجية.",
+    "This account cannot create API tokens.": "لا يستطيع هذا الحساب إنشاء رموز للواجهة البرمجية.",
+    "This account already has the most tokens it can hold. Revoke one first.": "بلغ هذا الحساب أقصى عدد من الرموز. ألغِ رمزًا أولًا.",
+    "Token revoked.": "تم إلغاء الرمز.",
+    "This proposal changed since the version you sent. Read it again before saving.": "تغيّر هذا العرض بعد النسخة التي أرسلتها. اقرأه من جديد قبل الحفظ."
 }

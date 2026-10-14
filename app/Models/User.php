@@ -21,6 +21,7 @@ use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Contracts\PasskeyUser;
 use Laravel\Fortify\PasskeyAuthenticatable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
 /**
  * @property-read Profile|null $profile
@@ -50,7 +51,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 class User extends Authenticatable implements HasLocalePreference, MustVerifyEmail, PasskeyUser
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
+    use HasApiTokens, HasFactory, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
 
     /**
      * Match database defaults before a newly created model is reloaded.
@@ -162,6 +163,8 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
                 throw ValidationException::withMessages(['password' => __('Contract obligations prevent account closure.')]);
             }
             IdentityVerification::where('user_id', $user->id)->first()?->delete();
+            // Plan 028: an account's API tokens go with it; their table has no foreign key to do that.
+            $user->tokens()->delete();
         });
     }
 }

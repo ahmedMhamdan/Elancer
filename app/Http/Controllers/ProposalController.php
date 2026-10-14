@@ -4,22 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Actions\Conversations\HiringAccess;
 use App\Actions\Demo\DemoWorld;
-use App\Actions\Invitations\InvitationLifecycle;
 use App\Actions\Offers\OfferLifecycle;
+use App\Actions\Proposals\ProposalRules;
+use App\Actions\Proposals\SaveProposal;
+use App\Actions\Proposals\WithdrawProposal;
 use App\Models\Contract;
 use App\Models\Conversation;
 use App\Models\Offer;
 use App\Models\Profile;
 use App\Models\Project;
 use App\Models\Proposal;
-use App\Models\ProposalEvent;
-use App\Models\User;
-use App\Notifications\WorkspaceEvent;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -28,24 +26,7 @@ class ProposalController extends Controller
 {
     private function eligible(Request $request): void
     {
-        abort_unless($request->user()?->canParticipateInMarketplace() && $request->user()->onboarding_completed_at, 403);
-    }
-
-    private function canEdit(Project $project, ?Proposal $proposal): bool
-    {
-        // A project hidden by moderation takes no new applications; a proposal already submitted keeps working.
-        $open = in_array($proposal?->status, ['submitted', 'reopened'], true) ? Project::query()->listable() : Project::query()->visible();
-        if ($project->status !== 'published' || ! $open->whereKey($project->id)->exists()) {
-            return false;
-        }
-        if ($proposal && Offer::query()->where('proposal_id', $proposal->id)->where('status', 'pending')->where('expires_at', '>', now())->exists()) {
-            return false;
-        }
-        if ($proposal?->status === 'declined') {
-            return false;
-        }
-
-        return in_array($proposal?->status, ['submitted', 'reopened'], true) || (bool) $project->application_closes_at?->isFuture();
+        abort_unless(ProposalRules::eligible($request->user()), 403);
     }
 
     /** The owner reads a submitted proposal, except a member's application to a demo project, which stays with the member (plan 027). */
@@ -53,12 +34,6 @@ class ProposalController extends Controller
     {
         return $proposal->project->user_id === $request->user()->id && $proposal->submitted_at !== null
             && ! DemoWorld::trial($proposal->user_id, $proposal->project->user_id);
-    }
-
-    /** Plan 027: a demo account never applies to a member's project; a member may try applying to a demo one. */
-    private function closed(int $applicant, int $owner): bool
-    {
-        return DemoWorld::apart($applicant, $owner) && ! DemoWorld::trial($applicant, $owner);
     }
 
     /** @return array<string, mixed> */
@@ -86,9 +61,9 @@ class ProposalController extends Controller
     {
         $this->eligible($request);
         abort_if($project->user_id === $request->user()->id, 403);
-        abort_if($this->closed($request->user()->id, $project->user_id), 403, __('Demo accounts and members work apart, so this is not available between them.'));
+        abort_if(ProposalRules::closed($request->user()->id, $project->user_id), 403, __('Demo accounts and members work apart, so this is not available between them.'));
         $proposal = Proposal::query()->where('project_id', $project->id)->where('user_id', $request->user()->id)->first();
-        abort_unless($this->canEdit($project, $proposal), 409, __('This proposal cannot be edited right now.'));
+        abort_unless(ProposalRules::editable($project, $proposal), 409, __('This proposal cannot be edited right now.'));
 
         return Inertia::render('proposals/edit', [
             'project' => $this->projectDetails($project),
@@ -101,72 +76,13 @@ class ProposalController extends Controller
 
     public function save(Request $request, Project $project): JsonResponse
     {
-        $this->eligible($request);
-        $request->validate(['action' => ['required', Rule::in(['save', 'submit'])], 'version' => ['required', 'integer', 'min:0']]);
+        $result = SaveProposal::handle($request->user(), $project, $request->all());
+        $proposal = $result['proposal'];
+        if ($result['conflict']) {
+            return response()->json(['conflict' => true, 'proposal' => $proposal ? $this->details($proposal, true) : null], 409);
+        }
 
-        return DB::transaction(function () use ($request, $project): JsonResponse {
-            $user = $request->user()->newQuery()->lockForUpdate()->findOrFail($request->user()->id);
-            abort_unless($user->canParticipateInMarketplace() && $user->onboarding_completed_at, 403);
-            $locked = Project::query()->lockForUpdate()->findOrFail($project->id);
-            abort_if($locked->user_id === $user->id, 403);
-            abort_if($this->closed($user->id, $locked->user_id), 403, __('Demo accounts and members work apart, so this is not available between them.'));
-            $proposal = Proposal::query()->where('project_id', $locked->id)->where('user_id', $user->id)->lockForUpdate()->first();
-            abort_unless($this->canEdit($locked, $proposal), 409, __('This proposal cannot be edited right now.'));
-            if (($proposal->version ?? 0) !== $request->integer('version')) {
-                return response()->json(['conflict' => true, 'proposal' => $proposal ? $this->details($proposal, true) : null], 409);
-            }
-            abort_if(InvitationLifecycle::blocked($locked->user_id, $user->id), 403);
-            $submit = $request->input('action') === 'submit';
-            $presence = $submit ? 'required' : 'nullable';
-            $data = Validator::make($request->all(), [
-                'price' => [$presence, 'numeric', 'min:1', 'max:1000000', 'decimal:0,2'],
-                'duration_days' => [$presence, 'integer', 'min:1', 'max:3650'],
-                'message' => [$presence, 'string', 'max:10000', ...($submit ? ['min:20'] : [])],
-                'answers' => ['present', 'array', 'list', 'max:3', ...($submit ? ['size:'.count($locked->screening_questions ?? [])] : [])],
-                'answers.*' => [$submit ? 'required' : 'nullable', 'string', 'max:3000'],
-                'samples' => ['present', 'array', 'list', 'max:3'],
-                'samples.*' => ['array:label,url'],
-                'samples.*.label' => ['required', 'string', 'max:80'],
-                'samples.*.url' => ['required', 'url:https', 'max:2000'],
-                'user_id' => ['missing'], 'status' => ['missing'], 'profile_snapshot' => ['missing'], 'client_note' => ['missing'],
-            ])->validate();
-            $profile = $user->profile;
-            if ($submit && ! in_array($proposal?->status, ['submitted', 'reopened'], true)) {
-                abort_unless($profile && Profile::query()->publiclyVisible()->whereKey($profile->id)->exists(), 422, __('Publish your freelancer profile before applying.'));
-            }
-            $data['price'] = isset($data['price']) ? number_format((float) $data['price'], 2, '.', '') : null;
-            $data['duration_days'] = isset($data['duration_days']) ? (int) $data['duration_days'] : null;
-            $data['answers'] = array_map(fn ($answer) => $answer ?? '', $data['answers']);
-            $proposal ??= new Proposal;
-            $previousStatus = $proposal->status;
-            $proposal->forceFill(['project_id' => $locked->id, 'user_id' => $user->id, 'version' => ($proposal->exists ? $proposal->version : 0) + 1, 'draft' => $data]);
-            if ($submit) {
-                $first = $proposal->submitted_at === null;
-                $proposal->content = $data;
-                $proposal->forceFill(['price' => $data['price'], 'duration_days' => $data['duration_days']]);
-                // Retain the exact shared identity; private edits never enter a recipient's view.
-                if ($first) {
-                    $proposal->profile_snapshot = $profile?->publicDetails();
-                }
-                $proposal->status = 'submitted';
-                $proposal->submitted_at ??= now();
-                $proposal->draft = null;
-                $proposal->save();
-                InvitationLifecycle::accept($proposal);
-                // Plan 027: the shared demo account is not told of a member's application.
-                if ($first && ! DemoWorld::trial($user->id, $locked->user_id)) {
-                    DB::afterCommit(fn () => User::query()->find($locked->user_id)?->notify(new WorkspaceEvent('proposal_received', '/proposals/'.$proposal->id, $locked->title, $user->name)));
-                }
-                $this->event($proposal, $user->id, $first ? 'submitted' : (in_array($previousStatus, ['withdrawn', 'reopened'], true) ? 'resubmitted' : 'revised'), $data);
-            } else {
-                if (! $proposal->exists) {
-                    $proposal->status = 'draft';
-                }
-                $proposal->save();
-            }
-
-            return response()->json(['proposal' => $this->details($proposal, true), 'url' => $submit ? route('proposals.show', $proposal) : null]);
-        });
+        return response()->json(['proposal' => $this->details($proposal, true), 'url' => $request->input('action') === 'submit' ? route('proposals.show', $proposal) : null]);
     }
 
     public function index(Request $request): Response
@@ -200,7 +116,7 @@ class ProposalController extends Controller
             'canStartConversation' => ! $author && HiringAccess::writable($proposal),
             'canOffer' => ! $author && HiringAccess::writable($proposal),
             'offers' => Offer::query()->where('proposal_id', $proposal->id)->orderByDesc('id')->get(['id', 'status']),
-            'canEdit' => $author && $this->canEdit($proposal->project, $proposal),
+            'canEdit' => $author && ProposalRules::editable($proposal->project, $proposal),
             'canReview' => ! $author && $proposal->project->status === 'published',
             'trial' => DemoWorld::trial($proposal->user_id, $proposal->project->user_id),
         ]);
@@ -208,20 +124,7 @@ class ProposalController extends Controller
 
     public function withdraw(Request $request, Proposal $proposal): RedirectResponse
     {
-        $this->eligible($request);
-        $request->validate(['version' => ['required', 'integer', 'min:1']]);
-        abort_unless($proposal->user_id === $request->user()->id, 404);
-        DB::transaction(function () use ($request, $proposal): void {
-            $project = Project::query()->lockForUpdate()->findOrFail($proposal->project_id);
-            $locked = Proposal::query()->lockForUpdate()->findOrFail($proposal->id);
-            abort_unless($project->status === 'published' && $locked->version === $request->integer('version') && in_array($locked->status, ['submitted', 'reopened'], true), 409);
-            OfferLifecycle::expire($project->id);
-            abort_if(Offer::query()->where('proposal_id', $locked->id)->where('status', 'pending')->exists(), 409, __('Respond to the pending offer before withdrawing this proposal.'));
-            $locked->status = 'withdrawn';
-            $locked->version++;
-            $locked->save();
-            $this->event($locked, $request->user()->id, 'withdrawn');
-        });
+        WithdrawProposal::handle($request->user(), $proposal, $request->all());
 
         return back()->with('success', __('Proposal withdrawn.'));
     }
@@ -270,11 +173,11 @@ class ProposalController extends Controller
                 abort_if(Offer::query()->where('proposal_id', $locked->id)->where('status', 'pending')->exists(), 409, __('Withdraw the pending offer before declining this proposal.'));
                 abort_unless(in_array($locked->status, ['submitted', 'reopened'], true), 409);
                 $locked->status = 'declined';
-                $this->event($locked, $request->user()->id, 'declined');
+                ProposalRules::record($locked, $request->user()->id, 'declined');
             } elseif ($data['action'] === 'reopen') {
                 abort_unless($locked->status === 'declined', 409);
                 $locked->status = 'reopened';
-                $this->event($locked, $request->user()->id, 'reopened');
+                ProposalRules::record($locked, $request->user()->id, 'reopened');
             }
             $locked->forceFill(['organization' => $data['organization'], 'client_note' => $data['client_note'] ?? null, 'version' => $locked->version + 1])->save();
         });
@@ -293,12 +196,5 @@ class ProposalController extends Controller
         abort_unless($proposals->count() === count($data['ids']), 404);
 
         return Inertia::render('proposals/compare', ['project' => $this->projectDetails($project), 'proposals' => $proposals->map(fn (Proposal $proposal) => $this->details($proposal, false))]);
-    }
-
-    /** @param array<string, mixed>|null $content */
-    private function event(Proposal $proposal, int $actor, string $kind, ?array $content = null): void
-    {
-        $event = new ProposalEvent;
-        $event->forceFill(['proposal_id' => $proposal->id, 'actor_id' => $actor, 'kind' => $kind, 'content' => $content])->save();
     }
 }

@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -48,6 +49,14 @@ class AppServiceProvider extends ServiceProvider
                 }
             }
         });
+        // Plan 028: the API counts by token, so one program cannot use up another's allowance.
+        foreach (['api-read' => 60, 'api-write' => 20] as $name => $perMinute) {
+            RateLimiter::for($name, function (Request $request) use ($name, $perMinute) {
+                $token = $request->user()?->currentAccessToken();
+
+                return Limit::perMinute($perMinute)->by($name.':'.($token instanceof PersonalAccessToken ? $token->getKey() : $request->ip()));
+            });
+        }
         RateLimiter::for('profile-photos', function (Request $request) {
             if (! $request->hasFile('photo')) {
                 return Limit::none();

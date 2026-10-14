@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Settings\ApiTokenController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SecurityController;
 use Illuminate\Auth\Middleware\RequirePassword;
@@ -27,6 +28,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('settings/appearance', 'settings/appearance')->name('appearance.edit');
     Route::get('settings/notifications', [NotificationController::class, 'preferences'])->name('notification-preferences.edit');
     Route::patch('settings/notifications', [NotificationController::class, 'updatePreferences'])->name('notification-preferences.update');
+
+    // Plan 028: API tokens are managed behind a recent sign-in, like the security page.
+    Route::get('settings/tokens', [ApiTokenController::class, 'index'])->middleware(RequirePassword::class)->name('api-tokens.index');
+    Route::post('settings/tokens', [ApiTokenController::class, 'store'])->middleware([RequirePassword::class, 'throttle:10,1'])->name('api-tokens.store');
+    Route::delete('settings/tokens/{token}', [ApiTokenController::class, 'destroy'])->whereNumber('token')->middleware([RequirePassword::class, 'throttle:30,1'])->name('api-tokens.destroy');
 });
 
 Route::get('.well-known/passkey-endpoints', function () {
