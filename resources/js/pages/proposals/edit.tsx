@@ -24,11 +24,14 @@ export default function Edit({
     proposal,
     profilePublished,
     sampleLinks,
+    trial,
 }: {
     project: ProposalProject;
     proposal: Proposal | null;
     profilePublished: boolean;
     sampleLinks: WorkLink[];
+    // Plan 027: a member trying out a demo project.
+    trial: boolean;
 }) {
     const { t } = useTranslation();
     const initial = proposal?.draft ?? proposal?.content;
@@ -152,9 +155,11 @@ export default function Edit({
                         void save('submit');
                     }}
                 >
-                    <p className="market-muted">
+                    <p className="market-muted" data-test="proposal-note">
                         {t(
-                            'Drafts are private. Only submitting shares your proposal with the client.',
+                            trial
+                                ? 'This is a sample project from the demo. You can apply to see how applying works, but no real client will read or answer your proposal.'
+                                : 'Drafts are private. Only submitting shares your proposal with the client.',
                         )}
                     </p>
                     {!eligible && (

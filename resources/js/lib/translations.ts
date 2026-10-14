@@ -2401,8 +2401,11 @@ export const arabic: Record<string, string> = {
     'Switch to the demo freelancer': 'انتقل إلى حساب المستقل التجريبي',
     'No account needed. Demo accounts are shared with other visitors and filled with sample projects, proposals and contracts. What you do there stays inside the demo and is reset from time to time.':
         'لا حاجة إلى حساب. الحسابات التجريبية مشتركة بين الزوار وفيها مشاريع وعروض وعقود تجريبية. ما تفعله هناك يبقى داخل العرض التجريبي ويُعاد ضبطه من وقت لآخر.',
-    'This is a sample project from the demo, so it does not take applications from member accounts.':
-        'هذا مشروع تجريبي من العرض التجريبي، لذلك لا يستقبل عروضًا من حسابات الأعضاء.',
+    'This is a sample project from the demo. You can apply to see how applying works, but no real client will read or answer your proposal.':
+        'هذا مشروع تجريبي من العرض التجريبي. يمكنك التقدم له لترى كيف يعمل التقديم، لكن لن يقرأ عرضك أو يرد عليه عميل حقيقي.',
+    'This proposal is for a sample project from the demo, so no real client will read or answer it.':
+        'هذا العرض مقدَّم لمشروع تجريبي من العرض التجريبي، لذلك لن يقرأه أو يرد عليه عميل حقيقي.',
+    'Sample project': 'مشروع تجريبي',
     'This project belongs to a member. A demo account can apply to demo projects only.':
         'هذا المشروع يخص أحد الأعضاء. الحساب التجريبي يستطيع التقديم على المشاريع التجريبية فقط.',
     'This is a sample profile from the demo, so member accounts cannot invite it.':

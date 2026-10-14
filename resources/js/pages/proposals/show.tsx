@@ -22,7 +22,10 @@ export default function Show({
     canStartConversation,
     canOffer,
     offers,
+    trial,
 }: {
+    // Plan 027: the author's own application to a demo project.
+    trial: boolean;
     proposal: Proposal;
     project: ProposalProject;
     author: boolean;
@@ -62,6 +65,13 @@ export default function Show({
         <ProposalLayout title={t('Proposal details')}>
             <Head title={t('Proposal details')} />
             <div className="market-stack">
+                {trial && (
+                    <p className="market-muted" data-test="demo-trial">
+                        {t(
+                            'This proposal is for a sample project from the demo, so no real client will read or answer it.',
+                        )}
+                    </p>
+                )}
                 <div className="market-actions">
                     {canOffer && (
                         <Link href={`/proposals/${proposal.id}/offer`}>

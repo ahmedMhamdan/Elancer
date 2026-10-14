@@ -17,6 +17,8 @@ export default function Index({
         updated_at: string;
         project: ProposalProject;
         content: ProposalContent | null;
+        // Plan 027: an application to a demo project, which nobody answers.
+        trial: boolean;
     }>;
 }) {
     const { t } = useTranslation();
@@ -45,6 +47,11 @@ export default function Index({
                         <div className="market-actions">
                             <ProposalStatus status={proposal.status} />
                             <JobDate value={proposal.updated_at} />
+                            {proposal.trial && (
+                                <span className="market-muted">
+                                    {t('Sample project')}
+                                </span>
+                            )}
                         </div>
                         <h2>
                             <Link href={`/proposals/${proposal.id}`} dir="auto">
