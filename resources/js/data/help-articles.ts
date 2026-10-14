@@ -136,6 +136,9 @@ export function helpGroups(t: (text: string) => string): HelpGroup[] {
                             'Open a project in Find work and choose Apply. A proposal has your price, the delivery time in days, a cover message of at least 20 characters, your answers to the client’s questions and up to three links to your work.',
                         ),
                         t(
+                            'You can attach up to three files of 5 MB each: JPG, PNG, WebP, PDF, TXT or ZIP. Only the project’s client can download them, and only the files of a version you submitted.',
+                        ),
+                        t(
                             'A draft is private and saves by itself. After you submit, you can still change the proposal or withdraw it while the project is hiring.',
                         ),
                         t(
@@ -165,6 +168,9 @@ export function helpGroups(t: (text: string) => string): HelpGroup[] {
                     body: [
                         t(
                             'Work starts when the client has funded the contract. Use messages for progress; when the work is ready, submit a delivery from the contract page with a note and any files.',
+                        ),
+                        t(
+                            'A message can carry up to three files of 5 MB each. Only the two of you can download them, and a file cannot be removed once sent.',
                         ),
                         t(
                             'The client approves the delivery or asks for a revision. One revision request lists all the changes and uses one of the rounds included in the agreement.',

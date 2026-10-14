@@ -1,0 +1,87 @@
+/* Plan 030: files on proposals and in messages. Rows and the picker follow a brief's files (elancer-jobs.css),
+   which adapt TailAdmin form/input/FileInput.tsx: one bordered field with its button at the start. */
+.attached-files {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.attached-files li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 1px solid var(--el-border);
+    border-radius: 8px;
+    font-size: 14px;
+}
+/* The name sits in a box that follows the page's direction, so a name in the other script still starts beside the paperclip. */
+.attached-files a,
+.attached-files .attached-files-name {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+.attached-files a {
+    color: var(--el-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+.attached-files svg,
+.attached-files-size {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+.attached-files-size {
+    color: var(--el-muted);
+    font-size: 13px;
+}
+.attached-files-block {
+    display: grid;
+    gap: 10px;
+    min-width: 0;
+}
+.attached-files-block > p,
+.attached-files-block small {
+    color: var(--el-muted);
+    font-size: 14px;
+    line-height: 1.7;
+}
+.attached-files-field {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 44px;
+    overflow: hidden;
+    border: 1px solid var(--el-border);
+    border-radius: 8px;
+    color: var(--el-muted);
+    font-size: 14px;
+}
+.attached-files-field label {
+    margin: 0;
+    padding: 11px 16px;
+    border-inline-end: 1px solid var(--el-border);
+    background: var(--el-surface-soft);
+    color: var(--el-text);
+    white-space: nowrap;
+    cursor: pointer;
+}
+.attached-files-field input:focus-visible + label {
+    outline: 2px solid var(--el-accent);
+    outline-offset: -2px;
+}
+.attached-files-field input:disabled + label {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+.attached-files-note {
+    min-height: 24px;
+    color: var(--el-muted);
+    font-size: 14px;
+}
+.attached-files-error {
+    color: var(--el-error);
+}

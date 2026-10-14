@@ -5,11 +5,18 @@ import {
     ArchiveRestore,
     CheckCheck,
     MoreHorizontal,
+    Paperclip,
     RefreshCw,
     Send,
     ShieldBan,
+    X,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import {
+    AttachedFiles,
+    FILE_ACCEPT,
+    useFileProblem,
+} from '@/components/attached-files';
 import InputError from '@/components/input-error';
 import ReportDialog from '@/components/report-dialog';
 import Button from '@/components/tailadmin/button';
@@ -28,6 +35,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useTranslation } from '@/hooks/use-translation';
 import { cn } from '@/lib/utils';
+import { FileSize } from '@/pages/discovery/shared';
 import type { Page } from '@/pages/discovery/shared';
 import {
     MessageLayout,
@@ -132,13 +140,19 @@ function MessageItem({
                         </div>
                     </form>
                 ) : (
-                    <p
-                        className="text-sm leading-7 whitespace-pre-wrap"
-                        dir="auto"
-                    >
-                        {message.body}
-                    </p>
+                    !!message.body && (
+                        <p
+                            className="text-sm leading-7 whitespace-pre-wrap"
+                            dir="auto"
+                        >
+                            {message.body}
+                        </p>
+                    )
                 )}
+                <AttachedFiles
+                    files={message.files}
+                    href={(file) => `/messages/files/${file.id}`}
+                />
                 {sent}
                 {(message.can_edit ||
                     !message.mine ||
@@ -206,6 +220,7 @@ type ShowProps = {
     messages: Page<Message>;
     writable: boolean;
     visibleThrough: number;
+    fileLimit: number;
 };
 
 export default function Show(props: ShowProps) {
@@ -223,10 +238,40 @@ function ConversationChat({
     messages,
     writable,
     visibleThrough,
+    fileLimit,
 }: ShowProps) {
     const { t, ar } = useTranslation();
     const page = usePage();
-    const form = useForm({ body: '', client_token: crypto.randomUUID() });
+    const form = useForm<{ body: string; client_token: string; files: File[] }>(
+        {
+            body: '',
+            client_token: crypto.randomUUID(),
+            files: [],
+        },
+    );
+    // Plan 030: files chosen for the next message, checked here first and again on the server.
+    const fileProblem = useFileProblem();
+    const [fileNote, setFileNote] = useState<string | null>(null);
+    const fileError =
+        form.errors.files ??
+        Object.entries(form.errors).find(([key]) =>
+            key.startsWith('files.'),
+        )?.[1];
+    function choose(chosen: FileList | null) {
+        const picked = Array.from(chosen ?? []);
+        if (!picked.length) return;
+        const problem = picked.map(fileProblem).find(Boolean);
+        if (problem) return setFileNote(problem);
+        if (form.data.files.length + picked.length > fileLimit)
+            return setFileNote(
+                t('A message can carry up to :count files.', {
+                    count: fileLimit,
+                }),
+            );
+        setFileNote(null);
+        form.clearErrors();
+        form.setData('files', [...form.data.files, ...picked]);
+    }
     const [refreshing, setRefreshing] = useState(false);
     const thread = useRef<HTMLDivElement>(null);
     const latestId = messages.data[0]?.id;
@@ -355,21 +400,79 @@ function ConversationChat({
                         form.setData({
                             body: '',
                             client_token: crypto.randomUUID(),
+                            files: [],
                         });
+                        setFileNote(null);
                         document.getElementById('message-body')?.focus();
                     },
                 });
             }}
         >
+            {!!form.data.files.length && (
+                <ul
+                    className="chat-pending-files"
+                    aria-label={t('Files to send')}
+                >
+                    {form.data.files.map((file, i) => (
+                        <li key={i}>
+                            <Paperclip size={14} aria-hidden="true" />
+                            <bdi>{file.name}</bdi>
+                            <span className="attached-files-size">
+                                <FileSize bytes={file.size} />
+                            </span>
+                            <button
+                                type="button"
+                                disabled={form.processing}
+                                aria-label={t('Remove :name', {
+                                    name: file.name,
+                                })}
+                                onClick={() =>
+                                    form.setData(
+                                        'files',
+                                        form.data.files.filter(
+                                            (_, j) => j !== i,
+                                        ),
+                                    )
+                                }
+                            >
+                                <X className="size-4" aria-hidden="true" />
+                            </button>
+                        </li>
+                    ))}
+                </ul>
+            )}
             <label htmlFor="message-body" className="sr-only">
                 {t('Message')}
             </label>
             <div className="flex items-end gap-2">
+                <input
+                    id="message-files"
+                    type="file"
+                    multiple
+                    className="sr-only"
+                    accept={FILE_ACCEPT}
+                    disabled={
+                        form.processing || form.data.files.length >= fileLimit
+                    }
+                    aria-describedby="message-help"
+                    onChange={(event) => {
+                        choose(event.target.files);
+                        event.target.value = '';
+                    }}
+                />
+                <label
+                    htmlFor="message-files"
+                    className="chat-attach mb-1"
+                    title={t('Attach files')}
+                >
+                    <Paperclip className="size-5" aria-hidden="true" />
+                    <span className="sr-only">{t('Attach files')}</span>
+                </label>
                 <div className="min-w-0 flex-1">
                     <TextArea
                         id="message-body"
                         rows={2}
-                        required
+                        required={!form.data.files.length}
                         maxLength={10000}
                         value={form.data.body}
                         onChange={(value) => form.setData('body', value)}
@@ -383,7 +486,10 @@ function ConversationChat({
                 <Button
                     type="submit"
                     className="mb-1 min-h-11"
-                    disabled={form.processing || !form.data.body.trim()}
+                    disabled={
+                        form.processing ||
+                        (!form.data.body.trim() && !form.data.files.length)
+                    }
                     startIcon={
                         <Send
                             className="size-4 rtl:rotate-180"
@@ -397,12 +503,17 @@ function ConversationChat({
                 </Button>
             </div>
             <InputError message={form.errors.body} />
+            <InputError message={fileNote ?? fileError} />
             <p
                 id="message-help"
                 className="text-muted-foreground mt-2 text-xs leading-relaxed"
             >
                 {t(
                     'You can correct sent text for 15 minutes. Messages cannot be deleted.',
+                )}{' '}
+                {t(
+                    'Attach up to :count files of 5 MB each: JPG, PNG, WebP, PDF, TXT or ZIP. Files cannot be removed once sent.',
+                    { count: fileLimit },
                 )}
             </p>
         </form>

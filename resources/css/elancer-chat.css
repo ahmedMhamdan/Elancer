@@ -224,6 +224,87 @@ body:has(.chat-workspace) {
     resize: vertical;
     max-height: 10rem;
 }
+/* Plan 030: the attach control adapts TailAdmin FileInput as one square button beside the text. */
+.chat-attach {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--el-border);
+    border-radius: 8px;
+    color: var(--el-muted);
+    cursor: pointer;
+}
+.chat-attach:hover {
+    color: var(--el-accent);
+    border-color: var(--el-accent);
+}
+#message-files:focus-visible + .chat-attach {
+    outline: 2px solid var(--el-accent);
+    outline-offset: 2px;
+}
+#message-files:disabled + .chat-attach {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+.chat-pending-files {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 10px;
+    padding: 0;
+    list-style: none;
+}
+.chat-pending-files li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+    min-height: 44px;
+    padding-inline: 12px 4px;
+    border: 1px solid var(--el-border);
+    border-radius: 8px;
+    background: var(--el-surface-soft);
+    font-size: 13px;
+}
+.chat-pending-files bdi {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.chat-pending-files svg {
+    flex-shrink: 0;
+}
+.chat-pending-files button {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    color: var(--el-muted);
+}
+.chat-pending-files button:hover {
+    color: var(--el-error);
+}
+.chat-bubble .attached-files {
+    margin-top: 8px;
+}
+.chat-bubble .attached-files li {
+    min-height: 40px;
+}
+/* In a sent bubble the file rows take the bubble's own text colour, as its other text does. */
+.chat-message-mine .attached-files li {
+    border-color: color-mix(in srgb, currentColor 40%, transparent);
+}
+.chat-message-mine .attached-files a,
+.chat-message-mine .attached-files-size {
+    color: inherit;
+}
 .chat-readonly {
     padding: 16px;
     border-top: 1px solid var(--el-border);

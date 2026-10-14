@@ -158,6 +158,7 @@ export default function ReportPage({
         resolved: t('Resolved'),
         note_added: t('Note added'),
         conversation_read: t('Conversation read'),
+        conversation_file_read: t('Conversation file downloaded'),
         content_hidden: t('Content hidden'),
         content_restored: t('Content restored'),
         account_suspended: t('Account suspended'),

@@ -2713,4 +2713,27 @@ export const arabic: Record<string, string> = {
         'جرّب كلمة أقصر أو مختلفة، أو تصفّح المجموعات الخمس. وللإبلاغ عن شيء يخالف القواعد، استخدم «إبلاغ» في صفحة المشروع أو الملف أو الرسالة أو العقد الذي حدث فيه.',
     'Read more in Help': 'اقرأ المزيد في المساعدة',
     'Open Help': 'افتح المساعدة',
+    'Attach a JPG, PNG, WebP, PDF, TXT or ZIP file.':
+        'أرفق ملفًا من نوع JPG أو PNG أو WebP أو PDF أو TXT أو ZIP.',
+    'Nobody receives a proposal on a sample project, so it takes no files.':
+        'لا يستلم أحد العروض المقدَّمة لمشروع تجريبي، لذلك لا يمكن إرفاق ملفات بها.',
+    'Only this project’s client can download them, and only once you submit. A file you add or remove later reaches the client with your next submission.':
+        'لا يستطيع تنزيلها إلا عميل هذا المشروع، وبعد أن ترسل عرضك فقط. أي ملف تضيفه أو تزيله لاحقًا يصل إلى العميل مع إرسالك التالي.',
+    'Up to :count files, 5 MB each: JPG, PNG, WebP, PDF, TXT or ZIP.':
+        'حتى :count ملفات، 5 ميغابايت لكل ملف: JPG أو PNG أو WebP أو PDF أو TXT أو ZIP.',
+    'Save your draft before attaching files.': 'احفظ مسودتك قبل إرفاق الملفات.',
+    'Remove :name from this proposal?': 'هل تريد إزالة :name من هذا العرض؟',
+    'A message can carry up to :count files.':
+        'يمكن إرفاق ما لا يزيد على :count ملفات بالرسالة.',
+    'Files to send': 'ملفات للإرسال',
+    'Attach files': 'إرفاق ملفات',
+    'Attach up to :count files of 5 MB each: JPG, PNG, WebP, PDF, TXT or ZIP. Files cannot be removed once sent.':
+        'يمكنك إرفاق حتى :count ملفات، 5 ميغابايت لكل ملف: JPG أو PNG أو WebP أو PDF أو TXT أو ZIP. لا يمكن إزالة الملفات بعد إرسالها.',
+    'Sent a file': 'تم إرسال ملف',
+    'Sent :count files': 'تم إرسال :count ملفات',
+    'Conversation file downloaded': 'تم تنزيل ملف من المحادثة',
+    'You can attach up to three files of 5 MB each: JPG, PNG, WebP, PDF, TXT or ZIP. Only the project’s client can download them, and only the files of a version you submitted.':
+        'يمكنك إرفاق حتى ثلاثة ملفات، 5 ميغابايت لكل ملف: JPG أو PNG أو WebP أو PDF أو TXT أو ZIP. لا يستطيع تنزيلها إلا عميل المشروع، ولا ينزّل إلا ملفات النسخ التي أرسلتها.',
+    'A message can carry up to three files of 5 MB each. Only the two of you can download them, and a file cannot be removed once sent.':
+        'يمكن أن تحمل الرسالة حتى ثلاثة ملفات، 5 ميغابايت لكل ملف. لا يستطيع تنزيلها غيركما، ولا يمكن إزالة الملف بعد إرساله.',
 };

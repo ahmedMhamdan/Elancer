@@ -1,11 +1,18 @@
+// The file control adapts TailAdmin form/input/FileInput.tsx as the brief editor does (plan 030).
 import { Head, Link, router } from '@inertiajs/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+    AttachedFiles,
+    FILE_ACCEPT,
+    useFileProblem,
+} from '@/components/attached-files';
 import Button from '@/components/tailadmin/button';
 import Input from '@/components/tailadmin/input';
 import TextArea from '@/components/tailadmin/textarea';
 import HelpLink from '@/components/help-link';
 import { useTranslation } from '@/hooks/use-translation';
 import type { WorkLink } from '@/components/freelancer-card';
+import type { Attachment } from '@/pages/discovery/shared';
 import {
     ProposalLayout,
     ProjectContext,
@@ -25,12 +32,14 @@ export default function Edit({
     proposal,
     profilePublished,
     sampleLinks,
+    fileLimit,
     trial,
 }: {
     project: ProposalProject;
     proposal: Proposal | null;
     profilePublished: boolean;
     sampleLinks: WorkLink[];
+    fileLimit: number;
     // Plan 027: a member trying out a demo project.
     trial: boolean;
 }) {
@@ -50,6 +59,8 @@ export default function Edit({
     const [errors, setErrors] = useState<string[]>([]);
     const [conflict, setConflict] = useState(false);
     const version = useRef(proposal?.version ?? 0);
+    // The first save makes the proposal, so a file's address is known from then on.
+    const [proposalId, setProposalId] = useState(proposal?.id ?? null);
     const inFlight = useRef(false);
     const lastSaved = useRef(JSON.stringify(data));
     const latest = useRef(data);
@@ -101,6 +112,7 @@ export default function Edit({
                     return;
                 }
                 version.current = result.proposal.version;
+                setProposalId(result.proposal.id);
                 lastSaved.current = JSON.stringify(payload);
                 setSaved(true);
                 if (action === 'submit') {
@@ -137,6 +149,123 @@ export default function Edit({
         window.addEventListener('beforeunload', warn);
         return () => window.removeEventListener('beforeunload', warn);
     }, []);
+    // Files are saved apart from the text: neither waits for the other, and neither's failure is the other's (Q71).
+    const [files, setFiles] = useState<Attachment[]>(proposal?.files ?? []);
+    const [fileBusy, setFileBusy] = useState(false);
+    const [fileNote, setFileNote] = useState<{
+        text: string;
+        error: boolean;
+    } | null>(null);
+    const picker = useRef<HTMLInputElement>(null);
+    const mounted = useRef(true);
+    useEffect(
+        () => () => {
+            mounted.current = false;
+        },
+        [],
+    );
+    const fileProblem = useFileProblem();
+    async function fileRequest(
+        method: 'POST' | 'DELETE',
+        path: string,
+        body: FormData | null,
+        done: string,
+    ) {
+        setFileBusy(true);
+        try {
+            const token =
+                document.cookie
+                    .split('; ')
+                    .find((v) => v.startsWith('XSRF-TOKEN='))
+                    ?.slice(11) ?? '';
+            const response = await fetch(
+                `/jobs/${project.id}/proposal/files${path}`,
+                {
+                    method,
+                    credentials: 'same-origin',
+                    headers: {
+                        Accept: 'application/json',
+                        'X-XSRF-TOKEN': decodeURIComponent(token),
+                    },
+                    body,
+                },
+            );
+            if (!mounted.current) return;
+            const result = await response.json().catch(() => null);
+            if (response.ok && result?.files) {
+                setFiles(result.files);
+                setFileNote({ text: done, error: false });
+                return;
+            }
+            setFileNote({
+                error: true,
+                text:
+                    response.status === 419 || response.status === 401
+                        ? t(
+                              'Your session expired. Sign in in another tab, then retry here.',
+                          )
+                        : response.status === 413
+                          ? t(
+                                'This file could not be uploaded. It may be larger than this server accepts.',
+                            )
+                          : (result?.errors?.file?.[0] ??
+                            result?.message ??
+                            t(
+                                'The file change did not go through. Your text is not affected.',
+                            )),
+            });
+        } catch {
+            if (mounted.current)
+                setFileNote({
+                    error: true,
+                    text: t(
+                        'The file change did not go through. Check your connection and try again.',
+                    ),
+                });
+        } finally {
+            if (mounted.current) setFileBusy(false);
+        }
+    }
+    async function attach(file: File | undefined) {
+        if (picker.current) picker.current.value = '';
+        if (!file) return;
+        const problem = fileProblem(file);
+        if (problem) return setFileNote({ error: true, text: problem });
+        setFileNote({
+            error: false,
+            text: t('Uploading :name…', { name: file.name }),
+        });
+        // A file belongs to a saved draft, so the first one waits for the draft to be saved.
+        if (version.current === 0) await save('save');
+        if (!mounted.current) return;
+        if (version.current === 0)
+            return setFileNote({
+                error: true,
+                text: t('Save your draft before attaching files.'),
+            });
+        const body = new FormData();
+        body.append('file', file);
+        await fileRequest(
+            'POST',
+            '',
+            body,
+            t(':name was added.', { name: file.name }),
+        );
+    }
+    function detach(file: Attachment) {
+        if (
+            !window.confirm(
+                t('Remove :name from this proposal?', { name: file.name }),
+            )
+        )
+            return;
+        void fileRequest(
+            'DELETE',
+            `/${file.id}`,
+            null,
+            t(':name was removed.', { name: file.name }),
+        );
+    }
     const update = <K extends keyof Draft>(key: K, value: Draft[K]) => {
         setSaved(false);
         setErrors([]);
@@ -359,10 +488,89 @@ export default function Edit({
                                 ))}
                         </div>
                     )}
+                    <fieldset className="attached-files-block">
+                        <legend>
+                            <h2>{t('Attached files (optional)')}</h2>
+                        </legend>
+                        {trial ? (
+                            <p>
+                                {t(
+                                    'Nobody receives a proposal on a sample project, so it takes no files.',
+                                )}
+                            </p>
+                        ) : (
+                            <>
+                                {/* Who will see the files is said before the control, not after an upload. */}
+                                <p id="proposal-files-audience">
+                                    {t(
+                                        'Only this project’s client can download them, and only once you submit. A file you add or remove later reaches the client with your next submission.',
+                                    )}
+                                </p>
+                                <AttachedFiles
+                                    files={files}
+                                    href={(file) =>
+                                        `/proposals/${proposalId}/files/${file.id}`
+                                    }
+                                    remove={{
+                                        disabled: fileBusy || conflict,
+                                        label: (file) =>
+                                            t('Remove :name', {
+                                                name: file.name,
+                                            }),
+                                        onClick: detach,
+                                    }}
+                                />
+                                <div className="attached-files-field">
+                                    <input
+                                        ref={picker}
+                                        id="proposal-file"
+                                        type="file"
+                                        className="sr-only"
+                                        accept={FILE_ACCEPT}
+                                        disabled={
+                                            fileBusy ||
+                                            busy ||
+                                            conflict ||
+                                            files.length >= fileLimit
+                                        }
+                                        aria-describedby="proposal-files-audience proposal-files-rules"
+                                        onChange={(e) =>
+                                            void attach(e.target.files?.[0])
+                                        }
+                                    />
+                                    <label htmlFor="proposal-file">
+                                        {t('Choose a file')}
+                                    </label>
+                                    <span>
+                                        {t(':count of :total files attached', {
+                                            count: files.length,
+                                            total: fileLimit,
+                                        })}
+                                    </span>
+                                </div>
+                                <small id="proposal-files-rules">
+                                    {t(
+                                        'Up to :count files, 5 MB each: JPG, PNG, WebP, PDF, TXT or ZIP.',
+                                        { count: fileLimit },
+                                    )}
+                                </small>
+                                <p
+                                    role={fileNote?.error ? 'alert' : 'status'}
+                                    className={
+                                        fileNote?.error
+                                            ? 'attached-files-note attached-files-error'
+                                            : 'attached-files-note'
+                                    }
+                                >
+                                    {fileNote?.text}
+                                </p>
+                            </>
+                        )}
+                    </fieldset>
                     <div className="market-actions">
                         <Button
                             type="submit"
-                            disabled={busy || conflict || !eligible}
+                            disabled={busy || fileBusy || conflict || !eligible}
                         >
                             {t(
                                 proposal?.submitted_at

@@ -3,7 +3,9 @@ import { Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/hooks/use-translation';
 import type { Freelancer, WorkLink } from '@/components/freelancer-card';
+import { AttachedFiles } from '@/components/attached-files';
 import { Money } from '@/pages/discovery/shared';
+import type { Attachment } from '@/pages/discovery/shared';
 import '../../../css/elancer-marketplace.css';
 export type ProposalContent = {
     price: string | null;
@@ -11,6 +13,8 @@ export type ProposalContent = {
     message: string;
     answers: string[];
     samples: WorkLink[];
+    // Plan 030: frozen into each submitted version; absent from versions sent before files existed.
+    files?: Attachment[];
 };
 export type ProposalProject = {
     id: number;
@@ -31,6 +35,9 @@ export type Proposal = {
     content: ProposalContent | null;
     profile_snapshot: Freelancer | null;
     submitted_at: string | null;
+    // The author's only: the files of the next version, and whether they differ from the one the client has.
+    files?: Attachment[];
+    files_changed?: boolean;
     events: {
         kind: string;
         content: ProposalContent | null;
@@ -73,9 +80,11 @@ export function ProposalStatus({ status }: { status: string }) {
 export function ContentDetails({
     content,
     project,
+    proposalId,
 }: {
     content: ProposalContent;
     project: ProposalProject;
+    proposalId: number;
 }) {
     const { t } = useTranslation();
     return (
@@ -130,6 +139,17 @@ export function ContentDetails({
                             </li>
                         ))}
                     </ul>
+                </section>
+            )}
+            {!!content.files?.length && (
+                <section className="market-stack">
+                    <h2>{t('Attached files')}</h2>
+                    <AttachedFiles
+                        files={content.files}
+                        href={(file) =>
+                            `/proposals/${proposalId}/files/${file.id}`
+                        }
+                    />
                 </section>
             )}
         </div>

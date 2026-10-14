@@ -1,6 +1,7 @@
 // Uses the adapted TailAdmin Alert and pagination (MIT: THIRD_PARTY_NOTICES.md).
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
+import { AttachedFiles } from '@/components/attached-files';
 import Alert from '@/components/tailadmin/alert';
 import Pagination, {
     type PaginationData,
@@ -16,6 +17,8 @@ type Entry = {
     hidden: boolean;
     sender: 'client' | 'freelancer';
     revisions: { body: string; version: number; created_at: string }[];
+    // Plan 030: each download is audited like reading the thread.
+    files: { id: number; name: string; size: number }[];
 };
 
 export default function ReportedConversation({
@@ -99,6 +102,16 @@ export default function ReportedConversation({
                         >
                             {message.body}
                         </p>
+                        {!!message.files.length && (
+                            <div className="mt-3">
+                                <AttachedFiles
+                                    files={message.files}
+                                    href={(file) =>
+                                        `/admin/reports/${report.id}/files/${file.id}`
+                                    }
+                                />
+                            </div>
+                        )}
                         {!!message.revisions.length && (
                             <details className="mt-2 text-sm">
                                 <summary className="focus-visible:outline-ring inline-flex min-h-11 cursor-pointer items-center underline underline-offset-4 focus-visible:outline-2">

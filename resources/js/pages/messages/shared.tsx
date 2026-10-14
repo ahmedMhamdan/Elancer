@@ -2,6 +2,7 @@ import { Head } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/hooks/use-translation';
+import type { Attachment } from '@/pages/discovery/shared';
 import '../../../css/elancer-marketplace.css';
 import '../../../css/elancer-chat.css';
 
@@ -14,6 +15,8 @@ export type ConversationSummary = {
     preview: string;
     // The latest message was hidden by moderation, so there is no text to preview.
     preview_hidden: boolean;
+    // Plan 030: the latest message is files alone, so its preview names how many.
+    preview_files: number;
     archived: boolean;
     unread: number;
     updated_at: string;
@@ -29,6 +32,8 @@ export type Message = {
     mine: boolean;
     can_edit: boolean;
     revisions: { body: string; version: number; created_at: string }[];
+    // Plan 030: none for a message moderation hid.
+    files: Attachment[];
 };
 
 export function MessageLayout({ children }: { children: ReactNode }) {

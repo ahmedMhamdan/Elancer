@@ -54,6 +54,7 @@ export default function Compare({
                                 <ContentDetails
                                     content={proposal.content}
                                     project={project}
+                                    proposalId={proposal.id}
                                 />
                             )}
                         </article>

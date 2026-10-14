@@ -161,6 +161,7 @@ export default function Show({
                                 <ContentDetails
                                     content={proposal.content}
                                     project={project}
+                                    proposalId={proposal.id}
                                 />
                             ) : proposal.draft ? (
                                 <>
@@ -168,18 +169,21 @@ export default function Show({
                                     <ContentDetails
                                         content={proposal.draft}
                                         project={project}
+                                        proposalId={proposal.id}
                                     />
                                 </>
                             ) : (
                                 <p>{t('No proposal content yet.')}</p>
                             )}
-                            {author && proposal.content && proposal.draft && (
-                                <p className="market-muted">
-                                    {t(
-                                        'You have private draft changes. Submit them to update what the client sees.',
-                                    )}
-                                </p>
-                            )}
+                            {author &&
+                                proposal.content &&
+                                (proposal.draft || proposal.files_changed) && (
+                                    <p className="market-muted">
+                                        {t(
+                                            'You have private draft changes. Submit them to update what the client sees.',
+                                        )}
+                                    </p>
+                                )}
                         </section>
                         <section className="market-panel">
                             <h2>{t('Submission history')}</h2>
@@ -200,6 +204,7 @@ export default function Show({
                                         <ContentDetails
                                             content={event.content}
                                             project={project}
+                                            proposalId={proposal.id}
                                         />
                                     )}
                                 </details>
