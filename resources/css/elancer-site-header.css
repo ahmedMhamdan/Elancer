@@ -311,6 +311,13 @@
     padding-inline: 9px;
     gap: 5px;
 }
+/* A member's bar holds a sixth menu, Log out and Workspace; keep them inside it from 1280px, in Arabic too. */
+.elancer-navbar-member .motion-navigation-list {
+    gap: 2px;
+}
+.elancer-navbar-member .elancer-navbar-actions {
+    gap: 4px;
+}
 .elancer-guide-menu {
     width: min(420px, calc(100vw - 32px));
 }

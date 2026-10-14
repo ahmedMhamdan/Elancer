@@ -34,12 +34,16 @@ export default function ElancerSiteHeader({
 
     return (
         <Navbar>
-            <NavBody>
+            {/* A member's bar adds Your workspace, Log out and Workspace: it does not narrow on scroll and sits tighter. */}
+            <NavBody
+                className={auth.user ? 'elancer-navbar-member' : undefined}
+                compactWidth={auth.user ? 1280 : undefined}
+            >
                 <NavbarLogo />
                 <div className="elancer-desktop-links">
                     <ExploreSkillsMenu />
                 </div>
-                <div className="flex shrink-0 items-center gap-2">
+                <div className="elancer-navbar-actions flex shrink-0 items-center gap-2">
                     <ElancerSpotlight />
                     <LanguageToggle />
                     <ThemeToggle />

@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { home } from '@/routes';
 
 type NavbarProps = { children: React.ReactNode; className?: string };
-type NavBodyProps = NavbarProps & { visible?: boolean };
+type NavBodyProps = NavbarProps & { visible?: boolean; compactWidth?: number };
 type NavItemsProps = { items: { name: string; link: string }[]; className?: string; onItemClick?: () => void };
 type MobileNavMenuProps = NavbarProps & { isOpen: boolean; onClose: () => void; id?: string };
 
@@ -27,13 +27,14 @@ export function Navbar({ children, className }: NavbarProps) {
     );
 }
 
-export function NavBody({ children, className, visible }: NavBodyProps) {
+// compactWidth: how far the bar narrows on scroll; a bar with more controls than fit at 1220 keeps 1280.
+export function NavBody({ children, className, visible, compactWidth = 1220 }: NavBodyProps) {
     const reduceMotion = useReducedMotion();
     return (
         <motion.div
             initial={false}
             style={{ maxWidth: 1280 }}
-            animate={{ maxWidth: visible ? 1220 : 1280, y: visible ? 4 : 0 }}
+            animate={{ maxWidth: visible ? compactWidth : 1280, y: visible ? 4 : 0 }}
             transition={reduceMotion ? { duration: 0 } : { duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             data-compact={visible}
             className={cn('elancer-resizable-body relative mx-auto hidden w-[calc(100%-2rem)] items-center justify-between gap-3 rounded-full px-4 py-3 min-[1280px]:flex', className)}
