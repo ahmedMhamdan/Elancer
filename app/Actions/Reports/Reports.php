@@ -84,18 +84,19 @@ class Reports
     }
 
     /** Q65: the reviewer handling a report may read its conversation, and every read is logged. */
-    public static function readConversation(User $actor, Report $report): void
+    /** Reading the thread and downloading one of its files (plan 030) are audited apart. */
+    public static function readConversation(User $actor, Report $report, string $action = 'conversation_read'): void
     {
         abort_unless(self::handles($actor, $report), 404);
         abort_unless($report->conversation_id !== null && $report->status === 'in_review' && $report->handler_id === $actor->id, 403);
-        self::audit($actor, 'conversation_read', $report);
+        self::audit($actor, $action, $report);
     }
 
     public static function audit(User $actor, string $action, Report $report, ?string $reason = null): void
     {
         DB::table('moderation_events')->insert(['actor_id' => $actor->id, 'actor_email' => $actor->email, 'action' => $action,
             'report_id' => $report->id, 'target_type' => $report->target_type, 'target_id' => $report->target_id,
-            'conversation_id' => $action === 'conversation_read' ? $report->conversation_id : null,
+            'conversation_id' => in_array($action, ['conversation_read', 'conversation_file_read'], true) ? $report->conversation_id : null,
             'subject_id' => $report->subject_id, 'reason' => $reason, 'created_at' => now()]);
     }
 

@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
@@ -32,5 +33,11 @@ class ConversationMessage extends Model
     public function conversation(): BelongsTo
     {
         return $this->belongsTo(Conversation::class);
+    }
+
+    /** @return HasMany<MessageFile, $this> */
+    public function files(): HasMany
+    {
+        return $this->hasMany(MessageFile::class);
     }
 }

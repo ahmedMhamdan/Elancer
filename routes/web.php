@@ -33,6 +33,7 @@ use App\Http\Controllers\ProfilePhotoController;
 use App\Http\Controllers\ProjectAttachmentController;
 use App\Http\Controllers\ProjectDiscoveryController;
 use App\Http\Controllers\ProposalController;
+use App\Http\Controllers\ProposalFileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SavedItemController;
 use App\Http\Controllers\SkillController;
@@ -117,6 +118,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('messages/{conversation}', [ConversationController::class, 'send'])->whereNumber('conversation')->middleware('throttle:60,1')->name('messages.send');
         Route::patch('messages/{conversation}/state', [ConversationController::class, 'state'])->whereNumber('conversation')->name('messages.state');
         Route::patch('messages/items/{message}', [ConversationController::class, 'edit'])->whereNumber('message')->middleware('throttle:30,1')->name('messages.edit');
+        Route::get('messages/files/{file}', [ConversationController::class, 'file'])->whereNumber('file')->middleware('throttle:60,1')->name('messages.files.show');
         Route::post('messages/{conversation}/block', [ContactBlockController::class, 'fromConversation'])->whereNumber('conversation')->middleware('throttle:20,1')->name('messages.block');
         Route::get('invitations', [InvitationController::class, 'index'])->name('invitations.index');
         Route::get('freelancers/{profile}/invite', [InvitationController::class, 'create'])->name('invitations.create');
@@ -143,6 +145,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('my-proposals', [ProposalController::class, 'index'])->name('proposals.index');
         Route::get('jobs/{project}/apply', [ProposalController::class, 'edit'])->name('proposals.edit');
         Route::put('jobs/{project}/proposal', [ProposalController::class, 'save'])->middleware('throttle:120,1')->name('proposals.save');
+        Route::post('jobs/{project}/proposal/files', [ProposalFileController::class, 'store'])->whereNumber('project')->middleware('throttle:30,1')->name('proposals.files.store');
+        Route::delete('jobs/{project}/proposal/files/{file}', [ProposalFileController::class, 'destroy'])->whereNumber(['project', 'file'])->middleware('throttle:30,1')->name('proposals.files.destroy');
+        Route::get('proposals/{proposal}/files/{file}', [ProposalFileController::class, 'download'])->whereNumber(['proposal', 'file'])->middleware('throttle:60,1')->name('proposals.files.show');
         Route::get('proposals/{proposal}', [ProposalController::class, 'show'])->name('proposals.show');
         Route::post('proposals/{proposal}/withdraw', [ProposalController::class, 'withdraw'])->name('proposals.withdraw');
         Route::patch('proposals/{proposal}/review', [ProposalController::class, 'review'])->name('proposals.review');
@@ -194,6 +199,7 @@ Route::middleware(['auth', 'verified', EnsureCategoryAdministrator::class])
         Route::patch('{report}', [AdminReportController::class, 'update'])->whereNumber('report')->middleware('throttle:30,1')->name('update');
         Route::post('{report}/notes', [AdminReportController::class, 'note'])->whereNumber('report')->middleware('throttle:30,1')->name('notes');
         Route::get('{report}/conversation', [AdminReportController::class, 'conversation'])->whereNumber('report')->middleware('throttle:60,1')->name('conversation');
+        Route::get('{report}/files/{file}', [AdminReportController::class, 'file'])->whereNumber(['report', 'file'])->middleware('throttle:60,1')->name('file');
     });
 
 // Q69: suspending and reinstating ordinary members is open to regular administrators too.

@@ -7,6 +7,7 @@ use App\Actions\Invitations\InvitationLifecycle;
 use App\Models\Profile;
 use App\Models\Project;
 use App\Models\Proposal;
+use App\Models\ProposalFile;
 use App\Models\User;
 use App\Notifications\WorkspaceEvent;
 use Illuminate\Support\Facades\DB;
@@ -63,6 +64,10 @@ class SaveProposal
             $proposal->forceFill(['project_id' => $locked->id, 'user_id' => $user->id, 'version' => ($proposal->exists ? $proposal->version : 0) + 1, 'draft' => $data]);
             if ($submit) {
                 $first = $proposal->submitted_at === null;
+                // Plan 030: the files the freelancer is working with become this version's, for the client and the history alike.
+                $files = $proposal->exists ? $proposal->files()->whereNull('removed_at')->orderBy('id')->lockForUpdate()->get() : collect();
+                $data['files'] = array_values($files->map(fn (ProposalFile $file) => $file->only(['id', 'name', 'size']))->all());
+                ProposalFile::query()->whereIn('id', array_column($data['files'], 'id'))->whereNull('submitted_at')->update(['submitted_at' => now()]);
                 $proposal->content = $data;
                 $proposal->forceFill(['price' => $data['price'], 'duration_days' => $data['duration_days']]);
                 // Retain the exact shared identity; private edits never enter a recipient's view.

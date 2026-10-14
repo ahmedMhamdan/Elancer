@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Conversations\HiringAccess;
 use App\Actions\Demo\DemoWorld;
+use App\Actions\Files\AttachedFiles;
 use App\Actions\Offers\OfferLifecycle;
 use App\Actions\Proposals\ProposalRules;
 use App\Actions\Proposals\SaveProposal;
@@ -47,7 +48,11 @@ class ProposalController extends Controller
     {
         $data = $proposal->only(['id', 'project_id', 'status', 'content', 'profile_snapshot', 'version', 'submitted_at']);
         if ($author) {
-            $data['draft'] = $proposal->draft;
+            // Plan 030: the files the freelancer is working with, and whether they differ from what the client received.
+            $files = ProposalFileController::draft($proposal);
+            $data['draft'] = $proposal->draft === null ? null : [...$proposal->draft, 'files' => $files];
+            $data['files'] = $files;
+            $data['files_changed'] = $proposal->content !== null && array_column($files, 'id') !== array_column($proposal->content['files'] ?? [], 'id');
         } else {
             $data['organization'] = $proposal->organization;
             $data['client_note'] = $proposal->client_note;
@@ -70,6 +75,7 @@ class ProposalController extends Controller
             'proposal' => $proposal ? $this->details($proposal, true) : null,
             'profilePublished' => Profile::query()->publiclyVisible()->where('user_id', $request->user()->id)->exists(),
             'sampleLinks' => $request->user()->profile->professional_links ?? [],
+            'fileLimit' => AttachedFiles::LIMIT,
             'trial' => DemoWorld::trial($request->user()->id, $project->user_id),
         ]);
     }

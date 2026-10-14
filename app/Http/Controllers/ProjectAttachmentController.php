@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Auth\DemoAccess;
 use App\Actions\Demo\DemoWorld;
+use App\Actions\Files\AttachedFiles;
 use App\Models\Project;
 use App\Models\ProjectAttachment;
 use App\Models\User;
@@ -63,6 +64,8 @@ class ProjectAttachmentController extends Controller
                 'file.uploaded' => __('This file could not be uploaded. It may be larger than this server accepts.'),
             ]);
         $file = $request->file('file');
+        // Plan 030: the upload budget, checked again under the lock.
+        AttachedFiles::ensureRoom($request->user()->id, (int) $file->getSize(), 'file');
         // Stored before the row lock, so the lock is never held during the transfer.
         $path = 'project-attachments/'.$project->id.'/'.Str::uuid();
         try {
@@ -70,11 +73,13 @@ class ProjectAttachmentController extends Controller
                 throw ValidationException::withMessages(['file' => __('We could not save this file. Please try again.')]);
             }
             DB::transaction(function () use ($request, $project, $file, $path): void {
+                User::query()->lockForUpdate()->findOrFail($request->user()->id);
                 $locked = Project::query()->whereKey($project->id)->lockForUpdate()->firstOrFail();
                 $this->draft($request, $locked);
                 if ($locked->attachments()->count() >= ProjectAttachment::LIMIT) {
                     throw ValidationException::withMessages(['file' => __('A brief can carry up to :count files. Remove one to add another.', ['count' => ProjectAttachment::LIMIT])]);
                 }
+                AttachedFiles::ensureRoom($request->user()->id, (int) $file->getSize(), 'file');
                 (new ProjectAttachment)->forceFill(['project_id' => $locked->id, 'name' => Str::limit(basename($file->getClientOriginalName()), 200, ''),
                     'path' => $path, 'mime' => (string) $file->getMimeType(), 'size' => (int) $file->getSize()])->save();
             });

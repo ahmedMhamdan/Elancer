@@ -396,5 +396,13 @@
     "This account cannot create API tokens.": "لا يستطيع هذا الحساب إنشاء رموز للواجهة البرمجية.",
     "This account already has the most tokens it can hold. Revoke one first.": "بلغ هذا الحساب أقصى عدد من الرموز. ألغِ رمزًا أولًا.",
     "Token revoked.": "تم إلغاء الرمز.",
-    "This proposal changed since the version you sent. Read it again before saving.": "تغيّر هذا العرض بعد النسخة التي أرسلتها. اقرأه من جديد قبل الحفظ."
+    "This proposal changed since the version you sent. Read it again before saving.": "تغيّر هذا العرض بعد النسخة التي أرسلتها. اقرأه من جديد قبل الحفظ.",
+    "Attach a JPG, PNG, WebP, PDF, TXT or ZIP file.": "أرفق ملفًا من نوع JPG أو PNG أو WebP أو PDF أو TXT أو ZIP.",
+    "Your account has used its :size MB for files. Files you already attached stay; new ones cannot be added.": "استخدم حسابك كل المساحة المخصصة له للملفات، وهي :size ميغابايت. تبقى الملفات التي أرفقتها، لكن لا يمكن إضافة ملفات جديدة.",
+    "Elancer has no room for new files right now. Files you already attached stay.": "لا توجد في Elancer مساحة لملفات جديدة حاليًا. تبقى الملفات التي أرفقتها.",
+    "A proposal can carry up to :count files. Remove one to add another.": "يمكن إرفاق ما لا يزيد على :count ملفات بالعرض. أزل ملفًا لإضافة آخر.",
+    "Nobody receives a proposal on a sample project, so it takes no files.": "لا يستلم أحد العروض المقدَّمة لمشروع تجريبي، لذلك لا يمكن إرفاق ملفات بها.",
+    "Save your draft before attaching files.": "احفظ مسودتك قبل إرفاق الملفات.",
+    "Write a message or attach a file.": "اكتب رسالة أو أرفق ملفًا.",
+    "A message can carry up to :count files.": "يمكن إرفاق ما لا يزيد على :count ملفات بالرسالة."
 }

@@ -8,6 +8,7 @@ use App\Models\Contract;
 use App\Models\ContractReview;
 use App\Models\Conversation;
 use App\Models\ConversationMessage;
+use App\Models\MessageFile;
 use App\Models\PortfolioCase;
 use App\Models\Profile;
 use App\Models\Project;
@@ -18,9 +19,11 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class AdminReportController extends Controller
 {
@@ -116,6 +119,8 @@ class AdminReportController extends Controller
         $conversation = Conversation::query()->with(['client', 'freelancer', 'proposal.project'])->findOrFail($report->conversation_id);
         $messages = $conversation->messages()->orderBy('id')->paginate(50)->withQueryString();
         $revisions = $this->revisions($messages->getCollection()->map(fn (ConversationMessage $message) => $message->id)->values()->all());
+        // Plan 030: the reviewer sees what was sent, hidden messages included, as with the text.
+        $files = MessageFile::query()->whereIn('conversation_message_id', $messages->getCollection()->pluck('id'))->orderBy('id')->get(['id', 'conversation_message_id', 'name', 'size'])->groupBy('conversation_message_id');
 
         return Inertia::render('admin/reports/conversation', [
             'report' => ['id' => $report->id, 'reported_message' => $report->target_type === 'message' ? $report->target_id : null],
@@ -125,8 +130,20 @@ class AdminReportController extends Controller
                 'hidden' => $message->moderated_at !== null,
                 'sender' => $message->sender_id === $conversation->client_id ? 'client' : 'freelancer',
                 'revisions' => $revisions[$message->id] ?? [],
+                'files' => ($files->get($message->id) ?? collect())->map(fn (MessageFile $file) => $file->only(['id', 'name', 'size']))->values(),
             ]),
         ]);
+    }
+
+    /** Plan 030, Q65: a file of the reported conversation, for the administrator holding the report. Each download is audited. */
+    public function file(Request $request, Report $report, MessageFile $file): SymfonyResponse
+    {
+        abort_unless($file->message->conversation_id === $report->conversation_id, 404);
+        Reports::readConversation($request->user(), $report, 'conversation_file_read');
+        abort_unless(Storage::disk('uploads')->exists($file->path), 404);
+
+        // Always a download under a neutral type, so a file is never shown or run inside the site.
+        return Storage::disk('uploads')->download($file->path, $file->name, ['Content-Type' => 'application/octet-stream', 'Cache-Control' => 'private, no-store', 'X-Content-Type-Options' => 'nosniff']);
     }
 
     /**

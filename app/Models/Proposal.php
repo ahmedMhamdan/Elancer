@@ -43,4 +43,10 @@ class Proposal extends Model
     {
         return $this->hasMany(ProposalEvent::class);
     }
+
+    /** @return HasMany<ProposalFile, $this> */
+    public function files(): HasMany
+    {
+        return $this->hasMany(ProposalFile::class);
+    }
 }

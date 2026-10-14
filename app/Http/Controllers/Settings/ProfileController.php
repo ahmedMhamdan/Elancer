@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Settings;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileDeleteRequest;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
+use App\Models\Conversation;
 use App\Models\PortfolioCase;
 use App\Models\Project;
+use App\Models\Proposal;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -64,6 +66,10 @@ class ProfileController extends Controller
         $photoPath = $user->profile()->first()?->photo_path;
         $portfolio = PortfolioCase::query()->where('user_id', $user->id)->pluck('id');
         $briefs = Project::withTrashed()->where('user_id', $user->id)->whereHas('attachments')->pluck('id');
+        // Plan 030: the member's proposals and the proposals to their projects go with the account, and so do their conversations.
+        $proposals = Proposal::query()->whereHas('files')->where(fn ($q) => $q->where('user_id', $user->id)
+            ->orWhereIn('project_id', Project::withTrashed()->where('user_id', $user->id)->select('id')))->pluck('id');
+        $conversations = Conversation::query()->whereHas('messages.files')->where(fn ($q) => $q->where('client_id', $user->id)->orWhere('freelancer_id', $user->id))->pluck('id');
         DB::transaction(function () use ($user): void {
             $locked = $user->newQuery()->lockForUpdate()->findOrFail($user->id);
             $locked->delete();
@@ -80,6 +86,12 @@ class ProfileController extends Controller
         // Q11: the same for the files attached to the member's briefs.
         foreach ($briefs as $brief) {
             rescue(fn () => Storage::disk('uploads')->deleteDirectory('project-attachments/'.$brief));
+        }
+        foreach ($proposals as $proposal) {
+            rescue(fn () => Storage::disk('uploads')->deleteDirectory('proposal-files/'.$proposal));
+        }
+        foreach ($conversations as $conversation) {
+            rescue(fn () => Storage::disk('uploads')->deleteDirectory('message-files/'.$conversation));
         }
 
         $request->session()->invalidate();

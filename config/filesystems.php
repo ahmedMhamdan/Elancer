@@ -31,6 +31,13 @@ return [
 
     'default' => env('FILESYSTEM_DISK', 'local'),
 
+    // Plan 030 (plan 003 section 15): how many megabytes of member files one account and the whole
+    // site may keep before a new brief, proposal or message file is refused. Deliveries are never refused.
+    'budgets' => [
+        'account' => (int) env('UPLOAD_ACCOUNT_BUDGET_MB', 25),
+        'site' => (int) env('UPLOAD_SITE_BUDGET_MB', 750),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Filesystem Disks

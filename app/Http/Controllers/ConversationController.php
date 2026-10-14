@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Auth\DemoAccess;
 use App\Actions\Conversations\HiringAccess;
+use App\Actions\Files\AttachedFiles;
 use App\Events\WorkspaceSignal;
 use App\Models\Contract;
 use App\Models\Conversation;
 use App\Models\ConversationMessage;
+use App\Models\MessageFile;
 use App\Models\Project;
 use App\Models\Proposal;
 use App\Models\User;
@@ -15,12 +18,16 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Throwable;
 
 class ConversationController extends Controller
 {
@@ -68,6 +75,7 @@ class ConversationController extends Controller
         $writable = HiringAccess::conversationWritable($conversation->proposal);
         $messages = $conversation->messages()->orderByDesc('id')->paginate(30)->withQueryString();
         $revisions = DB::table('message_revisions')->whereIn('conversation_message_id', $messages->getCollection()->pluck('id'))->orderBy('version')->get(['conversation_message_id', 'body', 'version', 'created_at'])->groupBy('conversation_message_id');
+        $files = MessageFile::query()->whereIn('conversation_message_id', $messages->getCollection()->pluck('id'))->orderBy('id')->get(['id', 'conversation_message_id', 'name', 'size'])->groupBy('conversation_message_id');
         $visibleThrough = (int) ($messages->getCollection()->max('id') ?? 0);
 
         return Inertia::render('messages/show', [
@@ -77,14 +85,16 @@ class ConversationController extends Controller
             // Q68: a message hidden by moderation reaches neither participant; only a notice does.
             'messages' => $messages->through(fn (ConversationMessage $message) => $message->moderated_at !== null ? [
                 ...$message->only(['id', 'version', 'created_at']),
-                'body' => null, 'edited_at' => null, 'hidden' => true, 'mine' => $message->sender_id === $user, 'can_edit' => false, 'revisions' => [],
+                'body' => null, 'edited_at' => null, 'hidden' => true, 'mine' => $message->sender_id === $user, 'can_edit' => false, 'revisions' => [], 'files' => [],
             ] : [
                 ...$message->only(['id', 'body', 'version', 'created_at', 'edited_at']),
                 'hidden' => false,
                 'mine' => $message->sender_id === $user,
                 'can_edit' => $writable && $message->sender_id === $user && $message->created_at->addMinutes(15)->isFuture(),
                 'revisions' => ($revisions->get($message->id) ?? collect())->map(fn ($revision) => ['body' => $revision->body, 'version' => $revision->version, 'created_at' => $revision->created_at])->values(),
+                'files' => ($files->get($message->id) ?? collect())->map(fn (MessageFile $file) => $file->only(['id', 'name', 'size']))->values(),
             ]),
+            'fileLimit' => AttachedFiles::LIMIT,
         ]);
     }
 
@@ -92,11 +102,34 @@ class ConversationController extends Controller
     {
         abort_unless($conversation->contains($request->user()->id), 404);
         $filters = $this->filters($request);
-        $data = $request->validate(['body' => ['required', 'string', 'max:10000'], 'client_token' => ['required', 'uuid']]);
-        DB::transaction(function () use ($request, $conversation, $data): void {
-            $locked = $this->lockWritable($conversation);
-            $this->sendMessage($locked, $request->user()->id, $data['body'], $data['client_token']);
-        }, 3);
+        // Plan 030: up to three files beside the text, or files alone.
+        $data = $request->validate([
+            'body' => ['nullable', 'required_without:files', 'string', 'max:10000'], 'client_token' => ['required', 'uuid'],
+            'files' => ['nullable', 'array', 'list', 'max:'.AttachedFiles::LIMIT], 'files.*' => AttachedFiles::rules(),
+        ], ['body.required_without' => __('Write a message or attach a file.'), 'files.max' => __('A message can carry up to :count files.', ['count' => AttachedFiles::LIMIT])] + AttachedFiles::messages('files.*'));
+        $files = array_values($request->file('files') ?? []);
+        $stored = [];
+        try {
+            if ($files !== []) {
+                AttachedFiles::ensureRoom($request->user()->id, array_sum(array_map(fn (UploadedFile $file) => (int) $file->getSize(), $files)), 'files');
+                // Stored before the row locks, so no lock is held during the transfer.
+                foreach ($files as $file) {
+                    $stored[] = AttachedFiles::store($file, 'message-files/'.$conversation->id, 'files');
+                }
+            }
+            $sent = DB::transaction(function () use ($request, $conversation, $data, $files, $stored): bool {
+                $locked = $this->lockWritable($conversation);
+
+                return $this->sendMessage($locked, $request->user()->id, $data['body'] ?? '', $data['client_token'], $files, $stored);
+            }, 3);
+        } catch (Throwable $exception) {
+            rescue(fn () => Storage::disk('uploads')->delete($stored));
+            throw $exception;
+        }
+        // A repeated send request returns the message it already made; this copy of its files is not needed.
+        if (! $sent && $stored !== []) {
+            rescue(fn () => Storage::disk('uploads')->delete($stored));
+        }
 
         return to_route('messages.show', ['conversation' => $conversation, ...array_filter($filters, fn ($value) => $value !== '' && $value !== false), ...($request->integer('list_page') > 1 ? ['list_page' => $request->integer('list_page')] : [])]);
     }
@@ -147,6 +180,19 @@ class ConversationController extends Controller
         }
 
         return back();
+    }
+
+    /** Plan 030: the two participants download a message's files, unless moderation hid the message. */
+    public function file(Request $request, MessageFile $file): SymfonyResponse
+    {
+        $message = $file->message;
+        abort_unless($message->conversation->contains($request->user()->id) && $message->moderated_at === null, 404);
+        // Plans 025 and 027: no file leaves storage through an account anyone can open.
+        abort_if(DemoAccess::active($request), 403);
+        abort_unless(Storage::disk('uploads')->exists($file->path), 404);
+
+        // Always a download under a neutral type, so a file is never shown or run inside the site.
+        return Storage::disk('uploads')->download($file->path, $file->name, ['Content-Type' => 'application/octet-stream', 'Cache-Control' => 'private, no-store', 'X-Content-Type-Options' => 'nosniff']);
     }
 
     /** @return array{kind: string, archived: bool, unread: bool, q: string} */
@@ -213,18 +259,32 @@ class ConversationController extends Controller
         return Conversation::query()->lockForUpdate()->findOrFail($conversation->id);
     }
 
-    private function sendMessage(Conversation $conversation, int $sender, string $body, string $token): void
+    /**
+     * @param  list<UploadedFile>  $files
+     * @param  list<string>  $paths  where each of the files was stored, in the same order
+     */
+    private function sendMessage(Conversation $conversation, int $sender, string $body, string $token, array $files = [], array $paths = []): bool
     {
         $existing = $conversation->messages()->where('sender_id', $sender)->where('client_token', $token)->first();
         if ($existing) {
             abort_unless($existing->body === $body, 409, __('This send request was already used for another message.'));
 
-            return;
+            return false;
+        }
+        if ($files !== []) {
+            // The participants' rows are locked, so two sends at once cannot both fit in the same room.
+            AttachedFiles::ensureRoom($sender, array_sum(array_map(fn (UploadedFile $file) => (int) $file->getSize(), $files)), 'files');
         }
         $message = new ConversationMessage;
         $message->forceFill(['conversation_id' => $conversation->id, 'sender_id' => $sender, 'body' => $body, 'client_token' => $token])->save();
+        foreach ($files as $i => $file) {
+            (new MessageFile)->forceFill(['conversation_message_id' => $message->id, 'name' => AttachedFiles::name($file), 'path' => $paths[$i],
+                'mime' => (string) $file->getMimeType(), 'size' => (int) $file->getSize()])->save();
+        }
         $conversation->forceFill(['client_archived' => false, 'freelancer_archived' => false])->touch();
         DB::afterCommit(fn () => $this->announce($conversation, $sender));
+
+        return true;
     }
 
     /** The counterpart's open pages update at once; the bell keeps one unread entry per conversation however many messages arrive. */
@@ -265,6 +325,7 @@ class ConversationController extends Controller
             'counterpart' => $user === $conversation->client_id ? $conversation->freelancer->name : $conversation->client->name,
             'preview' => $conversation->latestMessage?->moderated_at === null ? Str::limit($conversation->latestMessage->body ?? '', 120) : '',
             'preview_hidden' => $conversation->latestMessage?->moderated_at !== null,
+            'preview_files' => $conversation->latestMessage && $conversation->latestMessage->moderated_at === null && $conversation->latestMessage->body === '' ? $conversation->latestMessage->files()->count() : 0,
             'archived' => (bool) $conversation->getAttribute($conversation->archiveColumn($user)),
             'unread' => $conversation->messages()->where('sender_id', '!=', $user)->where('id', '>', $conversation->getAttribute($conversation->readColumn($user)))->count(),
             'updated_at' => $conversation->updated_at,
