@@ -49,6 +49,8 @@ Route::get('/', HomeController::class)->name('home');
 foreach (['how-it-works', 'project-guides', 'inspiration', 'why-elancer', 'resources'] as $guide) {
     Route::inertia('learn/'.$guide, 'learn/show', ['guide' => $guide])->name('learn.'.$guide);
 }
+// Plan 029: bilingual Help articles, searched in the page itself.
+Route::inertia('help', 'help/index')->name('help');
 
 Route::get('search/filters', [ProjectDiscoveryController::class, 'filters'])->middleware('throttle:60,1')->name('search.filters');
 Route::get('categories', [ProjectDiscoveryController::class, 'categories'])->name('categories.index');

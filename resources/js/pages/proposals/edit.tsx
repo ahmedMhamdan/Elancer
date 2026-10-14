@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Button from '@/components/tailadmin/button';
 import Input from '@/components/tailadmin/input';
 import TextArea from '@/components/tailadmin/textarea';
+import HelpLink from '@/components/help-link';
 import { useTranslation } from '@/hooks/use-translation';
 import type { WorkLink } from '@/components/freelancer-card';
 import {
@@ -162,6 +163,9 @@ export default function Edit({
                                 : 'Drafts are private. Only submitting shares your proposal with the client.',
                         )}
                     </p>
+                    <HelpLink
+                        article={trial ? 'sample-projects' : 'applying'}
+                    />
                     {!eligible && (
                         <p className="market-error">
                             <Link href="/my-profile">

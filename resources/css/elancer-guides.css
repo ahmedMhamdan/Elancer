@@ -192,3 +192,113 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Plan 029: Help uses the guides' frame; these are its search field and its article rows. */
+.elancer-help-search {
+    position: relative;
+    max-width: 620px;
+    margin-top: 28px;
+}
+.elancer-help-search svg {
+    position: absolute;
+    inset-inline-start: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--el-muted);
+    pointer-events: none;
+}
+.elancer-help-search input {
+    width: 100%;
+    min-height: 52px;
+    padding-block: 12px;
+    padding-inline: 48px 16px;
+    border: 1px solid var(--el-border-strong);
+    border-radius: 14px;
+    background: var(--el-surface);
+    color: var(--el-text);
+    font-size: 16px;
+}
+.elancer-help-search input::placeholder {
+    color: var(--el-muted);
+}
+.elancer-help-search input:focus-visible {
+    outline: 3px solid var(--el-accent);
+    outline-offset: 2px;
+}
+.elancer-guide-heading > .elancer-help-status {
+    font-size: 15px;
+    line-height: 1.7;
+    margin-top: 12px;
+    min-height: 1.7em;
+}
+.elancer-help-item {
+    border-top: 1px solid var(--el-border);
+    scroll-margin-top: 112px;
+}
+.elancer-help-item summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    min-height: 56px;
+    padding: 12px 0;
+    cursor: pointer;
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.6;
+    list-style: none;
+}
+.elancer-help-item summary::-webkit-details-marker {
+    display: none;
+}
+.elancer-help-item summary svg {
+    flex-shrink: 0;
+    color: var(--el-muted);
+    transition: transform 0.2s ease;
+}
+.elancer-help-item[open] summary svg {
+    transform: rotate(180deg);
+}
+.elancer-help-item summary:hover {
+    color: var(--el-accent);
+}
+.elancer-help-item summary:focus-visible,
+.elancer-help-clear:focus-visible {
+    outline: 3px solid var(--el-accent);
+    outline-offset: 4px;
+    border-radius: 4px;
+}
+.elancer-help-item p,
+.elancer-help-result p {
+    line-height: 1.9;
+    margin-bottom: 12px;
+    overflow-wrap: anywhere;
+}
+.elancer-help-item .elancer-guide-action {
+    margin-top: 0;
+    margin-bottom: 12px;
+}
+.elancer-help-result h2 {
+    margin-bottom: 14px;
+}
+.elancer-help-result .elancer-guide-action {
+    margin-top: 4px;
+}
+.elancer-help-clear {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--el-accent);
+    font-weight: 600;
+    cursor: pointer;
+}
+@media (prefers-reduced-motion: reduce) {
+    .elancer-help-item summary svg {
+        transition: none;
+    }
+}
+@media (max-width: 767px) {
+    .elancer-help-item {
+        scroll-margin-top: 100px;
+    }
+}

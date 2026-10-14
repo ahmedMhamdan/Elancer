@@ -10,6 +10,7 @@ import {
     Bookmark,
     BriefcaseBusiness,
     ChevronDown,
+    CircleHelp,
     Compass,
     CreditCard,
     FileText,
@@ -199,6 +200,12 @@ export function AppSidebar() {
                     label: t('Account settings'),
                     href: edit().url,
                     icon: <Settings size={20} />,
+                },
+                // Plan 029: Help sits with the account controls, as plan 003 places it.
+                {
+                    label: t('Help'),
+                    href: '/help',
+                    icon: <CircleHelp size={20} />,
                 },
             ],
         },

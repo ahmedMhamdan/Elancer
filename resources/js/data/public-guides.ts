@@ -379,8 +379,8 @@ export function publicGuides(t: (text: string) => string): PublicGuide[] {
                             'For project questions, keep the discussion in the relevant conversation so both participants can refer to it. This page is a self-service guide, not a support ticket form.',
                         ),
                     ],
-                    href: '/learn/how-it-works#faq',
-                    action: t('Read common questions'),
+                    href: '/help',
+                    action: t('Open Help'),
                 },
                 {
                     id: 'updates',

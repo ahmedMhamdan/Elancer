@@ -4,6 +4,7 @@
 // and payment attempts with Elancer tokens. See THIRD_PARTY_NOTICES.md.
 import { Head, Link, usePage } from '@inertiajs/react';
 import { CircleCheck, Clock } from 'lucide-react';
+import HelpLink from '@/components/help-link';
 import Pagination from '@/components/tailadmin/pagination';
 import {
     Table,
@@ -102,6 +103,7 @@ export default function Finance({
                             'Agreed contract amounts and test payments. Elancer does not hold or move real money, so there is no balance to withdraw.',
                         )}
                     </p>
+                    <HelpLink article="test-mode" className="mt-2" />
                 </div>
 
                 {shown.map(({ role, title, awaiting, funded }) => (

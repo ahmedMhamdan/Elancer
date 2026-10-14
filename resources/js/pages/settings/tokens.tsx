@@ -1,6 +1,7 @@
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 import Heading from '@/components/heading';
+import HelpLink from '@/components/help-link';
 import Alert from '@/components/tailadmin/alert';
 import Button from '@/components/tailadmin/button';
 import Input from '@/components/tailadmin/input';
@@ -435,6 +436,7 @@ export default function ApiTokens({
                         'Send the token with every request as a bearer token. Answers are JSON, lists come in pages, and each token may make 60 reads and 20 changes a minute.',
                     )}
                 />
+                <HelpLink article="api-tokens" />
                 <pre
                     dir="ltr"
                     className="bg-muted overflow-x-auto rounded-lg p-3 text-left text-sm"

@@ -22,6 +22,7 @@ import {
     CancellationStatus,
     type Cancellation,
 } from './cancellation';
+import HelpLink from '@/components/help-link';
 import { Deliveries, type Submission } from './deliveries';
 import { Funding } from './funding';
 import { Portfolio, type PortfolioState } from './portfolio';
@@ -301,7 +302,13 @@ export default function Show({
                 className="market-stack"
             >
                 {tab === 'deliveries' && (
-                    <Deliveries contract={contract} submissions={submissions} />
+                    <>
+                        <Deliveries
+                            contract={contract}
+                            submissions={submissions}
+                        />
+                        <HelpLink article="delivering" />
+                    </>
                 )}
                 {tab === 'agreement' && (
                     <>

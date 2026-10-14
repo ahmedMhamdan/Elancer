@@ -53,6 +53,9 @@ export default function HoverFooter({
                                     {t('Back to the beginning')}
                                 </a>
                             </li>
+                            <li>
+                                <Link href="/help">{t('Help')}</Link>
+                            </li>
                         </ul>
                     </nav>
                     <nav aria-label={t('Your account')}>

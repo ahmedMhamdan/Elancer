@@ -2,6 +2,7 @@
 import { useForm } from '@inertiajs/react';
 import { Flag } from 'lucide-react';
 import { useId, useState } from 'react';
+import HelpLink from '@/components/help-link';
 import InputError from '@/components/input-error';
 import Button from '@/components/tailadmin/button';
 import Label from '@/components/tailadmin/label';
@@ -139,6 +140,7 @@ export default function ReportDialog({
                             )}
                         </p>
                     )}
+                    <HelpLink article="reporting" />
                     {(errors.report || failure) && (
                         <p role="alert" className="text-destructive text-sm">
                             {errors.report || failure}

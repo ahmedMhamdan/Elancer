@@ -1525,7 +1525,6 @@ export const arabic: Record<string, string> = {
         'ستجد أدوات اللغة والمظهر في شريط التنقل، وخيارات الحساب والأمان في الإعدادات بعد تسجيل الدخول.',
     'For project questions, keep the discussion in the relevant conversation so both participants can refer to it. This page is a self-service guide, not a support ticket form.':
         'لأسئلة المشروع، أبقِ النقاش في المحادثة المرتبطة به ليتمكن الطرفان من الرجوع إليه. هذه الصفحة دليل للمساعدة الذاتية وليست نموذجًا لتذاكر الدعم.',
-    'Read common questions': 'اقرأ الأسئلة الشائعة',
     'Platform updates': 'تحديثات المنصة',
     'What is available, and what is still being built.':
         'ما هو متاح، وما زال قيد التطوير.',
@@ -2519,4 +2518,199 @@ export const arabic: Record<string, string> = {
     'Save a draft or submit a proposal': 'حفظ مسودة أو إرسال عرض',
     'Withdraw a proposal': 'سحب عرض',
     'Any token': 'أي رمز',
+    'Posting a project, choosing a freelancer and agreeing the terms.':
+        'نشر مشروع، اختيار مستقل والاتفاق على الشروط.',
+    'Posting a project': 'نشر مشروع',
+    'Start a draft from My projects and fill it in step by step: the brief, the category and skills, the budget, the date applications close and up to three questions for applicants. The draft saves by itself and only you can see it.':
+        'ابدأ مسودة من «مشاريعي» واملأها خطوة بخطوة: وصف المشروع، التصنيف والمهارات، الميزانية، آخر موعد للتقديم، وحتى ثلاثة أسئلة للمتقدمين. تُحفظ المسودة تلقائيًا ولا يراها أحد غيرك.',
+    'Projects are fixed price. Give one target amount or a range in US dollars; freelancers may propose more or less.':
+        'المشاريع بسعر ثابت. حدّد مبلغًا مستهدفًا واحدًا أو نطاقًا بالدولار الأمريكي؛ وللمستقلين أن يقترحوا أكثر أو أقل.',
+    'Review the draft, then publish it. A published project appears in Find work and takes applications until its closing date.':
+        'راجع المسودة ثم انشرها. يظهر المشروع المنشور في «ابحث عن عمل» ويستقبل العروض حتى آخر موعد للتقديم.',
+    'Open My projects': 'افتح مشاريعي',
+    'Changing a project after publishing': 'تعديل مشروع بعد نشره',
+    'The published brief stays as written, so every applicant answers the same text. To add or correct something, post a clarification: a dated public note under the brief. Freelancers who already applied are told.':
+        'يبقى وصف المشروع المنشور كما كُتب، ليجيب كل المتقدمين عن النص نفسه. لإضافة شيء أو تصحيحه، انشر توضيحًا: ملاحظة عامة مؤرخة تظهر تحت الوصف. ويُبلَّغ بها المستقلون الذين سبق أن تقدموا.',
+    'You can move the closing date later, which reopens applications if it had passed. Files are attached while the project is still a draft: up to three, 5 MB each.':
+        'يمكنك تأخير آخر موعد للتقديم، وهذا يعيد فتح التقديم إن كان الموعد قد مضى. تُرفق الملفات والمشروع ما زال مسودة: حتى ثلاثة ملفات، كل منها 5 ميغابايت على الأكثر.',
+    'Reviewing proposals': 'مراجعة العروض',
+    'Open a project and choose Review applicants to read each proposal: the price, the delivery time, the cover message, the answers to your questions and the work samples.':
+        'افتح مشروعًا واختر «مراجعة المتقدمين» لتقرأ كل عرض: السعر، مدة التسليم، رسالة التقديم، الإجابات عن أسئلتك ونماذج الأعمال.',
+    'Mark applicants as shortlisted or archived and keep private notes; only you see them. Select up to three proposals to compare them side by side.':
+        'ضع المتقدمين في القائمة المختصرة أو الأرشيف واكتب ملاحظات خاصة؛ لا يراها أحد غيرك. اختر حتى ثلاثة عروض لتقارن بينها جنبًا إلى جنب.',
+    'A proposal you decline shows as declined to its author, and you can reopen it later.':
+        'العرض الذي ترفضه يظهر لصاحبه مرفوضًا، ويمكنك إعادة فتحه لاحقًا.',
+    'Inviting a freelancer': 'دعوة مستقل',
+    'The freelancer directory lists published profiles. On a profile, choose Invite and pick one of your open projects.':
+        'يعرض دليل المستقلين الملفات المنشورة. في ملف المستقل اختر «دعوة» ثم اختر أحد مشاريعك المفتوحة.',
+    'An invitation asks the freelancer to apply; it is not a job offer. It counts as accepted when they submit a proposal. If they decline, you can send it again after seven days.':
+        'الدعوة تطلب من المستقل أن يتقدم بعرض، وليست عرض عمل. تُعدّ مقبولة عندما يرسل عرضه. وإن رفضها، يمكنك إرسالها مجددًا بعد سبعة أيام.',
+    'Conversations and final offers': 'المحادثات والعروض النهائية',
+    'Once a freelancer has applied, you can start a private conversation with them from their proposal. A freelancer cannot message a client first.':
+        'بعد أن يتقدم المستقل بعرض، يمكنك بدء محادثة خاصة معه من صفحة عرضه. لا يستطيع المستقل مراسلة العميل أولًا.',
+    'When you agree, send a final offer: the scope, the named deliverables, the price, the delivery time in calendar days and the number of revision rounds included. A project has one pending offer at a time, and an offer expires after 72 hours.':
+        'عند الاتفاق، أرسل عرضًا نهائيًا: نطاق العمل، المخرجات المسمّاة، السعر، مدة التسليم بالأيام التقويمية وعدد جولات التعديل المشمولة. للمشروع عرض نهائي معلّق واحد في كل مرة، وتنتهي صلاحية العرض بعد 72 ساعة.',
+    'The freelancer accepts, declines or asks for changes. Acceptance creates the contract and closes hiring on the project.':
+        'للمستقل أن يقبل أو يرفض أو يطلب تغييرات. القبول ينشئ العقد ويغلق التوظيف في المشروع.',
+    'Open Messages': 'افتح الرسائل',
+    Working: 'العمل',
+    'Your profile, applying, delivering and getting reviewed.':
+        'ملفك الشخصي، التقديم، التسليم والتقييمات.',
+    'Publishing your freelancer profile': 'نشر ملفك كمستقل',
+    'A profile needs a headline, a short introduction and at least one skill from the list. A photo, your location and links to your work are optional.':
+        'يحتاج الملف إلى عنوان مهني ونبذة قصيرة ومهارة واحدة على الأقل من القائمة. الصورة والموقع وروابط أعمالك اختيارية.',
+    'A profile is private until you publish it. You need a published profile to apply, and you can unpublish it at any time.':
+        'يبقى الملف خاصًا إلى أن تنشره. تحتاج إلى ملف منشور لتتقدم للمشاريع، ويمكنك إلغاء نشره في أي وقت.',
+    'Open My profile': 'افتح ملفي الشخصي',
+    'Applying to a project': 'التقدم لمشروع',
+    'Open a project in Find work and choose Apply. A proposal has your price, the delivery time in days, a cover message of at least 20 characters, your answers to the client’s questions and up to three links to your work.':
+        'افتح مشروعًا في «ابحث عن عمل» واختر التقدم. يتضمن العرض سعرك، مدة التسليم بالأيام، رسالة تقديم لا تقل عن 20 حرفًا، إجاباتك عن أسئلة العميل، وحتى ثلاثة روابط لأعمالك.',
+    'A draft is private and saves by itself. After you submit, you can still change the proposal or withdraw it while the project is hiring.':
+        'المسودة خاصة بك وتُحفظ تلقائيًا. بعد الإرسال يمكنك تعديل العرض أو سحبه ما دام التوظيف في المشروع مفتوحًا.',
+    'Applications close on the date shown on the project. The client may then start a conversation with you or send you a final offer.':
+        'يُغلق التقديم في الموعد الظاهر على المشروع. بعدها قد يبدأ العميل محادثة معك أو يرسل إليك عرضًا نهائيًا.',
+    'Sample projects from the demo': 'مشاريع تجريبية من العرض التجريبي',
+    'Some projects and freelancer profiles are samples: they belong to the demo accounts that visitors explore from the login page, not to real clients.':
+        'بعض المشاريع وملفات المستقلين تجريبية: تعود إلى الحسابات التجريبية التي يتصفحها الزوار من صفحة تسجيل الدخول، لا إلى عملاء حقيقيين.',
+    'You can apply to a sample project to see how applying works. The page tells you first, and your proposal is marked “Sample project” under My proposals. No real client reads or answers it, and it never becomes a contract.':
+        'يمكنك التقدم لمشروع تجريبي لترى كيف يعمل التقديم. تخبرك الصفحة بذلك أولًا، ويظهر عرضك في «عروضي» بعلامة «مشروع تجريبي». لن يقرأه أو يرد عليه عميل حقيقي، ولن يصبح عقدًا.',
+    'Open My proposals': 'افتح عروضي',
+    'Delivering work and revisions': 'تسليم العمل والتعديلات',
+    'Work starts when the client has funded the contract. Use messages for progress; when the work is ready, submit a delivery from the contract page with a note and any files.':
+        'يبدأ العمل عندما يموّل العميل العقد. استخدم الرسائل لمتابعة التقدم؛ وعندما يجهز العمل، أرسل تسليمًا من صفحة العقد مع ملاحظة وأي ملفات.',
+    'The client approves the delivery or asks for a revision. One revision request lists all the changes and uses one of the rounds included in the agreement.':
+        'يوافق العميل على التسليم أو يطلب تعديلًا. طلب التعديل الواحد يجمع كل التغييرات ويستهلك جولة واحدة من الجولات المشمولة في الاتفاق.',
+    'More rounds or more time need both sides to agree to a change of the agreement. The price of a contract does not go up.':
+        'الجولات الإضافية أو الوقت الإضافي يحتاجان إلى موافقة الطرفين على تعديل الاتفاق. وسعر العقد لا يزيد.',
+    'Open Contracts': 'افتح العقود',
+    'Reviews after a contract': 'التقييمات بعد العقد',
+    'When a contract is completed, the client and the freelancer each give a rating from 1 to 5 and a written review.':
+        'عند اكتمال العقد، يعطي كلٌّ من العميل والمستقل تقييمًا من 1 إلى 5 مع مراجعة مكتوبة.',
+    'Reviews stay hidden until both are in or 14 days have passed, so neither side can answer the other. A published review cannot be changed.':
+        'تبقى التقييمات مخفية حتى يرسلها الطرفان أو تمضي 14 يومًا، فلا يردّ أحدهما على الآخر. والتقييم المنشور لا يمكن تعديله.',
+    'Portfolio and case studies': 'معرض الأعمال ودراسات الحالة',
+    'Add case studies to your profile with a description, images and links to work you are allowed to show.':
+        'أضف دراسات حالة إلى ملفك مع وصف وصور وروابط لأعمال يُسمح لك بعرضها.',
+    'To show work from a completed contract, ask the client to approve the exact text, images and links. If you change them the approval is asked again, and the client can withdraw it.':
+        'لعرض عمل من عقد مكتمل، اطلب من العميل الموافقة على النص والصور والروابط كما هي. إن غيّرتها تُطلب الموافقة من جديد، وللعميل أن يسحبها.',
+    'Open My portfolio': 'افتح معرض أعمالي',
+    'Saved projects, freelancers and searches':
+        'المشاريع والمستقلون وعمليات البحث المحفوظة',
+    'Use Save on a project or a freelancer profile to keep it in your Saved list. Nobody else can see what you saved.':
+        'استخدم «حفظ» في صفحة مشروع أو ملف مستقل ليبقى في قائمة محفوظاتك. لا يرى أحد غيرك ما حفظته.',
+    'In Find work you can also save a search with its filters and run it again later. Saved searches do not send email.':
+        'في «ابحث عن عمل» يمكنك أيضًا حفظ بحث بمرشّحاته وتشغيله لاحقًا. عمليات البحث المحفوظة لا ترسل بريدًا إلكترونيًا.',
+    'Open Saved': 'افتح المحفوظات',
+    'Signing in, security, language and settings.':
+        'تسجيل الدخول، الأمان، اللغة والإعدادات.',
+    'Creating an account and signing in': 'إنشاء حساب وتسجيل الدخول',
+    'Register with your email address and a password, or continue with Google or GitHub. Confirm your email address from the message we send before you post or apply.':
+        'سجّل ببريدك الإلكتروني وكلمة مرور، أو تابع عبر Google أو GitHub. أكّد بريدك الإلكتروني من الرسالة التي نرسلها قبل أن تنشر مشروعًا أو تتقدم لمشروع.',
+    'A short setup asks for your name, where you are and how you plan to use Elancer. If you forget your password, use the reset link on the login page.':
+        'إعداد قصير يسألك عن اسمك ومكانك وكيف تنوي استخدام Elancer. إن نسيت كلمة المرور، استخدم رابط إعادة التعيين في صفحة تسجيل الدخول.',
+    'Looking around without an account': 'التصفح بلا حساب',
+    'On the login and register pages, “Explore as a client” and “Explore as a freelancer” open a prepared demo account with sample projects, proposals and contracts.':
+        'في صفحتي تسجيل الدخول وإنشاء الحساب، يفتح «تصفّح كصاحب مشاريع» و«تصفّح كمستقل» حسابًا تجريبيًا جاهزًا فيه مشاريع وعروض وعقود تجريبية.',
+    'Demo accounts are shared with other visitors, so some things are switched off there, such as files, the profile and account settings. Anything you change stays inside the demo and is reset from time to time.':
+        'الحسابات التجريبية مشتركة بين الزوار، لذلك تُعطَّل فيها أشياء مثل الملفات والملف الشخصي وإعدادات الحساب. وكل ما تغيّره يبقى داخل العرض التجريبي ويُعاد ضبطه من وقت لآخر.',
+    'Open the login page': 'افتح صفحة تسجيل الدخول',
+    'Client and freelancer workspaces': 'مساحتا عمل صاحب المشاريع والمستقل',
+    'One account works both ways. The Client and Freelancer switch in the sidebar changes which menus you see: projects and applicants as a client, proposals and invitations as a freelancer.':
+        'الحساب الواحد يعمل بالصفتين. مفتاح «صاحب مشاريع | مستقل» في الشريط الجانبي يغيّر القوائم التي تراها: المشاريع والمتقدمون بصفتك صاحب مشاريع، والعروض والدعوات بصفتك مستقلًا.',
+    'Switching does not change what your account may do, and your messages, contracts and notifications stay the same.':
+        'التبديل لا يغيّر ما يُسمح به لحسابك، وتبقى رسائلك وعقودك وإشعاراتك كما هي.',
+    'Open your workspace': 'افتح مساحة عملك',
+    'Passwords, two-factor and passkeys':
+        'كلمات المرور، المصادقة الثنائية ومفاتيح المرور',
+    'Settings, Security is where you change your password, turn on two-factor authentication with an authenticator app and add passkeys. You can also connect or disconnect Google and GitHub sign-in there.':
+        'في «الإعدادات» ثم «الأمان» تغيّر كلمة المرور، وتفعّل المصادقة الثنائية بتطبيق مصادقة، وتضيف مفاتيح مرور. ويمكنك هناك أيضًا ربط تسجيل الدخول عبر Google وGitHub أو فصله.',
+    'Keep your recovery codes somewhere safe: they let you in if you lose your phone.':
+        'احتفظ برموز الاسترداد في مكان آمن: بها تدخل حسابك إن فقدت هاتفك.',
+    'Open Security settings': 'افتح إعدادات الأمان',
+    'Language and appearance': 'اللغة والمظهر',
+    'Elancer works in English and Arabic. Use the language button at the top of any page; your choice is saved to your account.':
+        'يعمل Elancer بالعربية والإنجليزية. استخدم زر اللغة أعلى أي صفحة؛ ويُحفظ اختيارك في حسابك.',
+    'Text written by members, such as briefs, proposals and messages, stays in the language it was written in. Light and dark appearance is under Settings, Appearance.':
+        'النص الذي يكتبه الأعضاء، مثل أوصاف المشاريع والعروض والرسائل، يبقى باللغة التي كُتب بها. والمظهر الفاتح أو الداكن تجده في «الإعدادات» ثم «المظهر».',
+    'Open Appearance settings': 'افتح إعدادات المظهر',
+    'Notifications and email': 'الإشعارات والبريد الإلكتروني',
+    'The bell shows every update about your projects, proposals, offers, contracts and messages.':
+        'يعرض الجرس كل تحديث يخص مشاريعك وعروضك والعروض النهائية وعقودك ورسائلك.',
+    'Under Settings, Notifications you choose which of them are also sent by email. Emails about offers and contracts are on unless you switch them off; security emails are always sent.':
+        'من «الإعدادات» ثم «الإشعارات» تختار ما يُرسل منها إلى بريدك أيضًا. رسائل العروض النهائية والعقود مفعّلة ما لم توقفها، ورسائل الأمان تُرسل دائمًا.',
+    'Open Notification settings': 'افتح إعدادات الإشعارات',
+    'A token lets a program you run read public projects and manage your own proposals. Create one under Settings, API tokens: give it a name, choose what it may do and when it expires, from 7 to 90 days.':
+        'الرمز يسمح لبرنامج تشغّله بقراءة المشاريع العامة وإدارة عروضك. أنشئ رمزًا من «الإعدادات» ثم «رموز الواجهة البرمجية»: سمِّه، واختر ما يُسمح له به ومتى تنتهي صلاحيته، من 7 إلى 90 يومًا.',
+    'The token is shown once, so copy it then. Revoke a token as soon as you no longer need it or think someone else has seen it.':
+        'يظهر الرمز مرة واحدة فانسخه حينها. ألغِ الرمز فور استغنائك عنه أو إن ظننت أن غيرك رآه.',
+    'Open API tokens': 'افتح رموز الواجهة البرمجية',
+    'Closing your account': 'إغلاق حسابك',
+    'You can delete your account from Settings, Profile. Your profile, drafts and saved items are removed with it.':
+        'يمكنك حذف حسابك من «الإعدادات» ثم «الملف الشخصي». يُحذف معه ملفك ومسوداتك ومحفوظاتك.',
+    'An account that has a contract cannot be closed, because the other side still needs the record.':
+        'الحساب الذي له عقد لا يمكن إغلاقه، لأن الطرف الآخر ما زال يحتاج إلى السجل.',
+    'Open Profile settings': 'افتح إعدادات الملف الشخصي',
+    'Funding a contract, test mode and cancellations.':
+        'تمويل العقد، الوضع التجريبي والإلغاء.',
+    'Payments are in test mode': 'المدفوعات في وضع تجريبي',
+    'Elancer is a portfolio project. Payments run through a test provider: no real money moves, no fee is charged and nothing is paid out.':
+        'Elancer مشروع لعرض الأعمال. تمر المدفوعات عبر مزوّد دفع تجريبي: لا تتحرك أموال حقيقية، ولا تُفرض رسوم، ولا يُصرف شيء.',
+    'The amounts you see are the ones agreed in your contracts. There is no balance, wallet or withdrawal.':
+        'المبالغ التي تراها هي المتفق عليها في عقودك. لا يوجد رصيد ولا محفظة ولا سحب.',
+    'Open Finance': 'افتح المالية',
+    'Funding a contract': 'تمويل عقد',
+    'After a freelancer accepts your final offer, the contract waits for payment. Open the contract and choose a payment option to fund the agreed amount.':
+        'بعد أن يقبل المستقل عرضك النهائي، ينتظر العقد الدفع. افتح العقد واختر وسيلة دفع لتمويل المبلغ المتفق عليه.',
+    'Work, deliveries and revisions open once the payment is confirmed. If a payment is not completed, you can start it again from the same page.':
+        'يُفتح العمل والتسليمات والتعديلات بعد تأكيد الدفع. وإن لم يكتمل الدفع، يمكنك بدؤه من جديد من الصفحة نفسها.',
+    'Cancelling a contract': 'إلغاء عقد',
+    'Either side can ask to cancel a contract, and it is cancelled only when the other side agrees. While a request is open, messages still work and deliveries are paused.':
+        'لأي من الطرفين أن يطلب إلغاء العقد، ولا يُلغى إلا بموافقة الطرف الآخر. ما دام الطلب مفتوحًا تبقى الرسائل تعمل وتتوقف التسليمات.',
+    'If the contract was funded, the cancellation completes when the test payment has been refunded. Elancer staff do not decide who is right and do not force a completion or a refund.':
+        'إن كان العقد مموّلًا، يكتمل الإلغاء عند استرداد الدفعة التجريبية. فريق Elancer لا يحكم بين الطرفين ولا يفرض إكمالًا أو استردادًا.',
+    'The Finance page': 'صفحة المالية',
+    'Finance lists your contracts with their agreed amounts and whether each is funded, separately for your client side and your freelancer side.':
+        'تعرض المالية عقودك بمبالغها المتفق عليها وهل مُوِّل كل منها، بصفتك صاحب مشاريع وبصفتك مستقلًا كلٌّ على حدة.',
+    'Payment history shows every payment attempt with its date, provider and result.':
+        'يعرض سجل الدفعات كل محاولة دفع بتاريخها ومزوّدها ونتيجتها.',
+    Safety: 'السلامة',
+    'Reporting, blocking and keeping your account in good standing.':
+        'الإبلاغ، الحظر والحفاظ على سلامة حسابك.',
+    'Reporting a problem': 'الإبلاغ عن مشكلة',
+    'Use Report on a project, a freelancer profile, a message or a contract when something breaks the rules. Choose a reason and describe what happened.':
+        'استخدم «إبلاغ» في صفحة مشروع أو ملف مستقل أو رسالة أو عقد عندما يخالف شيء القواعد. اختر السبب واشرح ما حدث.',
+    'Follow your reports under My reports: Submitted, In review, then Resolved with a short outcome. Reviewers may read the reported conversation to decide. There is no separate support ticket system.':
+        'تابع بلاغاتك في «بلاغاتي»: مرسل، ثم قيد المراجعة، ثم تمت المعالجة مع نتيجة موجزة. قد يقرأ المراجعون المحادثة المبلَّغ عنها ليقرروا. ولا يوجد نظام تذاكر دعم مستقل.',
+    'Open My reports': 'افتح بلاغاتي',
+    'Blocking an account': 'حظر حساب',
+    'Block someone from their profile, an invitation or a conversation. They can no longer invite you, apply to your projects or start new hiring contact with you.':
+        'احظر شخصًا من ملفه أو من دعوة أو من محادثة. لن يستطيع بعدها دعوتك أو التقدم لمشاريعك أو بدء تواصل توظيف جديد معك.',
+    'A contract you already share keeps working, including its messages. Manage your list under Blocked accounts.':
+        'العقد القائم بينكما يبقى يعمل، ومعه رسائله. أدر قائمتك من «الحسابات المحظورة».',
+    'Open Blocked accounts': 'افتح الحسابات المحظورة',
+    'If your account is suspended': 'إن أُوقف حسابك',
+    'A suspended account cannot post, apply, send offers or fund contracts. You can still sign in and handle the contracts you already have.':
+        'الحساب الموقوف لا يستطيع نشر مشاريع أو التقدم لها أو إرسال عروض نهائية أو تمويل عقود. ما زال بإمكانك تسجيل الدخول ومتابعة عقودك القائمة.',
+    'A banner in your workspace gives the reason. An administrator can reinstate the account.':
+        'شريط في مساحة عملك يذكر السبب. ويستطيع أحد المشرفين إعادة تفعيل الحساب.',
+    'Identity verification': 'التحقق من الهوية',
+    'Verification is optional and is not needed to post or apply. If you choose it, you upload one photo of an identity document and one selfie, JPEG or PNG, up to 2 MB each, and agree to the review.':
+        'التحقق اختياري وليس شرطًا للنشر أو التقديم. إن اخترته، ترفع صورة واحدة لوثيقة هوية وصورة شخصية واحدة، بصيغة JPEG أو PNG وبحجم لا يتجاوز 2 ميغابايت لكل منهما، وتوافق على المراجعة.',
+    'Only authorised reviewers see the images. They are stored encrypted and deleted after the review.':
+        'لا يرى الصور إلا المراجعون المخوَّلون. تُخزَّن مشفّرة وتُحذف بعد المراجعة.',
+    Help: 'المساعدة',
+    'Answers about hiring, working, your account, payments and safety.':
+        'إجابات عن التوظيف والعمل وحسابك والمدفوعات والسلامة.',
+    'Search Help': 'ابحث في المساعدة',
+    'Search Help, for example “offer” or “refund”':
+        'ابحث في المساعدة، مثل «عرض» أو «استرداد»',
+    ':count articles in five groups': ':count مقالًا في خمس مجموعات',
+    ':count of :total articles match': 'يطابق البحث :count من :total مقالًا',
+    'No article matches “:query”.': 'لا يوجد مقال يطابق «:query».',
+    'Show all articles': 'عرض كل المقالات',
+    'Nothing found': 'لا توجد نتائج',
+    'Try a shorter or a different word, or look through the five groups. To report something that breaks the rules, use Report on the project, profile, message or contract where it happened.':
+        'جرّب كلمة أقصر أو مختلفة، أو تصفّح المجموعات الخمس. وللإبلاغ عن شيء يخالف القواعد، استخدم «إبلاغ» في صفحة المشروع أو الملف أو الرسالة أو العقد الذي حدث فيه.',
+    'Read more in Help': 'اقرأ المزيد في المساعدة',
+    'Open Help': 'افتح المساعدة',
 };
