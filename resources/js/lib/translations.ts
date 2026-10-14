@@ -2465,4 +2465,58 @@ export const arabic: Record<string, string> = {
     'By itself, when a visitor entered': 'تلقائيًا عند دخول زائر',
     'From the command line': 'من سطر الأوامر',
     'Nothing has happened yet.': 'لم يحدث شيء بعد.',
+    'API tokens': 'رموز الواجهة البرمجية',
+    'Let a program you run read projects and manage your proposals for you. A token works like a password for that program: give it only what it needs, and revoke it when you are done.':
+        'اسمح لبرنامج تشغّله بقراءة المشاريع وإدارة عروضك نيابةً عنك. الرمز يعمل ككلمة مرور لذلك البرنامج: امنحه ما يحتاجه فقط، وألغِه عند انتهائك.',
+    'Copy this token now. It is shown only this once.':
+        'انسخ هذا الرمز الآن. لن يظهر إلا هذه المرة.',
+    'Copy token': 'نسخ الرمز',
+    'I have copied it': 'نسختُه',
+    'This account cannot create API tokens.':
+        'لا يستطيع هذا الحساب إنشاء رموز للواجهة البرمجية.',
+    'Token name': 'اسم الرمز',
+    'A name that tells you where the token is used.':
+        'اسم يذكّرك بمكان استخدام الرمز.',
+    'What it may do': 'ما يُسمح له به',
+    'Read projects': 'قراءة المشاريع',
+    'The public project list and each project page.':
+        'قائمة المشاريع العامة وصفحة كل مشروع.',
+    'Read my proposals': 'قراءة عروضي',
+    'Your own drafts and submitted proposals.': 'مسوداتك وعروضك المرسلة.',
+    'Write my proposals': 'تعديل عروضي',
+    'Save drafts, submit, change and withdraw your proposals.':
+        'حفظ المسودات وإرسال عروضك وتعديلها وسحبها.',
+    'Expires after': 'تنتهي صلاحيته بعد',
+    ':count days': ':count يومًا',
+    'Create token': 'إنشاء رمز',
+    'Creating…': 'جارٍ الإنشاء…',
+    'This account has the most tokens it can hold. Revoke one to create another.':
+        'بلغ هذا الحساب أقصى عدد من الرموز. ألغِ رمزًا لتنشئ آخر.',
+    'Choose at least one thing the token may do.':
+        'اختر أمرًا واحدًا على الأقل يُسمح للرمز به.',
+    'Unable to create the token. Please try again.':
+        'تعذّر إنشاء الرمز. حاول مرة أخرى.',
+    'Your tokens': 'رموزك',
+    ':count of :limit tokens': ':count من :limit رموز',
+    'No tokens yet': 'لا توجد رموز بعد',
+    'Create one above when a program needs to work for you.':
+        'أنشئ رمزًا من الأعلى عندما يحتاج برنامج إلى العمل نيابةً عنك.',
+    Created: 'أُنشئ في',
+    'Never used': 'لم يُستخدم بعد',
+    'Expires on': 'تنتهي صلاحيته في',
+    'Expired on': 'انتهت صلاحيته في',
+    'Revoke this token? Any program using it stops working at once.':
+        'هل تريد إلغاء هذا الرمز؟ أي برنامج يستخدمه سيتوقف عن العمل فورًا.',
+    Revoke: 'إلغاء الرمز',
+    'Using a token': 'استخدام الرمز',
+    'Send the token with every request as a bearer token. Answers are JSON, lists come in pages, and each token may make 60 reads and 20 changes a minute.':
+        'أرسل الرمز مع كل طلب كرمز Bearer. الإجابات بصيغة JSON، والقوائم تأتي على صفحات، ولكل رمز 60 قراءة و20 تعديلًا في الدقيقة.',
+    'Your account and what the token may do': 'حسابك وما يُسمح للرمز به',
+    'Public projects, with the filters of the Find work page':
+        'المشاريع العامة، بمرشّحات صفحة البحث عن عمل',
+    'One public project': 'مشروع عام واحد',
+    'One of your proposals': 'أحد عروضك',
+    'Save a draft or submit a proposal': 'حفظ مسودة أو إرسال عرض',
+    'Withdraw a proposal': 'سحب عرض',
+    'Any token': 'أي رمز',
 };
