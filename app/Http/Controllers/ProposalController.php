@@ -48,6 +48,19 @@ class ProposalController extends Controller
         return in_array($proposal?->status, ['submitted', 'reopened'], true) || (bool) $project->application_closes_at?->isFuture();
     }
 
+    /** The owner reads a submitted proposal, except a member's application to a demo project, which stays with the member (plan 027). */
+    private function reads(Request $request, Proposal $proposal): bool
+    {
+        return $proposal->project->user_id === $request->user()->id && $proposal->submitted_at !== null
+            && ! DemoWorld::trial($proposal->user_id, $proposal->project->user_id);
+    }
+
+    /** Plan 027: a demo account never applies to a member's project; a member may try applying to a demo one. */
+    private function closed(int $applicant, int $owner): bool
+    {
+        return DemoWorld::apart($applicant, $owner) && ! DemoWorld::trial($applicant, $owner);
+    }
+
     /** @return array<string, mixed> */
     private function projectDetails(Project $project): array
     {
@@ -73,8 +86,7 @@ class ProposalController extends Controller
     {
         $this->eligible($request);
         abort_if($project->user_id === $request->user()->id, 403);
-        // Plan 027: a demo account and a real member never hire each other.
-        abort_if(DemoWorld::apart($request->user()->id, $project->user_id), 403, __('Demo accounts and members work apart, so this is not available between them.'));
+        abort_if($this->closed($request->user()->id, $project->user_id), 403, __('Demo accounts and members work apart, so this is not available between them.'));
         $proposal = Proposal::query()->where('project_id', $project->id)->where('user_id', $request->user()->id)->first();
         abort_unless($this->canEdit($project, $proposal), 409, __('This proposal cannot be edited right now.'));
 
@@ -83,6 +95,7 @@ class ProposalController extends Controller
             'proposal' => $proposal ? $this->details($proposal, true) : null,
             'profilePublished' => Profile::query()->publiclyVisible()->where('user_id', $request->user()->id)->exists(),
             'sampleLinks' => $request->user()->profile->professional_links ?? [],
+            'trial' => DemoWorld::trial($request->user()->id, $project->user_id),
         ]);
     }
 
@@ -96,7 +109,7 @@ class ProposalController extends Controller
             abort_unless($user->canParticipateInMarketplace() && $user->onboarding_completed_at, 403);
             $locked = Project::query()->lockForUpdate()->findOrFail($project->id);
             abort_if($locked->user_id === $user->id, 403);
-            abort_if(DemoWorld::apart($user->id, $locked->user_id), 403, __('Demo accounts and members work apart, so this is not available between them.'));
+            abort_if($this->closed($user->id, $locked->user_id), 403, __('Demo accounts and members work apart, so this is not available between them.'));
             $proposal = Proposal::query()->where('project_id', $locked->id)->where('user_id', $user->id)->lockForUpdate()->first();
             abort_unless($this->canEdit($locked, $proposal), 409, __('This proposal cannot be edited right now.'));
             if (($proposal->version ?? 0) !== $request->integer('version')) {
@@ -140,7 +153,8 @@ class ProposalController extends Controller
                 $proposal->draft = null;
                 $proposal->save();
                 InvitationLifecycle::accept($proposal);
-                if ($first) {
+                // Plan 027: the shared demo account is not told of a member's application.
+                if ($first && ! DemoWorld::trial($user->id, $locked->user_id)) {
                     DB::afterCommit(fn () => User::query()->find($locked->user_id)?->notify(new WorkspaceEvent('proposal_received', '/proposals/'.$proposal->id, $locked->title, $user->name)));
                 }
                 $this->event($proposal, $user->id, $first ? 'submitted' : (in_array($previousStatus, ['withdrawn', 'reopened'], true) ? 'resubmitted' : 'revised'), $data);
@@ -164,6 +178,7 @@ class ProposalController extends Controller
                 ...$proposal->only(['id', 'status', 'submitted_at', 'updated_at']),
                 'project' => $this->projectDetails($proposal->project),
                 'content' => $proposal->draft ?? $proposal->content,
+                'trial' => DemoWorld::trial($proposal->user_id, $proposal->project->user_id),
             ]),
         ]);
     }
@@ -175,7 +190,7 @@ class ProposalController extends Controller
             $this->eligible($request);
         }
         $author = $proposal->user_id === $request->user()->id;
-        abort_unless($author || ($proposal->project->user_id === $request->user()->id && $proposal->submitted_at), 404);
+        abort_unless($author || $this->reads($request, $proposal), 404);
 
         return Inertia::render('proposals/show', [
             'proposal' => $this->details($proposal, $author),
@@ -187,6 +202,7 @@ class ProposalController extends Controller
             'offers' => Offer::query()->where('proposal_id', $proposal->id)->orderByDesc('id')->get(['id', 'status']),
             'canEdit' => $author && $this->canEdit($proposal->project, $proposal),
             'canReview' => ! $author && $proposal->project->status === 'published',
+            'trial' => DemoWorld::trial($proposal->user_id, $proposal->project->user_id),
         ]);
     }
 
@@ -216,6 +232,7 @@ class ProposalController extends Controller
         abort_unless($project->user_id === $request->user()->id, 404);
         $data = $request->validate(['sort' => ['nullable', Rule::in(['newest', 'price', 'duration'])], 'organization' => ['nullable', Rule::in(['received', 'shortlisted', 'archived'])]]);
         $query = $project->proposals()->whereNotNull('submitted_at');
+        DemoWorld::ownApplicants($query, $project->user_id);
         if (! empty($data['organization'])) {
             $query->where('organization', $data['organization']);
         }
@@ -237,7 +254,7 @@ class ProposalController extends Controller
     public function review(Request $request, Proposal $proposal): RedirectResponse
     {
         $this->eligible($request);
-        abort_unless($proposal->project->user_id === $request->user()->id && $proposal->submitted_at, 404);
+        abort_unless($this->reads($request, $proposal), 404);
         $data = $request->validate([
             'action' => ['required', Rule::in(['organize', 'decline', 'reopen'])],
             'organization' => ['required', Rule::in(['received', 'shortlisted', 'archived'])],
@@ -270,7 +287,9 @@ class ProposalController extends Controller
         $this->eligible($request);
         abort_unless($project->user_id === $request->user()->id, 404);
         $data = $request->validate(['ids' => ['required', 'array', 'min:1', 'max:3'], 'ids.*' => ['required', 'integer', 'distinct']]);
-        $proposals = $project->proposals()->whereNotNull('submitted_at')->whereIn('id', $data['ids'])->get();
+        $query = $project->proposals()->whereNotNull('submitted_at')->whereIn('id', $data['ids']);
+        DemoWorld::ownApplicants($query, $project->user_id);
+        $proposals = $query->get();
         abort_unless($proposals->count() === count($data['ids']), 404);
 
         return Inertia::render('proposals/compare', ['project' => $this->projectDetails($project), 'proposals' => $proposals->map(fn (Proposal $proposal) => $this->details($proposal, false))]);

@@ -250,13 +250,12 @@ class DemoIsolationTest extends TestCase
         $demoProject = $this->project($demoClient);
         $realProject = $this->project($realClient);
 
-        // A real freelancer looks at a demo project and cannot apply to it; a member's project works as before.
+        // A real freelancer may try applying to a demo project (the next test follows that); a member's project works as before.
         $this->actingAs($realFreelancer)->get('/jobs/'.$demoProject->id)->assertOk()->assertInertia(fn (Assert $page) => $page->where('application.apart', 'demo'));
-        $this->get('/jobs/'.$demoProject->id.'/apply')->assertForbidden();
-        $this->putJson('/jobs/'.$demoProject->id.'/proposal', $this->application())->assertForbidden()->assertJsonPath('message', self::APART);
+        $this->get('/jobs/'.$demoProject->id.'/apply')->assertOk()->assertInertia(fn (Assert $page) => $page->where('trial', true));
         $this->post('/jobs/'.$demoProject->id.'/save')->assertSessionHasNoErrors();
         $this->get('/jobs/'.$realProject->id)->assertInertia(fn (Assert $page) => $page->where('application.apart', null));
-        $this->get('/jobs/'.$realProject->id.'/apply')->assertOk();
+        $this->get('/jobs/'.$realProject->id.'/apply')->assertOk()->assertInertia(fn (Assert $page) => $page->where('trial', false));
 
         // A real client looks at a demo freelancer and cannot invite them.
         $this->actingAs($realClient)->get('/freelancers/'.$demoFreelancer->profile->id)->assertInertia(fn (Assert $page) => $page->where('canContact', true)->where('apart', 'demo'));
@@ -282,7 +281,7 @@ class DemoIsolationTest extends TestCase
         $this->putJson('/jobs/'.$demoProject->id.'/proposal', $this->application())->assertOk();
         $this->post('/logout');
 
-        // A proposal that already crosses, from before the rule, goes no further.
+        // A proposal that crosses goes no further, whichever way it came to be.
         $crossing = new Proposal;
         $crossing->forceFill(['project_id' => $demoProject->id, 'user_id' => $realFreelancer->id, 'status' => 'submitted', 'version' => 1,
             'content' => ['price' => '300.00', 'duration_days' => 7], 'submitted_at' => now()])->save();
@@ -302,6 +301,74 @@ class DemoIsolationTest extends TestCase
         $this->assertGuest();
         $this->actingAs($realClient)->patch('/settings/profile', ['name' => $realClient->name, 'email' => 'rana@DEMO.elancer.test'])->assertSessionHasErrors('email');
         $this->assertSame('rana@example.com', $realClient->fresh()->email);
+    }
+
+    /** Ahmed, 2026-10-13: a registrant can try applying while almost every project is a demo one. The application is theirs alone. */
+    public function test_a_member_tries_applying_to_a_demo_project_and_the_application_stays_with_the_member(): void
+    {
+        $demoClient = $this->member('client-01@demo.elancer.test');
+        $demoFreelancer = $this->member('freelancer-01@demo.elancer.test', true);
+        $omar = $this->member('omar@example.com', true);
+        $project = $this->project($demoClient);
+        $this->actingAs($demoFreelancer);
+        $inside = $this->apply($project);
+        DemoBaseline::save(null);
+        $this->travel(5)->seconds();
+        $told = fn (User $user): int => DB::table('notifications')->where('notifiable_id', $user->id)->count();
+        $this->assertSame([1, 0], [$told($demoClient), $told($omar)]);
+
+        // The member applies, changes the proposal and finds it under their own proposals, marked as a sample.
+        $this->actingAs($omar)->get('/jobs/'.$project->id)->assertInertia(fn (Assert $page) => $page->where('application.apart', 'demo')->where('project.proposals_received', 1));
+        $proposal = $this->apply($project);
+        $this->assertSame([$omar->id, 'submitted'], [$proposal->user_id, $proposal->status]);
+        $this->putJson('/jobs/'.$project->id.'/proposal', [...$this->application(), 'version' => 1, 'price' => '350'])->assertOk();
+        $this->get('/proposals/'.$proposal->id)->assertOk()->assertInertia(fn (Assert $page) => $page->where('trial', true)->where('author', true)->where('canEdit', true)
+            ->where('canStartConversation', false)->where('proposal.content.price', '350.00'));
+        $this->get('/my-proposals')->assertInertia(fn (Assert $page) => $page->has('proposals.data', 1)->where('proposals.data.0.trial', true));
+        $this->get('/jobs/'.$project->id)->assertInertia(fn (Assert $page) => $page->where('project.proposals_received', 2)->where('application.proposal.id', $proposal->id));
+
+        // The shared demo account is not told of it and is never shown it, entered with its own credentials or through the button.
+        $this->assertSame(1, $told($demoClient));
+        $unseen = function () use ($project, $proposal, $inside): void {
+            $this->get('/my-projects/'.$project->id.'/proposals')->assertInertia(fn (Assert $page) => $page->has('proposals.data', 1)->where('proposals.data.0.id', $inside->id));
+            $this->get('/proposals/'.$inside->id)->assertOk();
+            $this->get('/proposals/'.$proposal->id)->assertNotFound();
+            $this->get('/my-projects/'.$project->id.'/proposals/compare?ids[]='.$inside->id.'&ids[]='.$proposal->id)->assertNotFound();
+            $this->patchJson('/proposals/'.$proposal->id.'/review', ['action' => 'decline', 'organization' => 'archived', 'version' => 2])->assertNotFound();
+            $this->get('/proposals/'.$proposal->id.'/offer')->assertForbidden();
+            $this->post('/proposals/'.$proposal->id.'/conversation', ['body' => 'Hello there.', 'client_token' => (string) Str::uuid()])->assertStatus(409);
+        };
+        $this->actingAs($demoClient);
+        $unseen();
+        $this->post('/logout');
+        $this->post('/demo/client')->assertRedirect('/dashboard');
+        $unseen();
+        $this->get('/dashboard')->assertInertia(fn (Assert $page) => $page->where('overview.client', true)->where('overview.counts.proposals', 1)->where('overview.work.0.count', 1)
+            ->where('overview.activity', fn ($activity): bool => ! str_contains((string) json_encode($activity), 'Omar')));
+
+        // A visitor's note on the project is not sent to the member, and a project a visitor publishes takes no member's application.
+        $this->post('/my-projects/'.$project->id.'/clarifications', ['body' => 'A note added by a visitor.'])->assertSessionHasNoErrors();
+        $new = $this->publish($project, 'A booking form for a clinic');
+        $this->post('/logout');
+        $this->assertSame([1, 0], [$told($demoFreelancer), $told($omar)]);
+        $this->actingAs($omar)->get('/jobs/'.$new->id)->assertNotFound();
+        $this->get('/jobs/'.$new->id.'/apply')->assertStatus(409);
+        $this->putJson('/jobs/'.$new->id.'/proposal', $this->application())->assertStatus(409);
+
+        // So a reset is never held up by a member's application, and it leaves the application as it is.
+        $kept = fn (): array => [DB::table('proposals')->where('user_id', $omar->id)->get()->all(), DB::table('proposal_events')->where('proposal_id', $proposal->id)->orderBy('id')->get()->all()];
+        $before = $kept();
+        $this->assertCount(2, $before[1]);
+        DemoBaseline::restore(null);
+        $this->assertEquals($before, $kept());
+        $this->assertNull(Project::withTrashed()->find($new->id));
+        $this->assertNull(DB::table('demo_baselines')->orderByDesc('id')->value('problem'));
+
+        // The member withdraws it like any other proposal. Nothing else exists between the two sides.
+        $this->actingAs($omar)->post('/proposals/'.$proposal->id.'/withdraw', ['version' => 2])->assertSessionHasNoErrors();
+        $this->assertSame('withdrawn', $proposal->fresh()->status);
+        $this->assertSame([0, 0, 0], [DB::table('conversations')->count(), DB::table('offers')->count(), DB::table('invitations')->count()]);
+        $this->assertSame(0, $told($omar));
     }
 
     public function test_a_reset_returns_the_demo_to_its_starting_point_and_leaves_members_alone(): void

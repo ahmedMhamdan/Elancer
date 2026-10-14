@@ -14,8 +14,8 @@ use stdClass;
 /**
  * Plan 027 (plan 003 section 10): the prepared accounts and what they hold are a world apart from
  * real members. This class answers who is inside it, who is looking, and what that changes:
- * a demo account and a real member never hire each other, and what a demo account wrote after the
- * saved starting point is shown inside the demo only.
+ * a demo account and a real member never hire each other, a member may try applying to a demo project
+ * and no more, and what a demo account wrote after the saved starting point is shown inside the demo only.
  */
 class DemoWorld
 {
@@ -53,6 +53,24 @@ class DemoWorld
     public static function apart(?int $first, ?int $second): bool
     {
         return self::holds($first) !== self::holds($second);
+    }
+
+    /**
+     * A real member applying to a demo account's project. Ahmed opened this on 2026-10-13 so that a registrant can
+     * try applying while almost every project is a demo one. The application stays with the member: the shared demo
+     * account is never shown it or told of it, and it takes no conversation and no offer.
+     */
+    public static function trial(?int $applicant, ?int $owner): bool
+    {
+        return $applicant !== null && self::holds($owner) && ! self::holds($applicant);
+    }
+
+    /** Leaves members' applications out of what the demo account that owns the project is shown. */
+    public static function ownApplicants(Builder $query, ?int $owner, string $applicant = 'user_id'): void
+    {
+        if (self::holds($owner)) {
+            $query->whereIn($applicant, self::accounts());
+        }
     }
 
     /** The saved starting point without its copy of the rows, or null while none was saved. */

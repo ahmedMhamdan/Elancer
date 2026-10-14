@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Demo\DemoWorld;
 use App\Actions\Invitations\InvitationLifecycle;
 use App\Models\Category;
 use App\Models\Contract;
@@ -206,7 +207,8 @@ class ClientProjectController extends Controller
             $owner = $request->user();
             $name = $owner->profile?->company ?: Str::before($owner->name, ' ');
             $applicants = Proposal::query()->where('project_id', $locked->id)->whereIn('status', ['submitted', 'reopened'])->pluck('user_id')
-                ->reject(fn (int $applicant) => InvitationLifecycle::blocked($owner->id, $applicant))->values();
+                // Plan 027: a member who tried applying to a demo project is not told what a demo visitor writes.
+                ->reject(fn (int $applicant) => InvitationLifecycle::blocked($owner->id, $applicant) || DemoWorld::apart($owner->id, $applicant))->values();
             DB::afterCommit(fn () => User::query()->whereKey($applicants)->get()
                 ->each(fn (User $applicant) => $applicant->notify(new WorkspaceEvent('project_clarified', '/jobs/'.$locked->id, $locked->title, $name))));
         });

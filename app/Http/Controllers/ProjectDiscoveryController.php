@@ -182,7 +182,7 @@ class ProjectDiscoveryController extends Controller
             'returnUrl' => '/jobs'.(is_string($request->query('search')) && strlen($request->query('search')) <= 4000 && $request->query('search') !== '' ? '?'.$request->query('search') : ''),
             'application' => [
                 'owner' => $request->user()?->id === $project->user_id,
-                // Plan 027: a demo account and a real member look at each other's projects and cannot apply to them.
+                // Plan 027: the side the project is on when the viewer is on the other. A demo account cannot apply to a member's project; a member may try applying to a demo one.
                 'apart' => DemoWorld::across($request->user()?->id, $project->user_id),
                 'proposal' => $request->user() ? $project->proposals()->where('user_id', $request->user()->id)->first()?->only(['id', 'status']) : null,
             ],

@@ -2,6 +2,7 @@
 
 namespace App\Actions\Dashboard;
 
+use App\Actions\Demo\DemoWorld;
 use App\Actions\Payments\ContractFunding;
 use App\Enums\WorkspaceRole;
 use App\Models\Contract;
@@ -25,6 +26,10 @@ class BuildOverview
         $proposals = Proposal::query()->whereHas('project')->when($client,
             fn ($query) => $query->whereHas('project', fn ($project) => $project->where('user_id', $user->id))->whereNotNull('submitted_at'),
             fn ($query) => $query->where('user_id', $user->id));
+        if ($client) {
+            // Plan 027: a member's application to a demo project is not shown to the shared demo account.
+            DemoWorld::ownApplicants($proposals, $user->id);
+        }
         $contracts = Contract::query()->where(fn ($query) => $query->where('client_id', $user->id)->orWhere('freelancer_id', $user->id));
         $messages = ConversationMessage::query()->whereHas('conversation', fn ($query) => $query->where(fn ($query) => $query->where('client_id', $user->id)->orWhere('freelancer_id', $user->id)));
         $unread = (clone $messages)->where('sender_id', '!=', $user->id)->whereHas('conversation', fn ($query) => $query
@@ -41,7 +46,7 @@ class BuildOverview
         }
 
         $work = $client
-            ? (clone $projects)->withCount(['proposals' => fn ($query) => $query->whereNotNull('submitted_at')])->latest('updated_at')->latest('id')->limit(4)->get()->map(fn (Project $project) => [
+            ? (clone $projects)->withCount(['proposals' => fn ($query) => $query->whereNotNull('submitted_at')->tap(fn ($query) => DemoWorld::ownApplicants($query, $user->id))])->latest('updated_at')->latest('id')->limit(4)->get()->map(fn (Project $project) => [
                 'id' => 'project-'.$project->id, 'title' => $project->title, 'status' => $project->status, 'kind' => 'project',
                 'href' => '/my-projects/'.$project->id.'/edit', 'count' => $project->getAttribute('proposals_count'),
                 'updated_at' => $project->getAttribute('updated_at')->toISOString(),
