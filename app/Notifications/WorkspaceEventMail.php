@@ -15,7 +15,8 @@ class WorkspaceEventMail extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(private string $kind, private string $href, private ?string $title = null, private ?string $actor = null)
+    /** @param  int|null  $count  plan 031: how many messages a conversation's email stands for */
+    public function __construct(private string $kind, private string $href, private ?string $title = null, private ?string $actor = null, private ?int $count = null)
     {
         $this->afterCommit();
     }
@@ -29,7 +30,8 @@ class WorkspaceEventMail extends Notification implements ShouldQueue
     /** Rendered in the recipient's saved language. */
     public function toMail(object $notifiable): MailMessage
     {
-        $sentence = trim(implode(' ', array_filter([$this->actor, self::sentence($this->kind), $this->title])));
+        $fragment = $this->kind === 'message_received' && $this->count > 1 ? __('sent you :count new messages about', ['count' => $this->count]) : self::sentence($this->kind);
+        $sentence = trim(implode(' ', array_filter([$this->actor, $fragment, $this->title])));
         $subject = __('Elancer: :title', ['title' => $this->title ?? __('workspace update')]);
 
         // Same layout as the verification email (resources/views/mail/verify-email.blade.php).
@@ -49,7 +51,7 @@ class WorkspaceEventMail extends Notification implements ShouldQueue
                 'recipientName' => $notifiable->name ?? '',
                 'sentence' => $sentence,
                 'actor' => $this->actor,
-                'fragment' => self::sentence($this->kind),
+                'fragment' => $fragment,
                 'project' => $this->title,
                 'actionText' => __('Open in Elancer'),
                 'actionUrl' => url($this->href),

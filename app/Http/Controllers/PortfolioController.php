@@ -9,6 +9,7 @@ use App\Models\PortfolioApproval;
 use App\Models\PortfolioCase;
 use App\Models\PortfolioImage;
 use App\Models\Profile;
+use App\Models\ProposalCase;
 use App\Models\Skill;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -208,7 +209,7 @@ class PortfolioController extends Controller
             'contract' => $case->contract ? ['id' => $case->contract->id, 'title' => $case->contract->agreement['project_title'] ?? ''] : null,
             'pending' => $pending !== null,
             'history' => self::history($case),
-            'deletable' => $case->approvals->isEmpty(),
+            'deletable' => $case->approvals->isEmpty() && ! ProposalCase::query()->where('portfolio_case_id', $case->id)->exists(),
         ];
     }
 

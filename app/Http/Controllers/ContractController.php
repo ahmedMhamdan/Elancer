@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Contracts\ContractWork;
+use App\Actions\Conversations\ConversationThread;
 use App\Actions\Payments\ContractFunding;
 use App\Models\Contract;
 use App\Models\ContractAmendment;
@@ -10,6 +11,7 @@ use App\Models\ContractCancellation;
 use App\Models\ContractReview;
 use App\Models\ContractSubmission;
 use App\Models\ContractSubmissionFile;
+use App\Models\Conversation;
 use App\Models\PaymentAttempt;
 use App\Payments\Gateways;
 use Illuminate\Http\Request;
@@ -56,7 +58,25 @@ class ContractController extends Controller
             'activity' => $this->activity($contract, $submissions, $cancellations, $amendments),
             'reviews' => $this->reviews($contract, $user),
             'portfolio' => PortfolioController::forContract($contract, $user),
+            'thread' => $this->thread($contract, $user),
         ]);
+    }
+
+    /**
+     * Plan 031 (Q31): the contract's conversation in the workroom's Messages tab, read as on the Messages page.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function thread(Contract $contract, int $user): ?array
+    {
+        $conversation = Conversation::query()->find($contract->conversation_id);
+        if (! $conversation) {
+            return null;
+        }
+
+        return ['id' => $conversation->id, 'counterpart' => $contract->client_id === $user ? $contract->agreement['freelancer_name'] ?? '' : $contract->agreement['client_name'] ?? '',
+            'unread' => ConversationThread::unread($conversation, $user),
+            ...ConversationThread::for($conversation, $user, 'messages_page', ['tab' => 'messages'])];
     }
 
     /** @return array<string, mixed> */

@@ -148,6 +148,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('jobs/{project}/proposal/files', [ProposalFileController::class, 'store'])->whereNumber('project')->middleware('throttle:30,1')->name('proposals.files.store');
         Route::delete('jobs/{project}/proposal/files/{file}', [ProposalFileController::class, 'destroy'])->whereNumber(['project', 'file'])->middleware('throttle:30,1')->name('proposals.files.destroy');
         Route::get('proposals/{proposal}/files/{file}', [ProposalFileController::class, 'download'])->whereNumber(['proposal', 'file'])->middleware('throttle:60,1')->name('proposals.files.show');
+        Route::get('proposals/{proposal}/cases/{copy}/images/{image}', [ProposalController::class, 'caseImage'])->whereNumber(['proposal', 'copy', 'image'])->middleware('throttle:120,1')->name('proposals.cases.image');
         Route::get('proposals/{proposal}', [ProposalController::class, 'show'])->name('proposals.show');
         Route::post('proposals/{proposal}/withdraw', [ProposalController::class, 'withdraw'])->name('proposals.withdraw');
         Route::patch('proposals/{proposal}/review', [ProposalController::class, 'review'])->name('proposals.review');

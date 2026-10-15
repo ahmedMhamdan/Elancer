@@ -7,6 +7,7 @@ use App\Models\Contract;
 use App\Models\PortfolioApproval;
 use App\Models\PortfolioCase;
 use App\Models\PortfolioImage;
+use App\Models\ProposalCase;
 use App\Models\User;
 use App\Notifications\WorkspaceEvent;
 use Illuminate\Database\Eloquent\Builder;
@@ -108,12 +109,13 @@ class PortfolioCases
     }
 
     /**
-     * Removes images that the working copy, the public version and every request no longer
-     * list. Images named by a past request stay as private history. Call inside the case lock.
+     * Removes images that the working copy, the public version, every request and every copy sent on a
+     * proposal no longer list. Images named by a past request or a proposal stay as private history. Call inside the case lock.
      */
     private static function prune(PortfolioCase $case): void
     {
         $kept = PortfolioApproval::query()->where('portfolio_case_id', $case->id)->get()->map(fn (PortfolioApproval $approval) => $approval->content)
+            ->concat(ProposalCase::query()->where('portfolio_case_id', $case->id)->get()->map(fn (ProposalCase $copy) => $copy->content))
             ->push($case->content, $case->public_content)
             ->flatMap(fn (?array $content) => array_column($content['images'] ?? [], 'id'))->all();
         $unused = PortfolioImage::query()->where('portfolio_case_id', $case->id)->whereNotIn('id', $kept)->get();
@@ -202,12 +204,12 @@ class PortfolioCases
         }, 3);
     }
 
-    /** A case that was ever sent to a client is kept as history. */
+    /** A case that was ever sent to a client, for approval or on a proposal (plan 031), is kept as history. */
     public static function delete(PortfolioCase $case): void
     {
         DB::transaction(function () use ($case): void {
             $locked = PortfolioCase::query()->lockForUpdate()->findOrFail($case->id);
-            if (PortfolioApproval::query()->where('portfolio_case_id', $locked->id)->exists()) {
+            if (PortfolioApproval::query()->where('portfolio_case_id', $locked->id)->exists() || ProposalCase::query()->where('portfolio_case_id', $locked->id)->exists()) {
                 throw ValidationException::withMessages(['case' => __('A case study that was sent to a client is kept as history. You can hide it instead.')]);
             }
             $locked->delete();

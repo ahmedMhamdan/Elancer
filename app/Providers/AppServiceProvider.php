@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Events\WorkspaceSignal;
 use App\Http\Middleware\ThrottleRequestsPerRoute;
+use App\Jobs\SendMessageDigest;
 use App\Models\User;
 use App\Notifications\WorkspaceEvent;
 use App\Notifications\WorkspaceEventMail;
@@ -45,7 +46,12 @@ class AppServiceProvider extends ServiceProvider
                 $stored = $event->notification;
                 $recipient = $event->notifiable;
                 if ($recipient->hasVerifiedEmail() && $recipient->hasDeliverableEmail() && $recipient->emailPreferences()[$stored->category()]) {
-                    rescue(fn () => $recipient->notify(new WorkspaceEventMail($stored->kind, $stored->href, $stored->title, $stored->actor)));
+                    // Plan 031: a conversation's email waits, so it can stand for every message sent meanwhile or be dropped once read.
+                    if ($stored->kind === 'message_received' && $stored->conversation !== null) {
+                        rescue(fn () => SendMessageDigest::schedule($recipient->id, $stored->conversation, (string) $stored->id));
+                    } else {
+                        rescue(fn () => $recipient->notify(new WorkspaceEventMail($stored->kind, $stored->href, $stored->title, $stored->actor)));
+                    }
                 }
             }
         });

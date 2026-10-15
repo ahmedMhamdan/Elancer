@@ -4,6 +4,7 @@ namespace App\Actions\Proposals;
 
 use App\Actions\Demo\DemoWorld;
 use App\Actions\Invitations\InvitationLifecycle;
+use App\Models\PortfolioCase;
 use App\Models\Profile;
 use App\Models\Project;
 use App\Models\Proposal;
@@ -40,6 +41,8 @@ class SaveProposal
             abort_if(InvitationLifecycle::blocked($locked->user_id, $user->id), 403);
             $submit = $input['action'] === 'submit';
             $presence = $submit ? 'required' : 'nullable';
+            // Plan 031: nobody receives a proposal on a sample project, so it shares no case study.
+            $trial = DemoWorld::trial($user->id, $locked->user_id);
             $data = Validator::make($input, [
                 'price' => [$presence, 'numeric', 'min:1', 'max:1000000', 'decimal:0,2'],
                 'duration_days' => [$presence, 'integer', 'min:1', 'max:3650'],
@@ -50,6 +53,8 @@ class SaveProposal
                 'samples.*' => ['array:label,url'],
                 'samples.*.label' => ['required', 'string', 'max:80'],
                 'samples.*.url' => ['required', 'url:https', 'max:2000'],
+                'cases' => ['sometimes', 'array', 'list', 'max:'.($trial ? 0 : ProposalCases::LIMIT)],
+                'cases.*' => ['integer', 'distinct', Rule::exists('portfolio_cases', 'id')->where('user_id', $user->id)],
                 'user_id' => ['missing'], 'status' => ['missing'], 'profile_snapshot' => ['missing'], 'client_note' => ['missing'],
             ])->validate();
             $profile = $user->profile;
@@ -59,6 +64,10 @@ class SaveProposal
             $data['price'] = isset($data['price']) ? number_format((float) $data['price'], 2, '.', '') : null;
             $data['duration_days'] = isset($data['duration_days']) ? (int) $data['duration_days'] : null;
             $data['answers'] = array_map(fn ($answer) => $answer ?? '', $data['answers']);
+            // A caller that does not send the cases (the API before plan 031) keeps the ones already chosen.
+            $data['cases'] = array_map(intval(...), array_values($data['cases'] ?? (($proposal->draft ?? $proposal?->content)['cases'] ?? [])));
+            // A case deleted since it was chosen in a draft simply drops out.
+            $data['cases'] = array_values(array_intersect($data['cases'], PortfolioCase::query()->where('user_id', $user->id)->whereKey($data['cases'])->pluck('id')->all()));
             $proposal ??= new Proposal;
             $previousStatus = $proposal->status;
             $proposal->forceFill(['project_id' => $locked->id, 'user_id' => $user->id, 'version' => ($proposal->exists ? $proposal->version : 0) + 1, 'draft' => $data]);
@@ -68,6 +77,12 @@ class SaveProposal
                 $files = $proposal->exists ? $proposal->files()->whereNull('removed_at')->orderBy('id')->lockForUpdate()->get() : collect();
                 $data['files'] = array_values($files->map(fn (ProposalFile $file) => $file->only(['id', 'name', 'size']))->all());
                 ProposalFile::query()->whereIn('id', array_column($data['files'], 'id'))->whereNull('submitted_at')->update(['submitted_at' => now()]);
+                // Plan 031: the chosen case studies are copied as they are public now; the copies need the proposal's row.
+                if ($data['cases'] !== [] && ! $proposal->exists) {
+                    $proposal->status = 'draft';
+                    $proposal->save();
+                }
+                $data['shared'] = ProposalCases::freeze($proposal, $data['cases']);
                 $proposal->content = $data;
                 $proposal->forceFill(['price' => $data['price'], 'duration_days' => $data['duration_days']]);
                 // Retain the exact shared identity; private edits never enter a recipient's view.

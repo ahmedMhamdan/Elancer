@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Auth\DemoAccess;
+use App\Actions\Conversations\ConversationThread;
 use App\Actions\Conversations\HiringAccess;
 use App\Actions\Files\AttachedFiles;
 use App\Events\WorkspaceSignal;
@@ -72,29 +73,12 @@ class ConversationController extends Controller
         $filters = $this->filters($request);
         $conversation->loadMissing(['latestMessage']);
         $user = $request->user()->id;
-        $writable = HiringAccess::conversationWritable($conversation->proposal);
-        $messages = $conversation->messages()->orderByDesc('id')->paginate(30)->withQueryString();
-        $revisions = DB::table('message_revisions')->whereIn('conversation_message_id', $messages->getCollection()->pluck('id'))->orderBy('version')->get(['conversation_message_id', 'body', 'version', 'created_at'])->groupBy('conversation_message_id');
-        $files = MessageFile::query()->whereIn('conversation_message_id', $messages->getCollection()->pluck('id'))->orderBy('id')->get(['id', 'conversation_message_id', 'name', 'size'])->groupBy('conversation_message_id');
-        $visibleThrough = (int) ($messages->getCollection()->max('id') ?? 0);
 
         return Inertia::render('messages/show', [
             'conversations' => $this->inbox($user, $filters)->paginate(20, ['*'], 'list_page')->withQueryString()->through(fn (Conversation $item) => $this->summary($item, $user)),
             'filters' => $filters,
-            'conversation' => $this->summary($conversation, $user), 'writable' => $writable, 'visibleThrough' => $visibleThrough,
-            // Q68: a message hidden by moderation reaches neither participant; only a notice does.
-            'messages' => $messages->through(fn (ConversationMessage $message) => $message->moderated_at !== null ? [
-                ...$message->only(['id', 'version', 'created_at']),
-                'body' => null, 'edited_at' => null, 'hidden' => true, 'mine' => $message->sender_id === $user, 'can_edit' => false, 'revisions' => [], 'files' => [],
-            ] : [
-                ...$message->only(['id', 'body', 'version', 'created_at', 'edited_at']),
-                'hidden' => false,
-                'mine' => $message->sender_id === $user,
-                'can_edit' => $writable && $message->sender_id === $user && $message->created_at->addMinutes(15)->isFuture(),
-                'revisions' => ($revisions->get($message->id) ?? collect())->map(fn ($revision) => ['body' => $revision->body, 'version' => $revision->version, 'created_at' => $revision->created_at])->values(),
-                'files' => ($files->get($message->id) ?? collect())->map(fn (MessageFile $file) => $file->only(['id', 'name', 'size']))->values(),
-            ]),
-            'fileLimit' => AttachedFiles::LIMIT,
+            'conversation' => $this->summary($conversation, $user),
+            ...ConversationThread::for($conversation, $user),
         ]);
     }
 
@@ -106,6 +90,8 @@ class ConversationController extends Controller
         $data = $request->validate([
             'body' => ['nullable', 'required_without:files', 'string', 'max:10000'], 'client_token' => ['required', 'uuid'],
             'files' => ['nullable', 'array', 'list', 'max:'.AttachedFiles::LIMIT], 'files.*' => AttachedFiles::rules(),
+            // Plan 031: sent from the workroom's Messages tab, so the member stays there.
+            'workroom' => ['sometimes', 'boolean'],
         ], ['body.required_without' => __('Write a message or attach a file.'), 'files.max' => __('A message can carry up to :count files.', ['count' => AttachedFiles::LIMIT])] + AttachedFiles::messages('files.*'));
         $files = array_values($request->file('files') ?? []);
         $stored = [];
@@ -129,6 +115,11 @@ class ConversationController extends Controller
         // A repeated send request returns the message it already made; this copy of its files is not needed.
         if (! $sent && $stored !== []) {
             rescue(fn () => Storage::disk('uploads')->delete($stored));
+        }
+
+        $contract = $request->boolean('workroom') ? Contract::query()->where('proposal_id', $conversation->proposal_id)->value('id') : null;
+        if ($contract) {
+            return to_route('contracts.show', ['contract' => $contract, 'tab' => 'messages']);
         }
 
         return to_route('messages.show', ['conversation' => $conversation, ...array_filter($filters, fn ($value) => $value !== '' && $value !== false), ...($request->integer('list_page') > 1 ? ['list_page' => $request->integer('list_page')] : [])]);
@@ -327,7 +318,7 @@ class ConversationController extends Controller
             'preview_hidden' => $conversation->latestMessage?->moderated_at !== null,
             'preview_files' => $conversation->latestMessage && $conversation->latestMessage->moderated_at === null && $conversation->latestMessage->body === '' ? $conversation->latestMessage->files()->count() : 0,
             'archived' => (bool) $conversation->getAttribute($conversation->archiveColumn($user)),
-            'unread' => $conversation->messages()->where('sender_id', '!=', $user)->where('id', '>', $conversation->getAttribute($conversation->readColumn($user)))->count(),
+            'unread' => ConversationThread::unread($conversation, $user),
             'updated_at' => $conversation->updated_at,
         ];
     }

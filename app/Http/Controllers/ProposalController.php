@@ -6,22 +6,28 @@ use App\Actions\Conversations\HiringAccess;
 use App\Actions\Demo\DemoWorld;
 use App\Actions\Files\AttachedFiles;
 use App\Actions\Offers\OfferLifecycle;
+use App\Actions\Proposals\ProposalCases;
 use App\Actions\Proposals\ProposalRules;
 use App\Actions\Proposals\SaveProposal;
 use App\Actions\Proposals\WithdrawProposal;
 use App\Models\Contract;
 use App\Models\Conversation;
 use App\Models\Offer;
+use App\Models\PortfolioImage;
 use App\Models\Profile;
 use App\Models\Project;
 use App\Models\Proposal;
+use App\Models\ProposalCase;
+use App\Models\ProposalEvent;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProposalController extends Controller
 {
@@ -47,17 +53,22 @@ class ProposalController extends Controller
     private function details(Proposal $proposal, bool $author): array
     {
         $data = $proposal->only(['id', 'project_id', 'status', 'content', 'profile_snapshot', 'version', 'submitted_at']);
+        // Plan 031: the case studies each version sent, as this reader may see them now.
+        $data['content'] = $proposal->content === null ? null : [...$proposal->content, 'case_samples' => ProposalCases::resolve($proposal, $proposal->content, $author)];
         if ($author) {
             // Plan 030: the files the freelancer is working with, and whether they differ from what the client received.
             $files = ProposalFileController::draft($proposal);
-            $data['draft'] = $proposal->draft === null ? null : [...$proposal->draft, 'files' => $files];
+            $data['draft'] = $proposal->draft === null ? null : [...$proposal->draft, 'files' => $files, 'case_samples' => ProposalCases::preview($proposal, $proposal->draft)];
             $data['files'] = $files;
             $data['files_changed'] = $proposal->content !== null && array_column($files, 'id') !== array_column($proposal->content['files'] ?? [], 'id');
         } else {
             $data['organization'] = $proposal->organization;
             $data['client_note'] = $proposal->client_note;
         }
-        $data['events'] = $proposal->events()->orderByDesc('id')->get(['kind', 'content', 'created_at']);
+        $data['events'] = $proposal->events()->orderByDesc('id')->get(['kind', 'content', 'created_at'])->map(fn (ProposalEvent $event) => [
+            'kind' => $event->kind, 'created_at' => $event->created_at,
+            'content' => $event->content === null ? null : [...$event->content, 'case_samples' => ProposalCases::resolve($proposal, $event->content, $author)],
+        ]);
 
         return $data;
     }
@@ -75,6 +86,8 @@ class ProposalController extends Controller
             'proposal' => $proposal ? $this->details($proposal, true) : null,
             'profilePublished' => Profile::query()->publiclyVisible()->where('user_id', $request->user()->id)->exists(),
             'sampleLinks' => $request->user()->profile->professional_links ?? [],
+            'caseOptions' => DemoWorld::trial($request->user()->id, $project->user_id) ? [] : ProposalCases::options($request->user()->id),
+            'caseLimit' => ProposalCases::LIMIT,
             'fileLimit' => AttachedFiles::LIMIT,
             'trial' => DemoWorld::trial($request->user()->id, $project->user_id),
         ]);
@@ -126,6 +139,22 @@ class ProposalController extends Controller
             'canReview' => ! $author && $proposal->project->status === 'published',
             'trial' => DemoWorld::trial($proposal->user_id, $proposal->project->user_id),
         ]);
+    }
+
+    /** Plan 031: an image of a case study as this proposal sent it, to its author and its client, under Q55. */
+    public function caseImage(Request $request, Proposal $proposal, ProposalCase $copy, PortfolioImage $image): StreamedResponse
+    {
+        if (! ($request->user()->keepsExistingAccess() && Contract::query()->where('proposal_id', $proposal->id)->exists())) {
+            $this->eligible($request);
+        }
+        $author = $proposal->user_id === $request->user()->id;
+        abort_unless($author || $this->reads($request, $proposal), 404);
+        abort_unless($copy->proposal_id === $proposal->id && $image->portfolio_case_id === $copy->portfolio_case_id
+            && in_array($image->id, array_column($copy->content['images'] ?? [], 'id'), true), 404);
+        abort_unless($author || ProposalCases::visible($copy), 404);
+        abort_unless(Storage::disk('uploads')->exists($image->path), 404);
+
+        return Storage::disk('uploads')->response($image->path, null, ['Cache-Control' => 'private, no-store', 'X-Content-Type-Options' => 'nosniff']);
     }
 
     public function withdraw(Request $request, Proposal $proposal): RedirectResponse

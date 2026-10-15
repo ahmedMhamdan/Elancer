@@ -17,6 +17,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property int $freelancer_read_through
  * @property bool $client_archived
  * @property bool $freelancer_archived
+ * @property CarbonImmutable|null $client_emailed_at
+ * @property CarbonImmutable|null $freelancer_emailed_at
  * @property CarbonImmutable $updated_at
  * @property-read ConversationMessage|null $latestMessage
  * @property-read Proposal $proposal
@@ -29,7 +31,8 @@ class Conversation extends Model
 
     protected function casts(): array
     {
-        return ['client_read_through' => 'integer', 'freelancer_read_through' => 'integer', 'client_archived' => 'boolean', 'freelancer_archived' => 'boolean', 'updated_at' => 'immutable_datetime'];
+        return ['client_read_through' => 'integer', 'freelancer_read_through' => 'integer', 'client_archived' => 'boolean', 'freelancer_archived' => 'boolean', 'updated_at' => 'immutable_datetime',
+            'client_emailed_at' => 'immutable_datetime', 'freelancer_emailed_at' => 'immutable_datetime'];
     }
 
     /** @return BelongsTo<Proposal, $this> */
@@ -75,5 +78,17 @@ class Conversation extends Model
     public function archiveColumn(int $user): string
     {
         return $user === $this->client_id ? 'client_archived' : 'freelancer_archived';
+    }
+
+    public function emailedColumn(int $user): string
+    {
+        return $user === $this->client_id ? 'client_emailed_at' : 'freelancer_emailed_at';
+    }
+
+    /** Messages from the other participant this member has not marked read; moderation-hidden ones are not counted. */
+    public function unreadFor(int $user): int
+    {
+        return $this->messages()->where('sender_id', '!=', $user)->whereNull('moderated_at')
+            ->where('id', '>', (int) $this->getAttribute($this->readColumn($user)))->count();
     }
 }

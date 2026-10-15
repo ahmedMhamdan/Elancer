@@ -57,12 +57,13 @@ class NotificationDeliveryTest extends TestCase
         $this->assertCount(1, $sent);
         $member->notify(new WorkspaceEvent('proposal_received', '/proposals/1', 'Project', 'Sara'));
         $member->notify(new WorkspaceEvent('message_received', '/messages/1', 'Project', 'Sara', 1));
-        $this->assertCount(3, $sent);
+        // Plan 031: a message email waits for its conversation's check (MessageDigestTest), so none goes at once.
+        $this->assertCount(2, $sent);
         // The bell is never affected by an email preference, and an unverified address gets no email.
         $this->assertSame(6, $member->notifications()->count());
         $unverified = User::factory()->unverified()->create();
         $unverified->notify(new WorkspaceEvent('delivery_submitted', '/contracts/1', 'Project', 'Sara'));
-        $this->assertCount(3, $sent);
+        $this->assertCount(2, $sent);
         $this->assertSame(1, $unverified->notifications()->count());
         // Demo and placeholder addresses can only bounce, so they keep the bell and get no email.
         foreach (['client-01@demo.elancer.test', 'someone@example.com'] as $address) {
@@ -70,7 +71,7 @@ class NotificationDeliveryTest extends TestCase
             $demo->notify(new WorkspaceEvent('delivery_submitted', '/contracts/1', 'Project', 'Sara'));
             $this->assertSame(1, $demo->notifications()->count());
         }
-        $this->assertCount(3, $sent);
+        $this->assertCount(2, $sent);
     }
 
     public function test_the_email_uses_the_recipients_language_and_a_local_link(): void

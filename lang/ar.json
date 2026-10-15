@@ -404,5 +404,7 @@
     "Nobody receives a proposal on a sample project, so it takes no files.": "لا يستلم أحد العروض المقدَّمة لمشروع تجريبي، لذلك لا يمكن إرفاق ملفات بها.",
     "Save your draft before attaching files.": "احفظ مسودتك قبل إرفاق الملفات.",
     "Write a message or attach a file.": "اكتب رسالة أو أرفق ملفًا.",
-    "A message can carry up to :count files.": "يمكن إرفاق ما لا يزيد على :count ملفات بالرسالة."
+    "A message can carry up to :count files.": "يمكن إرفاق ما لا يزيد على :count ملفات بالرسالة.",
+    "\":title\" is not public now, so it cannot be sent. Remove it from your samples or publish it first.": "«:title» غير منشورة الآن، لذلك لا يمكن إرسالها. أزلها من نماذج أعمالك أو انشرها أولًا.",
+    "sent you :count new messages about": "أرسل لك :count رسائل جديدة بخصوص"
 }
