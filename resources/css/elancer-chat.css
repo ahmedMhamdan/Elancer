@@ -305,6 +305,24 @@ body:has(.chat-workspace) {
 .chat-message-mine .attached-files-size {
     color: inherit;
 }
+/* Plan 031: the contract's conversation in the workroom. The page scrolls as usual; only the history scrolls inside. */
+.contract-chat {
+    height: min(72dvh, 46rem);
+    min-height: 28rem;
+    overflow: hidden;
+    border: 1px solid var(--el-border);
+    border-radius: 16px;
+    background: var(--el-surface);
+}
+.contract-chat-open {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-inline: 8px;
+    color: var(--el-accent);
+    font-size: 14px;
+    font-weight: 500;
+}
 .chat-readonly {
     padding: 16px;
     border-top: 1px solid var(--el-border);

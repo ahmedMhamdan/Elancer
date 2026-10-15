@@ -17,7 +17,14 @@ export type CaseImage = { id: number; alt: string };
 export const caseImageUrl = (id: number) => `/portfolio/images/${id}`;
 
 // One rendering of a case study, so the client approves exactly what the public page shows.
-export function CaseBody({ content }: { content: CaseContent }) {
+// A proposal's copy (plan 031) serves its images through the proposal instead.
+export function CaseBody({
+    content,
+    imageUrl = caseImageUrl,
+}: {
+    content: CaseContent;
+    imageUrl?: (id: number) => string;
+}) {
     const { t } = useTranslation();
     return (
         <div className="market-stack">
@@ -32,12 +39,12 @@ export function CaseBody({ content }: { content: CaseContent }) {
                     {content.images.map((image) => (
                         <li key={image.id}>
                             <a
-                                href={caseImageUrl(image.id)}
+                                href={imageUrl(image.id)}
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
                                 <img
-                                    src={caseImageUrl(image.id)}
+                                    src={imageUrl(image.id)}
                                     alt={image.alt}
                                     loading="lazy"
                                 />

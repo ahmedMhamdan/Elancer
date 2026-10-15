@@ -26,12 +26,23 @@ type Draft = {
     message: string;
     answers: string[];
     samples: WorkLink[];
+    cases: number[];
+};
+// Plan 031: the member's case studies; only public ones can be sent.
+type CaseOption = {
+    id: number;
+    title: string;
+    summary: string;
+    elancer_work: boolean;
+    shareable: boolean;
 };
 export default function Edit({
     project,
     proposal,
     profilePublished,
     sampleLinks,
+    caseOptions,
+    caseLimit,
     fileLimit,
     trial,
 }: {
@@ -39,6 +50,8 @@ export default function Edit({
     proposal: Proposal | null;
     profilePublished: boolean;
     sampleLinks: WorkLink[];
+    caseOptions: CaseOption[];
+    caseLimit: number;
     fileLimit: number;
     // Plan 027: a member trying out a demo project.
     trial: boolean;
@@ -53,6 +66,9 @@ export default function Edit({
             (_, i) => initial?.answers[i] ?? '',
         ),
         samples: initial?.samples ?? [],
+        cases: (initial?.cases ?? []).filter((id) =>
+            caseOptions.some((option) => option.id === id),
+        ),
     });
     const [busy, setBusy] = useState(false);
     const [saved, setSaved] = useState(false);
@@ -487,6 +503,92 @@ export default function Edit({
                                     </Button>
                                 ))}
                         </div>
+                    )}
+                    {!trial && (
+                        <fieldset className="proposal-cases-field">
+                            <legend>
+                                <h2>{t('Case studies (optional)')}</h2>
+                            </legend>
+                            <p
+                                className="market-muted"
+                                id="proposal-cases-help"
+                            >
+                                {t(
+                                    'Choose up to :count published case studies from your portfolio. The client receives them as they are when you submit, and keeps that copy.',
+                                    { count: caseLimit },
+                                )}
+                            </p>
+                            {caseOptions.length ? (
+                                <ul className="proposal-case-options">
+                                    {caseOptions.map((option) => {
+                                        const chosen = data.cases.includes(
+                                            option.id,
+                                        );
+                                        return (
+                                            <li key={option.id}>
+                                                <label>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={chosen}
+                                                        disabled={
+                                                            !chosen &&
+                                                            (!option.shareable ||
+                                                                data.cases
+                                                                    .length >=
+                                                                    caseLimit)
+                                                        }
+                                                        aria-describedby="proposal-cases-help"
+                                                        onChange={() =>
+                                                            update(
+                                                                'cases',
+                                                                chosen
+                                                                    ? data.cases.filter(
+                                                                          (
+                                                                              id,
+                                                                          ) =>
+                                                                              id !==
+                                                                              option.id,
+                                                                      )
+                                                                    : [
+                                                                          ...data.cases,
+                                                                          option.id,
+                                                                      ],
+                                                            )
+                                                        }
+                                                    />
+                                                    <span>
+                                                        <strong dir="auto">
+                                                            {option.title}
+                                                        </strong>
+                                                        <span
+                                                            dir="auto"
+                                                            className="market-muted"
+                                                        >
+                                                            {option.summary}
+                                                        </span>
+                                                        {!option.shareable && (
+                                                            <span className="market-error">
+                                                                {t(
+                                                                    'Not public, so it cannot be sent.',
+                                                                )}
+                                                            </span>
+                                                        )}
+                                                    </span>
+                                                </label>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            ) : (
+                                <p>
+                                    <Link href="/my-portfolio">
+                                        {t(
+                                            'Publish a case study in your portfolio to share it here.',
+                                        )}
+                                    </Link>
+                                </p>
+                            )}
+                        </fieldset>
                     )}
                     <fieldset className="attached-files-block">
                         <legend>

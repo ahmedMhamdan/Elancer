@@ -136,6 +136,9 @@ export function helpGroups(t: (text: string) => string): HelpGroup[] {
                             'Open a project in Find work and choose Apply. A proposal has your price, the delivery time in days, a cover message of at least 20 characters, your answers to the client’s questions and up to three links to your work.',
                         ),
                         t(
+                            'You can also choose up to three case studies published in your portfolio. The client receives each one as it is when you submit and keeps that copy; work done for a client on Elancer stays shown only while that client’s approval stands.',
+                        ),
+                        t(
                             'You can attach up to three files of 5 MB each: JPG, PNG, WebP, PDF, TXT or ZIP. Only the project’s client can download them, and only the files of a version you submitted.',
                         ),
                         t(
@@ -167,7 +170,7 @@ export function helpGroups(t: (text: string) => string): HelpGroup[] {
                     title: t('Delivering work and revisions'),
                     body: [
                         t(
-                            'Work starts when the client has funded the contract. Use messages for progress; when the work is ready, submit a delivery from the contract page with a note and any files.',
+                            'Work starts when the client has funded the contract. Talk about progress in the contract’s Messages tab; when the work is ready, submit a delivery from the contract page with a note and any files.',
                         ),
                         t(
                             'A message can carry up to three files of 5 MB each. Only the two of you can download them, and a file cannot be removed once sent.',
@@ -310,6 +313,9 @@ export function helpGroups(t: (text: string) => string): HelpGroup[] {
                         ),
                         t(
                             'Under Settings, Notifications you choose which of them are also sent by email. Emails about offers and contracts are on unless you switch them off; security emails are always sent.',
+                        ),
+                        t(
+                            'An email about messages waits 15 minutes and goes only if the conversation is still unread then, at most once an hour for each conversation. It says how many messages are waiting, never what they say.',
                         ),
                     ],
                     href: '/settings/notifications',

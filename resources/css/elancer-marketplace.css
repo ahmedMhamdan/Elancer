@@ -323,6 +323,63 @@
     color: var(--destructive);
     font-size: 14px;
 }
+/* Plan 031: a case study sent with a proposal, and the apply form's choice of them. */
+.proposal-case {
+    display: grid;
+    gap: 10px;
+    min-width: 0;
+    padding: 16px;
+    border: 1px solid var(--el-border);
+    border-radius: 12px;
+}
+/* More specific than the panels' own h3, so a case title reads above its summary. */
+.market-stack .proposal-case h3 {
+    font-size: 18px;
+    font-weight: 600;
+}
+/* Inside a proposal the summary reads below the title, not above it in size. */
+.proposal-case .talent-headline {
+    font-size: 15px;
+}
+.proposal-cases-field {
+    display: grid;
+    gap: 10px;
+    min-width: 0;
+}
+.proposal-case-options {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.proposal-case-options label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    min-height: 44px;
+    padding: 12px;
+    border: 1px solid var(--el-border);
+    border-radius: 8px;
+    cursor: pointer;
+}
+.proposal-case-options label:has(input:disabled) {
+    cursor: not-allowed;
+}
+.proposal-case-options input {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin-top: 3px;
+    accent-color: var(--el-accent);
+}
+.proposal-case-options label > span {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
 .proposal-history {
     border-top: 1px solid var(--el-border);
     padding-top: 16px;
@@ -489,6 +546,20 @@ td .provider-mark svg {
 .contract-tabs button:focus-visible {
     outline: 2px solid var(--el-accent);
     outline-offset: -2px;
+}
+/* Plan 031: unread messages beside the Messages tab, as the inbox counts them. */
+.contract-tab-count {
+    display: inline-block;
+    min-width: 20px;
+    margin-inline-start: 6px;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: var(--el-accent);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 18px;
+    text-align: center;
 }
 .contract-overdue {
     background: color-mix(in srgb, #dc2626 12%, transparent);

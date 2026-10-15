@@ -25,6 +25,7 @@ import {
 import HelpLink from '@/components/help-link';
 import { Deliveries, type Submission } from './deliveries';
 import { Funding } from './funding';
+import { ContractMessages, type Thread } from './messages';
 import { Portfolio, type PortfolioState } from './portfolio';
 import { Reviews, type ReviewState } from './reviews';
 
@@ -41,6 +42,7 @@ export default function Show({
     portfolio,
     cancellation,
     amendments,
+    thread,
 }: {
     contract: Contract;
     payment: Payment | null;
@@ -52,9 +54,12 @@ export default function Show({
     portfolio: PortfolioState | null;
     cancellation: Cancellation | null;
     amendments: Amendment[];
+    thread: Thread | null;
 }) {
     const { t, locale } = useTranslation();
+    // Q31: Messages leads the tabs; the page still opens on the tab for the next step.
     const tabs = [
+        ...(thread ? [{ key: 'messages', label: t('Messages') }] : []),
         { key: 'deliveries', label: t('Deliveries') },
         { key: 'agreement', label: t('Agreement') },
         { key: 'payments', label: t('Payments') },
@@ -221,12 +226,6 @@ export default function Show({
                     {next[contract.status]?.[mine]}
                 </p>
                 <div className="market-actions">
-                    <Link
-                        className="market-primary-link"
-                        href={`/messages/${contract.conversation_id}`}
-                    >
-                        {t('Open messages')}
-                    </Link>
                     {contract.status === 'cancelled' && contract.is_client && (
                         <Button
                             variant="outline"
@@ -292,6 +291,16 @@ export default function Show({
                         onClick={() => setTab(key)}
                     >
                         {label}
+                        {key === 'messages' && !!thread?.unread && (
+                            <span className="contract-tab-count">
+                                <span aria-hidden="true">{thread.unread}</span>
+                                <span className="sr-only">
+                                    {t(':count unread', {
+                                        count: thread.unread,
+                                    })}
+                                </span>
+                            </span>
+                        )}
                     </button>
                 ))}
             </div>
@@ -301,6 +310,9 @@ export default function Show({
                 aria-labelledby={`contract-tab-${tab}`}
                 className="market-stack"
             >
+                {tab === 'messages' && thread && (
+                    <ContractMessages thread={thread} />
+                )}
                 {tab === 'deliveries' && (
                     <>
                         <Deliveries

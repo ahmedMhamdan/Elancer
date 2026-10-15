@@ -1,0 +1,417 @@
+// Compose/correction controls reuse the inspected local TailAdmin TextArea/Button sources.
+// Plan 031: shared by the Messages page and the workroom's Messages tab.
+import { useForm } from '@inertiajs/react';
+import { Paperclip, Send, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import {
+    AttachedFiles,
+    FILE_ACCEPT,
+    useFileProblem,
+} from '@/components/attached-files';
+import InputError from '@/components/input-error';
+import ReportDialog from '@/components/report-dialog';
+import Button from '@/components/tailadmin/button';
+import Pagination from '@/components/tailadmin/pagination';
+import TextArea from '@/components/tailadmin/textarea';
+import { useTranslation } from '@/hooks/use-translation';
+import { cn } from '@/lib/utils';
+import { FileSize } from '@/pages/discovery/shared';
+import type { Page } from '@/pages/discovery/shared';
+import type { Message } from './shared';
+
+function MessageItem({
+    message,
+    counterpart,
+}: {
+    message: Message;
+    counterpart: string;
+}) {
+    const { t, locale } = useTranslation();
+    const [editing, setEditing] = useState(false);
+    const form = useForm({
+        body: message.body ?? '',
+        version: message.version,
+    });
+    const sent = (
+        <div className="chat-message-meta">
+            <span>{message.mine ? t('You') : counterpart}</span>
+            <time dateTime={message.created_at}>
+                {new Date(message.created_at).toLocaleString(locale, {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                })}
+            </time>
+            {message.edited_at && <span>{t('Edited')}</span>}
+        </div>
+    );
+    // Q68: a notice stands in for a message that moderation hid, with nothing to correct or report.
+    if (message.hidden)
+        return (
+            <article
+                className={cn(
+                    'chat-message',
+                    message.mine && 'chat-message-mine',
+                )}
+                aria-label={message.mine ? t('You') : counterpart}
+            >
+                <div className="chat-bubble">
+                    <p className="text-sm leading-7 italic">
+                        {t('This message was hidden by moderation.')}
+                    </p>
+                    {sent}
+                </div>
+            </article>
+        );
+    return (
+        <article
+            className={cn('chat-message', message.mine && 'chat-message-mine')}
+            aria-label={message.mine ? t('You') : counterpart}
+        >
+            <div className="chat-bubble">
+                {editing ? (
+                    <form
+                        className="chat-edit space-y-3"
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            form.patch('/messages/items/' + message.id, {
+                                preserveScroll: true,
+                                onSuccess: () => setEditing(false),
+                            });
+                        }}
+                    >
+                        <label
+                            className="block text-sm font-medium"
+                            htmlFor={'correction-' + message.id}
+                        >
+                            {t('Correct message')}
+                        </label>
+                        <TextArea
+                            id={'correction-' + message.id}
+                            value={form.data.body}
+                            onChange={(value) => form.setData('body', value)}
+                            required
+                            maxLength={10000}
+                            autoFocus
+                            aria-invalid={!!form.errors.body}
+                        />
+                        <InputError message={form.errors.body} />
+                        <div className="flex flex-wrap gap-2">
+                            <Button
+                                type="submit"
+                                disabled={
+                                    form.processing || !form.data.body.trim()
+                                }
+                            >
+                                {t('Save correction')}
+                            </Button>
+                            <Button
+                                variant="outline"
+                                disabled={form.processing}
+                                onClick={() => setEditing(false)}
+                            >
+                                {t('Cancel')}
+                            </Button>
+                        </div>
+                    </form>
+                ) : (
+                    !!message.body && (
+                        <p
+                            className="text-sm leading-7 whitespace-pre-wrap"
+                            dir="auto"
+                        >
+                            {message.body}
+                        </p>
+                    )
+                )}
+                <AttachedFiles
+                    files={message.files}
+                    href={(file) => `/messages/files/${file.id}`}
+                />
+                {sent}
+                {(message.can_edit ||
+                    !message.mine ||
+                    message.revisions.length > 0) && (
+                    <div className="chat-message-actions">
+                        {!message.mine && (
+                            <ReportDialog
+                                type="message"
+                                id={message.id}
+                                label={t('Report message')}
+                                className="!text-xs"
+                            />
+                        )}
+                        {message.can_edit && !editing && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    form.setData({
+                                        body: message.body ?? '',
+                                        version: message.version,
+                                    });
+                                    setEditing(true);
+                                }}
+                            >
+                                {t('Correct message')}
+                            </button>
+                        )}
+                        {!!message.revisions.length && (
+                            <details>
+                                <summary>{t('Correction history')}</summary>
+                                <ol className="mt-2 space-y-3 border-t border-current/20 pt-3">
+                                    {message.revisions.map((revision) => (
+                                        <li key={revision.version}>
+                                            <p
+                                                className="text-sm leading-relaxed whitespace-pre-wrap"
+                                                dir="auto"
+                                            >
+                                                {revision.body}
+                                            </p>
+                                            <time
+                                                dateTime={revision.created_at}
+                                            >
+                                                {new Date(
+                                                    revision.created_at,
+                                                ).toLocaleString(locale, {
+                                                    timeZoneName: 'short',
+                                                })}
+                                            </time>
+                                        </li>
+                                    ))}
+                                </ol>
+                            </details>
+                        )}
+                    </div>
+                )}
+            </div>
+        </article>
+    );
+}
+
+/** The scrolling history: older pages above, the newest message at the bottom and in view. */
+export function MessageHistory({
+    conversationId,
+    messages,
+    counterpart,
+    busy,
+}: {
+    conversationId: number;
+    messages: Page<Message>;
+    counterpart: string;
+    busy: boolean;
+}) {
+    const { t } = useTranslation();
+    const thread = useRef<HTMLDivElement>(null);
+    const latestId = messages.data[0]?.id;
+    useEffect(() => {
+        if (thread.current)
+            thread.current.scrollTop = thread.current.scrollHeight;
+    }, [conversationId, messages.current_page, latestId]);
+    return (
+        <div
+            ref={thread}
+            className="chat-thread"
+            tabIndex={0}
+            role="region"
+            aria-label={t('Message history')}
+            aria-busy={busy}
+        >
+            {messages.last_page > 1 && (
+                <div className="mb-5">
+                    <Pagination data={messages} />
+                </div>
+            )}
+            {[...messages.data].reverse().map((message) => (
+                <MessageItem
+                    key={message.id}
+                    message={message}
+                    counterpart={counterpart}
+                />
+            ))}
+        </div>
+    );
+}
+
+/** The composer, or the read-only notice. `extra` travels with every send (the workroom asks to stay in place). */
+export function MessageComposer({
+    url,
+    writable,
+    fileLimit,
+    extra = {},
+}: {
+    url: string;
+    writable: boolean;
+    fileLimit: number;
+    extra?: Record<string, boolean>;
+}) {
+    const { t } = useTranslation();
+    const form = useForm<{
+        body: string;
+        client_token: string;
+        files: File[];
+    }>({
+        body: '',
+        client_token: crypto.randomUUID(),
+        files: [],
+    });
+    // Plan 030: files chosen for the next message, checked here first and again on the server.
+    const fileProblem = useFileProblem();
+    const [fileNote, setFileNote] = useState<string | null>(null);
+    const fileError =
+        form.errors.files ??
+        Object.entries(form.errors).find(([key]) =>
+            key.startsWith('files.'),
+        )?.[1];
+    function choose(chosen: FileList | null) {
+        const picked = Array.from(chosen ?? []);
+        if (!picked.length) return;
+        const problem = picked.map(fileProblem).find(Boolean);
+        if (problem) return setFileNote(problem);
+        if (form.data.files.length + picked.length > fileLimit)
+            return setFileNote(
+                t('A message can carry up to :count files.', {
+                    count: fileLimit,
+                }),
+            );
+        setFileNote(null);
+        form.clearErrors();
+        form.setData('files', [...form.data.files, ...picked]);
+    }
+    if (!writable)
+        return (
+            <p role="status" className="chat-readonly">
+                {t('This hiring conversation is read-only.')}
+            </p>
+        );
+    return (
+        <form
+            className="chat-composer"
+            onSubmit={(event) => {
+                event.preventDefault();
+                form.transform((data) => ({ ...data, ...extra }));
+                form.post(url, {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        form.setData({
+                            body: '',
+                            client_token: crypto.randomUUID(),
+                            files: [],
+                        });
+                        setFileNote(null);
+                        document.getElementById('message-body')?.focus();
+                    },
+                });
+            }}
+        >
+            {!!form.data.files.length && (
+                <ul
+                    className="chat-pending-files"
+                    aria-label={t('Files to send')}
+                >
+                    {form.data.files.map((file, i) => (
+                        <li key={i}>
+                            <Paperclip size={14} aria-hidden="true" />
+                            <bdi>{file.name}</bdi>
+                            <span className="attached-files-size">
+                                <FileSize bytes={file.size} />
+                            </span>
+                            <button
+                                type="button"
+                                disabled={form.processing}
+                                aria-label={t('Remove :name', {
+                                    name: file.name,
+                                })}
+                                onClick={() =>
+                                    form.setData(
+                                        'files',
+                                        form.data.files.filter(
+                                            (_, j) => j !== i,
+                                        ),
+                                    )
+                                }
+                            >
+                                <X className="size-4" aria-hidden="true" />
+                            </button>
+                        </li>
+                    ))}
+                </ul>
+            )}
+            <label htmlFor="message-body" className="sr-only">
+                {t('Message')}
+            </label>
+            <div className="flex items-end gap-2">
+                <input
+                    id="message-files"
+                    type="file"
+                    multiple
+                    className="sr-only"
+                    accept={FILE_ACCEPT}
+                    disabled={
+                        form.processing || form.data.files.length >= fileLimit
+                    }
+                    aria-describedby="message-help"
+                    onChange={(event) => {
+                        choose(event.target.files);
+                        event.target.value = '';
+                    }}
+                />
+                <label
+                    htmlFor="message-files"
+                    className="chat-attach mb-1"
+                    title={t('Attach files')}
+                >
+                    <Paperclip className="size-5" aria-hidden="true" />
+                    <span className="sr-only">{t('Attach files')}</span>
+                </label>
+                <div className="min-w-0 flex-1">
+                    <TextArea
+                        id="message-body"
+                        rows={2}
+                        required={!form.data.files.length}
+                        maxLength={10000}
+                        value={form.data.body}
+                        onChange={(value) => form.setData('body', value)}
+                        placeholder={t('Type a message')}
+                        aria-describedby="message-help"
+                        aria-invalid={!!form.errors.body}
+                        disabled={form.processing}
+                        dir="auto"
+                    />
+                </div>
+                <Button
+                    type="submit"
+                    className="mb-1 min-h-11"
+                    disabled={
+                        form.processing ||
+                        (!form.data.body.trim() && !form.data.files.length)
+                    }
+                    startIcon={
+                        <Send
+                            className="size-4 rtl:rotate-180"
+                            aria-hidden="true"
+                        />
+                    }
+                >
+                    <span className="sr-only sm:not-sr-only">
+                        {form.processing ? t('Sending...') : t('Send message')}
+                    </span>
+                </Button>
+            </div>
+            <InputError message={form.errors.body} />
+            <InputError message={fileNote ?? fileError} />
+            <p
+                id="message-help"
+                className="text-muted-foreground mt-2 text-xs leading-relaxed"
+            >
+                {t(
+                    'You can correct sent text for 15 minutes. Messages cannot be deleted.',
+                )}{' '}
+                {t(
+                    'Attach up to :count files of 5 MB each: JPG, PNG, WebP, PDF, TXT or ZIP. Files cannot be removed once sent.',
+                    { count: fileLimit },
+                )}
+            </p>
+        </form>
+    );
+}

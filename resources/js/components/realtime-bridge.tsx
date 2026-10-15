@@ -14,17 +14,20 @@ const chatProps = [
 ];
 
 // Turns a live signal into fresh page data: the bell count everywhere, the open
-// inbox or conversation on Messages, and a toast for a new notification.
+// inbox or conversation on Messages or in a workroom (plan 031), and a toast for a new notification.
 export default function RealtimeBridge() {
     const page = usePage();
     const { t } = useTranslation();
     const sentence = useNotificationSentence();
     const { auth, realtime } = page.props;
     const chat = page.component.startsWith('messages/');
+    const workroom = page.component === 'contracts/show';
     const open =
         page.component === 'messages/show'
             ? (page.props.conversation as { id: number }).id
-            : null;
+            : workroom
+              ? ((page.props.thread as { id: number } | null)?.id ?? null)
+              : null;
     const handle = useRef<(signal: Signal) => void>(() => {});
     const timer = useRef<number | undefined>(undefined);
 
@@ -37,7 +40,9 @@ export default function RealtimeBridge() {
                     router.reload({
                         only: chat
                             ? ['notifications', ...chatProps]
-                            : ['notifications'],
+                            : workroom
+                              ? ['notifications', 'thread']
+                              : ['notifications'],
                     }),
                 150,
             );

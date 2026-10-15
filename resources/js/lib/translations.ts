@@ -2576,8 +2576,8 @@ export const arabic: Record<string, string> = {
         'يمكنك التقدم لمشروع تجريبي لترى كيف يعمل التقديم. تخبرك الصفحة بذلك أولًا، ويظهر عرضك في «عروضي» بعلامة «مشروع تجريبي». لن يقرأه أو يرد عليه عميل حقيقي، ولن يصبح عقدًا.',
     'Open My proposals': 'افتح عروضي',
     'Delivering work and revisions': 'تسليم العمل والتعديلات',
-    'Work starts when the client has funded the contract. Use messages for progress; when the work is ready, submit a delivery from the contract page with a note and any files.':
-        'يبدأ العمل عندما يموّل العميل العقد. استخدم الرسائل لمتابعة التقدم؛ وعندما يجهز العمل، أرسل تسليمًا من صفحة العقد مع ملاحظة وأي ملفات.',
+    'Work starts when the client has funded the contract. Talk about progress in the contract’s Messages tab; when the work is ready, submit a delivery from the contract page with a note and any files.':
+        'يبدأ العمل عندما يموّل العميل العقد. تابعا التقدم في تبويب الرسائل في صفحة العقد؛ وعندما يجهز العمل، أرسل تسليمًا من صفحة العقد مع ملاحظة وأي ملفات.',
     'The client approves the delivery or asks for a revision. One revision request lists all the changes and uses one of the rounds included in the agreement.':
         'يوافق العميل على التسليم أو يطلب تعديلًا. طلب التعديل الواحد يجمع كل التغييرات ويستهلك جولة واحدة من الجولات المشمولة في الاتفاق.',
     'More rounds or more time need both sides to agree to a change of the agreement. The price of a contract does not go up.':
@@ -2736,4 +2736,18 @@ export const arabic: Record<string, string> = {
         'يمكنك إرفاق حتى ثلاثة ملفات، 5 ميغابايت لكل ملف: JPG أو PNG أو WebP أو PDF أو TXT أو ZIP. لا يستطيع تنزيلها إلا عميل المشروع، ولا ينزّل إلا ملفات النسخ التي أرسلتها.',
     'A message can carry up to three files of 5 MB each. Only the two of you can download them, and a file cannot be removed once sent.':
         'يمكن أن تحمل الرسالة حتى ثلاثة ملفات، 5 ميغابايت لكل ملف. لا يستطيع تنزيلها غيركما، ولا يمكن إزالة الملف بعد إرساله.',
+    'Case studies': 'دراسات الحالة',
+    'This case study is no longer available.': 'لم تعد دراسة الحالة هذه متاحة.',
+    'The client no longer sees this case study: its approval was withdrawn or it was hidden by moderation.':
+        'لم يعد العميل يرى دراسة الحالة هذه: سُحبت الموافقة عليها أو أخفاها المشرفون.',
+    'Case studies (optional)': 'دراسات الحالة (اختياري)',
+    'Choose up to :count published case studies from your portfolio. The client receives them as they are when you submit, and keeps that copy.':
+        'اختر حتى :count من دراسات الحالة المنشورة في معرض أعمالك. يستلمها العميل كما هي لحظة إرسال العرض، وتبقى تلك النسخة لديه.',
+    'Not public, so it cannot be sent.': 'غير منشورة، لذلك لا يمكن إرسالها.',
+    'Publish a case study in your portfolio to share it here.':
+        'انشر دراسة حالة في معرض أعمالك لتتمكن من مشاركتها هنا.',
+    'You can also choose up to three case studies published in your portfolio. The client receives each one as it is when you submit and keeps that copy; work done for a client on Elancer stays shown only while that client’s approval stands.':
+        'يمكنك أيضًا اختيار حتى ثلاث دراسات حالة منشورة في معرض أعمالك. يستلم العميل كل واحدة منها كما هي لحظة الإرسال وتبقى تلك النسخة لديه؛ أما العمل المنجز لعميل على إيلانسر فلا يظهر إلا ما دامت موافقة ذلك العميل قائمة.',
+    'An email about messages waits 15 minutes and goes only if the conversation is still unread then, at most once an hour for each conversation. It says how many messages are waiting, never what they say.':
+        'تنتظر رسالة البريد الخاصة بالرسائل 15 دقيقة، ولا تُرسل إلا إذا بقيت المحادثة غير مقروءة حينها، ومرة واحدة في الساعة على الأكثر لكل محادثة. تذكر عدد الرسائل المنتظرة، ولا تذكر محتواها أبدًا.',
 };
