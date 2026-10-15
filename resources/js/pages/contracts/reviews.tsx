@@ -117,8 +117,8 @@ export function Reviews({
                             value={form.data.body}
                             onChange={(value) => form.setData('body', value)}
                             required
-                            minLength={20}
-                            maxLength={3000}
+                            minLength={10}
+                            maxLength={2000}
                             rows={5}
                         />
                         <InputError message={errors.body ?? errors.review} />
