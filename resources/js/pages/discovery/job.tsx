@@ -400,9 +400,11 @@ export default function JobDetails({
                     </p>
                     <hr />
                     <p>
-                        {t(':count proposals received', {
-                            count: project.proposals_received,
-                        })}
+                        {project.proposals_received === 1
+                            ? t('1 proposal received')
+                            : t(':count proposals received', {
+                                  count: project.proposals_received,
+                              })}
                     </p>
                     {application.owner ? (
                         <Link

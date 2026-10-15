@@ -4,6 +4,7 @@ export const arabic: Record<string, string> = {
     Project: 'مشروع',
     Proposal: 'عرض',
     ':count proposals': ':count عروض',
+    '1 proposal': 'عرض واحد',
     'Untitled draft': 'مسودة بلا عنوان',
     'Your proposals': 'عروضك',
     'Owned projects, excluding trash': 'مشاريعك، باستثناء المحذوفة',
@@ -74,6 +75,7 @@ export const arabic: Record<string, string> = {
     'Search people or projects': 'ابحث عن شخص أو مشروع',
     'Filter conversations': 'تصفية المحادثات',
     ':count conversations': ':count محادثات',
+    '1 conversation': 'محادثة واحدة',
     'Current conversation': 'المحادثة الحالية',
     'Try another search or filter.': 'جرّب بحثًا آخر أو غيّر التصفية.',
     'Conversation pages': 'صفحات المحادثات',
@@ -315,6 +317,7 @@ export const arabic: Record<string, string> = {
     Skill: 'المهارة',
     'Any availability': 'أي حالة تفرغ',
     ':count freelancers': ':count مستقل',
+    '1 freelancer': 'مستقل واحد',
     'No matching freelancers yet': 'لا يوجد مستقلون مطابقون حاليًا',
     'Try another skill or a broader search.': 'جرّب مهارة أخرى أو بحثًا أوسع.',
     ':count proposals received': ':count عرض مستلم',
@@ -340,6 +343,7 @@ export const arabic: Record<string, string> = {
         'ستظهر العروض المرسلة هنا لمراجعتها.',
     Compare: 'مقارنة',
     ':count calendar days': ':count يومًا تقويميًا',
+    '1 calendar day': 'يوم تقويمي واحد',
     'Review proposal': 'مراجعة العرض',
     'Compare applicants': 'مقارنة المتقدمين',
     'Unable to save. Please try again.': 'تعذّر الحفظ. حاول مرة أخرى.',
@@ -1166,7 +1170,9 @@ export const arabic: Record<string, string> = {
     'Search categories': 'ابحث عن تصنيف',
     Search: 'بحث',
     ':count categories': 'عدد التصنيفات: :count',
+    '1 category': 'تصنيف واحد',
     ':count open projects': 'مشاريع متاحة: :count',
+    '1 open project': 'مشروع متاح واحد',
     'View all jobs': 'عرض جميع المشاريع',
     'No categories found': 'لا توجد تصنيفات مطابقة',
     'Try a different search or check back for new categories.':
@@ -1212,6 +1218,7 @@ export const arabic: Record<string, string> = {
     'Remove filter: :name': 'إزالة التصفية: :name',
     'Search results': 'نتائج البحث',
     ':count projects': 'عدد المشاريع: :count',
+    '1 project': 'مشروع واحد',
     'Refine your search': 'خصص نتائج البحث',
     'Sort by': 'ترتيب حسب',
     Newest: 'الأحدث',
@@ -1526,14 +1533,17 @@ export const arabic: Record<string, string> = {
     'For project questions, keep the discussion in the relevant conversation so both participants can refer to it. This page is a self-service guide, not a support ticket form.':
         'لأسئلة المشروع، أبقِ النقاش في المحادثة المرتبطة به ليتمكن الطرفان من الرجوع إليه. هذه الصفحة دليل للمساعدة الذاتية وليست نموذجًا لتذاكر الدعم.',
     'Platform updates': 'تحديثات المنصة',
-    'What is available, and what is still being built.':
-        'ما هو متاح، وما زال قيد التطوير.',
+    'What is available today, and its limits.': 'ما هو متاح اليوم، وحدوده.',
     'September 2026: profiles, project discovery, proposals, invitations and private hiring conversations are available.':
         'سبتمبر 2026: الملفات الشخصية وتصفّح المشاريع والعروض والدعوات ومحادثات التوظيف الخاصة متاحة.',
     'Google and GitHub sign-in, final offers and recorded contract agreements have been added.':
         'أُضيف تسجيل الدخول باستخدام Google وGitHub، والعروض النهائية، وسجلات اتفاقات العقود.',
-    'Coming later: sandbox funding and formal delivery workflows. No real payment collection is available in the current project.':
-        'لاحقًا: التمويل التجريبي ومسارات التسليم الرسمي. تحصيل المدفوعات الحقيقية غير متاح في المشروع الحالي.',
+    'October 2026: contracts can be funded in test mode, delivered with files, revised, completed and reviewed, and a funded contract can be cancelled with a refund. Briefs, proposals and messages can carry files.':
+        'أكتوبر 2026: يمكن تمويل العقود في وضع تجريبي، وتسليمها مع الملفات، وطلب تعديلها، وإكمالها وتقييمها، ويمكن إلغاء عقد مموَّل مع استرداد المبلغ. ويمكن إرفاق الملفات بتفاصيل المشاريع والعروض والرسائل.',
+    'Portfolios with case studies, saved projects and freelancers, API tokens and a searchable Help centre are also available.':
+        'تتوفر أيضًا معارض الأعمال مع دراسات الحالة، وحفظ المشاريع والمستقلين، ورموز الواجهة البرمجية، ومركز مساعدة يمكن البحث فيه.',
+    'Payments run in provider test mode only: no real money moves, and nothing is paid out.':
+        'تعمل المدفوعات في الوضع التجريبي لدى مزوّد الدفع فقط: لا تتحرك أموال حقيقية، ولا يُصرف شيء.',
     'On this page': 'في هذه الصفحة',
     'Illustrative project idea': 'فكرة مشروع توضيحية',
     'Explore another guide': 'تصفّح دليلًا آخر',

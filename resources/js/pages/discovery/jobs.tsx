@@ -416,7 +416,11 @@ function SearchPage({
                 <section aria-busy={busy} aria-label={t('Search results')}>
                     <div className="jobs-results-bar">
                         <h2 aria-live="polite">
-                            {t(':count projects', { count: projects.total })}
+                            {projects.total === 1
+                                ? t('1 project')
+                                : t(':count projects', {
+                                      count: projects.total,
+                                  })}
                         </h2>
                         {auth.user?.status === 'active' && (
                             // Q17: a named copy of the filters shown above, never of the results.

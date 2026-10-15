@@ -170,9 +170,11 @@ export function JobCard({ job, search }: { job: Job; search: string }) {
                         )}
                     </span>
                     <span className="job-muted">
-                        {t(':count proposals received', {
-                            count: job.proposals_received,
-                        })}
+                        {job.proposals_received === 1
+                            ? t('1 proposal received')
+                            : t(':count proposals received', {
+                                  count: job.proposals_received,
+                              })}
                     </span>
                     {!!job.attachments && (
                         <span className="job-muted job-attachment-count">

@@ -54,7 +54,11 @@ export default function Categories({
                 <Button type="submit">{t('Search')}</Button>
             </form>
             <div className="jobs-section-bar">
-                <p>{t(':count categories', { count: categories.total })}</p>
+                <p>
+                    {categories.total === 1
+                        ? t('1 category')
+                        : t(':count categories', { count: categories.total })}
+                </p>
                 <Link href="/jobs">
                     {t('View all jobs')} <ArrowUpRight size={16} />
                 </Link>
@@ -69,9 +73,11 @@ export default function Categories({
                         <Layers size={24} aria-hidden="true" />
                         <h2 dir="auto">{category.categoryname}</h2>
                         <p>
-                            {t(':count open projects', {
-                                count: category.open_projects_count ?? 0,
-                            })}
+                            {category.open_projects_count === 1
+                                ? t('1 open project')
+                                : t(':count open projects', {
+                                      count: category.open_projects_count ?? 0,
+                                  })}
                         </p>
                         <ArrowUpRight
                             className="job-category-arrow"

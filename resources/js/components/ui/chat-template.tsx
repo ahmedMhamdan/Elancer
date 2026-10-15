@@ -129,7 +129,7 @@ function ConversationList({ conversations, filters, selected }: {
                 <div className="flex items-center justify-between gap-2">
                     <div>
                         <h2 className="font-semibold">{heading}</h2>
-                        <p className="text-muted-foreground mt-1 text-xs">{t(':count conversations', { count: conversations.total })}</p>
+                        <p className="text-muted-foreground mt-1 text-xs">{conversations.total === 1 ? t('1 conversation') : t(':count conversations', { count: conversations.total })}</p>
                     </div>
                     <DropdownMenu dir={ar ? 'rtl' : 'ltr'}>
                         <DropdownMenuTrigger asChild>

@@ -135,7 +135,7 @@ export function App1({ overview, published }: { overview: OverviewData; publishe
                                 </div>
                                 <div className="text-muted-foreground mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
                                     <span>{item.kind === 'contract' ? t('Contract') : item.kind === 'project' ? t('Project') : t('Proposal')}</span>
-                                    {item.count !== null && <span>{t(':count proposals', { count: item.count })}</span>}
+                                    {item.count !== null && <span>{item.count === 1 ? t('1 proposal') : t(':count proposals', { count: item.count })}</span>}
                                     <time dateTime={item.updated_at} className="ms-auto">{date(item.updated_at)}</time>
                                     <ChevronRight className={ar ? 'size-4 rotate-180' : 'size-4'} aria-hidden="true" />
                                 </div>

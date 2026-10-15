@@ -385,9 +385,7 @@ export function publicGuides(t: (text: string) => string): PublicGuide[] {
                 {
                     id: 'updates',
                     title: t('Platform updates'),
-                    description: t(
-                        'What is available, and what is still being built.',
-                    ),
+                    description: t('What is available today, and its limits.'),
                     points: [
                         t(
                             'September 2026: profiles, project discovery, proposals, invitations and private hiring conversations are available.',
@@ -396,7 +394,13 @@ export function publicGuides(t: (text: string) => string): PublicGuide[] {
                             'Google and GitHub sign-in, final offers and recorded contract agreements have been added.',
                         ),
                         t(
-                            'Coming later: sandbox funding and formal delivery workflows. No real payment collection is available in the current project.',
+                            'October 2026: contracts can be funded in test mode, delivered with files, revised, completed and reviewed, and a funded contract can be cancelled with a refund. Briefs, proposals and messages can carry files.',
+                        ),
+                        t(
+                            'Portfolios with case studies, saved projects and freelancers, API tokens and a searchable Help centre are also available.',
+                        ),
+                        t(
+                            'Payments run in provider test mode only: no real money moves, and nothing is paid out.',
                         ),
                     ],
                 },

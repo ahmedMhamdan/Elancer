@@ -90,7 +90,9 @@ export default function Freelancers({
                 </Button>
             </form>
             <p className="market-results">
-                {t(':count freelancers', { count: freelancers.total })}
+                {freelancers.total === 1
+                    ? t('1 freelancer')
+                    : t(':count freelancers', { count: freelancers.total })}
             </p>
             {freelancers.data.length ? (
                 <div className="talent-grid">

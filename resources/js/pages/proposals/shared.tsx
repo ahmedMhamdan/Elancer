@@ -115,9 +115,12 @@ export function ContentDetails({
                 <div>
                     <dt>{t('Delivery duration')}</dt>
                     <dd>
-                        {t(':count calendar days', {
-                            count: content.duration_days ?? 0,
-                        })}
+                        {/* The saved value may be the number as text. */}
+                        {Number(content.duration_days) === 1
+                            ? t('1 calendar day')
+                            : t(':count calendar days', {
+                                  count: content.duration_days ?? 0,
+                              })}
                     </dd>
                 </div>
             </dl>

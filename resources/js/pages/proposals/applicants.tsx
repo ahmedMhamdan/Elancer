@@ -140,9 +140,13 @@ export default function Applicants({
                                 max={proposal.content?.price ?? '0'}
                             />
                             <span>
-                                {t(':count calendar days', {
-                                    count: proposal.content?.duration_days ?? 0,
-                                })}
+                                {Number(proposal.content?.duration_days) === 1
+                                    ? t('1 calendar day')
+                                    : t(':count calendar days', {
+                                          count:
+                                              proposal.content?.duration_days ??
+                                              0,
+                                      })}
                             </span>
                         </div>
                         <p className="line-clamp-2" dir="auto">
