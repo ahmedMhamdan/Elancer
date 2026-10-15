@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Contracts\ContractWork;
+use App\Actions\Files\AttachedFiles;
 use App\Models\Contract;
 use App\Models\ContractSubmissionFile;
 use Illuminate\Http\RedirectResponse;
@@ -20,11 +21,12 @@ class ContractWorkController extends Controller
             'links' => ['nullable', 'array', 'list', 'max:5'],
             'links.*' => ['required', 'string', 'max:2000', 'url:http,https', 'distinct'],
             'files' => ['nullable', 'array', 'list', 'max:3'],
-            'files.*' => ['required', 'file', 'max:5120', 'mimes:jpg,jpeg,png,webp,pdf,txt,zip'],
+            // The same rules as a brief, a proposal or a message: a note with commas in it is still a text file.
+            'files.*' => AttachedFiles::rules(),
             // Q49: a formal delivery is the complete agreed set, never a part.
             'complete' => ['accepted'],
             'client_token' => ['required', 'uuid'],
-        ]);
+        ], AttachedFiles::messages('files.*'));
         ContractWork::submit($contract, $data, array_values($request->file('files') ?? []));
 
         return to_route('contracts.show', $contract);
@@ -51,7 +53,8 @@ class ContractWorkController extends Controller
     public function review(Request $request, Contract $contract): RedirectResponse
     {
         abort_unless($contract->contains($request->user()->id), 404);
-        $data = $request->validate(['rating' => ['required', 'integer', 'min:1', 'max:5'], 'body' => ['required', 'string', 'min:20', 'max:3000']]);
+        // Plan 003 section 15: one 1-5 rating and 10 to 2,000 characters of text.
+        $data = $request->validate(['rating' => ['required', 'integer', 'min:1', 'max:5'], 'body' => ['required', 'string', 'min:10', 'max:2000']]);
         ContractWork::review($contract, $request->user()->id, (int) $data['rating'], $data['body']);
 
         return to_route('contracts.show', $contract);

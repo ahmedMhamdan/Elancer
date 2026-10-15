@@ -108,6 +108,16 @@ class ContractWorkTest extends TestCase
         $this->get('/contracts/'.$second->id.'/files/'.$file->id)->assertNotFound();
     }
 
+    public function test_a_delivery_takes_files_by_the_same_rules_as_a_message(): void
+    {
+        [, $freelancer, $contract] = $this->contract();
+        // A plain note with commas in it is detected as text/csv; it is still a text file named .txt.
+        $this->actingAs($freelancer)->post('/contracts/'.$contract->id.'/deliveries', $this->delivery(['files' => [UploadedFile::fake()->create('archive.pdf', 4, 'application/zip')]]))
+            ->assertSessionHasErrors('files.0');
+        $this->post('/contracts/'.$contract->id.'/deliveries', $this->delivery(['files' => [UploadedFile::fake()->create('NOTES.TXT', 4, 'text/csv')]]))->assertSessionHasNoErrors();
+        $this->assertSame(['NOTES.TXT'], ContractSubmissionFile::query()->pluck('name')->all());
+    }
+
     public function test_one_revision_request_consumes_one_round_and_the_allowance_is_enforced(): void
     {
         [$client, $freelancer, $contract] = $this->contract(rounds: 1);
@@ -158,6 +168,9 @@ class ContractWorkTest extends TestCase
         $submission = $this->deliver($freelancer, $contract);
         $this->actingAs($client)->post('/contracts/'.$contract->id.'/complete', ['submission' => $submission->id]);
         $this->put('/contracts/'.$contract->id.'/review', ['rating' => 6, 'body' => 'short'])->assertSessionHasErrors(['rating', 'body']);
+        // Plan 003 section 15: 10 to 2,000 characters.
+        $this->put('/contracts/'.$contract->id.'/review', ['rating' => 5, 'body' => str_repeat('a', 9)])->assertSessionHasErrors('body');
+        $this->put('/contracts/'.$contract->id.'/review', ['rating' => 5, 'body' => str_repeat('a', 2001)])->assertSessionHasErrors('body');
         $this->put('/contracts/'.$contract->id.'/review', $review)->assertSessionHasNoErrors();
         // Hidden: the author may edit; the counterpart learns only that one exists.
         $this->put('/contracts/'.$contract->id.'/review', [...$review, 'rating' => 4])->assertSessionHasNoErrors();
