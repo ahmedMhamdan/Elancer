@@ -6,14 +6,13 @@ import { useState } from 'react';
 import ElancerWordmark from '@/components/elancer-wordmark';
 import Input from '@/components/tailadmin/input';
 import Label from '@/components/tailadmin/label';
-import ThemeIcon from '@/components/theme-icon';
+import ThemeToggle from '@/components/theme-toggle';
 import {
     InputOTP,
     InputOTPGroup,
     InputOTPSlot,
 } from '@/components/ui/input-otp';
 import { Spinner } from '@/components/ui/spinner';
-import { useAppearance } from '@/hooks/use-appearance';
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
 import { home, login } from '@/routes';
 import { store } from '@/routes/two-factor/login';
@@ -25,8 +24,6 @@ export default function TwoFactorChallenge() {
     const [recovery, setRecovery] = useState(false);
     const [code, setCode] = useState('');
     const [requestError, setRequestError] = useState('');
-    const { resolvedAppearance, updateAppearance } = useAppearance();
-    const nextTheme = resolvedAppearance === 'dark' ? 'light' : 'dark';
 
     return (
         <div className="elancer-two-factor">
@@ -41,14 +38,7 @@ export default function TwoFactorChallenge() {
                 </Link>
                 <div className="flex items-center gap-2">
                     <LanguageToggle />
-                    <button
-                        type="button"
-                        className="two-factor-theme"
-                        aria-label={t(`Switch to ${nextTheme} mode`)}
-                        onClick={() => updateAppearance(nextTheme)}
-                    >
-                        <ThemeIcon mode={nextTheme} />
-                    </button>
+                    <ThemeToggle className="two-factor-theme" />
                 </div>
             </header>
             <main className="two-factor-main">

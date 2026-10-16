@@ -40,6 +40,19 @@
     outline: 2px solid var(--el-accent);
     outline-offset: 3px;
 }
+/* Magic UI AnimatedThemeToggler: the new theme grows as a circle from the button (plan 032). Scoped to its own
+   transition so the language crossfade keeps its fade. */
+:root[data-magicui-theme-vt='active']::view-transition-old(root),
+:root[data-magicui-theme-vt='active']::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+}
+:root[data-magicui-theme-vt='active']::view-transition-new(root) {
+    clip-path: var(--magicui-theme-vt-clip-from);
+}
+:root[data-magicui-theme-vt='active']::view-transition-group(root) {
+    animation-duration: var(--magicui-theme-toggle-vt-duration);
+}
 
 /* Reuse the public site's palette throughout the workspace and its settings. */
 :root:root,

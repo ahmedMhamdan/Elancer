@@ -210,3 +210,9 @@ resources/js/components/workspace-switch.tsx adapts local TailAdmin src/componen
 ## Brief attachments (2026-10-11)
 
 The file control in resources/js/pages/projects/edit.tsx adapts local TailAdmin src/components/form/input/FileInput.tsx: the bordered field with its button at the start is kept, with a label in place of the browser's own button so its wording follows the interface language, Elancer tokens and Arabic/RTL. The TailAdmin MIT notice above applies.
+
+## Animated theme switch (2026-10-16)
+
+resources/js/components/ui/animated-theme-toggler.tsx adapts Magic UI's AnimatedThemeToggler (https://magicui.design/docs/components/animated-theme-toggler, registry file animated-theme-toggler.tsx), requested by Ahmed: the View Transitions circle reveal from the button, its clip-path shapes, guards and cleanup are kept; Elancer passes its own translated label and icon, keeps the theme in its existing appearance store, and switches at once for visitors who ask for reduced motion. Its CSS is scoped in resources/css/elancer-workspace.css.
+
+Magic UI is released under the MIT License, Copyright (c) Magic UI (https://github.com/magicuidesign/magicui).
