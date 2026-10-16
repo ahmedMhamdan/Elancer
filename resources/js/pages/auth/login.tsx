@@ -125,7 +125,7 @@ export default function Login({ status, canResetPassword }: Props) {
                     </div>
                 </section>
                 <aside
-                    className="registration-art"
+                    className="registration-art login-art"
                     aria-labelledby="login-art-title"
                 >
                     <div className="registration-art-copy">
@@ -138,13 +138,26 @@ export default function Login({ status, canResetPassword }: Props) {
                             )}
                         </p>
                     </div>
+                    {/* One picture per theme; the hidden lazy one is never fetched. */}
                     <img
+                        className="registration-art-light"
                         src="/images/login-welcome-back.png"
                         alt={t(
                             'A creative carrying a portfolio through the open doorway of a sunlit studio.',
                         )}
                         width="1536"
                         height="1024"
+                        loading="lazy"
+                    />
+                    <img
+                        className="registration-art-dark"
+                        src="/images/login-welcome-back-dark.png"
+                        alt={t(
+                            'A creative carrying a portfolio through the open doorway of a studio at sunset.',
+                        )}
+                        width="1536"
+                        height="1024"
+                        loading="lazy"
                     />
                     <div className="registration-art-caption">
                         <span>{t('Welcome back.')}</span>

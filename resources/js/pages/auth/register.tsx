@@ -167,13 +167,26 @@ export default function Register({ passwordRules }: Props) {
                             )}
                         </p>
                     </div>
+                    {/* One picture per theme; the hidden lazy one is never fetched. */}
                     <img
+                        className="registration-art-light"
                         src="/images/registration-collaboration.png"
                         alt={t(
                             'Two independent creatives collaborating on a design at a shared table.',
                         )}
                         width="1536"
                         height="1024"
+                        loading="lazy"
+                    />
+                    <img
+                        className="registration-art-dark"
+                        src="/images/registration-collaboration-dark.png"
+                        alt={t(
+                            'Two independent creatives collaborating on a design at a shared table.',
+                        )}
+                        width="1536"
+                        height="1024"
+                        loading="lazy"
                     />
                     <div className="registration-art-caption">
                         <span>{t('Find your people.')}</span>

@@ -542,6 +542,8 @@ export const arabic: Record<string, string> = {
         'مكان يجمع مهاراتك وفريقك والعمل الذي تحبه.',
     'A creative carrying a portfolio through the open doorway of a sunlit studio.':
         'مبدع يحمل أعماله ويدخل إلى استوديو مشمس.',
+    'A creative carrying a portfolio through the open doorway of a studio at sunset.':
+        'مبدع يحمل أعماله ويدخل إلى استوديو عند الغروب.',
     'Welcome back.': 'مرحبًا بعودتك.',
     'Make good work.': 'اصنع عملًا رائعًا.',
     'Skip to registration': 'انتقل إلى إنشاء الحساب',
