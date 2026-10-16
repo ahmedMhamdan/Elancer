@@ -996,6 +996,14 @@
     --art-soft: #142519;
     --art-on-ink: #0c1610;
 }
+.dark .home-art[data-tone='ink'],
+.dark .home-monogram[data-tone='ink'] {
+    --art-bg: #0a0e13;
+    --art-paper: #1e2731;
+    --art-ink: #dbe9f0;
+    --art-soft: #141b23;
+    --art-on-ink: #0a0e13;
+}
 .home-art[data-tone='paper'],
 .home-monogram[data-tone='paper'] {
     --art-bg: var(--el-surface);

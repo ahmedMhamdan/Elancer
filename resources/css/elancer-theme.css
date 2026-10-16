@@ -28,19 +28,26 @@
     --el-shadow: 0 12px 32px rgb(27 46 30 / 6%);
     --el-art-blend: multiply;
 }
+/* Slate night (plan 032): cool blue-grey surfaces; green is kept for actions, links and the brand. */
 .dark {
-    --el-page: #0e1812;
-    --el-error: #fda29b;
-    --el-surface: #16241b;
-    --el-surface-soft: #111e16;
-    --el-text: #edf4e9;
-    --el-muted: #b2c3b4;
-    --el-subtle: #a3b69f;
-    --el-border: #2b4031;
-    --el-border-strong: #47634b;
-    --el-accent: #9be3af;
-    --el-link-hover: #c4f4d1;
-    --el-soft: #243b2a;
-    --el-shadow: 0 12px 32px rgb(0 0 0 / 15%);
+    --el-page: #0f141a;
+    --el-error: #f9a59e;
+    --el-surface: #161d25;
+    --el-surface-soft: #121920;
+    --el-text: #e7edf3;
+    --el-muted: #9fadbb;
+    --el-subtle: #93a2b1;
+    --el-border: #2d3a46;
+    --el-border-strong: #4c5c6b;
+    --el-accent: #84dea1;
+    --el-link-hover: #b6eec8;
+    --el-soft: #1c2832;
+    --el-inverse: #0a0e13;
+    --el-inverse-text: #eef2f6;
+    --el-inverse-muted: #a3b0be;
+    --el-inverse-border: #2a3642;
+    --el-hero-mid: #0d1f1d;
+    --el-hero-dark: #0a0e13;
+    --el-shadow: 0 12px 32px rgb(0 0 0 / 22%);
     --el-art-blend: normal;
 }
