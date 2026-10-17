@@ -47,4 +47,13 @@ class ConversationThread
     {
         return $conversation->messages()->where('sender_id', '!=', $user)->where('id', '>', $conversation->getAttribute($conversation->readColumn($user)))->count();
     }
+
+    /** How many inbox conversations hold a message this member has not read: the inbox's Unread filter, archived ones left out (plan 032). */
+    public static function unreadConversations(int $user): int
+    {
+        $side = fn (string $role) => fn ($query) => $query->where($role.'_id', $user)->where($role.'_archived', false)
+            ->whereHas('messages', fn ($query) => $query->where('sender_id', '!=', $user)->whereColumn('conversation_messages.id', '>', 'conversations.'.$role.'_read_through'));
+
+        return Conversation::query()->where($side('client'))->orWhere($side('freelancer'))->count();
+    }
 }

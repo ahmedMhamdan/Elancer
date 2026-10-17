@@ -14,6 +14,7 @@ declare module '@inertiajs/core' {
             locale: 'en' | 'ar';
             auth: Auth;
             notifications: { unread: number };
+            inbox: { unread: number };
             realtime: RealtimeConfig | null;
             sidebarOpen: boolean;
             [key: string]: unknown;

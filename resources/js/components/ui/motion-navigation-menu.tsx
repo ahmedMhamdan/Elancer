@@ -294,6 +294,29 @@ export function MotionNavigationMenuItem({
     );
 }
 export const motionNavigationMenuTriggerStyle = cva('elancer-explore-trigger');
+// Arrow keys, Home and End move along the bar's menus and links; landing on a menu opens it, on a link closes any.
+function rove(event: React.KeyboardEvent<HTMLElement>, context: MenuContext | null) {
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+    const items = Array.from(
+        event.currentTarget
+            .closest('ul')
+            ?.querySelectorAll<HTMLElement>(
+                '[data-menu-trigger], [data-menu-link]',
+            ) ?? [],
+    );
+    const rtl = getComputedStyle(event.currentTarget).direction === 'rtl';
+    const step = (event.key === 'ArrowRight' ? 1 : -1) * (rtl ? -1 : 1);
+    const index =
+        event.key === 'Home'
+            ? 0
+            : event.key === 'End'
+              ? items.length - 1
+              : (items.indexOf(event.currentTarget) + step + items.length) %
+                items.length;
+    event.preventDefault();
+    items[index]?.focus();
+    context?.open(items[index]?.dataset.menuTrigger ?? '');
+}
 export function MotionNavigationMenuTrigger({
     children,
     ...props
@@ -327,35 +350,7 @@ export function MotionNavigationMenuTrigger({
                     event.preventDefault();
                     context?.open(value, true);
                 }
-                if (
-                    ['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(
-                        event.key,
-                    )
-                ) {
-                    const buttons = Array.from(
-                        event.currentTarget
-                            .closest('ul')
-                            ?.querySelectorAll<HTMLButtonElement>('button') ??
-                            [],
-                    );
-                    const rtl =
-                        getComputedStyle(event.currentTarget).direction ===
-                        'rtl';
-                    const step =
-                        (event.key === 'ArrowRight' ? 1 : -1) * (rtl ? -1 : 1);
-                    const index =
-                        event.key === 'Home'
-                            ? 0
-                            : event.key === 'End'
-                              ? buttons.length - 1
-                              : (buttons.indexOf(event.currentTarget) +
-                                    step +
-                                    buttons.length) %
-                                buttons.length;
-                    event.preventDefault();
-                    buttons[index]?.focus();
-                    context?.open(buttons[index]?.dataset.menuTrigger ?? '');
-                }
+                rove(event, context);
             }}
         >
             {open && (
@@ -392,6 +387,29 @@ export function MotionNavigationMenuContent({
         [register, value, children, className],
     );
     return null;
+}
+// A plain link in the bar beside the menus: pointing at it closes an open menu.
+export function MotionNavigationMenuTopLink({
+    className,
+    ...props
+}: React.ComponentProps<typeof Link>) {
+    const context = React.useContext(Context);
+    return (
+        <Link
+            {...props}
+            data-menu-link
+            className={cn(
+                motionNavigationMenuTriggerStyle(),
+                'motion-navigation-top-link',
+                className,
+            )}
+            onPointerEnter={(event) => {
+                if (event.pointerType === 'mouse') context?.close();
+            }}
+            onFocus={() => context?.close()}
+            onKeyDown={(event) => rove(event, context)}
+        />
+    );
 }
 export function MotionNavigationMenuLink(
     props: React.ComponentProps<typeof Link>,

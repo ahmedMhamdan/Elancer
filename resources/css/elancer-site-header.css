@@ -236,8 +236,28 @@
 .elancer-menu-feature:hover {
     background: color-mix(in srgb, var(--el-soft), var(--el-accent) 10%);
 }
-.elancer-account-menu {
-    width: min(390px, calc(100vw - 32px));
+.elancer-link-menu {
+    width: min(420px, calc(100vw - 32px));
+}
+/* Messages and Categories sit in the bar as plain links beside the two menus. */
+.motion-navigation-top-link {
+    transition: background-color 160ms ease;
+}
+.motion-navigation-top-link:hover {
+    background: var(--el-soft);
+}
+.elancer-nav-count {
+    display: inline-grid;
+    place-items: center;
+    min-width: 20px;
+    height: 20px;
+    padding-inline: 6px;
+    border-radius: 999px;
+    background: var(--el-brand);
+    color: var(--el-on-brand);
+    font-size: 11px;
+    font-weight: 650;
+    line-height: 1;
 }
 .motion-navigation :is(button, a):focus-visible {
     outline: 2px solid var(--el-accent);
@@ -306,49 +326,13 @@
     background: var(--el-soft);
 }
 
-/* Five learning groups share the supplied motion menu and public header. */
 .elancer-desktop-links .elancer-explore-trigger {
-    padding-inline: 9px;
-    gap: 5px;
-}
-/* A member's bar holds a sixth menu, Log out and Workspace; keep them inside it from 1280px, in Arabic too. */
-.elancer-navbar-member .motion-navigation-list {
-    gap: 2px;
-}
-.elancer-navbar-member .elancer-navbar-actions {
-    gap: 4px;
-}
-.elancer-guide-menu {
-    width: min(420px, calc(100vw - 32px));
-}
-.elancer-guide-menu-intro {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 4px 12px 8px;
-    padding: 12px 0 16px;
-    border-bottom: 1px solid var(--el-border);
-    color: var(--el-accent);
-}
-.elancer-guide-menu-intro svg {
-    flex-shrink: 0;
-}
-.elancer-guide-menu-intro p {
-    font-size: 14px;
-    line-height: 1.7;
-}
-.elancer-guide-menu .motion-navigation-link {
-    justify-content: space-between;
-}
-.elancer-guide-menu .motion-navigation-link > span {
-    min-width: 0;
+    padding-inline: 12px;
+    gap: 6px;
 }
 .motion-navigation-mobile .motion-navigation-list {
     flex-wrap: wrap;
 }
-.motion-navigation-mobile .elancer-guide-menu {
+.motion-navigation-mobile .elancer-link-menu {
     width: 100%;
-}
-[dir='rtl'] .elancer-guide-menu .motion-navigation-link > svg {
-    transform: scaleX(-1);
 }

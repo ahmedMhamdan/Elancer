@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Actions\Auth\DemoAccess;
+use App\Actions\Conversations\ConversationThread;
 use App\Actions\Demo\DemoWorld;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -58,6 +59,8 @@ class HandleInertiaRequests extends Middleware
             ],
             // The recipient's own count only; the list loads when the bell opens.
             'notifications' => ['unread' => $user?->unreadNotifications()->count() ?? 0],
+            // Plan 032: the count beside Messages in the public bar ("messages" is a page prop of the conversation pages).
+            'inbox' => ['unread' => $user === null ? 0 : ConversationThread::unreadConversations($user->id)],
             'realtime' => $user === null ? null : $this->realtime(),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];

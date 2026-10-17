@@ -79,6 +79,21 @@ class HiringConversationTest extends TestCase
         $this->assertFalse($conversation->fresh()->client_archived);
     }
 
+    public function test_the_shared_inbox_count_follows_unread_and_archived_conversations(): void
+    {
+        $this->get('/jobs')->assertInertia(fn (Assert $page) => $page->where('inbox.unread', 0));
+        [$client, $freelancer, $proposal] = $this->participants();
+        $conversation = $this->start($client, $proposal);
+        $this->get('/jobs')->assertInertia(fn (Assert $page) => $page->where('inbox.unread', 0));
+        $this->actingAs($freelancer)->get('/jobs')->assertInertia(fn (Assert $page) => $page->where('inbox.unread', 1));
+        $this->patch('/messages/'.$conversation->id.'/state', ['read_through' => ConversationMessage::query()->max('id')])->assertRedirect();
+        $this->post('/messages/'.$conversation->id, ['body' => 'A reply from the freelancer.', 'client_token' => (string) Str::uuid()])->assertRedirect();
+        $this->get('/jobs')->assertInertia(fn (Assert $page) => $page->where('inbox.unread', 0));
+        $this->actingAs($client)->get('/jobs')->assertInertia(fn (Assert $page) => $page->where('inbox.unread', 1));
+        $this->patch('/messages/'.$conversation->id.'/state', ['archived' => true])->assertRedirect();
+        $this->get('/jobs')->assertInertia(fn (Assert $page) => $page->where('inbox.unread', 0));
+    }
+
     public function test_corrections_keep_history_and_expire_from_original_send_time(): void
     {
         $this->freezeTime();

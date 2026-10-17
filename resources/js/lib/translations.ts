@@ -204,6 +204,8 @@ export const arabic: Record<string, string> = {
     'Clients can start a conversation after receiving a proposal.':
         'يمكن للعملاء بدء محادثة بعد استلام عرض.',
     ':count unread': ':count غير مقروءة',
+    'Messages, :count unread': 'الرسائل، :count غير مقروءة',
+    Learn: 'تعلّم',
     You: 'أنت',
     Counterpart: 'الطرف الآخر',
     Edited: 'معدّلة',
@@ -281,7 +283,6 @@ export const arabic: Record<string, string> = {
     Shortcuts: 'اختصارات',
     'Find freelancers': 'ابحث عن مستقلين',
     'My proposals': 'عروضي',
-    'Track your applications and drafts.': 'تابع عروضك ومسوداتك.',
     'Discover people with the skills you need.':
         'اكتشف أصحاب المهارات التي تحتاجها.',
     Busy: 'مشغول',
@@ -646,7 +647,6 @@ export const arabic: Record<string, string> = {
     Saved: 'تم الحفظ',
     'Edit profile': 'تعديل الملف',
     Profile: 'الملف الشخصي',
-    Dashboard: 'لوحة التحكم',
     'Delete account': 'حذف الحساب',
     'Forgot password': 'نسيت كلمة المرور',
     'Reset password': 'إعادة تعيين كلمة المرور',
@@ -1272,9 +1272,6 @@ export const arabic: Record<string, string> = {
         'اعثر على المجال المناسب لمشروعك القادم.',
     'Explore projects by skill, budget, and category.':
         'استكشف المشاريع حسب المهارة والميزانية والتصنيف.',
-    'Return to your workspace.': 'عُد إلى مساحة عملك.',
-    'Manage your profile and skills.': 'أدر ملفك الشخصي ومهاراتك.',
-    'Manage your project drafts.': 'أدر مسودات مشاريعك.',
     'Join as a client or freelancer.': 'انضم كصاحب مشاريع أو مستقل.',
     'Continue where you left off.': 'تابع من حيث توقفت.',
     'From a first conversation to a clear agreement.':
