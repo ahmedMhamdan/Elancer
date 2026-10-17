@@ -69,7 +69,7 @@
         rgb(5 9 7 / 75%) 0%,
         rgb(6 8 5 / 18%) 35%,
         rgb(9 12 8 / 14%) 60%,
-        var(--el-inverse) 100%
+        var(--el-page) 100%
     );
 }
 .elancer-header {
