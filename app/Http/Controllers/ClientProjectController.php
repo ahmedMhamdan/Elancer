@@ -6,6 +6,8 @@ use App\Actions\Demo\DemoWorld;
 use App\Actions\Invitations\InvitationLifecycle;
 use App\Models\Category;
 use App\Models\Contract;
+use App\Models\Conversation;
+use App\Models\Offer;
 use App\Models\Project;
 use App\Models\ProjectAttachment;
 use App\Models\ProjectClarification;
@@ -14,6 +16,7 @@ use App\Models\Skill;
 use App\Models\User;
 use App\Notifications\WorkspaceEvent;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -44,13 +47,101 @@ class ClientProjectController extends Controller
         // Q64: a suspended client still reads their own list; every change below stays refused.
         $readOnly = ! $request->user()->canParticipateInMarketplace();
         abort_unless($request->user()->keepsExistingAccess() && $request->user()->onboarding_completed_at !== null, 403);
-        $trash = $request->query('status') === 'trash';
-        $query = Project::query()->where('user_id', $request->user()->id);
-        if ($trash) {
-            $query->onlyTrashed();
-        }
+        $user = $request->user()->id;
+        $status = $request->query('status');
+        $list = is_string($status) && in_array($status, ['draft', 'open', 'closed', 'hired', 'waiting', 'trash'], true) ? $status : 'all';
+        $mine = fn (): Builder => Project::query()->where('user_id', $user);
+        $projects = $this->listed($mine(), $list, $user)->with('category:id,categoryname')->withCount('skills')
+            ->withCount(['proposals as applicants_count' => fn ($query) => $this->applicants($query, $user)])
+            ->withCount(['proposals as waiting_count' => fn ($query) => $this->waiting($query, $user)])
+            // Three most recent applicants per project; limit() on the relation keeps the three per project.
+            ->with(['proposals' => function ($query) use ($user): void {
+                $this->applicants($query->getQuery(), $user);
+                $query->latest('submitted_at')->latest('id')->limit(3);
+            }])
+            ->orderByDesc('updated_at')->orderByDesc('id')->paginate(20)->withQueryString();
+        // The hired freelancer as the client met them: the accepted application's frozen profile.
+        $contracts = Contract::query()->where('client_id', $user)->whereIn('project_id', $projects->getCollection()->where('status', 'hired')->pluck('id'))
+            ->orderByDesc('id')->get()->unique('project_id')->keyBy('project_id');
+        $hired = Proposal::query()->whereIn('id', $contracts->pluck('proposal_id'))->get()->keyBy('id');
+        $face = fn (?Proposal $proposal): array => ['name' => $proposal?->profile_snapshot['name'] ?? null, 'avatar' => $proposal?->profile_snapshot['avatar'] ?? null];
 
-        return Inertia::render('projects/index', ['projects' => $query->orderByDesc('updated_at')->orderByDesc('id')->paginate(20)->withQueryString(), 'trash' => $trash, 'readOnly' => $readOnly]);
+        return Inertia::render('projects/index', [
+            'projects' => $projects->through(fn (Project $project) => [
+                ...$project->only(['id', 'title', 'status', 'budget_min', 'budget_max', 'published_at', 'application_closes_at', 'updated_at', 'deleted_at', 'moderated_at']),
+                'category' => $project->category?->categoryname,
+                'applicants' => (int) $project->getAttribute('applicants_count'),
+                'waiting' => (int) $project->getAttribute('waiting_count'),
+                'recent' => $project->proposals->map($face)->values(),
+                // What publishing still needs, by the rules of fields() when publishing.
+                'checklist' => $project->status !== 'draft' ? null : [
+                    'title' => mb_strlen((string) $project->title) >= 5,
+                    'description' => mb_strlen((string) $project->description) >= 50,
+                    'category' => $project->category !== null,
+                    'skills' => (int) $project->getAttribute('skills_count') > 0,
+                    'budget' => (float) $project->budget_min >= 1 && (float) $project->budget_max >= (float) $project->budget_min,
+                    'cutoff' => (bool) $project->application_closes_at?->isFuture(),
+                ],
+                'hire' => ($contract = $contracts->get($project->id)) === null ? null : [
+                    'contract' => $contract->id, 'status' => $contract->status, 'due' => $contract->delivery_due_at, ...$face($hired->get($contract->proposal_id)),
+                ],
+            ]),
+            'list' => $list,
+            'counts' => [
+                ...collect(['all', 'draft', 'open', 'closed', 'hired', 'trash'])->mapWithKeys(fn (string $name) => [$name => $this->listed($mine(), $name, $user)->count()])->all(),
+                'waiting' => $this->waiting(Proposal::query()->whereIn('project_id', $mine()->where('status', 'published')->select('id')), $user)->count(),
+            ],
+            'readOnly' => $readOnly,
+        ]);
+    }
+
+    /**
+     * One of the lists on My projects. Open and closed follow the application cutoff, as the list labels do.
+     *
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
+     */
+    private function listed(Builder $query, string $list, int $user): Builder
+    {
+        return match ($list) {
+            'trash' => $query->onlyTrashed(),
+            'draft', 'hired' => $query->where('status', $list),
+            'open' => $query->where('status', 'published')->whereNull('moderated_at')->where('application_closes_at', '>', now()),
+            'closed' => $query->where(fn (Builder $query) => $query->where('status', 'closed')
+                ->orWhere(fn (Builder $query) => $query->where('status', 'published')->where('application_closes_at', '<=', now()))),
+            'waiting' => $query->where('status', 'published')->whereIn('id', $this->waiting(Proposal::query(), $user)->select('project_id')),
+            default => $query,
+        };
+    }
+
+    /**
+     * Submitted applications the owner may see; a demo project shows only the visitor's own (plan 027).
+     *
+     * @param  Builder<Proposal>  $query
+     * @return Builder<Proposal>
+     */
+    private function applicants(Builder $query, int $owner): Builder
+    {
+        $query->whereNotNull('submitted_at');
+        DemoWorld::ownApplicants($query, $owner);
+
+        return $query;
+    }
+
+    /**
+     * Plan 032: applications still waiting for the client's first answer. Still in Received, neither declined,
+     * withdrawn nor accepted, and no conversation or offer has started from them.
+     *
+     * @param  Builder<Proposal>  $query
+     * @return Builder<Proposal>
+     */
+    private function waiting(Builder $query, int $owner): Builder
+    {
+        $this->applicants($query, $owner);
+
+        return $query->whereIn('status', ['submitted', 'reopened'])->where('organization', 'received')
+            ->whereNotIn('id', Conversation::query()->select('proposal_id'))
+            ->whereNotIn('id', Offer::query()->select('proposal_id'));
     }
 
     public function store(Request $request): RedirectResponse

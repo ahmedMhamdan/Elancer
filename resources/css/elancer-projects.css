@@ -1,0 +1,327 @@
+/* My projects (plan 032 part 6): four tiles, the lists, one card per project. Clean surfaces; the status is the
+   site's own small square, as on the homepage labels. */
+.my-projects {
+    --mp-open: var(--el-brand);
+    --mp-closed: #b8841c;
+    --mp-hired: #3f7fc4;
+    --mp-draft: var(--el-muted);
+    --mp-hidden: var(--el-error);
+}
+.dark .my-projects {
+    --mp-closed: #e0b25a;
+    --mp-hired: #8fc3f2;
+}
+.my-projects-tiles {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+.my-projects-tile {
+    display: block;
+    padding: 14px 16px;
+    border: 1px solid var(--el-border);
+    border-radius: 14px;
+    background: var(--el-surface);
+    color: var(--el-text);
+    transition: border-color 160ms;
+}
+.my-projects-tile:hover,
+.my-projects-tile[aria-current='page'] {
+    border-color: var(--el-border-strong);
+}
+.my-projects-tile strong {
+    display: block;
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.25;
+}
+.my-projects-tile > span {
+    color: var(--el-muted);
+    font-size: 13px;
+}
+.my-projects-lists {
+    display: flex;
+    gap: 2px;
+    width: fit-content;
+    max-width: 100%;
+    overflow-x: auto;
+    margin-bottom: 18px;
+    padding: 4px;
+    border: 1px solid var(--el-border);
+    border-radius: 999px;
+    background: var(--el-surface);
+    scrollbar-width: none;
+}
+.my-projects-lists a {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    color: var(--el-muted);
+    font-size: 14px;
+    white-space: nowrap;
+    transition: color 160ms;
+}
+.my-projects-lists a:hover,
+.my-projects-lists a[aria-current='page'] {
+    color: var(--el-text);
+}
+.my-projects-lists a > span {
+    position: relative;
+    z-index: 1;
+}
+.my-projects-lists small {
+    color: var(--el-muted);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+}
+.my-projects-highlight {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--el-soft);
+}
+.my-projects-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.my-project {
+    padding: 20px 22px;
+    border: 1px solid var(--el-border);
+    border-radius: 16px;
+    background: var(--el-surface);
+    transition: border-color 160ms;
+}
+.my-project:hover {
+    border-color: var(--el-border-strong);
+}
+.my-project-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px 12px;
+    flex-wrap: wrap;
+    color: var(--el-muted);
+    font-size: 13px;
+}
+.my-project-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--el-text);
+    font-weight: 500;
+}
+.my-project-status::before {
+    content: '';
+    flex-shrink: 0;
+    width: 6px;
+    height: 6px;
+    background: var(--status);
+}
+.my-project-status[data-state='open'] {
+    --status: var(--mp-open);
+}
+.my-project-status[data-state='closed'] {
+    --status: var(--mp-closed);
+}
+.my-project-status[data-state='hired'] {
+    --status: var(--mp-hired);
+}
+.my-project-status[data-state='draft'] {
+    --status: var(--mp-draft);
+}
+.my-project-status[data-state='hidden'] {
+    --status: var(--mp-hidden);
+}
+/* A title keeps its own direction but sits at the page's start edge, as on the rest of the card
+   (Chrome resolves text-align: match-parent to the title's own start). */
+html[dir='rtl'] .my-project h2 {
+    text-align: right;
+}
+.my-project h2 {
+    text-align: left;
+    margin: 10px 0 4px;
+    font-size: 19px;
+    font-weight: 600;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+}
+.my-project h2 a:hover {
+    color: var(--el-accent);
+}
+.my-project-meta {
+    display: flex;
+    flex-wrap: wrap;
+    color: var(--el-muted);
+    font-size: 13px;
+}
+.my-project-meta > :not(:last-child)::after {
+    content: '·';
+    margin-inline: 8px;
+    color: var(--el-border-strong);
+}
+.my-project-window {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+    color: var(--el-muted);
+    font-size: 12px;
+}
+.my-project-window-bar {
+    flex: 1;
+    height: 4px;
+    overflow: hidden;
+    border-radius: 99px;
+    background: var(--el-soft);
+}
+.my-project-window-bar > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--el-accent);
+}
+.my-project-draft {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+.my-project-draft > :first-child {
+    flex: 1;
+}
+.my-project-checklist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    margin: 10px 0 0;
+    padding: 0;
+    list-style: none;
+    color: var(--el-muted);
+    font-size: 13px;
+}
+.my-project-checklist li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.my-project-checklist svg {
+    color: var(--el-border-strong);
+}
+.my-project-checklist li[data-done='true'] {
+    color: var(--el-text);
+}
+.my-project-checklist li[data-done='true'] svg {
+    color: var(--el-accent);
+}
+.my-project-ring {
+    flex-shrink: 0;
+    width: 64px;
+    height: 64px;
+    font-size: 13px;
+}
+.my-project-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--el-border);
+}
+.my-project-people {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    color: var(--el-muted);
+    font-size: 13px;
+}
+.my-project-people strong {
+    color: var(--el-text);
+    font-weight: 600;
+}
+.my-project-faces {
+    display: flex;
+}
+.my-project-face {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    overflow: hidden;
+    margin-inline-start: -8px;
+    border: 2px solid var(--el-surface);
+    border-radius: 50%;
+    background: var(--el-soft);
+    color: var(--el-text);
+    font-size: 12px;
+    font-weight: 600;
+}
+.my-project-face:first-child {
+    margin-inline-start: 0;
+}
+.my-project-face img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.my-project-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.my-project-link {
+    padding: 8px 12px;
+    border-radius: 999px;
+    color: var(--el-text);
+    font-size: 14px;
+    transition: background-color 160ms;
+}
+.my-project-link:hover {
+    background: var(--el-soft);
+}
+.my-project-more {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--el-border);
+    border-radius: 50%;
+    color: var(--el-muted);
+    cursor: pointer;
+    transition: background-color 160ms;
+}
+.my-project-more:hover {
+    background: var(--el-soft);
+}
+.my-project :is(a, button):focus-visible,
+.my-projects-tile:focus-visible,
+.my-projects-lists a:focus-visible {
+    outline: 2px solid var(--el-accent);
+    outline-offset: 2px;
+}
+@media (max-width: 767px) {
+    .my-projects-tiles {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .my-project {
+        padding: 16px;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .my-projects-tile,
+    .my-projects-lists a,
+    .my-project,
+    .my-project-link,
+    .my-project-more {
+        transition: none;
+    }
+}

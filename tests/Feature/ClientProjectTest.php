@@ -3,10 +3,14 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
+use App\Models\Conversation;
 use App\Models\Project;
+use App\Models\Proposal;
 use App\Models\Skill;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
+use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
 class ClientProjectTest extends TestCase
@@ -28,6 +32,49 @@ class ClientProjectTest extends TestCase
     private function complete(Project $project): array
     {
         return ['version' => $project->version, 'title' => 'Build a bilingual website', 'description' => str_repeat('Clear description of the expected deliverables. ', 3), 'category_id' => Category::create(['categoryname' => 'Web development'])->id, 'skills' => Skill::query()->limit(2)->pluck('id')->all(), 'budget_min' => 200, 'budget_max' => 500, 'application_closes_at' => now()->addDays(7)->toIso8601String(), 'screening_questions' => ['What is your approach?']];
+    }
+
+    public function test_my_projects_counts_lists_and_applications_waiting_for_a_reply(): void
+    {
+        $owner = $this->owner();
+        $draft = $this->draft($owner);
+        [$open, $closed, $hired] = array_map(function () use ($owner): Project {
+            $project = $this->draft($owner);
+            $this->postJson('/my-projects/'.$project->id.'/publish', $this->complete($project->fresh()))->assertOk();
+
+            return $project->fresh();
+        }, [1, 2, 3]);
+        $closed->forceFill(['application_closes_at' => now()->subDay()])->save();
+        $hired->forceFill(['status' => 'hired'])->save();
+        $apply = function (Project $project, array $values): Proposal {
+            $proposal = new Proposal;
+            $proposal->forceFill(['project_id' => $project->id, 'user_id' => User::factory()->create()->id, 'status' => 'submitted', 'submitted_at' => now(), ...$values])->save();
+
+            return $proposal;
+        };
+        $waiting = $apply($open, []);
+        $apply($open, ['organization' => 'shortlisted']);
+        $apply($open, ['status' => 'declined']);
+        $apply($open, ['status' => 'draft', 'submitted_at' => null]);
+        $apply($closed, []);
+        $messaged = $apply($open, []);
+        (new Conversation)->forceFill(['proposal_id' => $messaged->id, 'client_id' => $owner->id, 'freelancer_id' => $messaged->user_id])->save();
+
+        $this->get('/my-projects')->assertOk()->assertInertia(fn (Assert $page) => $page->where('list', 'all')
+            ->where('counts', ['all' => 4, 'draft' => 1, 'open' => 1, 'closed' => 1, 'hired' => 1, 'trash' => 0, 'waiting' => 2])
+            ->where('projects.data', fn (Collection $rows) => $rows->count() === 4
+                && $rows->firstWhere('id', $open->id)['applicants'] === 4 && $rows->firstWhere('id', $open->id)['waiting'] === 1
+                && count($rows->firstWhere('id', $open->id)['recent']) === 3
+                && $rows->firstWhere('id', $draft->id)['checklist']['title'] === false && $rows->firstWhere('id', $draft->id)['checklist']['cutoff'] === true
+                && $rows->firstWhere('id', $open->id)['checklist'] === null));
+        foreach (['open' => $open, 'closed' => $closed, 'hired' => $hired, 'draft' => $draft] as $list => $project) {
+            $this->get('/my-projects?status='.$list)->assertInertia(fn (Assert $page) => $page->where('list', $list)->has('projects.data', 1)->where('projects.data.0.id', $project->id));
+        }
+        $this->get('/my-projects?status=unknown')->assertInertia(fn (Assert $page) => $page->where('list', 'all')->has('projects.data', 4));
+        // A closed project that is still published keeps its unanswered application waiting.
+        $this->get('/my-projects?status=waiting')->assertInertia(fn (Assert $page) => $page->where('projects.data', fn (Collection $rows) => $rows->pluck('id')->sort()->values()->all() === collect([$open->id, $closed->id])->sort()->values()->all()));
+        $waiting->forceFill(['organization' => 'archived'])->save();
+        $this->get('/my-projects?status=waiting')->assertInertia(fn (Assert $page) => $page->where('counts.waiting', 1)->has('projects.data', 1)->where('projects.data.0.id', $closed->id));
     }
 
     public function test_owner_can_save_partial_draft_and_publish_a_valid_project(): void

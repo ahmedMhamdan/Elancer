@@ -72,8 +72,10 @@ export type Payment = {
     verified_at: string | null;
 };
 
-export function ContractStatus({ status }: { status: string }) {
-    const { t } = useTranslation();
+export function contractStatusLabel(
+    status: string,
+    t: (text: string) => string,
+): string {
     const labels: Record<string, string> = {
         awaiting_payment: t('Awaiting funding'),
         active: t('Funded and active'),
@@ -83,6 +85,10 @@ export function ContractStatus({ status }: { status: string }) {
         cancellation_pending: t('Cancellation pending'),
         cancelled: t('Cancelled'),
     };
+    return labels[status] ?? status;
+}
+export function ContractStatus({ status }: { status: string }) {
+    const { t } = useTranslation();
     return (
         <span
             className={
@@ -91,7 +97,7 @@ export function ContractStatus({ status }: { status: string }) {
                     : 'proposal-status proposal-status-submitted'
             }
         >
-            {labels[status] ?? status}
+            {contractStatusLabel(status, t)}
         </span>
     );
 }
