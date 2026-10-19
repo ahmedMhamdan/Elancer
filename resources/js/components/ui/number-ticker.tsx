@@ -1,7 +1,8 @@
 // Adapted from Magic UI's NumberTicker (https://magicui.design/docs/components/number-ticker, registry file
 // number-ticker.tsx, MIT; see THIRD_PARTY_NOTICES.md). Kept: the spring from the start value once the number is in
-// view. Changed for Elancer (plan 032): no "use client"; the colour comes from the surrounding text; the number is
-// formatted in the page's language; reduced motion shows the final value at once.
+// view, and the decimalPlaces option (given back in plan 032 part 7 for prices). Changed for Elancer (plan 032): no
+// "use client"; the colour comes from the surrounding text; the number is formatted in the page's language; a new value
+// springs from the one shown; reduced motion shows the final value at once.
 import {
     useEffect,
     useMemo,
@@ -21,12 +22,14 @@ interface NumberTickerProps extends ComponentPropsWithoutRef<'span'> {
     value: number;
     startValue?: number;
     delay?: number;
+    decimalPlaces?: number;
 }
 
 export function NumberTicker({
     value,
     startValue = 0,
     delay = 0,
+    decimalPlaces = 0,
     className,
     ...props
 }: NumberTickerProps) {
@@ -37,8 +40,12 @@ export function NumberTicker({
     const springValue = useSpring(motionValue, { damping: 60, stiffness: 100 });
     const isInView = useInView(ref, { once: true, margin: '0px' });
     const formatter = useMemo(
-        () => new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }),
-        [locale],
+        () =>
+            new Intl.NumberFormat(locale, {
+                minimumFractionDigits: decimalPlaces,
+                maximumFractionDigits: decimalPlaces,
+            }),
+        [locale, decimalPlaces],
     );
 
     useEffect(() => {
@@ -52,10 +59,10 @@ export function NumberTicker({
             springValue.on('change', (latest) => {
                 if (ref.current && !reduced)
                     ref.current.textContent = formatter.format(
-                        Math.round(latest),
+                        Number(latest.toFixed(decimalPlaces)),
                     );
             }),
-        [springValue, reduced, formatter],
+        [springValue, reduced, formatter, decimalPlaces],
     );
 
     return (

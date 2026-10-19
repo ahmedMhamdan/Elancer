@@ -22,6 +22,7 @@ import { AnimatedCircularProgressBar } from '@/components/ui/animated-circular-p
 import { BlurFade } from '@/components/ui/blur-fade';
 import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
 import { NumberTicker } from '@/components/ui/number-ticker';
+import { useRelativeTime } from '@/hooks/use-relative-time';
 import { useTranslation } from '@/hooks/use-translation';
 import { Money, type Page } from '../discovery/shared';
 import { contractStatusLabel } from '../offers/shared';
@@ -69,22 +70,6 @@ function stateOf(project: Project): State {
         : 'closed';
 }
 
-function useRelative() {
-    const { locale } = useTranslation();
-    return (value: string) => {
-        const format = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
-        const seconds = (new Date(value).getTime() - Date.now()) / 1000;
-        const size = Math.abs(seconds);
-        if (size < 3600)
-            return format.format(Math.round(seconds / 60), 'minute');
-        if (size < 86_400)
-            return format.format(Math.round(seconds / 3600), 'hour');
-        if (size < 86_400 * 60)
-            return format.format(Math.round(seconds / 86_400), 'day');
-        return format.format(Math.round(seconds / (86_400 * 30)), 'month');
-    };
-}
-
 function Faces({ faces }: { faces: Face[] }) {
     return (
         <span className="my-project-faces" aria-hidden="true">
@@ -113,7 +98,7 @@ function ProjectCard({
     onRemove: (project: Project) => void;
 }) {
     const { t, ar } = useTranslation();
-    const relative = useRelative();
+    const relative = useRelativeTime();
     const state = stateOf(project);
     const labels: Record<State, string> = {
         draft: t('Draft'),
