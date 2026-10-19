@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @property int $id
@@ -18,6 +19,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property array<string, mixed> $terms
  * @property CarbonImmutable $expires_at
  * @property-read Project $project
+ * @property-read User $client
+ * @property-read User $freelancer
+ * @property-read Proposal $proposal
+ * @property-read Contract|null $contract
  */
 class Offer extends Model
 {
@@ -41,6 +46,30 @@ class Offer extends Model
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
+    }
+
+    /** @return BelongsTo<User, $this> */
+    public function client(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'client_id');
+    }
+
+    /** @return BelongsTo<User, $this> */
+    public function freelancer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'freelancer_id');
+    }
+
+    /** @return BelongsTo<Proposal, $this> */
+    public function proposal(): BelongsTo
+    {
+        return $this->belongsTo(Proposal::class);
+    }
+
+    /** @return HasOne<Contract, $this> */
+    public function contract(): HasOne
+    {
+        return $this->hasOne(Contract::class);
     }
 
     public function contains(int $user): bool

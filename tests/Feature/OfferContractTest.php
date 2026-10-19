@@ -202,6 +202,38 @@ class OfferContractTest extends TestCase
         $duplicate->save();
     }
 
+    public function test_inbox_lists_offers_by_whose_move_it_is_and_shows_the_chosen_offer(): void
+    {
+        [$client, $freelancer, $proposal] = $this->participants();
+        $counts = fn (int $all, int $yours, int $theirs, int $accepted, int $closed) => compact('all', 'yours', 'theirs', 'accepted', 'closed');
+        $first = $this->offer($client, $proposal);
+        // Pending: the freelancer's move. /offers shows the newest offer beside the list as a preview.
+        $this->get('/offers')->assertInertia(fn (Assert $page) => $page->component('offers/index')
+            ->where('counts', $counts(1, 0, 1, 0, 0))->where('preview', true)->where('offer.id', $first->id)
+            ->where('offers.data.0.turn', 'theirs')->where('offers.data.0.amount', '750.25')
+            ->where('offers.data.0.counterpart.name', $freelancer->name)->where('offer.can_replace', false));
+        $this->actingAs($freelancer)->get('/offers?list=yours')->assertInertia(fn (Assert $page) => $page
+            ->where('counts', $counts(1, 1, 0, 0, 0))->has('offers.data', 1)->where('offers.data.0.counterpart.name', $client->name));
+        // A change request is the client's move while it is the latest offer and hiring is open.
+        $this->patch('/offers/'.$first->id, ['action' => 'changes_requested', 'version' => 1, 'reason' => 'Please add deployment notes.'])->assertSessionHasNoErrors();
+        $this->get('/offers?list=theirs')->assertInertia(fn (Assert $page) => $page->has('offers.data', 1)->where('offers.data.0.turn', 'theirs'));
+        $this->actingAs($client)->get('/offers?list=yours')->assertInertia(fn (Assert $page) => $page
+            ->where('counts', $counts(1, 1, 0, 0, 0))->where('offer.id', $first->id)->where('offer.can_replace', true)->where('offer.turn', 'yours'));
+        // A replacement supersedes it: the old offer closes, the new one waits for the freelancer.
+        $second = $this->offer($client, $proposal);
+        $this->get('/offers')->assertInertia(fn (Assert $page) => $page->where('counts', $counts(2, 0, 1, 0, 1)));
+        $this->get('/offers/'.$first->id)->assertInertia(fn (Assert $page) => $page->component('offers/index')
+            ->where('preview', false)->where('offer.latest', false)->where('offer.turn', null)->where('offer.can_replace', false)
+            ->has('history', 2)->where('history.0.id', $second->id)->has('offers.data', 2));
+        $this->get('/offers?list=closed')->assertInertia(fn (Assert $page) => $page->has('offers.data', 1)->where('offers.data.0.id', $first->id)->where('offers.data.0.latest', false));
+        // Expiry is applied when the inbox is read, so it counts as closed at once.
+        $this->travel(73)->hours();
+        $this->get('/offers')->assertInertia(fn (Assert $page) => $page->where('counts', $counts(2, 0, 0, 0, 2)));
+        $this->assertSame('expired', $second->fresh()->status);
+        $other = User::factory()->create(['onboarding_completed_at' => now()]);
+        $this->actingAs($other)->get('/offers')->assertInertia(fn (Assert $page) => $page->where('counts', $counts(0, 0, 0, 0, 0))->where('offer', null));
+    }
+
     public function test_account_deletion_cannot_erase_contract_or_log_out_the_rejected_user(): void
     {
         [$client, $freelancer, $proposal] = $this->participants();
