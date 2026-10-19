@@ -212,4 +212,64 @@ class ContractWorkTest extends TestCase
         $this->actingAs($client)->put('/contracts/'.$contract->id.'/review', ['rating' => 2, 'body' => 'An edit after the publication boundary.'])->assertSessionHasErrors('review');
         $this->actingAs($freelancer)->put('/contracts/'.$contract->id.'/review', ['rating' => 4, 'body' => 'A late first review is published at once.'])->assertSessionHasNoErrors();
     }
+
+    /** Plan 032 part 8: the contract lists follow whose move it is and add up to All for either side. */
+    public function test_contract_lists_follow_whose_move_it_is(): void
+    {
+        [$client, $freelancer, $contract] = $this->contract(rounds: 2, funded: false);
+        $expect = function (User $user, string $yours, array $counts, ?string $turn) use ($contract): void {
+            $this->actingAs($user)->get('/contracts')->assertInertia(fn (Assert $page) => $page->component('contracts/index')
+                ->where('list', 'all')->where('counts', ['all' => 1, ...$counts])->where('contracts.data.0.id', $contract->id)
+                ->where('contracts.data.0.turn', $turn));
+            $this->get('/contracts?list='.$yours)->assertInertia(fn (Assert $page) => $page->where('list', $yours)->has('contracts.data', 1));
+        };
+        $none = ['yours' => 0, 'theirs' => 0, 'completed' => 0, 'cancelled' => 0];
+        // The client funds, the freelancer waits.
+        $expect($client, 'yours', [...$none, 'yours' => 1], 'yours');
+        $expect($freelancer, 'theirs', [...$none, 'theirs' => 1], 'theirs');
+        $this->actingAs($client)->get('/contracts')->assertInertia(fn (Assert $page) => $page->where('agreed', '750.25')
+            ->where('contracts.data.0.counterpart.name', $freelancer->name)->where('contracts.data.0.amount', '750.25')
+            ->where('contracts.data.0.revision_rounds', 2)->where('contracts.data.0.deliveries', 0));
+        $this->actingAs($freelancer)->get('/contracts')->assertInertia(fn (Assert $page) => $page->where('contracts.data.0.counterpart.name', 'Clara Client')
+            ->where('contracts.data.0.counterpart.avatar', null));
+        $this->get('/contracts?list=yours')->assertInertia(fn (Assert $page) => $page->has('contracts.data', 0));
+
+        // Funded: the freelancer delivers.
+        $contract->forceFill(['status' => 'active', 'funded_at' => now(), 'delivery_due_at' => now()->addDays(14)])->save();
+        $expect($freelancer, 'yours', [...$none, 'yours' => 1], 'yours');
+        $expect($client, 'theirs', [...$none, 'theirs' => 1], 'theirs');
+
+        // Delivered: the client reviews.
+        $submission = $this->deliver($freelancer, $contract);
+        $expect($client, 'yours', [...$none, 'yours' => 1], 'yours');
+        $this->get('/contracts')->assertInertia(fn (Assert $page) => $page->where('contracts.data.0.deliveries', 1)
+            ->where('contracts.data.0.last_delivery_at', fn ($at) => $at !== null));
+
+        // A revision: the freelancer again.
+        $this->actingAs($client)->post('/contracts/'.$contract->id.'/revisions', ['submission' => $submission->id, 'changes' => 'Please adjust the layout of the totals.'])->assertSessionHasNoErrors();
+        $expect($freelancer, 'yours', [...$none, 'yours' => 1], 'yours');
+        $this->get('/contracts')->assertInertia(fn (Assert $page) => $page->where('contracts.data.0.revisions_used', 1)
+            ->where('contracts.data.0.revision_asked_at', fn ($at) => $at !== null));
+
+        // An open cancellation request waits on the other side.
+        $this->actingAs($freelancer)->post('/contracts/'.$contract->id.'/cancellation', ['reason' => 'The project was put on hold by our team.'])->assertSessionHasNoErrors();
+        $this->assertSame('cancellation_pending', $contract->fresh()->status);
+        $expect($client, 'yours', [...$none, 'yours' => 1], 'yours');
+        $expect($freelancer, 'theirs', [...$none, 'theirs' => 1], 'theirs');
+        $this->actingAs($client)->get('/contracts')->assertInertia(fn (Assert $page) => $page->where('contracts.data.0.cancellation.prior_status', 'revision_requested'));
+
+        // Completed and cancelled contracts are nobody's move; a cancelled one leaves the agreed total.
+        $contract->forceFill(['status' => 'completed', 'completed_at' => now()])->save();
+        $expect($client, 'completed', [...$none, 'completed' => 1], null);
+        $expect($freelancer, 'completed', [...$none, 'completed' => 1], null);
+        $contract->forceFill(['status' => 'cancelled', 'cancelled_at' => now()])->save();
+        $expect($client, 'cancelled', [...$none, 'cancelled' => 1], null);
+        $this->get('/contracts')->assertInertia(fn (Assert $page) => $page->where('agreed', '0.00'));
+
+        // Anything else in ?list= is All; a stranger sees nothing.
+        $this->get('/contracts?list=everything')->assertInertia(fn (Assert $page) => $page->where('list', 'all')->has('contracts.data', 1));
+        $stranger = User::factory()->create(['onboarding_completed_at' => now()]);
+        $this->actingAs($stranger)->get('/contracts')->assertInertia(fn (Assert $page) => $page->has('contracts.data', 0)
+            ->where('counts', ['all' => 0, ...$none])->where('agreed', '0.00'));
+    }
 }

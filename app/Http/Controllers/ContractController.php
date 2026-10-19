@@ -14,6 +14,7 @@ use App\Models\ContractSubmissionFile;
 use App\Models\Conversation;
 use App\Models\PaymentAttempt;
 use App\Payments\Gateways;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -22,13 +23,101 @@ use Inertia\Response;
 
 class ContractController extends Controller
 {
+    /** The contract lists by whose move it is; with Completed and Cancelled they add up to All for either side. */
+    private const LISTS = ['yours', 'theirs', 'completed', 'cancelled'];
+
+    /**
+     * Plan 032 part 8 (Ahmed's pick "B"): one card per contract with where it stands and the next step. Running
+     * contracts come first. The lists, counts and total are closures, so switching lists reloads only the cards.
+     */
     public function index(Request $request): Response
     {
         $user = $request->user()->id;
+        $query = $request->query('list');
+        $list = is_string($query) && in_array($query, self::LISTS, true) ? $query : 'all';
 
-        return Inertia::render('contracts/index', ['contracts' => Contract::query()
-            ->where(fn ($q) => $q->where('client_id', $user)->orWhere('freelancer_id', $user))
-            ->orderByDesc('id')->paginate(20)->through(fn (Contract $contract) => $this->details($contract, $user))]);
+        return Inertia::render('contracts/index', [
+            'contracts' => fn () => $this->listed($this->mine($user), $list, $user)
+                ->with(['proposal:id,profile_snapshot', 'clientProfile:id,user_id,company', 'openCancellation:id,open_contract_id,requester_id,status,prior_status,created_at'])
+                ->withCount('submissions')->withMax('submissions as last_delivery_at', 'created_at')
+                ->withMax('revisionRequests as revision_asked_at', 'created_at')
+                ->withCasts(['last_delivery_at' => 'immutable_datetime', 'revision_asked_at' => 'immutable_datetime'])
+                ->orderByRaw("case when status in ('completed', 'cancelled') then 1 else 0 end")->orderByDesc('id')
+                ->paginate(20)->withQueryString()->through(fn (Contract $contract) => $this->row($contract, $user)),
+            'list' => $list,
+            'counts' => fn () => collect(['all', ...self::LISTS])->mapWithKeys(fn (string $name) => [$name => $this->listed($this->mine($user), $name, $user)->count()])->all(),
+            // Agreed amounts only, as on Finance: no balance, earnings or payout.
+            'agreed' => fn () => number_format((float) $this->mine($user)->where('status', '!=', 'cancelled')->pluck('agreement->amount as amount')->sum(), 2, '.', ''),
+        ]);
+    }
+
+    /** @return Builder<Contract> */
+    private function mine(int $user): Builder
+    {
+        return Contract::query()->where(fn (Builder $query) => $query->where('client_id', $user)->orWhere('freelancer_id', $user));
+    }
+
+    /**
+     * One list. The client funds and reviews; the freelancer delivers and revises; an open cancellation request waits
+     * on the other side. Every other running contract waits on the other side.
+     *
+     * @param  Builder<Contract>  $query
+     * @return Builder<Contract>
+     */
+    private function listed(Builder $query, string $list, int $user): Builder
+    {
+        $yours = fn (Builder $query): Builder => $query->where(fn (Builder $query) => $query
+            ->where(fn (Builder $query) => $query->where('client_id', $user)->whereIn('status', ['awaiting_payment', 'submitted']))
+            ->orWhere(fn (Builder $query) => $query->where('freelancer_id', $user)->whereIn('status', ['active', 'revision_requested']))
+            ->orWhere(fn (Builder $query) => $query->where('status', 'cancellation_pending')
+                ->whereHas('openCancellation', fn (Builder $request) => $request->where('status', 'pending')->where('requester_id', '!=', $user))));
+
+        return match ($list) {
+            'yours' => $yours($query),
+            'theirs' => $query->whereNotIn('status', ['completed', 'cancelled'])->whereNot(fn (Builder $query) => $yours($query)),
+            'completed' => $query->where('status', 'completed'),
+            'cancelled' => $query->where('status', 'cancelled'),
+            default => $query,
+        };
+    }
+
+    /** Whose move it is, as in listed(): the viewer's, the other side's, or nobody's once the contract is closed. */
+    private function turn(Contract $contract, int $user): ?string
+    {
+        $client = $contract->client_id === $user;
+        $request = $contract->openCancellation;
+
+        return match ($contract->status) {
+            'awaiting_payment', 'submitted' => $client ? 'yours' : 'theirs',
+            'active', 'revision_requested' => $client ? 'theirs' : 'yours',
+            'cancellation_pending' => $request?->status === 'pending' && $request->requester_id !== $user ? 'yours' : 'theirs',
+            default => null,
+        };
+    }
+
+    /**
+     * One card. The other side as the viewer met them: a client sees the freelancer's proposal profile, a freelancer
+     * the client's name and company (client photos are private).
+     *
+     * @return array<string, mixed>
+     */
+    private function row(Contract $contract, int $user): array
+    {
+        $client = $contract->client_id === $user;
+        $snapshot = $contract->proposal->profile_snapshot ?? [];
+        $request = $contract->openCancellation;
+
+        return [...$contract->only(['id', 'project_id', 'conversation_id', 'status', 'created_at', 'funded_at', 'delivery_due_at', 'revision_due_at', 'completed_at', 'cancelled_at', 'revisions_used']),
+            'title' => $contract->agreement['project_title'] ?? '', 'amount' => $contract->agreement['amount'],
+            'duration_days' => $contract->agreement['duration_days'], 'revision_rounds' => $contract->revisionRounds(), 'is_client' => $client,
+            'counterpart' => $client
+                ? ['name' => $snapshot['name'] ?? $contract->agreement['freelancer_name'] ?? null, 'avatar' => $snapshot['avatar'] ?? null, 'company' => null]
+                : ['name' => $contract->agreement['client_name'] ?? null, 'avatar' => null, 'company' => $contract->clientProfile?->company],
+            'deliveries' => $contract->getAttribute('submissions_count'), 'last_delivery_at' => $contract->getAttribute('last_delivery_at'),
+            'revision_asked_at' => $contract->getAttribute('revision_asked_at'),
+            'cancellation' => $request ? ['status' => $request->status, 'prior_status' => $request->prior_status, 'created_at' => $request->created_at] : null,
+            'overdue' => $contract->status === 'active' && $contract->delivery_due_at?->isPast() === true,
+            'turn' => $this->turn($contract, $user)];
     }
 
     public function show(Request $request, Contract $contract, Gateways $gateways): Response

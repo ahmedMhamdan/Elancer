@@ -4,7 +4,9 @@ namespace App\Models;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @property int $id
@@ -58,5 +60,37 @@ class Contract extends Model
     public function submissions(): HasMany
     {
         return $this->hasMany(ContractSubmission::class)->orderBy('number');
+    }
+
+    /** @return HasMany<ContractRevisionRequest, $this> */
+    public function revisionRequests(): HasMany
+    {
+        return $this->hasMany(ContractRevisionRequest::class);
+    }
+
+    /**
+     * The cancellation request still open on this contract, while one is.
+     *
+     * @return HasOne<ContractCancellation, $this>
+     */
+    public function openCancellation(): HasOne
+    {
+        return $this->hasOne(ContractCancellation::class, 'open_contract_id');
+    }
+
+    /** @return BelongsTo<Proposal, $this> */
+    public function proposal(): BelongsTo
+    {
+        return $this->belongsTo(Proposal::class);
+    }
+
+    /**
+     * The client's profile, for the company a freelancer sees.
+     *
+     * @return HasOne<Profile, $this>
+     */
+    public function clientProfile(): HasOne
+    {
+        return $this->hasOne(Profile::class, 'user_id', 'client_id');
     }
 }
