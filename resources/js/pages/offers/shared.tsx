@@ -1,6 +1,6 @@
 // Cards/forms reuse local TailAdmin common/ComponentCard.tsx and form/form-elements/DefaultInputs.tsx.
 // Existing adaptations retain Elancer tokens, keyboard controls and RTL. See THIRD_PARTY_NOTICES.md.
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import {
     CircleCheck,
     CreditCard,
@@ -22,6 +22,29 @@ export type Terms = {
     duration_days: number;
     revision_rounds: number;
 };
+// The other side of an offer as the viewer met them (plan 032 part 7).
+export type Counterpart = {
+    name: string | null;
+    avatar: string | null;
+    company: string | null;
+};
+// Whose move it is on an offer: the viewer's, the other side's, or nobody's once it is settled.
+export type Turn = 'yours' | 'theirs' | null;
+export type OfferRow = {
+    id: number;
+    proposal_id: number;
+    project: { id: number; title: string };
+    amount: string;
+    status: string;
+    expires_at: string;
+    closed_at: string | null;
+    created_at: string;
+    is_client: boolean;
+    counterpart: Counterpart;
+    contract: { id: number; status: string } | null;
+    latest: boolean;
+    turn: Turn;
+};
 export type Offer = {
     id: number;
     proposal_id: number;
@@ -35,7 +58,18 @@ export type Offer = {
     created_at: string;
     is_client: boolean;
     contract_id: number | null;
+    contract: {
+        id: number;
+        status: string;
+        delivery_due_at: string | null;
+    } | null;
+    counterpart: Counterpart;
+    latest: boolean;
+    turn: Turn;
+    conversation_id: number | null;
+    can_replace: boolean;
 };
+export type OfferState = 'open' | 'closed' | 'hired' | 'draft' | 'hidden';
 export type Contract = {
     id: number;
     project_id: number;
@@ -226,41 +260,90 @@ export function usePaymentReason() {
         reason ? (reasons[reason] ?? null) : null;
 }
 
+// The hiring pages share a heading and three tabs. Each tab is its own page, so the current one is a still
+// underline rather than a sliding pill (plan 032 part 7).
 export function AgreementLayout({
     title,
+    lead,
+    href = '/offers',
     children,
 }: {
     title: string;
+    lead?: string;
+    href?: string;
     children: ReactNode;
 }) {
     const { t } = useTranslation();
+    const { url } = usePage();
+    const current = url.startsWith('/contracts') ? '/contracts' : '/offers';
+    const tabs: [string, string][] = [
+        ['/offers', t('Final offers')],
+        ['/contracts', t('Contracts')],
+        ['/messages', t('Messages')],
+    ];
     return (
-        <AppLayout breadcrumbs={[{ title, href: '/offers' }]}>
+        <AppLayout breadcrumbs={[{ title, href }]}>
             <Head title={title} />
             <main className="workspace-dashboard market-workspace market-stack">
-                <h1 className="text-2xl font-semibold">{title}</h1>
-                <nav className="market-actions" aria-label={t('Hiring')}>
-                    <Link href="/offers">{t('Offers')}</Link>
-                    <Link href="/contracts">{t('Contracts')}</Link>
-                    <Link href="/messages">{t('Messages')}</Link>
+                <div>
+                    <h1 className="text-2xl font-semibold">{title}</h1>
+                    {lead && <p className="hiring-lead">{lead}</p>}
+                </div>
+                <nav className="hiring-nav" aria-label={t('Hiring')}>
+                    {tabs.map(([path, label]) => (
+                        <Link
+                            key={path}
+                            href={path}
+                            aria-current={current === path ? 'page' : undefined}
+                        >
+                            {label}
+                        </Link>
+                    ))}
                 </nav>
                 {children}
             </main>
         </AppLayout>
     );
 }
-export function OfferStatus({ status }: { status: string }) {
-    const { t } = useTranslation();
-    const labels: Record<string, string> = {
-        pending: t('Pending'),
-        accepted: t('Accepted'),
-        declined: t('Declined'),
-        withdrawn: t('Withdrawn'),
-        expired: t('Expired'),
-        changes_requested: t('Changes requested'),
-        restricted: t('Closed by restriction'),
-    };
-    return <span className="proposal-status">{labels[status] ?? status}</span>;
+// The status of an offer as the viewer reads it, shown with the site's small square (plan 032 part 7).
+export function offerState(
+    offer: Pick<OfferRow, 'status' | 'is_client' | 'latest' | 'turn'>,
+    t: (text: string) => string,
+): { label: string; state: OfferState } {
+    switch (offer.status) {
+        case 'pending':
+            return {
+                label: offer.is_client
+                    ? t('Waiting for their answer')
+                    : t('Needs your answer'),
+                state: 'open',
+            };
+        case 'changes_requested':
+            if (!offer.latest)
+                return {
+                    label: t('Replaced by a newer offer'),
+                    state: 'draft',
+                };
+            return {
+                label:
+                    offer.turn !== null && !offer.is_client
+                        ? t('Waiting for a new offer')
+                        : t('Changes requested'),
+                state: offer.turn === null ? 'draft' : 'closed',
+            };
+        case 'accepted':
+            return { label: t('Offer accepted'), state: 'hired' };
+        case 'declined':
+            return { label: t('Offer declined'), state: 'draft' };
+        case 'withdrawn':
+            return { label: t('Offer withdrawn'), state: 'draft' };
+        case 'expired':
+            return { label: t('Expired'), state: 'draft' };
+        case 'restricted':
+            return { label: t('Closed by restriction'), state: 'hidden' };
+        default:
+            return { label: offer.status, state: 'draft' };
+    }
 }
 export function OfferTime({ value }: { value: string }) {
     const { locale } = useTranslation();

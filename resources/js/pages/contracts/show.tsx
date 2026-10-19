@@ -166,7 +166,7 @@ export default function Show({
         amendment_withdrawn: t('Proposed change withdrawn'),
     };
     return (
-        <AgreementLayout title={t('Contract')}>
+        <AgreementLayout title={t('Contract')} href="/contracts">
             <section className="market-panel market-stack">
                 <div className="market-actions">
                     <h2 className="!mb-0" dir="auto">

@@ -10,7 +10,7 @@ import {
 export default function Index({ contracts }: { contracts: Page<Contract> }) {
     const { t } = useTranslation();
     return (
-        <AgreementLayout title={t('Contracts')}>
+        <AgreementLayout title={t('Contracts')} href="/contracts">
             {!contracts.data.length && (
                 <section className="market-panel">
                     <p>{t('No contracts yet.')}</p>

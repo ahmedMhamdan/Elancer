@@ -273,6 +273,38 @@
 .market-workspace {
     color: var(--el-text);
 }
+/* Final offers, Contracts and Messages (plan 032 part 7): separate pages, so the current one is a still underline. */
+.hiring-lead {
+    margin-top: 4px;
+    color: var(--el-muted);
+    font-size: 15px;
+}
+.hiring-nav {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--el-border);
+    scrollbar-width: none;
+}
+.hiring-nav a {
+    padding: 10px 12px;
+    color: var(--el-muted);
+    font-size: 14px;
+    white-space: nowrap;
+    transition: color 160ms;
+}
+.hiring-nav a:hover,
+.hiring-nav a[aria-current='page'] {
+    color: var(--el-text);
+}
+.hiring-nav a[aria-current='page'] {
+    font-weight: 500;
+    box-shadow: inset 0 -2px 0 var(--el-accent);
+}
+.hiring-nav a:focus-visible {
+    outline: 2px solid var(--el-accent);
+    outline-offset: -2px;
+}
 .proposal-terms {
     display: flex;
     flex-wrap: wrap;
