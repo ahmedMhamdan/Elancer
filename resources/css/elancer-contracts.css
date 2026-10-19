@@ -1,0 +1,218 @@
+/* Contracts (plan 032 part 8, Ahmed's pick "B"): My projects' tiles, lists and cards (elancer-projects.css) with the
+   contract's four steps. Status colours as on My projects and Final offers; a contract waiting for funding gets a
+   hollow square. No glow, border light or pulse. */
+.contracts-page {
+    --mp-open: var(--el-brand);
+    --mp-closed: #b8841c;
+    --mp-hired: #3f7fc4;
+    --mp-draft: var(--el-muted);
+    --mp-hidden: var(--el-error);
+}
+.dark .contracts-page {
+    --mp-closed: #e0b25a;
+    --mp-hired: #8fc3f2;
+}
+.contracts-page .my-project-status[data-state='wait']::before {
+    width: 7px;
+    height: 7px;
+    background: none;
+    box-shadow: inset 0 0 0 1.5px var(--el-muted);
+}
+.contracts-total,
+.contracts-total:hover {
+    border-color: var(--el-border);
+}
+.contracts-price {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+.contracts-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 2px 16px;
+    flex-wrap: wrap;
+}
+.contracts-head h2 {
+    flex: 1 1 240px;
+    min-width: 0;
+}
+.contracts-head .contracts-price {
+    font-size: 18px;
+    font-weight: 600;
+}
+.contracts-card[data-short='true'] {
+    padding-block: 16px;
+}
+.contracts-card[data-short='true'] h2 {
+    margin-top: 8px;
+    font-size: 17px;
+}
+.contracts-card[data-short='true'] .contracts-head .contracts-price {
+    font-size: 16px;
+}
+.contracts-card[data-short='true'] .my-project-foot {
+    margin-top: 10px;
+    padding-top: 12px;
+}
+.contracts-facts {
+    color: var(--el-muted);
+    font-size: 13px;
+}
+.contracts-late {
+    color: var(--el-error);
+}
+.contracts-next {
+    margin-top: 14px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+.contracts-face {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    overflow: hidden;
+    border-radius: 50%;
+    background: var(--el-soft);
+    color: var(--el-text);
+    font-size: 12px;
+    font-weight: 600;
+}
+.contracts-face img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.contracts-empty-link {
+    display: inline-block;
+    margin-top: 12px;
+    border: 1px solid var(--el-border);
+}
+
+/* The four steps, after Origin UI's Stepper: a square per step, a line to the next, the title and one short line. */
+.contracts-steps {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+}
+.contracts-steps li {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    padding-inline-end: 8px;
+    color: var(--el-muted);
+    font-size: 13px;
+    line-height: 1.4;
+}
+.contracts-steps li > i {
+    position: relative;
+    z-index: 1;
+    width: 10px;
+    height: 10px;
+    margin-bottom: 6px;
+    border: 1.5px solid var(--el-border-strong);
+    background: var(--el-surface);
+}
+.contracts-steps li:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    inset-inline: 16px 6px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--el-border);
+}
+.contracts-steps li[data-step='done'] > i {
+    border-color: var(--el-accent);
+    background: var(--el-accent);
+}
+.contracts-steps li[data-step='done']:not(:last-child)::before {
+    background: var(--el-accent);
+}
+.contracts-steps[data-state='open'] {
+    --step: var(--mp-open);
+}
+.contracts-steps[data-state='closed'] {
+    --step: var(--mp-closed);
+}
+.contracts-steps[data-state='hired'] {
+    --step: var(--mp-hired);
+}
+.contracts-steps[data-state='wait'] {
+    --step: var(--el-muted);
+}
+.contracts-steps li[data-step='now'] > i {
+    border-color: var(--step);
+    background: var(--step);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--step) 22%, transparent);
+}
+.contracts-steps li[data-step='stop'] > i {
+    border-color: var(--mp-hidden);
+    background: var(--mp-hidden);
+}
+/* The share of the days used toward the date that matters, filled once. */
+.contracts-steps-fill {
+    position: absolute;
+    top: 4px;
+    inset-inline-start: 16px;
+    width: calc((100% - 22px) * var(--fill));
+    height: 2px;
+    border-radius: 2px;
+    background: var(--step);
+    transform-origin: left;
+    animation: contracts-fill 0.9s 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+html[dir='rtl'] .contracts-steps-fill {
+    transform-origin: right;
+}
+.contracts-steps[data-still] .contracts-steps-fill {
+    animation: none;
+}
+@keyframes contracts-fill {
+    from {
+        transform: scaleX(0);
+    }
+}
+.contracts-steps b {
+    color: var(--el-text);
+    font-weight: 500;
+}
+.contracts-steps li[data-step='next'] b {
+    color: var(--el-muted);
+    font-weight: 400;
+}
+.contracts-steps small {
+    overflow: hidden;
+    font-size: 12.5px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.contracts-card :is(a, button):focus-visible {
+    outline: 2px solid var(--el-accent);
+    outline-offset: 2px;
+}
+@media (max-width: 767px) {
+    .contracts-steps small {
+        white-space: normal;
+    }
+    /* On a phone the main action takes its own line, as on Final offers. */
+    .contracts-card .my-project-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .contracts-card .contracts-main {
+        flex: 1 1 100%;
+        order: -1;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .contracts-steps-fill {
+        animation: none;
+    }
+}
