@@ -2,7 +2,8 @@
 // number-ticker.tsx, MIT; see THIRD_PARTY_NOTICES.md). Kept: the spring from the start value once the number is in
 // view, and the decimalPlaces option (given back in plan 032 part 7 for prices). Changed for Elancer (plan 032): no
 // "use client"; the colour comes from the surrounding text; the number is formatted in the page's language; a new value
-// springs from the one shown; reduced motion shows the final value at once.
+// springs from the one shown; reduced motion shows the final value at once; a stiffer, near-critical spring (part 8,
+// Ahmed: "make the number counter faster"), so a figure lands in about a second instead of four.
 import {
     useEffect,
     useMemo,
@@ -17,6 +18,19 @@ import {
 } from 'motion/react';
 import { useTranslation } from '@/hooks/use-translation';
 import { cn } from '@/lib/utils';
+
+/** The ticker's own format, for a figure shown still beside counting ones. */
+export function useNumberFormat(decimalPlaces = 0) {
+    const { locale } = useTranslation();
+    return useMemo(
+        () =>
+            new Intl.NumberFormat(locale, {
+                minimumFractionDigits: decimalPlaces,
+                maximumFractionDigits: decimalPlaces,
+            }),
+        [locale, decimalPlaces],
+    );
+}
 
 interface NumberTickerProps extends ComponentPropsWithoutRef<'span'> {
     value: number;
@@ -33,20 +47,12 @@ export function NumberTicker({
     className,
     ...props
 }: NumberTickerProps) {
-    const { locale } = useTranslation();
     const reduced = useReducedMotion();
     const ref = useRef<HTMLSpanElement>(null);
     const motionValue = useMotionValue(startValue);
-    const springValue = useSpring(motionValue, { damping: 60, stiffness: 100 });
+    const springValue = useSpring(motionValue, { damping: 22, stiffness: 120 });
     const isInView = useInView(ref, { once: true, margin: '0px' });
-    const formatter = useMemo(
-        () =>
-            new Intl.NumberFormat(locale, {
-                minimumFractionDigits: decimalPlaces,
-                maximumFractionDigits: decimalPlaces,
-            }),
-        [locale, decimalPlaces],
-    );
+    const formatter = useNumberFormat(decimalPlaces);
 
     useEffect(() => {
         if (reduced || !isInView) return;

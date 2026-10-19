@@ -1,7 +1,8 @@
 // Final offers as an inbox (plan 032 part 7, Ahmed picked "B"): the offers on one side and the chosen one on the other,
-// like Messages. /offers and /offers/{id} render this page; a row opens its offer with a partial visit, so the figures
-// spring from the offer looked at before. Tiles and lists reuse My projects' pieces; the time left is Magic UI's
-// Animated Circular Progress Bar; every number counts once when it comes into view (Magic UI Number Ticker).
+// like Messages. /offers and /offers/{id} render this page; a row opens its offer with a partial visit. Tiles and lists
+// reuse My projects' pieces; the time left is Magic UI's Animated Circular Progress Bar. The tiles and row prices count
+// once when they come into view (Magic UI Number Ticker); the chosen offer's figures do not (part 8, Ahmed: counting
+// on every chosen offer "becomes repitive ... and anoying").
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft, MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
@@ -26,7 +27,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
-import { NumberTicker } from '@/components/ui/number-ticker';
+import { NumberTicker, useNumberFormat } from '@/components/ui/number-ticker';
 import { useRelativeTime } from '@/hooks/use-relative-time';
 import { useTranslation } from '@/hooks/use-translation';
 import type { Page } from '@/pages/discovery/shared';
@@ -100,17 +101,20 @@ function Who({
     );
 }
 
-function Price({ amount, delay = 0 }: { amount: string; delay?: number }) {
+function Price({ amount, still = false }: { amount: string; still?: boolean }) {
+    const format = useNumberFormat(2);
+    if (still)
+        return (
+            <bdi dir="ltr" className="offers-price">
+                ${format.format(Number(amount))}
+            </bdi>
+        );
     return (
         <bdi dir="ltr" className="offers-price">
             <span className="sr-only">${amount}</span>
             <span aria-hidden="true">
                 $
-                <NumberTicker
-                    value={Number(amount)}
-                    decimalPlaces={2}
-                    delay={delay}
-                />
+                <NumberTicker value={Number(amount)} decimalPlaces={2} />
             </span>
         </bdi>
     );
@@ -186,6 +190,7 @@ function OfferBody({
 }) {
     const { t, ar, locale } = useTranslation();
     const relative = useRelativeTime();
+    const format = useNumberFormat();
     const [confirm, setConfirm] = useState<Answer | null>(null);
     const [asking, setAsking] = useState(false);
     const [full, setFull] = useState(false);
@@ -326,7 +331,7 @@ function OfferBody({
                                 count: left,
                             })}
                         >
-                            <NumberTicker value={left} />
+                            {format.format(left)}
                             <small>{t('hours')}</small>
                         </span>
                     </AnimatedCircularProgressBar>
@@ -663,6 +668,7 @@ function OfferDetail({
 }) {
     const { t } = useTranslation();
     const relative = useRelativeTime();
+    const format = useNumberFormat();
     const state = offerState(offer, t);
     const when =
         offer.status === 'pending'
@@ -700,31 +706,20 @@ function OfferDetail({
                     <Who offer={offer} />
                 </span>
             </p>
-            {/* Kept mounted across offers so each figure springs from the one shown before. */}
             <dl className="offers-figures">
                 <div>
                     <dt>{t('Price')}</dt>
                     <dd>
-                        <Price amount={offer.terms.amount} delay={0.1} />
+                        <Price amount={offer.terms.amount} still />
                     </dd>
                 </div>
                 <div>
                     <dt>{t('Delivery days')}</dt>
-                    <dd>
-                        <NumberTicker
-                            value={offer.terms.duration_days}
-                            delay={0.15}
-                        />
-                    </dd>
+                    <dd>{format.format(offer.terms.duration_days)}</dd>
                 </div>
                 <div>
                     <dt>{t('Revision rounds')}</dt>
-                    <dd>
-                        <NumberTicker
-                            value={offer.terms.revision_rounds}
-                            delay={0.2}
-                        />
-                    </dd>
+                    <dd>{format.format(offer.terms.revision_rounds)}</dd>
                 </div>
             </dl>
             <OfferBody
