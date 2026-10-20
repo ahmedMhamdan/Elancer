@@ -2844,10 +2844,22 @@ export const arabic: Record<string, string> = {
     'Disconnect this app? It stops working at once and must ask to connect again.':
         'إلغاء ربط هذا التطبيق؟ سيتوقف عن العمل فورًا وعليه طلب الربط من جديد.',
     Disconnect: 'إلغاء الربط',
+    'Any future date such as 12/34 and any three-digit CVC. Stripe accepts nothing else here.':
+        'أي تاريخ مستقبلي مثل 12/34 وأي رمز تحقق من ثلاثة أرقام. لا يقبل Stripe هنا غير ذلك.',
+    'Any future month and year, any three-digit CVC and a name of two words. For Mada use 4201 3201 1111 1010. Moyasar accepts nothing else here.':
+        'أي شهر وسنة في المستقبل، وأي رمز تحقق من ثلاثة أرقام، واسم من كلمتين. لبطاقة مدى استخدم 4201 3201 1111 1010. لا يقبل ميسّر هنا غير ذلك.',
+    'Use a test card, never your real one':
+        'استخدم بطاقة تجريبية، ولا تستخدم بطاقتك الحقيقية أبدًا',
+    'Payments here are in test mode, so nothing is charged. Type only the test card below on the payment page.':
+        'المدفوعات هنا في وضع تجريبي، فلا يُخصم أي مبلغ. اكتب في صفحة الدفع البطاقة التجريبية أدناه فقط.',
+    'Copy card number': 'نسخ رقم البطاقة',
+    'More test cards': 'بطاقات تجريبية أخرى',
     'An AI agent or app that supports MCP can search projects, prepare and send your proposals, and read your projects and the proposals they received. Its address is on Settings, API tokens.':
         'يمكن لوكيل الذكاء الاصطناعي أو التطبيق الذي يدعم MCP البحث في المشاريع، وتحضير عروضك وإرسالها، وقراءة مشاريعك والعروض التي وصلتها. عنوانه في «الإعدادات» ثم «رموز الواجهة البرمجية».',
     'An app with a Connect button, such as Claude, ChatGPT, Cursor or VS Code, opens an Elancer page that names the app and where it returns to. Approve only an app you started yourself. A connected app may use every tool, and you can disconnect it on the same settings page.':
         'التطبيق الذي فيه زر «ربط»، مثل Claude أو ChatGPT أو Cursor أو VS Code، يفتح صفحة في إيلانسر تسمّي التطبيق والمكان الذي يعود إليه. وافق فقط على تطبيق شغّلته بنفسك. يمكن للتطبيق المرتبط استخدام كل الأدوات، ويمكنك إلغاء ربطه من صفحة الإعدادات نفسها.',
     'An agent that takes a header instead, such as Claude Code, uses an API token: it can do only what you gave the token. Ask your agent to check with you before it submits or withdraws a proposal.':
         'الوكيل الذي يأخذ ترويسة بدلًا من ذلك، مثل Claude Code، يستخدم رمزًا للواجهة البرمجية: لا يستطيع إلا ما منحتَه للرمز. اطلب من وكيلك أن يراجعك قبل أن يرسل عرضًا أو يسحبه.',
+    'Never type a real card on the payment page. Use the provider’s test card: on Stripe 4242 4242 4242 4242, on Moyasar 4111 1111 1111 1111, with any future date and any three-digit code.':
+        'لا تكتب بطاقة حقيقية في صفحة الدفع أبدًا. استخدم بطاقة المزود التجريبية: في Stripe الرقم 4242 4242 4242 4242، وفي ميسّر الرقم 4111 1111 1111 1111، مع أي تاريخ مستقبلي وأي رمز من ثلاثة أرقام.',
 };

@@ -386,6 +386,9 @@ export function helpGroups(t: (text: string) => string): HelpGroup[] {
                         t(
                             'The amounts you see are the ones agreed in your contracts. There is no balance, wallet or withdrawal.',
                         ),
+                        t(
+                            'Never type a real card on the payment page. Use the provider’s test card: on Stripe 4242 4242 4242 4242, on Moyasar 4111 1111 1111 1111, with any future date and any three-digit code.',
+                        ),
                     ],
                     href: '/finance',
                     action: t('Open Finance'),

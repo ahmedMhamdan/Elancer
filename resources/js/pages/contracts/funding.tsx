@@ -1,4 +1,5 @@
 import { router, useForm, usePage } from '@inertiajs/react';
+import { TriangleAlert } from 'lucide-react';
 import { useState } from 'react';
 import InputError from '@/components/input-error';
 import Button from '@/components/tailadmin/button';
@@ -12,6 +13,88 @@ import {
     type Contract,
     type Payment,
 } from '@/pages/offers/shared';
+
+// Plan 033: the providers' published test cards (docs.stripe.com/testing and
+// docs.moyasar.com/guides/card-payments/test-cards). The keys are test keys only,
+// so a real card is refused by the provider; this keeps one from being typed at all.
+const TEST_CARDS: Record<string, { number: string; docs: string }> = {
+    stripe: {
+        number: '4242424242424242',
+        docs: 'https://docs.stripe.com/testing#cards',
+    },
+    moyasar: {
+        number: '4111111111111111',
+        docs: 'https://docs.moyasar.com/guides/card-payments/test-cards',
+    },
+};
+
+/** Adapted, like the suspension banner, from the local TailAdmin Alert warning variant (MIT). */
+function TestCardNotice({ provider }: { provider: string }) {
+    const { t } = useTranslation();
+    const [copied, setCopied] = useState(false);
+    const card = TEST_CARDS[provider];
+    if (!card) return null;
+    const rules =
+        provider === 'stripe'
+            ? t(
+                  'Any future date such as 12/34 and any three-digit CVC. Stripe accepts nothing else here.',
+              )
+            : t(
+                  'Any future month and year, any three-digit CVC and a name of two words. For Mada use 4201 3201 1111 1010. Moyasar accepts nothing else here.',
+              );
+    return (
+        <div
+            role="note"
+            data-test="test-card"
+            className="rounded-xl border border-amber-500/50 bg-amber-500/10 p-4 text-amber-900 dark:text-amber-200"
+        >
+            <div className="flex items-start gap-3">
+                <TriangleAlert
+                    className="mt-0.5 size-5 shrink-0"
+                    aria-hidden="true"
+                />
+                <div className="min-w-0 space-y-2 text-sm">
+                    <h3 className="font-semibold">
+                        {t('Use a test card, never your real one')}
+                    </h3>
+                    <p>
+                        {t(
+                            'Payments here are in test mode, so nothing is charged. Type only the test card below on the payment page.',
+                        )}
+                    </p>
+                    <div className="flex flex-wrap items-center gap-2">
+                        <code
+                            dir="ltr"
+                            className="rounded-md border border-amber-500/40 bg-white/60 px-2 py-1 font-mono text-base tracking-wider select-all dark:bg-black/20"
+                        >
+                            {card.number.replace(/(\d{4})(?=\d)/g, '$1 ')}
+                        </code>
+                        <button
+                            type="button"
+                            className="focus-visible:outline-ring inline-flex min-h-11 items-center px-1 font-medium underline underline-offset-4 focus-visible:outline-2"
+                            onClick={() => {
+                                void navigator.clipboard
+                                    .writeText(card.number)
+                                    .then(() => setCopied(true));
+                            }}
+                        >
+                            {copied ? t('Copied') : t('Copy card number')}
+                        </button>
+                    </div>
+                    <p>{rules}</p>
+                    <a
+                        href={card.docs}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="focus-visible:outline-ring inline-flex min-h-11 items-center font-medium underline underline-offset-4 focus-visible:outline-2"
+                    >
+                        {t('More test cards')}
+                    </a>
+                </div>
+            </div>
+        </div>
+    );
+}
 
 export function Funding({
     contract,
@@ -88,6 +171,9 @@ export function Funding({
                             { provider: providerLabel(payment.provider) },
                         )}
                     </p>
+                    {contract.is_client && (
+                        <TestCardNotice provider={payment.provider} />
+                    )}
                     <div className="market-actions">
                         <Button disabled={busy} onClick={() => act('check')}>
                             {t('Check payment status')}
@@ -165,6 +251,7 @@ export function Funding({
                                     form.setData('provider', provider)
                                 }
                             />
+                            <TestCardNotice provider={form.data.provider} />
                             <div>
                                 <Button
                                     disabled={form.processing}
