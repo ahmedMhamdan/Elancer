@@ -128,7 +128,7 @@ Members can connect their own AI agents to Elancer through the [Model Context Pr
 
 There are two ways to sign in:
 
-- **Connect.** Apps that sign in themselves, such as Claude, ChatGPT, Cursor or VS Code, find the sign-in through OAuth discovery, register, and open an Elancer page that names the app and the address it returns to. The member signs in, confirms it is them and approves. A connected app may use every tool and appears under Settings, API tokens, where it can be disconnected.
+- **Connect.** Apps that sign in themselves, such as Claude, ChatGPT, Cursor or VS Code, find the sign-in through OAuth discovery, register, and open an Elancer page that names the app and the address it returns to. The member signs in, confirms it is them and approves. A connected app may use every tool and appears under Settings, AI agents, where it can be disconnected.
 - **An API token.** Agents that take a header, such as Claude Code, use a token from Settings and see only the tools its abilities allow. `hiring:read` covers the client tools.
 
 ```bash

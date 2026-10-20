@@ -147,8 +147,8 @@ class McpConnectTest extends TestCase
         $this->mcp($tokens['access_token'], 'tools/list')->assertUnauthorized();
         $this->mcp($renewed['access_token'], 'tools/list')->assertOk();
 
-        // The member sees the app on the tokens page and can disconnect it there; it is refused at once.
-        $this->actingAs($omar, 'web')->withSession($this->recent())->get('/settings/tokens')->assertOk()->assertInertia(fn (Assert $page) => $page->has('connections', 1)
+        // The member sees the app on the AI agents page and can disconnect it there; it is refused at once.
+        $this->actingAs($omar, 'web')->withSession($this->recent())->get('/settings/agents')->assertOk()->assertInertia(fn (Assert $page) => $page->has('connections', 1)
             ->where('connections.0.id', $client)->where('connections.0.name', 'Claude')->where('connections.0.returnsTo', 'claude.ai')->where('connectionLimit', 10)->where('mcpEndpoint', url('/mcp')));
         // Asking again while connected needs no second approval.
         $this->assertNotSame('', $this->code($this->get($this->request($client)['url'])));

@@ -2595,6 +2595,7 @@ export const arabic: Record<string, string> = {
     'The token is shown once, so copy it then. Revoke a token as soon as you no longer need it or think someone else has seen it.':
         'يظهر الرمز مرة واحدة فانسخه حينها. ألغِ الرمز فور استغنائك عنه أو إن ظننت أن غيرك رآه.',
     'Open API tokens': 'افتح رموز الواجهة البرمجية',
+    'Open AI agents': 'افتح وكلاء الذكاء الاصطناعي',
     'Closing your account': 'إغلاق حسابك',
     'You can delete your account from Settings, Profile. Your profile, drafts and saved items are removed with it.':
         'يمكنك حذف حسابك من «الإعدادات» ثم «الملف الشخصي». يُحذف معه ملفك ومسوداتك ومحفوظاتك.',
@@ -2807,8 +2808,8 @@ export const arabic: Record<string, string> = {
     'It cannot send messages or offers, fund or change contracts, or change your settings.':
         'لا يمكنه إرسال الرسائل أو العروض النهائية، ولا تمويل العقود أو تغييرها، ولا تغيير إعداداتك.',
     'After you approve, you return to': 'بعد موافقتك تعود إلى',
-    'Elancer does not check who made an app. Approve only an app you started yourself. You can disconnect it at any time in Settings, API tokens.':
-        'لا يتحقق إيلانسر ممّن صنع التطبيق. وافق فقط على تطبيق شغّلته بنفسك. يمكنك إلغاء ربطه متى شئت من «الإعدادات» ثم «رموز الواجهة البرمجية».',
+    'Elancer does not check who made an app. Approve only an app you started yourself. You can disconnect it at any time in Settings, AI agents.':
+        'لا يتحقق إيلانسر ممّن صنع التطبيق. وافق فقط على تطبيق شغّلته بنفسك. يمكنك إلغاء ربطه متى شئت من «الإعدادات» ثم «وكلاء الذكاء الاصطناعي».',
     Approve: 'موافقة',
     'Read my projects and received proposals': 'قراءة مشاريعي والعروض الواردة',
     'Your own projects as a client and the proposals they received, read only. Used by AI agents; the API routes below do not read it.':
@@ -2821,13 +2822,14 @@ export const arabic: Record<string, string> = {
         'العروض التي وصلت أحد مشاريعك',
     'One received proposal, as you read it': 'عرض وارد واحد، كما تقرؤه أنت',
     'Connect an AI agent': 'ربط وكيل ذكاء اصطناعي',
-    'AI agents and apps that support MCP can work with your account through one address. An app with a Connect button signs you in here and asks for your approval; any other agent takes a token from above.':
-        'يمكن لوكلاء الذكاء الاصطناعي والتطبيقات التي تدعم MCP العمل مع حسابك عبر عنوان واحد. التطبيق الذي فيه زر «ربط» يسجّل دخولك هنا ويطلب موافقتك، وأي وكيل آخر يأخذ رمزًا من الأعلى.',
+    'AI agents': 'وكلاء الذكاء الاصطناعي',
+    'AI agents and apps that support MCP can work with your account through one address. An app with a Connect button signs you in here and asks for your approval; any other agent uses a token from API tokens.':
+        'يمكن لوكلاء الذكاء الاصطناعي والتطبيقات التي تدعم MCP العمل مع حسابك عبر عنوان واحد. التطبيق الذي فيه زر «ربط» يسجّل دخولك هنا ويطلب موافقتك، وأي وكيل آخر يستخدم رمزًا من «رموز الواجهة البرمجية».',
     'Copy address': 'نسخ العنوان',
     'With a Connect button (for example Claude, ChatGPT, Cursor or VS Code): add Elancer as a custom connector with this address, then approve it on the page Elancer opens.':
         'مع زر «ربط» (مثل Claude أو ChatGPT أو Cursor أو VS Code): أضف إيلانسر موصّلًا مخصّصًا بهذا العنوان، ثم وافق عليه في الصفحة التي يفتحها إيلانسر.',
-    'With a header instead (for example Claude Code): create a token above with what the agent may do, then add the server like this:':
-        'مع ترويسة بدلًا من ذلك (مثل Claude Code): أنشئ رمزًا في الأعلى بما يُسمح للوكيل به، ثم أضف الخادم هكذا:',
+    'With a header instead (for example Claude Code): create a token on API tokens with what the agent may do, then add the server like this:':
+        'مع ترويسة بدلًا من ذلك (مثل Claude Code): أنشئ رمزًا في «رموز الواجهة البرمجية» بما يُسمح للوكيل به، ثم أضف الخادم هكذا:',
     'Elancer’s free hosting sleeps when nobody uses it, so the first call after a quiet time can take up to a minute.':
         'تتوقف استضافة إيلانسر المجانية حين لا يستخدمها أحد، لذا قد يستغرق أول طلب بعد فترة هدوء دقيقة كاملة.',
     'Connected apps': 'التطبيقات المرتبطة',
@@ -2853,8 +2855,8 @@ export const arabic: Record<string, string> = {
         'المدفوعات هنا في وضع تجريبي، فلا يُخصم أي مبلغ. اكتب في صفحة الدفع البطاقة التجريبية أدناه فقط.',
     'Copy card number': 'نسخ رقم البطاقة',
     'More test cards': 'بطاقات تجريبية أخرى',
-    'An AI agent or app that supports MCP can search projects, prepare and send your proposals, and read your projects and the proposals they received. Its address is on Settings, API tokens.':
-        'يمكن لوكيل الذكاء الاصطناعي أو التطبيق الذي يدعم MCP البحث في المشاريع، وتحضير عروضك وإرسالها، وقراءة مشاريعك والعروض التي وصلتها. عنوانه في «الإعدادات» ثم «رموز الواجهة البرمجية».',
+    'An AI agent or app that supports MCP can search projects, prepare and send your proposals, and read your projects and the proposals they received. Its address is on Settings, AI agents.':
+        'يمكن لوكيل الذكاء الاصطناعي أو التطبيق الذي يدعم MCP البحث في المشاريع، وتحضير عروضك وإرسالها، وقراءة مشاريعك والعروض التي وصلتها. عنوانه في «الإعدادات» ثم «وكلاء الذكاء الاصطناعي».',
     'An app with a Connect button, such as Claude, ChatGPT, Cursor or VS Code, opens an Elancer page that names the app and where it returns to. Approve only an app you started yourself. A connected app may use every tool, and you can disconnect it on the same settings page.':
         'التطبيق الذي فيه زر «ربط»، مثل Claude أو ChatGPT أو Cursor أو VS Code، يفتح صفحة في إيلانسر تسمّي التطبيق والمكان الذي يعود إليه. وافق فقط على تطبيق شغّلته بنفسك. يمكن للتطبيق المرتبط استخدام كل الأدوات، ويمكنك إلغاء ربطه من صفحة الإعدادات نفسها.',
     'An agent that takes a header instead, such as Claude Code, uses an API token: it can do only what you gave the token. Ask your agent to check with you before it submits or withdraws a proposal.':

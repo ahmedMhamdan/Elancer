@@ -340,7 +340,7 @@ export function helpGroups(t: (text: string) => string): HelpGroup[] {
                     title: t('Connect an AI agent'),
                     body: [
                         t(
-                            'An AI agent or app that supports MCP can search projects, prepare and send your proposals, and read your projects and the proposals they received. Its address is on Settings, API tokens.',
+                            'An AI agent or app that supports MCP can search projects, prepare and send your proposals, and read your projects and the proposals they received. Its address is on Settings, AI agents.',
                         ),
                         t(
                             'An app with a Connect button, such as Claude, ChatGPT, Cursor or VS Code, opens an Elancer page that names the app and where it returns to. Approve only an app you started yourself. A connected app may use every tool, and you can disconnect it on the same settings page.',
@@ -352,8 +352,8 @@ export function helpGroups(t: (text: string) => string): HelpGroup[] {
                             'Elancer’s free hosting sleeps when nobody uses it, so the first call after a quiet time can take up to a minute.',
                         ),
                     ],
-                    href: '/settings/tokens',
-                    action: t('Open API tokens'),
+                    href: '/settings/agents',
+                    action: t('Open AI agents'),
                 },
                 {
                     id: 'closing-account',

@@ -37,6 +37,11 @@ const sidebarNavItems: NavItem[] = [
         href: '/settings/tokens',
         icon: null,
     },
+    {
+        title: 'AI agents',
+        href: '/settings/agents',
+        icon: null,
+    },
 ];
 
 export default function SettingsLayout({ children }: PropsWithChildren) {

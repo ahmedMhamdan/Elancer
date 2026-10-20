@@ -97,7 +97,7 @@ export default function Authorize({ app, account, refusal, form }: Props) {
                 </dl>
                 <p className="connect-muted connect-note">
                     {t(
-                        'Elancer does not check who made an app. Approve only an app you started yourself. You can disconnect it at any time in Settings, API tokens.',
+                        'Elancer does not check who made an app. Approve only an app you started yourself. You can disconnect it at any time in Settings, AI agents.',
                     )}
                 </p>
 

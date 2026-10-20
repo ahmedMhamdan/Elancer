@@ -46,7 +46,13 @@ class ApiTokenController extends Controller
             'limit' => self::LIMIT,
             'allowed' => $this->allowed($request->user()),
             'endpoint' => url('/api/v1'),
-            // Plan 033: the MCP address and the apps connected through Connect.
+        ]);
+    }
+
+    /** Plan 033, its own tab since plan 032 part 9: the MCP address and the apps connected through Connect. */
+    public function agents(Request $request): Response
+    {
+        return Inertia::render('settings/agents', [
             'mcpEndpoint' => route('mcp'),
             'connections' => AgentAccess::connections($request->user()->id)->map(function (Collection $tokens, int|string $client): array {
                 $app = $tokens->first()?->client;

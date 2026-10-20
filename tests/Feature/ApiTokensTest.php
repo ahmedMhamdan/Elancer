@@ -48,15 +48,20 @@ class ApiTokensTest extends TestCase
 
         // A guest, and a member whose sign-in is not recent, reach nothing.
         $this->get('/settings/tokens')->assertRedirect('/login');
+        $this->get('/settings/agents')->assertRedirect('/login');
         $this->postJson('/settings/tokens', $this->wanted())->assertUnauthorized();
         $this->actingAs($omar)->withSession(self::RECENT)->get('/settings/tokens')->assertRedirect(route('password.confirm'));
+        $this->get('/settings/agents')->assertRedirect(route('password.confirm'));
         $this->postJson('/settings/tokens', $this->wanted())->assertStatus(423);
         $this->deleteJson('/settings/tokens/1')->assertStatus(423);
         $this->assertSame(0, DB::table('personal_access_tokens')->count());
 
         $this->withSession($this->recent())->get('/settings/tokens')->assertOk()->assertInertia(fn (Assert $page) => $page->component('settings/tokens')->has('tokens', 0)
             ->where('abilities', ['projects:read', 'proposals:read', 'proposals:write', 'hiring:read'])->where('expiryDays', [7, 30, 60, 90])->where('defaultExpiryDays', 30)
-            ->where('limit', 10)->where('allowed', true)->where('endpoint', url('/api/v1'))->where('mcpEndpoint', url('/mcp'))->has('connections', 0));
+            ->where('limit', 10)->where('allowed', true)->where('endpoint', url('/api/v1'))->missing('mcpEndpoint')->missing('connections'));
+        // Plan 032 part 9: AI agents have their own tab.
+        $this->get('/settings/agents')->assertOk()->assertInertia(fn (Assert $page) => $page->component('settings/agents')
+            ->where('mcpEndpoint', url('/mcp'))->has('connections', 0)->where('connectionLimit', 10)->missing('tokens'));
 
         // A name, at least one known ability and one of the four expiries; nothing longer than ninety days and nothing without an end.
         foreach ([['name' => ''], ['name' => str_repeat('n', 61)], ['abilities' => []], ['abilities' => ['projects:read', 'admin']], ['abilities' => ['*']],
@@ -131,6 +136,7 @@ class ApiTokensTest extends TestCase
             }
             $this->post('/demo/client')->assertRedirect('/dashboard');
             $this->withSession($this->recent())->get('/settings/tokens')->assertRedirect('/dashboard');
+            $this->withSession($this->recent())->get('/settings/agents')->assertRedirect('/dashboard');
             $this->postJson('/settings/tokens', $this->wanted())->assertForbidden();
             $this->post('/logout');
         }
