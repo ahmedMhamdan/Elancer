@@ -26,7 +26,7 @@ One project, from the brief to the review. Every step below works on the live si
 
 4. **A final offer becomes a contract.** The offer names the scope, the deliverables, the price, the duration and the revision rounds. It expires after 72 hours, and a project has one pending offer at a time. Accepting it creates a contract that waits for funding.
 
-5. **The client funds it in test mode.** Funding goes through Stripe or Moyasar test checkout. The contract starts only after the server has asked the provider itself; coming back from the checkout page is not enough.
+5. **The client funds it in test mode.** Funding goes through Stripe or Moyasar test checkout, and the funding page shows the provider's test card to type there instead of a real one. The contract starts only after the server has asked the provider itself; coming back from the checkout page is not enough.
 
 6. **The work happens in the workroom.** The contract page keeps Messages, Deliveries, Agreement, Payments and Activity together. A delivery is the complete set of deliverables, with files and links. One revision request groups every change and uses one round. Both sides can agree to change dates or add rounds; the price never goes up.
 
@@ -122,11 +122,27 @@ curl -X POST -H "Authorization: Bearer $TOKEN" -H "Accept: application/json" -H 
 
 Saving and withdrawing follow the same rules as the pages. A request with an out-of-date `version` is refused with `409` and the current proposal, so a stale copy never overwrites a newer one. Demo accounts cannot create tokens.
 
+## AI agents (MCP)
+
+Members can connect their own AI agents to Elancer through the [Model Context Protocol](https://modelcontextprotocol.io) at `https://elancer.onrender.com/mcp`. There are ten tools. Seven do what the API does: the account, project search and pages, and the member's own proposals, including saving, submitting and withdrawing them. The other three let a client read their own projects and the proposals those projects received, and change nothing.
+
+There are two ways to sign in:
+
+- **Connect.** Apps that sign in themselves, such as Claude, ChatGPT, Cursor or VS Code, find the sign-in through OAuth discovery, register, and open an Elancer page that names the app and the address it returns to. The member signs in, confirms it is them and approves. A connected app may use every tool and appears under Settings, API tokens, where it can be disconnected.
+- **An API token.** Agents that take a header, such as Claude Code, use a token from Settings and see only the tools its abilities allow. `hiring:read` covers the client tools.
+
+```bash
+claude mcp add --transport http elancer https://elancer.onrender.com/mcp \
+  --header "Authorization: Bearer YOUR_TOKEN"
+```
+
+Each tool runs the same rules as the pages. Demo accounts cannot connect, and Elancer itself runs no AI model. Built with [laravel/mcp](https://laravel.com/docs/13.x/mcp) and Laravel Passport (OAuth 2.1 with PKCE, one-hour access tokens, 30-day refresh tokens).
+
 ## Stack
 
 | Layer    | Tools                                                                                    |
 | -------- | ---------------------------------------------------------------------------------------- |
-| Backend  | PHP 8.3, Laravel 13, Fortify, Socialite, Sanctum, Reverb                                 |
+| Backend  | PHP 8.3, Laravel 13, Fortify, Socialite, Sanctum, Passport, laravel/mcp, Reverb          |
 | Frontend | React 19, TypeScript, Inertia 3, Tailwind CSS 4, Vite                                    |
 | Database | MySQL in local development, PostgreSQL on Supabase for the hosted site, SQLite for tests |
 | Quality  | PHPUnit, PHPStan (Larastan), Pint, and a translation coverage check                      |
@@ -176,6 +192,7 @@ Everything below is optional. Without it the related feature stays off, and the 
 | Photo safety check    | `SIGHTENGINE_API_USER`, `SIGHTENGINE_API_SECRET`, `SIGHTENGINE_PROFILE_WORKFLOW` | Without these, photo and portfolio image uploads are refused. Onboarding without a photo still works.  |
 | File storage          | `UPLOADS_DRIVER`, `AWS_*`                                                        | Kept in `storage/app` by default. Set the driver to `s3` for two private S3-compatible buckets.        |
 | Upload budgets        | `UPLOAD_ACCOUNT_BUDGET_MB`, `UPLOAD_SITE_BUDGET_MB`                              | 25 and 750 by default.                                                                                 |
+| AI apps' Connect      | `PASSPORT_PRIVATE_KEY`, `PASSPORT_PUBLIC_KEY`                                     | Locally `php artisan passport:keys` writes the pair to `storage/`. Without keys only Connect fails.     |
 
 Pending payments and refunds are rechecked with the providers every five minutes by `payments:reconcile`. Run `php artisan schedule:work` locally to have that happen.
 
