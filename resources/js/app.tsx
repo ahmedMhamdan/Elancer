@@ -26,6 +26,7 @@ void createInertiaApp({
             case name.startsWith('payments/'):
             case name.startsWith('portfolio/'):
             case name.startsWith('saved/'):
+            case name.startsWith('oauth/'):
             case name === 'onboarding':
             case name === 'welcome':
             case name === 'auth/register':

@@ -336,6 +336,26 @@ export function helpGroups(t: (text: string) => string): HelpGroup[] {
                     action: t('Open API tokens'),
                 },
                 {
+                    id: 'ai-agents',
+                    title: t('Connect an AI agent'),
+                    body: [
+                        t(
+                            'An AI agent or app that supports MCP can search projects, prepare and send your proposals, and read your projects and the proposals they received. Its address is on Settings, API tokens.',
+                        ),
+                        t(
+                            'An app with a Connect button, such as Claude, ChatGPT, Cursor or VS Code, opens an Elancer page that names the app and where it returns to. Approve only an app you started yourself. A connected app may use every tool, and you can disconnect it on the same settings page.',
+                        ),
+                        t(
+                            'An agent that takes a header instead, such as Claude Code, uses an API token: it can do only what you gave the token. Ask your agent to check with you before it submits or withdraws a proposal.',
+                        ),
+                        t(
+                            'Elancer’s free hosting sleeps when nobody uses it, so the first call after a quiet time can take up to a minute.',
+                        ),
+                    ],
+                    href: '/settings/tokens',
+                    action: t('Open API tokens'),
+                },
+                {
                     id: 'closing-account',
                     title: t('Closing your account'),
                     body: [
