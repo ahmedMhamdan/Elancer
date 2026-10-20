@@ -39,7 +39,13 @@ class ProposalController extends Controller
     /** The owner reads a submitted proposal, except a member's application to a demo project, which stays with the member (plan 027). */
     private function reads(Request $request, Proposal $proposal): bool
     {
-        return $proposal->project->user_id === $request->user()->id && $proposal->submitted_at !== null
+        return self::clientReads($request->user()->id, $proposal);
+    }
+
+    /** The same rule for a client's agent (plan 033). */
+    public static function clientReads(int $client, Proposal $proposal): bool
+    {
+        return $proposal->project->user_id === $client && $proposal->submitted_at !== null
             && ! DemoWorld::trial($proposal->user_id, $proposal->project->user_id);
     }
 

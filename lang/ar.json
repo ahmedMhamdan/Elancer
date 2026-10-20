@@ -406,5 +406,17 @@
     "Write a message or attach a file.": "اكتب رسالة أو أرفق ملفًا.",
     "A message can carry up to :count files.": "يمكن إرفاق ما لا يزيد على :count ملفات بالرسالة.",
     "\":title\" is not public now, so it cannot be sent. Remove it from your samples or publish it first.": "«:title» غير منشورة الآن، لذلك لا يمكن إرسالها. أزلها من نماذج أعمالك أو انشرها أولًا.",
-    "sent you :count new messages about": "أرسل لك :count رسائل جديدة بخصوص"
+    "sent you :count new messages about": "أرسل لك :count رسائل جديدة بخصوص",
+    "This connection may not use this tool.": "لا يُسمح لهذا الاتصال باستخدام هذه الأداة.",
+    "Too many changes in a minute. Try again shortly.": "تغييرات كثيرة خلال دقيقة. حاول مجددًا بعد قليل.",
+    "This account may not do that.": "لا يستطيع هذا الحساب فعل ذلك.",
+    "Not found, or not visible to this account.": "غير موجود، أو غير ظاهر لهذا الحساب.",
+    "This changed in the meantime. Read it again before trying.": "تغيّر هذا في الأثناء. اقرأه مجددًا قبل المحاولة.",
+    "Too many requests. Try again shortly.": "طلبات كثيرة. حاول مجددًا بعد قليل.",
+    "That could not be done.": "تعذّر تنفيذ ذلك.",
+    "This proposal changed since the version you sent (you sent :sent, it is now :current). Read it again before saving.": "تغيّر هذا العرض منذ النسخة التي أرسلتها (أرسلت :sent، وهو الآن :current). اقرأه مجددًا قبل الحفظ.",
+    "Demo accounts cannot connect AI agents. Create your own account to connect one.": "لا يمكن ربط وكلاء الذكاء الاصطناعي بالحسابات التجريبية. أنشئ حسابك الخاص لتربط وكيلًا.",
+    "This account cannot connect AI agents right now.": "لا يستطيع هذا الحساب ربط وكلاء الذكاء الاصطناعي الآن.",
+    "This account already has the most connected apps it can hold. Disconnect one first.": "بلغ هذا الحساب أقصى عدد من التطبيقات المرتبطة. ألغِ ربط أحدها أولًا.",
+    "App disconnected.": "تم إلغاء ربط التطبيق."
 }

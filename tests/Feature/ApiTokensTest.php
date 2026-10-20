@@ -55,8 +55,8 @@ class ApiTokensTest extends TestCase
         $this->assertSame(0, DB::table('personal_access_tokens')->count());
 
         $this->withSession($this->recent())->get('/settings/tokens')->assertOk()->assertInertia(fn (Assert $page) => $page->component('settings/tokens')->has('tokens', 0)
-            ->where('abilities', ['projects:read', 'proposals:read', 'proposals:write'])->where('expiryDays', [7, 30, 60, 90])->where('defaultExpiryDays', 30)
-            ->where('limit', 10)->where('allowed', true)->where('endpoint', url('/api/v1')));
+            ->where('abilities', ['projects:read', 'proposals:read', 'proposals:write', 'hiring:read'])->where('expiryDays', [7, 30, 60, 90])->where('defaultExpiryDays', 30)
+            ->where('limit', 10)->where('allowed', true)->where('endpoint', url('/api/v1'))->where('mcpEndpoint', url('/mcp'))->has('connections', 0));
 
         // A name, at least one known ability and one of the four expiries; nothing longer than ninety days and nothing without an end.
         foreach ([['name' => ''], ['name' => str_repeat('n', 61)], ['abilities' => []], ['abilities' => ['projects:read', 'admin']], ['abilities' => ['*']],

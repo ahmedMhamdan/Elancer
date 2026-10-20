@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Profile;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Laravel\Sanctum\PersonalAccessToken;
 
 /** Plan 028: who the token belongs to and what it may do, so a program can tell why something is refused. */
 class MeController extends Controller
@@ -15,6 +16,8 @@ class MeController extends Controller
     {
         $user = $request->user();
         $token = $user->currentAccessToken();
+        // /api/v1 signs in through Sanctum alone; a connected app's token belongs to /mcp (plan 033).
+        abort_unless($token instanceof PersonalAccessToken, 401);
         $published = Profile::query()->publiclyVisible()->where('user_id', $user->id)->exists();
 
         return response()->json(['data' => [

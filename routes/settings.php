@@ -33,6 +33,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('settings/tokens', [ApiTokenController::class, 'index'])->middleware(RequirePassword::class)->name('api-tokens.index');
     Route::post('settings/tokens', [ApiTokenController::class, 'store'])->middleware([RequirePassword::class, 'throttle:10,1'])->name('api-tokens.store');
     Route::delete('settings/tokens/{token}', [ApiTokenController::class, 'destroy'])->whereNumber('token')->middleware([RequirePassword::class, 'throttle:30,1'])->name('api-tokens.destroy');
+    // Plan 033: an app connected through Connect is disconnected on the same page, behind the same sign-in.
+    Route::delete('settings/connections/{client}', [ApiTokenController::class, 'disconnect'])->whereUuid('client')->middleware([RequirePassword::class, 'throttle:30,1'])->name('api-tokens.disconnect');
 });
 
 Route::get('.well-known/passkey-endpoints', function () {

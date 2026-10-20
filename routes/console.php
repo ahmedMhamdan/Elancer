@@ -10,6 +10,7 @@ use App\Models\PaymentAttempt;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
+use Laravel\Passport\Client;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -68,3 +69,13 @@ Artisan::command('demo:reset {--due : Only when the demo has been left changed a
 
 // Covers a host that stays awake; a sleeping one resets when the next visitor enters.
 Schedule::command('demo:reset --due')->everyTenMinutes()->withoutOverlapping();
+
+// Plan 033: expired and revoked OAuth tokens and codes go after a day, and so do apps that registered
+// themselves but were never approved by anyone (registration is open to any app that asks).
+Artisan::command('oauth:prune', function () {
+    $this->call('passport:purge', ['--hours' => 24]);
+    $clients = Client::query()->where('created_at', '<', now()->subDay())->doesntHave('tokens')->doesntHave('authCodes')->delete();
+    $this->info('Removed '.$clients.' unused apps.');
+})->purpose('Remove expired OAuth tokens and apps that were never connected');
+
+Schedule::command('oauth:prune')->daily()->withoutOverlapping();

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Actions\Offers\OfferLifecycle;
 use App\Enums\AccountStatus;
 use App\Enums\WorkspaceRole;
+use App\Mcp\AgentAccess;
 use Carbon\CarbonImmutable;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -21,7 +22,9 @@ use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Contracts\PasskeyUser;
 use Laravel\Fortify\PasskeyAuthenticatable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Laravel\Passport\AccessToken;
 use Laravel\Sanctum\HasApiTokens;
+use Laravel\Sanctum\PersonalAccessToken;
 
 /**
  * @property-read Profile|null $profile
@@ -50,8 +53,22 @@ use Laravel\Sanctum\HasApiTokens;
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements HasLocalePreference, MustVerifyEmail, PasskeyUser
 {
+    // Sanctum's HasApiTokens only (plan 028). Passport's trait declares the same property with another type,
+    // so the two cannot share a class; Passport's guard (plan 033) needs only withAccessToken(), which this
+    // one has, and currentAccessToken() below then returns whichever token signed the request in.
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
+
+    /**
+     * The token that signed this request in: an API token through Sanctum on /api/v1 and /mcp, or a
+     * connected app's through Passport on /mcp. Sanctum's trait declares its own kind only.
+     *
+     * @return PersonalAccessToken|AccessToken<mixed>|null
+     */
+    public function currentAccessToken(): PersonalAccessToken|AccessToken|null
+    {
+        return $this->accessToken;
+    }
 
     /**
      * Match database defaults before a newly created model is reloaded.
@@ -165,6 +182,8 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
             IdentityVerification::where('user_id', $user->id)->first()?->delete();
             // Plan 028: an account's API tokens go with it; their table has no foreign key to do that.
             $user->tokens()->delete();
+            // Plan 033: and so do the apps it connected.
+            AgentAccess::forget($user->id);
         });
     }
 }

@@ -15,7 +15,9 @@ use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Middleware\SubstituteBindings;
+use Laravel\Passport\Exceptions\OAuthServerException as PassportOAuthServerException;
 use Laravel\Sanctum\Http\Middleware\CheckAbilities;
+use League\OAuth2\Server\Exception\OAuthServerException as LeagueOAuthServerException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -53,9 +55,12 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        // Plan 033: an agent and an app signing in read JSON, never a redirect to the login page.
         $exceptions->shouldRenderJsonWhen(
-            fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
+            fn (Request $request) => $request->is('api/*', 'mcp', 'oauth/token', 'oauth/register') || $request->expectsJson(),
         );
+        // An expired or foreign OAuth token is the caller's error, answered with 401; it is not logged.
+        $exceptions->dontReport([LeagueOAuthServerException::class, PassportOAuthServerException::class]);
         // A signed-out image request must not become the page opened after the next login.
         $exceptions->render(fn (AuthenticationException $exception, Request $request) => $request->routeIs('profile.photo', 'admin.identity.image') ? response('', 401) : null);
     })->create();

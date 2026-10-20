@@ -51,12 +51,12 @@ class ClientProjectController extends Controller
         $status = $request->query('status');
         $list = is_string($status) && in_array($status, ['draft', 'open', 'closed', 'hired', 'waiting', 'trash'], true) ? $status : 'all';
         $mine = fn (): Builder => Project::query()->where('user_id', $user);
-        $projects = $this->listed($mine(), $list, $user)->with('category:id,categoryname')->withCount('skills')
-            ->withCount(['proposals as applicants_count' => fn ($query) => $this->applicants($query, $user)])
-            ->withCount(['proposals as waiting_count' => fn ($query) => $this->waiting($query, $user)])
+        $projects = self::listed($mine(), $list, $user)->with('category:id,categoryname')->withCount('skills')
+            ->withCount(['proposals as applicants_count' => fn ($query) => self::applicants($query, $user)])
+            ->withCount(['proposals as waiting_count' => fn ($query) => self::waiting($query, $user)])
             // Three most recent applicants per project; limit() on the relation keeps the three per project.
             ->with(['proposals' => function ($query) use ($user): void {
-                $this->applicants($query->getQuery(), $user);
+                self::applicants($query->getQuery(), $user);
                 $query->latest('submitted_at')->latest('id')->limit(3);
             }])
             ->orderByDesc('updated_at')->orderByDesc('id')->paginate(20)->withQueryString();
@@ -88,8 +88,8 @@ class ClientProjectController extends Controller
             ]),
             'list' => $list,
             'counts' => [
-                ...collect(['all', 'draft', 'open', 'closed', 'hired', 'trash'])->mapWithKeys(fn (string $name) => [$name => $this->listed($mine(), $name, $user)->count()])->all(),
-                'waiting' => $this->waiting(Proposal::query()->whereIn('project_id', $mine()->where('status', 'published')->select('id')), $user)->count(),
+                ...collect(['all', 'draft', 'open', 'closed', 'hired', 'trash'])->mapWithKeys(fn (string $name) => [$name => self::listed($mine(), $name, $user)->count()])->all(),
+                'waiting' => self::waiting(Proposal::query()->whereIn('project_id', $mine()->where('status', 'published')->select('id')), $user)->count(),
             ],
             'readOnly' => $readOnly,
         ]);
@@ -101,7 +101,7 @@ class ClientProjectController extends Controller
      * @param  Builder<Project>  $query
      * @return Builder<Project>
      */
-    private function listed(Builder $query, string $list, int $user): Builder
+    public static function listed(Builder $query, string $list, int $user): Builder
     {
         return match ($list) {
             'trash' => $query->onlyTrashed(),
@@ -109,7 +109,7 @@ class ClientProjectController extends Controller
             'open' => $query->where('status', 'published')->whereNull('moderated_at')->where('application_closes_at', '>', now()),
             'closed' => $query->where(fn (Builder $query) => $query->where('status', 'closed')
                 ->orWhere(fn (Builder $query) => $query->where('status', 'published')->where('application_closes_at', '<=', now()))),
-            'waiting' => $query->where('status', 'published')->whereIn('id', $this->waiting(Proposal::query(), $user)->select('project_id')),
+            'waiting' => $query->where('status', 'published')->whereIn('id', self::waiting(Proposal::query(), $user)->select('project_id')),
             default => $query,
         };
     }
@@ -120,7 +120,7 @@ class ClientProjectController extends Controller
      * @param  Builder<Proposal>  $query
      * @return Builder<Proposal>
      */
-    private function applicants(Builder $query, int $owner): Builder
+    public static function applicants(Builder $query, int $owner): Builder
     {
         $query->whereNotNull('submitted_at');
         DemoWorld::ownApplicants($query, $owner);
@@ -135,9 +135,9 @@ class ClientProjectController extends Controller
      * @param  Builder<Proposal>  $query
      * @return Builder<Proposal>
      */
-    private function waiting(Builder $query, int $owner): Builder
+    public static function waiting(Builder $query, int $owner): Builder
     {
-        $this->applicants($query, $owner);
+        self::applicants($query, $owner);
 
         return $query->whereIn('status', ['submitted', 'reopened'])->where('organization', 'received')
             ->whereNotIn('id', Conversation::query()->select('proposal_id'))

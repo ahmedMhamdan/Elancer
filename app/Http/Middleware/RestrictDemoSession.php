@@ -18,7 +18,9 @@ use Symfony\Component\HttpFoundation\Response;
 class RestrictDemoSession
 {
     /** Ends the session, belongs to the visitor alone, or only moves a read mark. */
-    private const ALLOWED = ['logout', 'demo.leave', 'demo.switch', 'locale.update', 'notifications.open', 'notifications.read-all'];
+    private const ALLOWED = ['logout', 'demo.leave', 'demo.switch', 'locale.update', 'notifications.open', 'notifications.read-all',
+        // Plan 033: turning down an app's request to connect stores nothing; approving stays closed.
+        'passport.authorizations.deny'];
 
     /**
      * Plan 027: the hiring journey between demo accounts. Left out on purpose: the shared profile, its photo,
