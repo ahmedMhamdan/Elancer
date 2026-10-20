@@ -42,6 +42,13 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        // Plan 033: apps connected through Connect (OAuth) call /mcp with Passport's access tokens.
+        // API tokens (plan 028) stay with Sanctum; /mcp picks the guard by the token's form.
+        'api' => [
+            'driver' => 'passport',
+            'provider' => 'users',
+        ],
     ],
 
     /*
