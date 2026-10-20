@@ -402,28 +402,46 @@ function Writing() {
     );
 }
 
+// Plan 032 part 9: one megaphone (mouthpiece, body, bell and its rim, the grip under the body leaning
+// back toward the speaker) facing its sound waves.
 function Marketing() {
     return (
         <>
             <circle className="art-soft" cx="70" cy="40" r="88" />
             <path
+                className="art-warm"
+                d="M88 140h22l-8 46a8 8 0 0 1-8 7h-8a8 8 0 0 1-8-9z"
+            />
+            <rect
                 className="art-ink"
-                d="M94 104l92-46a8 8 0 0 1 12 7v114a8 8 0 0 1-12 7l-92-46z"
+                x="58"
+                y="110"
+                width="20"
+                height="26"
+                rx="6"
             />
             <rect
                 className="art-pop"
-                x="54"
-                y="100"
-                width="46"
-                height="50"
-                rx="12"
+                x="72"
+                y="102"
+                width="50"
+                height="42"
+                rx="10"
             />
             <path
-                className="art-warm"
-                d="M80 150h30l9 34a10 10 0 0 1-10 12H97a10 10 0 0 1-10-8z"
+                className="art-ink"
+                d="M116 108l78-44a8 8 0 0 1 12 7v104a8 8 0 0 1-12 7l-78-44z"
             />
-            <path className="art-line-pop" d="M218 98a34 34 0 0 1 0 48" />
-            <path className="art-line-pop" d="M238 78a62 62 0 0 1 0 88" />
+            <rect
+                className="art-pop"
+                x="200"
+                y="62"
+                width="14"
+                height="122"
+                rx="7"
+            />
+            <path className="art-line-pop" d="M228 104a26 26 0 0 1 0 38" />
+            <path className="art-line-pop" d="M246 86a56 56 0 0 1 0 74" />
             <rect
                 className="art-shadow"
                 x="284"

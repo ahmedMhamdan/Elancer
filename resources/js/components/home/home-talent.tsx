@@ -11,11 +11,9 @@ export type HomeFreelancer = Omit<Freelancer, 'links'>;
 
 export default function HomeTalent({
     freelancers,
-    total,
     destination,
 }: {
     freelancers: HomeFreelancer[];
-    total: number;
     destination: string;
 }) {
     const { t } = useTranslation();
@@ -35,10 +33,6 @@ export default function HomeTalent({
                     </h2>
                 </div>
                 <div className="home-live-note">
-                    <span className="home-live-count">
-                        <span className="home-live-dot" aria-hidden="true" />
-                        {t('Public profiles: :count', { count: total })}
-                    </span>
                     <p>{t('Profiles published by freelancers on Elancer.')}</p>
                 </div>
             </div>

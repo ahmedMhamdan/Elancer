@@ -2216,7 +2216,6 @@ export const arabic: Record<string, string> = {
     'Ideas drawn to scale': 'أفكار مرسومة بدقة',
     'Browse projects': 'تصفح المشاريع',
     'Freelancers on Elancer': 'مستقلون على Elancer',
-    'Public profiles: :count': 'الملفات العامة: :count',
     'Profiles published by freelancers on Elancer.':
         'ملفات نشرها مستقلون على Elancer.',
     'No public freelancer profiles yet.': 'لا توجد ملفات مستقلين عامة بعد.',

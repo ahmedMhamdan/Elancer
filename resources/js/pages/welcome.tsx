@@ -175,7 +175,6 @@ export default function Welcome({
 
                     <HomeProjects
                         projects={projects}
-                        total={totals.projects}
                         destination={destination}
                     />
                     <HomeCategories
@@ -184,7 +183,6 @@ export default function Welcome({
                     />
                     <HomeTalent
                         freelancers={freelancers}
-                        total={totals.freelancers}
                         destination={destination}
                     />
                     <HomePaths destination={destination} />

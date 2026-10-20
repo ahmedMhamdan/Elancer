@@ -11,11 +11,9 @@ export type HomeProject = Omit<Job, 'excerpt'>;
 
 export default function HomeProjects({
     projects,
-    total,
     destination,
 }: {
     projects: HomeProject[];
-    total: number;
     destination: string;
 }) {
     const { t } = useTranslation();
@@ -35,10 +33,6 @@ export default function HomeProjects({
                     </h2>
                 </div>
                 <div className="home-live-note">
-                    <span className="home-live-count">
-                        <span className="home-live-dot" aria-hidden="true" />
-                        {t('Open projects: :count', { count: total })}
-                    </span>
                     <p>{t('Posted by clients on Elancer, newest first.')}</p>
                 </div>
             </div>

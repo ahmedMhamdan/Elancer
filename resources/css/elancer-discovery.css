@@ -708,26 +708,6 @@
 .home-live-note {
     max-width: 365px;
 }
-.home-live-count {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    margin-block-end: 12px;
-    padding: 6px 14px;
-    border: 1px solid var(--el-border);
-    border-radius: 999px;
-    background: var(--el-surface);
-    color: var(--el-text);
-    font-size: 13px;
-    font-weight: 500;
-}
-.home-live-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--el-brand);
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--el-brand) 22%, transparent);
-}
 .home-project-card,
 .home-person-card {
     position: relative;
@@ -987,6 +967,15 @@
     --art-warm: #e3a467;
     --art-on-ink: var(--el-surface);
     --art-on-pop: var(--el-on-brand);
+    --art-shade: var(--art-ink);
+    --art-shade-opacity: 0.1;
+}
+/* Plan 032 part 9: on a dark drawing the ink is light, so a shadow drawn in ink lit the card's edge
+   instead of shading it; there the shadow is black. */
+.home-art[data-tone='ink'],
+.dark .home-art {
+    --art-shade: #000;
+    --art-shade-opacity: 0.32;
 }
 .home-art[data-tone='ink'],
 .home-monogram[data-tone='ink'] {
@@ -1047,8 +1036,8 @@
     opacity: 0.07;
 }
 .art-shadow {
-    fill: var(--art-ink);
-    opacity: 0.1;
+    fill: var(--art-shade);
+    opacity: var(--art-shade-opacity);
 }
 .art-half {
     opacity: 0.45;
