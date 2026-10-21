@@ -2811,6 +2811,16 @@ export const arabic: Record<string, string> = {
     'Elancer does not check who made an app. Approve only an app you started yourself. You can disconnect it at any time in Settings, AI agents.':
         'لا يتحقق إيلانسر ممّن صنع التطبيق. وافق فقط على تطبيق شغّلته بنفسك. يمكنك إلغاء ربطه متى شئت من «الإعدادات» ثم «وكلاء الذكاء الاصطناعي».',
     Approve: 'موافقة',
+    'This approval page is out of date': 'صفحة الموافقة هذه لم تعد صالحة',
+    'Nothing was connected. A newer approval page was opened, or this one waited too long.':
+        'لم يُربط أي تطبيق. فُتحت صفحة موافقة أحدث، أو انتظرت هذه الصفحة وقتًا طويلًا.',
+    'To connect the app': 'لربط التطبيق',
+    'Go back to your AI app and connect again. It opens a new approval page.':
+        'ارجع إلى تطبيق الذكاء الاصطناعي واربطه من جديد، وسيفتح صفحة موافقة جديدة.',
+    'Approve on that new page, and keep only one approval page open.':
+        'وافق في تلك الصفحة الجديدة، وأبقِ صفحة موافقة واحدة فقط مفتوحة.',
+    'In Claude Code, run /mcp, choose the Elancer server, then Authenticate.':
+        'في Claude Code، شغّل ‎/mcp واختر خادم إيلانسر، ثم Authenticate.',
     'Read my projects and received proposals': 'قراءة مشاريعي والعروض الواردة',
     'Your own projects as a client and the proposals they received, read only. Used by AI agents; the API routes below do not read it.':
         'مشاريعك بصفتك عميلًا والعروض التي وصلتها، للقراءة فقط. يستخدمها وكلاء الذكاء الاصطناعي، ولا تقرؤها مسارات الواجهة البرمجية أدناه.',

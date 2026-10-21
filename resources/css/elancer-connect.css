@@ -118,3 +118,18 @@
     opacity: 0.55;
     cursor: not-allowed;
 }
+/* The out-of-date approval page (oauth/expired.tsx): a small mark above the heading. */
+.connect-badge {
+    display: inline-grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+    border-radius: 50%;
+    background: var(--el-soft);
+    color: var(--el-accent);
+}
+.connect-badge svg {
+    width: 22px;
+    height: 22px;
+}

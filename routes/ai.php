@@ -31,5 +31,9 @@ Route::prefix('oauth')->name('passport.')->group(function (): void {
     });
 });
 
+// Where an approval form that no longer matches the session lands (bootstrap/app.php): it tells the
+// member to start again from the app, instead of Passport's bare 403. Open to guests: the session may be gone.
+Route::middleware('web')->group(fn () => Route::inertia('oauth/expired', 'oauth/expired')->name('oauth.expired'));
+
 // Either kind of bearer token, the account rule of the API, then 60 calls a minute per token.
 Mcp::web('/mcp', ElancerServer::class)->middleware([AuthenticateAgent::class, 'api.account', 'throttle:mcp'])->name('mcp');

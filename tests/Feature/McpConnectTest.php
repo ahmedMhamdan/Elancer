@@ -227,4 +227,33 @@ class McpConnectTest extends TestCase
         $this->artisan('oauth:prune')->assertSuccessful();
         $this->assertSame(['Agent 1'], Client::query()->pluck('name')->all());
     }
+
+    public function test_an_approval_page_that_is_out_of_date_says_to_start_again_from_the_app(): void
+    {
+        $omar = $this->member('omar@example.com');
+        $client = $this->register();
+        $request = $this->request($client);
+
+        // The page opened twice in one session: Passport waits for the newer one only.
+        $older = $this->actingAs($omar)->withSession($this->recent())->get($request['url'])->assertOk();
+        $newer = $this->withSession($this->recent())->get($request['url'])->assertOk();
+        $this->approve($older)->assertStatus(303)->assertRedirect(route('oauth.expired'));
+        // A mismatch ends the waiting approval, so the newer page is out of date too, for Cancel as for Approve.
+        $this->approve($newer)->assertRedirect(route('oauth.expired'));
+        $form = $newer->viewData('page')['props']['form'];
+        $this->delete('/oauth/authorize', ['state' => $form['state'], 'client_id' => $form['clientId'], 'auth_token' => $form['authToken']])->assertRedirect(route('oauth.expired'));
+        $this->assertSame(0, DB::table('oauth_auth_codes')->count());
+
+        $this->get(route('oauth.expired'))->assertOk()->assertInertia(fn (Assert $page) => $page->component('oauth/expired'));
+        $this->post('/logout');
+        $this->get(route('oauth.expired'))->assertOk()->assertInertia(fn (Assert $page) => $page->component('oauth/expired'));
+
+        // A session that ended while the page was open: no approval waits, so no sign-in first.
+        $page = $this->actingAs($omar)->withSession($this->recent())->get($request['url'])->assertOk();
+        $this->post('/logout');
+        $this->approve($page)->assertStatus(303)->assertRedirect(route('oauth.expired'));
+
+        // Connecting again from the app works.
+        $this->code($this->approve($this->actingAs($omar)->withSession($this->recent())->get($request['url'])));
+    }
 }

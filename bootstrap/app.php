@@ -15,9 +15,12 @@ use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Session\TokenMismatchException;
+use Laravel\Passport\Exceptions\InvalidAuthTokenException;
 use Laravel\Passport\Exceptions\OAuthServerException as PassportOAuthServerException;
 use Laravel\Sanctum\Http\Middleware\CheckAbilities;
 use League\OAuth2\Server\Exception\OAuthServerException as LeagueOAuthServerException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -61,6 +64,15 @@ return Application::configure(basePath: dirname(__DIR__))
         );
         // An expired or foreign OAuth token is the caller's error, answered with 401; it is not logged.
         $exceptions->dontReport([LeagueOAuthServerException::class, PassportOAuthServerException::class]);
+        // Passport keeps one approval waiting per session. A form from an older page (the page opened again
+        // in another tab, or a session that has ended) gets Elancer's page saying to start again from the app,
+        // instead of Passport's bare 403, a 419, or the login page, after which no approval is waiting.
+        // Laravel has wrapped the first two by now.
+        $approving = fn (Request $request): bool => $request->routeIs('passport.authorizations.approve', 'passport.authorizations.deny');
+        $exceptions->render(fn (HttpException $exception, Request $request) => $approving($request)
+            && ($exception->getPrevious() instanceof InvalidAuthTokenException || $exception->getPrevious() instanceof TokenMismatchException)
+            ? redirect()->route('oauth.expired', status: 303) : null);
+        $exceptions->render(fn (AuthenticationException $exception, Request $request) => $approving($request) ? redirect()->route('oauth.expired', status: 303) : null);
         // A signed-out image request must not become the page opened after the next login.
         $exceptions->render(fn (AuthenticationException $exception, Request $request) => $request->routeIs('profile.photo', 'admin.identity.image') ? response('', 401) : null);
     })->create();
