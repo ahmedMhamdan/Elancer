@@ -23,6 +23,7 @@ import { BlurFade } from '@/components/ui/blur-fade';
 import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
 import { NumberTicker } from '@/components/ui/number-ticker';
 import { useRelativeTime } from '@/hooks/use-relative-time';
+import { useDemoSession } from '@/hooks/use-demo-session';
 import { useTranslation } from '@/hooks/use-translation';
 import { Money, type Page } from '../discovery/shared';
 import { contractStatusLabel } from '../offers/shared';
@@ -98,6 +99,8 @@ function ProjectCard({
     onRemove: (project: Project) => void;
 }) {
     const { t, ar } = useTranslation();
+    // Plan 032 part 10: a demo session may not delete a project for good; the server refuses it.
+    const { demo } = useDemoSession();
     const relative = useRelativeTime();
     const state = stateOf(project);
     const labels: Record<State, string> = {
@@ -252,12 +255,14 @@ function ProjectCard({
                 >
                     {t('Restore')}
                 </Button>
-                <Button
-                    variant="danger-outline"
-                    onClick={() => onRemove(project)}
-                >
-                    {t('Delete permanently')}
-                </Button>
+                {!demo && (
+                    <Button
+                        variant="danger-outline"
+                        onClick={() => onRemove(project)}
+                    >
+                        {t('Delete permanently')}
+                    </Button>
+                )}
             </>
         )
     ) : readOnly ? (

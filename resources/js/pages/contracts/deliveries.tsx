@@ -3,7 +3,9 @@ import { Download, ExternalLink } from 'lucide-react';
 import { useState } from 'react';
 import InputError from '@/components/input-error';
 import Button from '@/components/tailadmin/button';
+import { DemoOffNote } from '@/components/demo-off';
 import TextArea from '@/components/tailadmin/textarea';
+import { useDemoSession } from '@/hooks/use-demo-session';
 import { useTranslation } from '@/hooks/use-translation';
 import { OfferTime, type Contract } from '@/pages/offers/shared';
 
@@ -19,6 +21,8 @@ export type Submission = {
 
 function DeliveryForm({ contract }: { contract: Contract }) {
     const { t } = useTranslation();
+    // Plan 032 part 10: no file enters storage through the shared demo account.
+    const { demo } = useDemoSession();
     // One token per page load: a double click or retry records one delivery.
     const form = useForm({
         message: '',
@@ -102,28 +106,37 @@ function DeliveryForm({ contract }: { contract: Contract }) {
                 </p>
                 {listed('links')}
             </div>
-            <div className="market-field">
-                <label htmlFor="delivery-files">{t('Files')}</label>
-                <input
-                    id="delivery-files"
-                    type="file"
-                    multiple
-                    accept=".jpg,.jpeg,.png,.webp,.pdf,.txt,.zip"
-                    className="delivery-file-input"
-                    onChange={(event) =>
-                        form.setData(
-                            'files',
-                            Array.from(event.target.files ?? []),
-                        )
-                    }
-                />
-                <p className="market-muted">
-                    {t(
-                        'Up to 3 files, 5 MB each: JPG, PNG, WebP, PDF, TXT or ZIP. Only you and the client can download them.',
-                    )}
-                </p>
-                {listed('files')}
-            </div>
+            {demo ? (
+                <div className="market-field">
+                    <span>{t('Files')}</span>
+                    <DemoOffNote>
+                        {t('Files are switched off in the shared demo.')}
+                    </DemoOffNote>
+                </div>
+            ) : (
+                <div className="market-field">
+                    <label htmlFor="delivery-files">{t('Files')}</label>
+                    <input
+                        id="delivery-files"
+                        type="file"
+                        multiple
+                        accept=".jpg,.jpeg,.png,.webp,.pdf,.txt,.zip"
+                        className="delivery-file-input"
+                        onChange={(event) =>
+                            form.setData(
+                                'files',
+                                Array.from(event.target.files ?? []),
+                            )
+                        }
+                    />
+                    <p className="market-muted">
+                        {t(
+                            'Up to 3 files, 5 MB each: JPG, PNG, WebP, PDF, TXT or ZIP. Only you and the client can download them.',
+                        )}
+                    </p>
+                    {listed('files')}
+                </div>
+            )}
             <label className="delivery-confirm">
                 <input
                     type="checkbox"

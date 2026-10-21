@@ -13,7 +13,13 @@ import '../../../css/elancer-connect.css';
 
 export default function ApprovalExpired() {
     const { t } = useTranslation();
-    const signedIn = Boolean(usePage().props.auth.user);
+    const { auth } = usePage().props;
+    // Members open AI agents; a demo session has no settings (plan 032 part 10), a guest goes home.
+    const [href, label] = auth.demo
+        ? ['/dashboard', t('Demo workspace')]
+        : auth.user
+          ? ['/settings/agents', t('Open AI agents')]
+          : ['/', t('Elancer home')];
 
     return (
         <div className="elancer-two-factor">
@@ -75,11 +81,8 @@ export default function ApprovalExpired() {
                 </section>
 
                 <div className="connect-actions">
-                    <Link
-                        href={signedIn ? '/settings/agents' : '/'}
-                        className="two-factor-submit"
-                    >
-                        {signedIn ? t('Open AI agents') : t('Elancer home')}
+                    <Link href={href} className="two-factor-submit">
+                        {label}
                     </Link>
                 </div>
             </main>

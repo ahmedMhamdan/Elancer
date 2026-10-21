@@ -11,6 +11,7 @@ import {
     UserRound,
 } from 'lucide-react';
 import ComponentCard from '@/components/component-card';
+import { DemoOffCard } from '@/components/demo-off';
 import ProfilePhotoForm from '@/components/profile-photo-form';
 import ProfileForm from '@/components/profile-form';
 import ProfilePublication from '@/components/profile-publication';
@@ -43,6 +44,8 @@ export default function MarketplaceProfile({
     const { auth } = page.props;
     const name = auth.user.name;
     const isClient = auth.user.workspace_role === 'client';
+    // Plan 032 part 10: the shared demo profile, its photo and identity stay as they are.
+    const demo = auth.demo === true;
     const total = isClient ? 2 : 3;
     const completed = [
         ...(isClient ? [] : [profile?.headline]),
@@ -130,10 +133,24 @@ export default function MarketplaceProfile({
                 </div>
                 <div className="workspace-columns">
                     <div className="min-w-0 space-y-6">
-                        <ProfilePhotoForm />
-                        <ProfileForm profile={profile} />
-                        {!isClient && <ProfilePublication profile={profile} />}
-                        <IdentityVerification identity={identity} />
+                        {demo ? (
+                            <DemoOffCard
+                                title={t('The demo profile cannot be changed')}
+                            >
+                                {t(
+                                    'Every visitor shares this profile, so its details, photo, publication and identity check stay as they are. Your profile, below or beside, shows what is saved.',
+                                )}
+                            </DemoOffCard>
+                        ) : (
+                            <>
+                                <ProfilePhotoForm />
+                                <ProfileForm profile={profile} />
+                                {!isClient && (
+                                    <ProfilePublication profile={profile} />
+                                )}
+                                <IdentityVerification identity={identity} />
+                            </>
+                        )}
                     </div>
                     <aside>
                         <ComponentCard

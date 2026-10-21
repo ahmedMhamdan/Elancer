@@ -8,7 +8,11 @@ function getInitial(name: string): string {
 
 export function useInitials(): GetInitialsFn {
     return useCallback((fullName: string): string => {
-        const names = fullName.trim().split(/\s+/u).filter(Boolean);
+        // Plan 032 part 10: only words that start with a letter, so "Nadia Farah (Demo)" gives NF, not N(.
+        const names = fullName
+            .trim()
+            .split(/\s+/u)
+            .filter((name) => /^\p{L}/u.test(name));
 
         if (names.length === 0) {
             return '';

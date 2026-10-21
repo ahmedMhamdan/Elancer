@@ -90,10 +90,13 @@ export function App1({ overview, published }: { overview: OverviewData; publishe
                             {checks.map(([key, ready]) => <li key={key} className="flex items-center gap-2 text-sm"><span className={ready ? 'overview-check overview-check-ready' : 'overview-check'}>{ready && <Check className="size-3" aria-hidden="true" />}</span>{t(CHECK_LABELS[key])}<span className="text-muted-foreground ms-auto text-xs">{ready ? t('Ready') : t('To do')}</span></li>)}
                         </ul>
                         <Link href="/my-profile" className="overview-text-link min-h-11">{t('Manage profile')}<ChevronRight className={ar ? 'size-4 rotate-180' : 'size-4'} aria-hidden="true" /></Link>
-                        <div className="overview-account-links">
-                            <Link href="/settings/security"><ShieldCheck className="size-4" aria-hidden="true" /><span>{auth.user.two_factor_enabled ? t('2FA enabled') : t('Set up 2FA')}</span><ChevronRight className={ar ? 'ms-auto size-4 rotate-180' : 'ms-auto size-4'} aria-hidden="true" /></Link>
-                            <Link href="/settings/profile">{t('Check your account details')}<ChevronRight className={ar ? 'ms-auto size-4 rotate-180' : 'ms-auto size-4'} aria-hidden="true" /></Link>
-                        </div>
+                        {/* Plan 032 part 10: the shared demo account has no settings to open. */}
+                        {!auth.demo && (
+                            <div className="overview-account-links">
+                                <Link href="/settings/security"><ShieldCheck className="size-4" aria-hidden="true" /><span>{auth.user.two_factor_enabled ? t('2FA enabled') : t('Set up 2FA')}</span><ChevronRight className={ar ? 'ms-auto size-4 rotate-180' : 'ms-auto size-4'} aria-hidden="true" /></Link>
+                                <Link href="/settings/profile">{t('Check your account details')}<ChevronRight className={ar ? 'ms-auto size-4 rotate-180' : 'ms-auto size-4'} aria-hidden="true" /></Link>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             </div>

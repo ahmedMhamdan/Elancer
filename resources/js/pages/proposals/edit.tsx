@@ -9,7 +9,9 @@ import {
 import Button from '@/components/tailadmin/button';
 import Input from '@/components/tailadmin/input';
 import TextArea from '@/components/tailadmin/textarea';
+import { DemoOffNote } from '@/components/demo-off';
 import HelpLink from '@/components/help-link';
+import { useDemoSession } from '@/hooks/use-demo-session';
 import { useTranslation } from '@/hooks/use-translation';
 import type { WorkLink } from '@/components/freelancer-card';
 import type { Attachment } from '@/pages/discovery/shared';
@@ -57,6 +59,8 @@ export default function Edit({
     trial: boolean;
 }) {
     const { t } = useTranslation();
+    // Plan 032 part 10: no file enters storage through the shared demo account.
+    const { demo } = useDemoSession();
     const initial = proposal?.draft ?? proposal?.content;
     const [data, setData] = useState<Draft>({
         price: initial?.price ?? '',
@@ -600,6 +604,12 @@ export default function Edit({
                                     'Nobody receives a proposal on a sample project, so it takes no files.',
                                 )}
                             </p>
+                        ) : demo ? (
+                            <DemoOffNote>
+                                {t(
+                                    'Files are switched off in the shared demo.',
+                                )}
+                            </DemoOffNote>
                         ) : (
                             <>
                                 {/* Who will see the files is said before the control, not after an upload. */}

@@ -1,6 +1,7 @@
 ﻿import { Head, Link } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 import AppLayout from '@/layouts/app-layout';
+import { useDemoSession } from '@/hooks/use-demo-session';
 import { useTranslation } from '@/hooks/use-translation';
 import '../../../css/elancer-marketplace.css';
 
@@ -17,6 +18,8 @@ export type Invitation = {
 
 export function InvitationLayout({ children }: { children: ReactNode }) {
     const { t } = useTranslation();
+    // Plan 032 part 10: a shared demo account blocks and unblocks nobody.
+    const { demo } = useDemoSession();
     return (
         <AppLayout
             breadcrumbs={[{ title: t('Invitations'), href: '/invitations' }]}
@@ -29,9 +32,11 @@ export function InvitationLayout({ children }: { children: ReactNode }) {
                     <Link href="/invitations?box=sent">
                         {t('Sent invitations')}
                     </Link>
-                    <Link href="/blocked-accounts">
-                        {t('Blocked accounts')}
-                    </Link>
+                    {!demo && (
+                        <Link href="/blocked-accounts">
+                            {t('Blocked accounts')}
+                        </Link>
+                    )}
                 </nav>
                 {children}
             </main>

@@ -31,6 +31,13 @@ export default function ElancerSiteHeader({
     const [isOpen, setIsOpen] = useState(false);
     const closeMenu = useCallback(() => setIsOpen(false), []);
     const destination = auth.user ? dashboard().url : register().url;
+    // Plan 032 part 10: a demo visitor on the public pages can tell they are in the demo and leave it.
+    const demo = auth.demo === true;
+    const workspace = demo ? t('Demo workspace') : t('Workspace');
+    const leave = demo ? t('Leave the demo') : t('Log out');
+    const leaveHref = demo
+        ? { url: '/demo/leave', method: 'post' as const }
+        : logout();
 
     return (
         <Navbar>
@@ -45,12 +52,12 @@ export default function ElancerSiteHeader({
                     <ThemeToggle />
                     {auth.user && (
                         <Link
-                            href={logout()}
+                            href={leaveHref}
                             as="button"
                             onClick={() => router.flushAll()}
                             className="elancer-navbar-button elancer-navbar-button-secondary elancer-logout"
                         >
-                            {t('Log out')}
+                            {leave}
                         </Link>
                     )}
                     {!auth.user && (
@@ -63,7 +70,7 @@ export default function ElancerSiteHeader({
                     )}
                     {!registration && (
                         <NavbarButton href={destination}>
-                            {auth.user ? t('Workspace') : t('Join Elancer')}
+                            {auth.user ? workspace : t('Join Elancer')}
                         </NavbarButton>
                     )}
                 </div>
@@ -78,7 +85,7 @@ export default function ElancerSiteHeader({
                                 href={destination}
                                 className="px-4 text-xs"
                             >
-                                {auth.user ? t('Workspace') : t('Join Elancer')}
+                                {auth.user ? workspace : t('Join Elancer')}
                             </NavbarButton>
                         )}
                         <MobileNavToggle
@@ -94,12 +101,12 @@ export default function ElancerSiteHeader({
                         <ThemeToggle />
                         {auth.user && (
                             <Link
-                                href={logout()}
+                                href={leaveHref}
                                 as="button"
                                 onClick={() => router.flushAll()}
                                 className="elancer-navbar-button elancer-navbar-button-secondary elancer-logout"
                             >
-                                {t('Log out')}
+                                {leave}
                             </Link>
                         )}
                         {!auth.user && (
@@ -116,9 +123,7 @@ export default function ElancerSiteHeader({
                                 href={destination}
                                 onClick={closeMenu}
                             >
-                                {auth.user
-                                    ? t('Workspace')
-                                    : t('Create account')}
+                                {auth.user ? workspace : t('Create account')}
                             </NavbarButton>
                         )}
                     </div>

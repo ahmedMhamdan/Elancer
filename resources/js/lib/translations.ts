@@ -2349,6 +2349,22 @@ export const arabic: Record<string, string> = {
         'هذا الحساب مشترك بين الزوار وفيه بيانات تجريبية. جرّبه: انشر مشروعًا، قدّم عرضًا، راسل، وظّف وادفع عبر مزوّد الدفع التجريبي. كل ذلك يبقى داخل العرض التجريبي ويُعاد ضبطه من وقت لآخر. الملفات والملف الشخصي وإعدادات الحساب معطّلة.',
     'Switch to the demo client': 'انتقل إلى حساب صاحب المشاريع التجريبي',
     'Switch to the demo freelancer': 'انتقل إلى حساب المستقل التجريبي',
+    'Files are switched off in the shared demo.':
+        'الملفات معطّلة في العرض التجريبي المشترك.',
+    'Case studies are switched off in the shared demo.':
+        'دراسات الحالة معطّلة في العرض التجريبي المشترك.',
+    'Blocking is switched off in the shared demo.':
+        'الحظر معطّل في العرض التجريبي المشترك.',
+    'Settings are switched off in the shared demo.':
+        'الإعدادات معطّلة في العرض التجريبي المشترك.',
+    'The demo profile cannot be changed': 'لا يمكن تعديل الملف الشخصي التجريبي',
+    'Every visitor shares this profile, so its details, photo, publication and identity check stay as they are. Your profile, below or beside, shows what is saved.':
+        'يتشارك الزوار جميعًا هذا الملف الشخصي، لذلك تبقى بياناته وصورته ونشره والتحقق من الهوية كما هي. يعرض قسم «ملفك الشخصي» أدناه أو بجانبه ما هو محفوظ.',
+    'The demo portfolio cannot be changed': 'لا يمكن تعديل معرض الأعمال التجريبي',
+    'Every visitor shares this portfolio, so case studies cannot be added, edited, published or deleted here. Their public pages stay open.':
+        'يتشارك الزوار جميعًا معرض الأعمال هذا، لذلك لا يمكن هنا إضافة دراسات الحالة أو تعديلها أو نشرها أو حذفها. وتبقى صفحاتها العامة متاحة.',
+    'Demo workspace': 'مساحة العمل التجريبية',
+    'Leave the demo': 'مغادرة العرض التجريبي',
     'No account needed. Demo accounts are shared with other visitors and filled with sample projects, proposals and contracts. What you do there stays inside the demo and is reset from time to time.':
         'لا حاجة إلى حساب. الحسابات التجريبية مشتركة بين الزوار وفيها مشاريع وعروض وعقود تجريبية. ما تفعله هناك يبقى داخل العرض التجريبي ويُعاد ضبطه من وقت لآخر.',
     'This is a sample project from the demo. You can apply to see how applying works, but no real client will read or answer your proposal.':

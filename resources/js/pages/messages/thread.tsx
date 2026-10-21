@@ -13,6 +13,7 @@ import ReportDialog from '@/components/report-dialog';
 import Button from '@/components/tailadmin/button';
 import Pagination from '@/components/tailadmin/pagination';
 import TextArea from '@/components/tailadmin/textarea';
+import { useDemoSession } from '@/hooks/use-demo-session';
 import { useTranslation } from '@/hooks/use-translation';
 import { cn } from '@/lib/utils';
 import { FileSize } from '@/pages/discovery/shared';
@@ -246,6 +247,8 @@ export function MessageComposer({
     extra?: Record<string, boolean>;
 }) {
     const { t } = useTranslation();
+    // Plan 032 part 10: no file enters storage through the shared demo account.
+    const { demo } = useDemoSession();
     const form = useForm<{
         body: string;
         client_token: string;
@@ -341,29 +344,34 @@ export function MessageComposer({
                 {t('Message')}
             </label>
             <div className="flex items-end gap-2">
-                <input
-                    id="message-files"
-                    type="file"
-                    multiple
-                    className="sr-only"
-                    accept={FILE_ACCEPT}
-                    disabled={
-                        form.processing || form.data.files.length >= fileLimit
-                    }
-                    aria-describedby="message-help"
-                    onChange={(event) => {
-                        choose(event.target.files);
-                        event.target.value = '';
-                    }}
-                />
-                <label
-                    htmlFor="message-files"
-                    className="chat-attach mb-1"
-                    title={t('Attach files')}
-                >
-                    <Paperclip className="size-5" aria-hidden="true" />
-                    <span className="sr-only">{t('Attach files')}</span>
-                </label>
+                {!demo && (
+                    <>
+                        <input
+                            id="message-files"
+                            type="file"
+                            multiple
+                            className="sr-only"
+                            accept={FILE_ACCEPT}
+                            disabled={
+                                form.processing ||
+                                form.data.files.length >= fileLimit
+                            }
+                            aria-describedby="message-help"
+                            onChange={(event) => {
+                                choose(event.target.files);
+                                event.target.value = '';
+                            }}
+                        />
+                        <label
+                            htmlFor="message-files"
+                            className="chat-attach mb-1"
+                            title={t('Attach files')}
+                        >
+                            <Paperclip className="size-5" aria-hidden="true" />
+                            <span className="sr-only">{t('Attach files')}</span>
+                        </label>
+                    </>
+                )}
                 <div className="min-w-0 flex-1">
                     <TextArea
                         id="message-body"
@@ -407,10 +415,12 @@ export function MessageComposer({
                 {t(
                     'You can correct sent text for 15 minutes. Messages cannot be deleted.',
                 )}{' '}
-                {t(
-                    'Attach up to :count files of 5 MB each: JPG, PNG, WebP, PDF, TXT or ZIP. Files cannot be removed once sent.',
-                    { count: fileLimit },
-                )}
+                {demo
+                    ? t('Files are switched off in the shared demo.')
+                    : t(
+                          'Attach up to :count files of 5 MB each: JPG, PNG, WebP, PDF, TXT or ZIP. Files cannot be removed once sent.',
+                          { count: fileLimit },
+                      )}
             </p>
         </form>
     );

@@ -1,6 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { ArrowUpRight, ChevronDown, Search } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import { DemoOffNote } from '@/components/demo-off';
 import ElancerSiteHeader from '@/components/elancer-site-header';
 import HoverFooter from '@/components/hover-footer';
 import {
@@ -9,16 +10,26 @@ import {
     type HelpArticle,
 } from '@/data/help-articles';
 import { publicGuides } from '@/data/public-guides';
+import { useDemoSession } from '@/hooks/use-demo-session';
 import { useTranslation } from '@/hooks/use-translation';
 import '../../../css/elancer-guides.css';
 
 function ArticleBody({ article }: { article: HelpArticle }) {
+    const { t } = useTranslation();
+    // Plan 032 part 10: the articles stay; a shared demo account has no settings to open.
+    const { demo } = useDemoSession();
+    const closed = demo && article.href?.startsWith('/settings');
     return (
         <>
             {article.body.map((paragraph) => (
                 <p key={paragraph}>{paragraph}</p>
             ))}
-            {article.href && (
+            {closed && (
+                <DemoOffNote>
+                    {t('Settings are switched off in the shared demo.')}
+                </DemoOffNote>
+            )}
+            {article.href && !closed && (
                 <Link href={article.href} className="elancer-guide-action">
                     {article.action}
                     <ArrowUpRight size={18} aria-hidden="true" />

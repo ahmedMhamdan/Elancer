@@ -20,6 +20,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useDemoSession } from '@/hooks/use-demo-session';
 import { useTranslation } from '@/hooks/use-translation';
 import { cn } from '@/lib/utils';
 import type { Page } from '@/pages/discovery/shared';
@@ -58,6 +59,7 @@ function ConversationChat({
     fileLimit,
 }: ShowProps) {
     const { t, ar } = useTranslation();
+    const { demo } = useDemoSession();
     const page = usePage();
     const [refreshing, setRefreshing] = useState(false);
     const header = (
@@ -147,25 +149,30 @@ function ConversationChat({
                             ? t('Unarchive')
                             : t('Archive conversation')}
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                        className="text-destructive"
-                        onSelect={() => {
-                            if (
-                                window.confirm(
-                                    t(
-                                        'Block this account? New invitations and proposal contact will be stopped.',
-                                    ),
+                    {/* Plan 032 part 10: a shared demo account blocks nobody. */}
+                    {!demo && <DropdownMenuSeparator />}
+                    {!demo && (
+                        <DropdownMenuItem
+                            className="text-destructive"
+                            onSelect={() => {
+                                if (
+                                    window.confirm(
+                                        t(
+                                            'Block this account? New invitations and proposal contact will be stopped.',
+                                        ),
+                                    )
                                 )
-                            )
-                                router.post(
-                                    '/messages/' + conversation.id + '/block',
-                                );
-                        }}
-                    >
-                        <ShieldBan aria-hidden="true" />
-                        {t('Block account')}
-                    </DropdownMenuItem>
+                                    router.post(
+                                        '/messages/' +
+                                            conversation.id +
+                                            '/block',
+                                    );
+                            }}
+                        >
+                            <ShieldBan aria-hidden="true" />
+                            {t('Block account')}
+                        </DropdownMenuItem>
+                    )}
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>

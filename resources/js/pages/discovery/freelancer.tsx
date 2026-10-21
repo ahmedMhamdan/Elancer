@@ -115,7 +115,8 @@ export default function FreelancerProfile({
                             only={['saved']}
                         />
                     )}
-                    {auth.user && (
+                    {/* Plan 032 part 10: a shared demo account blocks nobody. */}
+                    {auth.user && !auth.demo && (
                         <Button
                             variant="danger-outline"
                             onClick={() => {

@@ -18,7 +18,9 @@ type Item = {
 export default function Notifications({ items }: { items: Page<Item> }) {
     const { t, locale } = useTranslation();
     const sentence = useNotificationSentence();
-    const unread = usePage().props.notifications.unread;
+    const { notifications, auth } = usePage().props;
+    const unread = notifications.unread;
+    const demo = auth.demo === true;
     return (
         <>
             <Head title={t('Notifications')} />
@@ -42,9 +44,12 @@ export default function Notifications({ items }: { items: Page<Item> }) {
                                 {t('Mark all as read')}
                             </Button>
                         )}
-                        <Link href="/settings/notifications">
-                            {t('Email preferences')}
-                        </Link>
+                        {/* Plan 032 part 10: the shared demo account has no settings to open. */}
+                        {!demo && (
+                            <Link href="/settings/notifications">
+                                {t('Email preferences')}
+                            </Link>
+                        )}
                     </div>
                 </div>
                 {items.data.length ? (

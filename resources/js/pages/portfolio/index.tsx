@@ -1,7 +1,9 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
+import { DemoOffCard } from '@/components/demo-off';
 import Button from '@/components/tailadmin/button';
+import { useDemoSession } from '@/hooks/use-demo-session';
 import { useTranslation } from '@/hooks/use-translation';
 import {
     ApprovalHistory,
@@ -22,6 +24,8 @@ export default function Index({
     limit: number;
 }) {
     const { t } = useTranslation();
+    // Plan 032 part 10: the shared demo portfolio is read here and never changed.
+    const { demo } = useDemoSession();
     const errors = usePage().props.errors as Record<string, string>;
     const [busy, setBusy] = useState(false);
     const act = (item: OwnedCase, action: string) => {
@@ -56,24 +60,37 @@ export default function Index({
                         {errors.case}
                     </p>
                 )}
-                <div className="market-actions">
-                    {full ? (
-                        <p className="market-muted">
-                            {t(
-                                'A portfolio can hold at most :count case studies.',
-                                { count: limit },
-                            )}
-                        </p>
-                    ) : (
-                        <Button
-                            startIcon={<Plus size={16} />}
-                            onClick={() => router.visit('/my-portfolio/create')}
-                        >
-                            {t('Add a case study')}
-                        </Button>
-                    )}
-                </div>
-                {!full && contracts.length > 0 && (
+                {demo && (
+                    <DemoOffCard
+                        title={t('The demo portfolio cannot be changed')}
+                    >
+                        {t(
+                            'Every visitor shares this portfolio, so case studies cannot be added, edited, published or deleted here. Their public pages stay open.',
+                        )}
+                    </DemoOffCard>
+                )}
+                {!demo && (
+                    <div className="market-actions">
+                        {full ? (
+                            <p className="market-muted">
+                                {t(
+                                    'A portfolio can hold at most :count case studies.',
+                                    { count: limit },
+                                )}
+                            </p>
+                        ) : (
+                            <Button
+                                startIcon={<Plus size={16} />}
+                                onClick={() =>
+                                    router.visit('/my-portfolio/create')
+                                }
+                            >
+                                {t('Add a case study')}
+                            </Button>
+                        )}
+                    </div>
+                )}
+                {!demo && !full && contracts.length > 0 && (
                     <section className="market-panel market-stack">
                         <h2 className="!mb-0">
                             {t('Completed work on Elancer')}
@@ -143,9 +160,11 @@ export default function Index({
                             </p>
                         )}
                         <div className="market-actions">
-                            <Link href={`/my-portfolio/${item.id}/edit`}>
-                                {t('Edit')}
-                            </Link>
+                            {!demo && (
+                                <Link href={`/my-portfolio/${item.id}/edit`}>
+                                    {t('Edit')}
+                                </Link>
+                            )}
                             {item.public_content &&
                                 !item.hidden_at &&
                                 !item.moderated &&
@@ -154,7 +173,8 @@ export default function Index({
                                         {t('View public page')}
                                     </Link>
                                 )}
-                            {!item.contract &&
+                            {!demo &&
+                                !item.contract &&
                                 (!item.public_content || item.changed) && (
                                     <Button
                                         disabled={busy}
@@ -165,7 +185,8 @@ export default function Index({
                                             : t('Publish')}
                                     </Button>
                                 )}
-                            {item.contract &&
+                            {!demo &&
+                                item.contract &&
                                 !item.pending &&
                                 (!item.public_content || item.changed) && (
                                     <Button
@@ -175,7 +196,7 @@ export default function Index({
                                         {t('Send for client approval')}
                                     </Button>
                                 )}
-                            {item.pending && (
+                            {!demo && item.pending && (
                                 <Button
                                     variant="outline"
                                     disabled={busy}
@@ -184,21 +205,25 @@ export default function Index({
                                     {t('Withdraw request')}
                                 </Button>
                             )}
-                            {item.public_content && !item.moderated && (
-                                <Button
-                                    variant="outline"
-                                    disabled={busy}
-                                    onClick={() =>
-                                        act(
-                                            item,
-                                            item.hidden_at ? 'show' : 'hide',
-                                        )
-                                    }
-                                >
-                                    {item.hidden_at ? t('Show') : t('Hide')}
-                                </Button>
-                            )}
-                            {item.deletable && (
+                            {!demo &&
+                                item.public_content &&
+                                !item.moderated && (
+                                    <Button
+                                        variant="outline"
+                                        disabled={busy}
+                                        onClick={() =>
+                                            act(
+                                                item,
+                                                item.hidden_at
+                                                    ? 'show'
+                                                    : 'hide',
+                                            )
+                                        }
+                                    >
+                                        {item.hidden_at ? t('Show') : t('Hide')}
+                                    </Button>
+                                )}
+                            {!demo && item.deletable && (
                                 <Button
                                     variant="danger-outline"
                                     disabled={busy}

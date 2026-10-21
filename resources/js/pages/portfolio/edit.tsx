@@ -13,6 +13,8 @@ import Button from '@/components/tailadmin/button';
 import Input from '@/components/tailadmin/input';
 import Label from '@/components/tailadmin/label';
 import TextArea from '@/components/tailadmin/textarea';
+import { DemoOffCard } from '@/components/demo-off';
+import { useDemoSession } from '@/hooks/use-demo-session';
 import { useTranslation } from '@/hooks/use-translation';
 import {
     ApprovalHistory,
@@ -186,6 +188,7 @@ export default function Edit({
     contract: { id: number; title: string } | null;
 }) {
     const { t } = useTranslation();
+    const { demo } = useDemoSession();
     const linked = item?.contract ?? contract;
     const form = useForm<CaseContent & { contract: number | null }>({
         title: item?.content.title ?? '',
@@ -205,6 +208,24 @@ export default function Edit({
             ),
         );
     const title = item ? t('Edit case study') : t('New case study');
+    // Plan 032 part 10: the shared demo portfolio is never changed.
+    if (demo)
+        return (
+            <PortfolioLayout title={title}>
+                <Head title={title} />
+                <DemoOffCard title={t('The demo portfolio cannot be changed')}>
+                    {t(
+                        'Every visitor shares this portfolio, so case studies cannot be added, edited, published or deleted here. Their public pages stay open.',
+                    )}
+                </DemoOffCard>
+                <Link
+                    href="/my-portfolio"
+                    className="inline-flex min-h-11 items-center text-sm underline underline-offset-4"
+                >
+                    {t('Back to portfolio')}
+                </Link>
+            </PortfolioLayout>
+        );
     return (
         <PortfolioLayout title={title}>
             <Head title={title} />

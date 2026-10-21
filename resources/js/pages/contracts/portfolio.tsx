@@ -2,6 +2,8 @@ import { Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { CaseBody, type CaseContent } from '@/components/portfolio-case';
 import Button from '@/components/tailadmin/button';
+import { DemoOffNote } from '@/components/demo-off';
+import { useDemoSession } from '@/hooks/use-demo-session';
 import { useTranslation } from '@/hooks/use-translation';
 import { OfferTime, type Contract } from '@/pages/offers/shared';
 import { ApprovalHistory, type Approval } from '@/pages/portfolio/shared';
@@ -37,6 +39,8 @@ export function Portfolio({
     portfolio: PortfolioState;
 }) {
     const { t } = useTranslation();
+    // Plan 032 part 10: case studies are off in the shared demo; what exists is still shown.
+    const { demo } = useDemoSession();
     const errors = usePage().props.errors as Record<string, string>;
     const [busy, setBusy] = useState(false);
     const send = (action: string, approval?: number) => {
@@ -66,7 +70,12 @@ export function Portfolio({
                     {errors.portfolio}
                 </p>
             )}
-            {!contract.is_client && (
+            {demo && (
+                <DemoOffNote>
+                    {t('Case studies are switched off in the shared demo.')}
+                </DemoOffNote>
+            )}
+            {!demo && !contract.is_client && (
                 <div className="market-actions">
                     <Link
                         href={
@@ -100,7 +109,7 @@ export function Portfolio({
                         title={t('Awaiting approval')}
                         content={portfolio.pending.content}
                     />
-                    {contract.is_client && (
+                    {!demo && contract.is_client && (
                         <div className="market-actions">
                             <Button
                                 disabled={busy}
@@ -139,7 +148,7 @@ export function Portfolio({
                         }
                         content={portfolio.public}
                     />
-                    {contract.is_client && (
+                    {!demo && contract.is_client && (
                         <div className="market-actions">
                             <Button
                                 variant="danger-outline"

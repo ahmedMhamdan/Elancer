@@ -1,5 +1,6 @@
 import { Link, useForm, router } from '@inertiajs/react';
 import Button from '@/components/tailadmin/button';
+import { useDemoSession } from '@/hooks/use-demo-session';
 import { useTranslation } from '@/hooks/use-translation';
 import { JobDate } from '@/pages/discovery/shared';
 import { InvitationLayout, InvitationStatus, type Invitation } from './shared';
@@ -16,6 +17,7 @@ export default function Show({
     events: { kind: string; created_at: string }[];
 }) {
     const { t, locale } = useTranslation();
+    const { demo } = useDemoSession();
     const form = useForm({
         action: author ? 'resend' : 'decline',
         version: invitation.version,
@@ -34,25 +36,28 @@ export default function Show({
     return (
         <InvitationLayout>
             <section className="market-panel market-stack">
-                <div>
-                    <Button
-                        variant="danger-outline"
-                        onClick={() => {
-                            if (
-                                window.confirm(
-                                    t(
-                                        'Block this account? New invitations and proposal contact will be stopped.',
-                                    ),
+                {/* Plan 032 part 10: a shared demo account blocks nobody. */}
+                {!demo && (
+                    <div>
+                        <Button
+                            variant="danger-outline"
+                            onClick={() => {
+                                if (
+                                    window.confirm(
+                                        t(
+                                            'Block this account? New invitations and proposal contact will be stopped.',
+                                        ),
+                                    )
                                 )
-                            )
-                                router.post(
-                                    `/invitations/${invitation.id}/block`,
-                                );
-                        }}
-                    >
-                        {t('Block account')}
-                    </Button>
-                </div>
+                                    router.post(
+                                        `/invitations/${invitation.id}/block`,
+                                    );
+                            }}
+                        >
+                            {t('Block account')}
+                        </Button>
+                    </div>
+                )}
                 <InvitationStatus status={invitation.status} />
                 <h2 dir="auto">{invitation.project.title}</h2>
                 <p dir="auto">

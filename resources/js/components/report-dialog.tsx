@@ -9,6 +9,7 @@ import Label from '@/components/tailadmin/label';
 import Modal from '@/components/tailadmin/modal';
 import Radio from '@/components/tailadmin/radio';
 import TextArea from '@/components/tailadmin/textarea';
+import { useDemoSession } from '@/hooks/use-demo-session';
 import { useReportLabels, type ReportTarget } from '@/hooks/use-report-labels';
 import { useTranslation } from '@/hooks/use-translation';
 import { cn } from '@/lib/utils';
@@ -38,12 +39,15 @@ export default function ReportDialog({
     const errors = form.errors as Record<string, string | undefined>;
     const length = form.data.explanation.trim().length;
     const [failure, setFailure] = useState('');
+    const { demo } = useDemoSession();
     const close = () => {
         setOpen(false);
         setFailure('');
         form.reset();
         form.clearErrors();
     };
+    // Plan 032 part 10: a shared demo account sends no reports.
+    if (demo) return null;
     return (
         <>
             <button

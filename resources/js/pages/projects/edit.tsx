@@ -8,6 +8,8 @@ import AppLayout from '@/layouts/app-layout';
 import Button from '@/components/tailadmin/button';
 import DatePicker from '@/components/tailadmin/date-picker';
 import Input from '@/components/tailadmin/input';
+import { DemoOffNote } from '@/components/demo-off';
+import { useDemoSession } from '@/hooks/use-demo-session';
 import { useTranslation } from '@/hooks/use-translation';
 import { FileSize, Money } from '../discovery/shared';
 import type { Attachment, Skill } from '../discovery/shared';
@@ -81,6 +83,8 @@ export default function EditProject({
     attachmentLimit: number;
 }) {
     const { t } = useTranslation();
+    // Plan 032 part 10: no file enters storage through the shared demo account.
+    const { demo } = useDemoSession();
     const [form, setForm] = useState(() => fromProject(project));
     // Files are saved apart from the text: neither waits for the other, and neither's failure is the other's.
     const [files, setFiles] = useState(attachments);
@@ -596,93 +600,120 @@ export default function EditProject({
                                 <legend>
                                     {t('Attached files (optional)')}
                                 </legend>
-                                {/* Q11: who will see the files is said before the control, not after an upload. */}
-                                <p id="project-attachments-audience">
-                                    {t(
-                                        'Everyone can see how many files a brief carries. Only signed-in members with an active account and a verified email can download them, so attach nothing private.',
-                                    )}
-                                </p>
-                                {files.length > 0 && (
-                                    <ul>
-                                        {files.map((file) => (
-                                            <li key={file.id}>
-                                                <Paperclip
-                                                    size={16}
-                                                    aria-hidden="true"
-                                                />
-                                                <a
-                                                    href={`/jobs/${project.id}/attachments/${file.id}`}
-                                                    download
-                                                >
-                                                    <bdi>{file.name}</bdi>
-                                                </a>
-                                                <span className="job-muted">
-                                                    <FileSize
-                                                        bytes={file.size}
-                                                    />
-                                                </span>
-                                                <Button
-                                                    variant="outline"
-                                                    disabled={
-                                                        fileBusy || !!conflict
-                                                    }
-                                                    aria-label={t(
-                                                        'Remove :name',
-                                                        { name: file.name },
-                                                    )}
-                                                    onClick={() => detach(file)}
-                                                >
-                                                    {t('Remove')}
-                                                </Button>
-                                            </li>
-                                        ))}
-                                    </ul>
+                                {demo ? (
+                                    <DemoOffNote>
+                                        {t(
+                                            'Files are switched off in the shared demo.',
+                                        )}
+                                    </DemoOffNote>
+                                ) : (
+                                    <>
+                                        {/* Q11: who will see the files is said before the control, not after an upload. */}
+                                        <p id="project-attachments-audience">
+                                            {t(
+                                                'Everyone can see how many files a brief carries. Only signed-in members with an active account and a verified email can download them, so attach nothing private.',
+                                            )}
+                                        </p>
+                                        {files.length > 0 && (
+                                            <ul>
+                                                {files.map((file) => (
+                                                    <li key={file.id}>
+                                                        <Paperclip
+                                                            size={16}
+                                                            aria-hidden="true"
+                                                        />
+                                                        <a
+                                                            href={`/jobs/${project.id}/attachments/${file.id}`}
+                                                            download
+                                                        >
+                                                            <bdi>
+                                                                {file.name}
+                                                            </bdi>
+                                                        </a>
+                                                        <span className="job-muted">
+                                                            <FileSize
+                                                                bytes={
+                                                                    file.size
+                                                                }
+                                                            />
+                                                        </span>
+                                                        <Button
+                                                            variant="outline"
+                                                            disabled={
+                                                                fileBusy ||
+                                                                !!conflict
+                                                            }
+                                                            aria-label={t(
+                                                                'Remove :name',
+                                                                {
+                                                                    name: file.name,
+                                                                },
+                                                            )}
+                                                            onClick={() =>
+                                                                detach(file)
+                                                            }
+                                                        >
+                                                            {t('Remove')}
+                                                        </Button>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                        <div className="project-file-field">
+                                            <input
+                                                ref={picker}
+                                                id="project-attachment"
+                                                type="file"
+                                                className="sr-only"
+                                                accept={FILE_TYPES.map(
+                                                    (type) => `.${type}`,
+                                                ).join(',')}
+                                                disabled={
+                                                    fileBusy ||
+                                                    !!conflict ||
+                                                    files.length >=
+                                                        attachmentLimit
+                                                }
+                                                aria-describedby="project-attachments-audience project-attachments-rules"
+                                                onChange={(e) =>
+                                                    attach(e.target.files?.[0])
+                                                }
+                                            />
+                                            <label htmlFor="project-attachment">
+                                                {t('Choose a file')}
+                                            </label>
+                                            <span>
+                                                {t(
+                                                    ':count of :total files attached',
+                                                    {
+                                                        count: files.length,
+                                                        total: attachmentLimit,
+                                                    },
+                                                )}
+                                            </span>
+                                        </div>
+                                        <small id="project-attachments-rules">
+                                            {t(
+                                                'Up to :count files, 5 MB each: JPG, PNG, WebP, PDF or TXT. Files cannot be added or removed after you publish.',
+                                                { count: attachmentLimit },
+                                            )}
+                                        </small>
+                                        <p
+                                            role={
+                                                fileNote?.error
+                                                    ? 'alert'
+                                                    : 'status'
+                                            }
+                                            className={
+                                                fileNote?.error
+                                                    ? 'project-file-note project-file-error'
+                                                    : 'project-file-note'
+                                            }
+                                        >
+                                            {fileNote?.text}
+                                        </p>
+                                    </>
                                 )}
-                                <div className="project-file-field">
-                                    <input
-                                        ref={picker}
-                                        id="project-attachment"
-                                        type="file"
-                                        className="sr-only"
-                                        accept={FILE_TYPES.map(
-                                            (type) => `.${type}`,
-                                        ).join(',')}
-                                        disabled={
-                                            fileBusy ||
-                                            !!conflict ||
-                                            files.length >= attachmentLimit
-                                        }
-                                        aria-describedby="project-attachments-audience project-attachments-rules"
-                                        onChange={(e) =>
-                                            attach(e.target.files?.[0])
-                                        }
-                                    />
-                                    <label htmlFor="project-attachment">
-                                        {t('Choose a file')}
-                                    </label>
-                                    <span>
-                                        {t(':count of :total files attached', {
-                                            count: files.length,
-                                            total: attachmentLimit,
-                                        })}
-                                    </span>
-                                </div>
-                                <small id="project-attachments-rules">
-                                    {t(
-                                        'Up to :count files, 5 MB each: JPG, PNG, WebP, PDF or TXT. Files cannot be added or removed after you publish.',
-                                        { count: attachmentLimit },
-                                    )}
-                                </small>
-                                <p
-                                    role={fileNote?.error ? 'alert' : 'status'}
-                                    className={
-                                        fileNote?.error
-                                            ? 'project-file-note project-file-error'
-                                            : 'project-file-note'
-                                    }
-                                >
-                                    {fileNote?.text}
-                                </p>
                             </fieldset>
                         </>
                     )}
