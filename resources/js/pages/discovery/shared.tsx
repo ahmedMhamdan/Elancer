@@ -47,16 +47,17 @@ export function DiscoveryLayout({ children }: { children: ReactNode }) {
         </div>
     );
 }
+// Plan 032 part 11: "$" and the figure, left to right in both languages, as Final offers and Contracts
+// write amounts. The currency style read "US$ 800.00" in Arabic, which a right-to-left line showed as "$US".
 export function Money({ min, max }: { min: string; max: string }) {
     const { locale } = useTranslation();
-    const format = (value: string) =>
-        new Intl.NumberFormat(locale, {
-            style: 'currency',
-            currency: 'USD',
-            maximumFractionDigits: 2,
-        }).format(Number(value));
+    const figure = new Intl.NumberFormat(locale, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    });
+    const format = (value: string) => '$' + figure.format(Number(value));
     return (
-        <bdi>
+        <bdi dir="ltr">
             {format(min)}
             {Number(min) !== Number(max) ? ` – ${format(max)}` : ''}
         </bdi>

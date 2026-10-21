@@ -109,6 +109,41 @@
 .workspace-site-link:hover {
     color: var(--el-accent);
 }
+/* Plan 032 part 11: with the sidebar open at 768 px the page name ran under "Explore Elancer". The header
+   is a size container. A narrow one leaves out "Explore Elancer", as phones always did, and shows only the
+   current page's name; a phone's shows none (the page's heading is just below). Long names shorten with "…". */
+.workspace-header {
+    container-type: inline-size;
+}
+.workspace-header [data-slot='breadcrumb'] {
+    min-width: 0;
+    overflow: hidden;
+}
+.workspace-header [data-slot='breadcrumb-list'] {
+    flex-wrap: nowrap;
+}
+.workspace-header [data-slot='breadcrumb-item'] {
+    min-width: 0;
+}
+.workspace-header
+    :is([data-slot='breadcrumb-page'], [data-slot='breadcrumb-link']) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+@container (max-width: 639px) {
+    .workspace-header .workspace-site-link,
+    .workspace-header [data-slot='breadcrumb-item']:not(:last-child),
+    .workspace-header [data-slot='breadcrumb-separator'] {
+        display: none;
+    }
+}
+/* The size is the header's inner width: a 375 px phone gives 343 px, the 768 px header beside the open sidebar 404 px. */
+@container (max-width: 379px) {
+    .workspace-header [data-slot='breadcrumb'] {
+        display: none;
+    }
+}
 .workspace-original-logo {
     display: inline-flex;
 }

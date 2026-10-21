@@ -113,7 +113,7 @@ export function App1({ overview, published }: { overview: OverviewData; publishe
                     {([['awaiting', client ? 'Awaiting your funding' : 'Awaiting client funding'], ['funded', client ? 'Funded by you' : 'Funded for your work']] as const).map(([key, label]) => (
                         <div key={key}>
                             <p className="text-muted-foreground text-sm">{t(label)}</p>
-                            <p className="mt-1 text-2xl font-semibold tabular-nums"><bdi>{Number(overview.finance[key].total).toLocaleString(locale, { style: 'currency', currency: 'USD' })}</bdi></p>
+                            <p className="mt-1 text-2xl font-semibold tabular-nums"><bdi dir="ltr">${Number(overview.finance[key].total).toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</bdi></p>
                             <p className="text-muted-foreground mt-1 text-xs">{overview.finance[key].count === 1 ? t('1 contract') : t(':count contracts', { count: number(overview.finance[key].count) })}</p>
                         </div>
                     ))}

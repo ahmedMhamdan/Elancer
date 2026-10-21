@@ -2753,6 +2753,7 @@ export const arabic: Record<string, string> = {
     Terms: 'الشروط',
     'Show full terms': 'اعرض الشروط كاملة',
     'Show less': 'عرض أقل',
+    'Show more': 'عرض المزيد',
     'All offers': 'كل العروض',
     'Offer actions': 'إجراءات العرض',
     'Send a message': 'أرسل رسالة',

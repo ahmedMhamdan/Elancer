@@ -1,6 +1,7 @@
 // Q18/Q82: a review's stars, a member's published rating and a list of published reviews.
 // No TailAdmin source has a rating display, so these are Elancer's own, on the star style the contract workroom introduced.
 import { Star } from 'lucide-react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from '@/hooks/use-translation';
 import '../../css/elancer-reviews.css';
 
@@ -83,6 +84,61 @@ export default function RatingSummary({
     );
 }
 
+/**
+ * Plan 032 part 11: a long review shows five lines and "Show more", which opens it in place. The button
+ * appears only when the text is cut off at the current width.
+ */
+function ReviewText({ body }: { body: string }) {
+    const { t } = useTranslation();
+    const id = useId();
+    const text = useRef<HTMLParagraphElement>(null);
+    const [open, setOpen] = useState(false);
+    const [cut, setCut] = useState(false);
+    useEffect(() => {
+        const element = text.current;
+        if (!element || open) return;
+        const measure = () =>
+            setCut(element.scrollHeight > element.clientHeight + 1);
+        measure();
+        // A width change resizes the box; a web font arriving late can add a line without resizing it.
+        const observer = new ResizeObserver(measure);
+        observer.observe(element);
+        let live = true;
+        void document.fonts.ready.then(() => live && measure());
+        document.fonts.addEventListener('loadingdone', measure);
+        return () => {
+            live = false;
+            observer.disconnect();
+            document.fonts.removeEventListener('loadingdone', measure);
+        };
+    }, [open, body]);
+    return (
+        <>
+            <p
+                id={id}
+                ref={text}
+                className={
+                    open ? 'review-text' : 'review-text review-text-short'
+                }
+                dir="auto"
+            >
+                {body}
+            </p>
+            {(cut || open) && (
+                <button
+                    type="button"
+                    className="review-more"
+                    aria-expanded={open}
+                    aria-controls={id}
+                    onClick={() => setOpen((value) => !value)}
+                >
+                    {open ? t('Show less') : t('Show more')}
+                </button>
+            )}
+        </>
+    );
+}
+
 export function ReviewList({
     reviews,
     total,
@@ -120,9 +176,7 @@ export function ReviewList({
                                 {review.project_title}
                             </h3>
                         )}
-                        <p className="review-text" dir="auto">
-                            {review.body}
-                        </p>
+                        <ReviewText body={review.body} />
                     </li>
                 ))}
             </ul>
