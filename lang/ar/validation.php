@@ -46,7 +46,7 @@ return [
     ],
     'attributes' => [
         'title' => 'عنوان المشروع', 'description' => 'تفاصيل المشروع', 'category_id' => 'التصنيف',
-        'version' => 'نسخة المسودة', 'budget_min' => 'الحد الأدنى للميزانية', 'budget_max' => 'الحد الأعلى للميزانية',
+        'version' => 'رقم النسخة', 'budget_min' => 'الحد الأدنى للميزانية', 'budget_max' => 'الحد الأعلى للميزانية',
         'application_closes_at' => 'آخر موعد للتقديم', 'screening_questions' => 'أسئلة المتقدمين', 'screening_questions.*' => 'السؤال',
         'name' => 'الاسم', 'email' => 'البريد الإلكتروني',
         'password' => 'كلمة المرور', 'locale' => 'اللغة',
@@ -61,5 +61,13 @@ return [
         'workspace_role' => 'مساحة العمل', 'onboarding_completed_at' => 'تاريخ إكمال الإعداد',
         'published_at' => 'تاريخ النشر', 'photo_path' => 'مسار الصورة',
         'is_admin' => 'صلاحية المشرف', 'is_super_admin' => 'صلاحية مسؤول الإدارة',
+        // Plan 033: the fields of the MCP tools, which the API and the pages share.
+        'project_id' => 'معرّف المشروع', 'proposal_id' => 'معرّف العرض', 'action' => 'الإجراء',
+        'price' => 'السعر', 'duration_days' => 'أيام التسليم', 'message' => 'الرسالة',
+        'answers' => 'الردود', 'answers.*' => 'الرد', 'samples' => 'نماذج الأعمال', 'samples.*' => 'نموذج العمل',
+        'samples.*.label' => 'اسم الرابط', 'samples.*.url' => 'الرابط', 'cases' => 'دراسات الحالة', 'cases.*' => 'دراسة الحالة',
+        'q' => 'كلمات البحث', 'category' => 'التصنيف', 'skill_mode' => 'طريقة مطابقة المهارات', 'posted' => 'مدة النشر',
+        'proposals' => 'عدد العروض', 'sort' => 'الترتيب', 'page' => 'رقم الصفحة', 'per_page' => 'عدد النتائج في الصفحة',
+        'list' => 'القائمة', 'organization' => 'تصنيف المتقدم',
     ],
 ];

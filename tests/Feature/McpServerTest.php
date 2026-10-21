@@ -177,6 +177,9 @@ class McpServerTest extends TestCase
         // Submitting asks what the page asks.
         $refused = $this->tool($token, 'save_proposal', ['project_id' => $project->id, 'action' => 'submit', 'version' => 2, 'message' => 'Too short']);
         $this->assertStringContainsString('message', $refused['error']);
+        // A field left out or wrong is named in the member's language, down to one link of a list.
+        $this->assertSame(['error' => 'حقل معرّف المشروع مطلوب.'], $this->tool($token, 'get_project', [], ['Accept-Language' => 'ar']));
+        $this->assertSame(['error' => 'حقل الرابط مطلوب.'], $this->tool($token, 'save_proposal', ['project_id' => $project->id, 'action' => 'save', 'version' => 2, 'samples' => [['label' => 'Shop']]], ['Accept-Language' => 'ar']));
         $sent = $this->tool($token, 'save_proposal', ['project_id' => $project->id, 'action' => 'submit', 'version' => 2, 'message' => 'I have built several booking applications like this one.']);
         $this->assertSame(['submitted', 3, '300.00'], [$sent['status'], $sent['version'], $sent['content']['price']]);
         $this->assertSame(1, $client->notifications()->count());
