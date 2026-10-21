@@ -131,10 +131,14 @@ The existing TailAdmin MIT license above applies to these adaptations.
 
 ## Cairo typeface
 
-Arabic interface typography uses Cairo by The Cairo Project Authors, licensed under the SIL Open Font License 1.1. The existing Vite font pipeline downloads and serves the font locally.
+Arabic interface typography uses Cairo by The Cairo Project Authors, licensed under the SIL Open Font License 1.1. Since 2026-10-21 the woff2 files (Arabic and Latin, weights 400 to 700) are kept in [resources/fonts/cairo](resources/fonts/cairo), copied from the [Fontsource](https://fontsource.org) package, and the Vite font pipeline serves them from the site; a build no longer downloads them.
 
 - [Font source](https://github.com/Gue3bara/Cairo)
 - [License](public/licenses/Cairo-OFL.txt)
+
+## Instrument Sans typeface (2026-10-21)
+
+Latin interface typography uses Instrument Sans by the Instrument Sans Project Authors, licensed under the SIL Open Font License 1.1. Its woff2 files (Latin, weights 400 to 600) are kept in [resources/fonts/instrument-sans](resources/fonts/instrument-sans), copied from the Fontsource package with its [license](resources/fonts/instrument-sans/LICENSE).
 
 ## Supplied motion navigation (2026-09-17)
 

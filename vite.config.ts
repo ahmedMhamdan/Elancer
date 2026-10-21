@@ -4,7 +4,7 @@ import babel from '@rolldown/plugin-babel';
 import tailwindcss from '@tailwindcss/vite';
 import react, { reactCompilerPreset } from '@vitejs/plugin-react';
 import laravel from 'laravel-vite-plugin';
-import { bunny } from 'laravel-vite-plugin/fonts';
+import { fontsource } from 'laravel-vite-plugin/fonts';
 import { defineConfig, lazyPlugins } from 'vite-plus';
 
 export default defineConfig({
@@ -12,12 +12,16 @@ export default defineConfig({
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.tsx'],
             refresh: true,
+            // The fonts live in resources/fonts (woff2 copies of Fontsource, in its layout), so a build
+            // downloads none: on 2026-10-21 a Render build failed when the font host timed out.
             fonts: [
-                bunny('Cairo', {
+                fontsource('Cairo', {
+                    package: './resources/fonts/cairo',
                     weights: [400, 500, 600, 700],
                     subsets: ['arabic', 'latin'],
                 }),
-                bunny('Instrument Sans', {
+                fontsource('Instrument Sans', {
+                    package: './resources/fonts/instrument-sans',
                     weights: [400, 500, 600],
                 }),
             ],
@@ -70,6 +74,7 @@ export default defineConfig({
         ignorePatterns: [
             '.github/**',
             'composer.json',
+            'resources/fonts/**',
             'resources/js/components/ui/*',
             'resources/views/mail/*',
         ],
