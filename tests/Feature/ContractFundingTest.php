@@ -68,7 +68,7 @@ class ContractFundingTest extends TestCase
         $attempt = $this->start($client, $contract);
         $this->actingAs($stranger)->get('/payments/'.$attempt->id.'/return')->assertNotFound();
         $this->post('/payments/'.$attempt->id.'/check')->assertNotFound();
-        $this->get('/finance')->assertInertia(fn (Assert $page) => $page->has('contracts.data', 0)->has('attempts', 0)->where('summary.client.awaiting.count', 0));
+        $this->get('/finance')->assertInertia(fn (Assert $page) => $page->has('awaiting', 0)->has('attempts', 0)->where('payments_count', 0)->where('summary.client.awaiting.count', 0));
         // The freelancer may follow status but can neither use the payer's page nor cancel.
         $this->actingAs($freelancer)->get('/payments/'.$attempt->id.'/simulator')->assertNotFound();
         $this->post('/payments/'.$attempt->id.'/simulator', ['decision' => 'approve'])->assertNotFound();
@@ -111,7 +111,8 @@ class ContractFundingTest extends TestCase
         $this->post('/contracts/'.$contract->id.'/payments', ['provider' => 'simulator', 'client_token' => (string) Str::uuid()])->assertSessionHasErrors('payment');
         $this->assertDatabaseCount('payment_attempts', 1);
         $this->get('/finance')->assertInertia(fn (Assert $page) => $page->where('summary.client.funded.count', 1)->where('summary.client.funded.total', '750.25')
-            ->where('summary.client.awaiting.count', 0)->where('summary.freelancer.funded.count', 0)->where('contracts.data.0.payment.status', 'succeeded'));
+            ->where('summary.client.awaiting.count', 0)->where('summary.freelancer.funded.count', 0)->where('summary.client.running.count', 1)
+            ->where('summary.client.completed.count', 0)->has('awaiting', 0)->where('attempts.0.status', 'succeeded')->where('payments_count', 1));
         $this->get('/finance/payments')->assertInertia(fn (Assert $page) => $page->component('finance/payments')->has('attempts.data', 1)->where('attempts.data.0.status', 'succeeded'));
         $this->actingAs(User::factory()->create(['onboarding_completed_at' => now()]))->get('/finance/payments')->assertInertia(fn (Assert $page) => $page->has('attempts.data', 0));
         $this->actingAs($freelancer)->get('/dashboard')->assertInertia(fn (Assert $page) => $page->where('overview.finance.funded.total', '750.25'));
@@ -130,6 +131,28 @@ class ContractFundingTest extends TestCase
         $duplicate->forceFill(['reference' => (string) Str::uuid(), 'client_token' => (string) Str::uuid(), 'provider_reference' => null]);
         $this->expectException(QueryException::class);
         $duplicate->save();
+    }
+
+    public function test_finance_lists_what_waits_for_funding_with_the_last_try_on_either_side(): void
+    {
+        [$client, $freelancer, $contract] = $this->contract();
+        $declined = $this->start($client, $contract);
+        $this->post('/payments/'.$declined->id.'/simulator', ['decision' => 'decline']);
+        $this->get('/payments/'.$declined->id.'/return');
+        // The client funds it: one card with the failed try, its receipt's reason and the agreed amount awaiting.
+        $this->get('/finance')->assertInertia(fn (Assert $page) => $page->component('finance/index')
+            ->where('summary.client.awaiting', ['count' => 1, 'total' => '750.25'])->where('summary.client.running.count', 0)
+            ->has('awaiting', 1)->where('awaiting_count', 1)->where('awaiting.0.id', $contract->id)->where('awaiting.0.is_client', true)->where('awaiting.0.amount', '750.25')
+            ->where('awaiting.0.payment.status', 'failed')->where('awaiting.0.conversation_id', $contract->conversation_id)
+            ->where('attempts.0.status', 'failed')->where('attempts.0.failure_reason', 'declined')->where('attempts.0.refunded_at', null)
+            ->where('attempts.0.project_title', 'Build an application')->where('payments_count', 1)
+            ->missing('attempts.0.client_token')->missing('attempts.0.provider_reference')->missing('attempts.0.payer_id'));
+        // The freelancer waits for it and follows the same payment, without the client's controls.
+        $this->actingAs($freelancer)->get('/finance')->assertInertia(fn (Assert $page) => $page
+            ->where('summary.freelancer.awaiting.count', 1)->where('summary.client.awaiting.count', 0)
+            ->where('awaiting.0.is_client', false)->where('awaiting.0.counterpart', $client->name)->where('payments_count', 1));
+        $this->get('/finance/payments')->assertInertia(fn (Assert $page) => $page->component('finance/payments')
+            ->where('attempts.data.0.status', 'failed')->has('providers'));
     }
 
     public function test_decline_and_cancel_free_the_slot_without_funding(): void

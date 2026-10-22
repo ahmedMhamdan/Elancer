@@ -82,6 +82,8 @@ class ContractCancellationTest extends TestCase
         $this->actingAs($client)->post('/contracts/'.$contract->id.'/payments', ['provider' => 'simulator', 'client_token' => (string) Str::uuid()])->assertSessionHasErrors('payment');
         $this->post('/contracts/'.$contract->id.'/cancellation', $reason)->assertSessionHasErrors('cancellation');
         $this->assertSame(0, ContractFunding::summary($client->id)['client']['awaiting']['count']);
+        // Cancelled before funding, it counts nowhere, not even as refunded.
+        $this->assertSame(0, ContractFunding::summary($client->id)['client']['refunded']['count']);
     }
 
     public function test_a_funded_request_pauses_work_and_decline_or_withdrawal_restores_it(): void
@@ -138,6 +140,9 @@ class ContractCancellationTest extends TestCase
         $this->assertSame(1, $client->notifications()->get()->where('data.kind', 'contract_refunded')->count());
         $this->assertSame(1, $freelancer->notifications()->get()->where('data.kind', 'contract_refunded')->count());
         $this->assertSame(0, ContractFunding::summary($client->id)['client']['funded']['count']);
+        $this->assertSame(['count' => 1, 'total' => '750.25'], ContractFunding::summary($client->id)['client']['refunded']);
+        $this->get('/finance')->assertInertia(fn (Assert $page) => $page->where('summary.client.running.count', 0)
+            ->where('attempts.0.status', 'refunded')->where('attempts.0.refunded_at', fn ($value) => $value !== null));
         $this->get('/contracts/'.$contract->id)->assertInertia(fn (Assert $page) => $page->where('contract.status', 'cancelled')
             ->where('activity.0.kind', 'cancelled')->where('reviews', null));
         $this->actingAs($client)->put('/contracts/'.$contract->id.'/review', ['rating' => 5, 'body' => 'Reviews are only for completed contracts.'])->assertSessionHasErrors('review');

@@ -25,7 +25,8 @@ class ContractFunding
     }
 
     /**
-     * Agreed amounts only: what awaits funding and what a verified test payment funded. Never a balance.
+     * Agreed amounts only: what awaits funding, what a verified test payment funded (split into work under way and
+     * completed) and what was refunded after a cancellation. Never a balance.
      *
      * @return array<string, array<string, array{count: int, total: string}>>
      */
@@ -33,18 +34,26 @@ class ContractFunding
     {
         $summary = [];
         foreach (['client' => 'client_id', 'freelancer' => 'freelancer_id'] as $role => $column) {
-            $minor = ['awaiting' => 0, 'funded' => 0];
-            $count = ['awaiting' => 0, 'funded' => 0];
+            $minor = ['awaiting' => 0, 'running' => 0, 'completed' => 0, 'refunded' => 0];
+            $count = $minor;
             foreach (Contract::query()->where($column, $user)->get(['id', 'status', 'agreement', 'funded_at']) as $contract) {
-                // A cancelled contract's refunded amount is no longer funded.
-                $group = $contract->status === 'cancelled' ? null : ($contract->funded_at ? 'funded' : ($contract->status === 'awaiting_payment' ? 'awaiting' : null));
+                // A funded contract is cancelled only once its refund is verified; one cancelled before funding counts nowhere.
+                $group = match (true) {
+                    $contract->status === 'cancelled' => $contract->funded_at ? 'refunded' : null,
+                    $contract->status === 'completed' => 'completed',
+                    $contract->funded_at !== null => 'running',
+                    $contract->status === 'awaiting_payment' => 'awaiting',
+                    default => null,
+                };
                 if ($group !== null) {
                     $minor[$group] += Money::minor((string) $contract->agreement['amount']);
                     $count[$group]++;
                 }
             }
-            $summary[$role] = ['awaiting' => ['count' => $count['awaiting'], 'total' => Money::decimal($minor['awaiting'])],
-                'funded' => ['count' => $count['funded'], 'total' => Money::decimal($minor['funded'])]];
+            $totals = fn (string $group): array => ['count' => $count[$group], 'total' => Money::decimal($minor[$group])];
+            $summary[$role] = ['awaiting' => $totals('awaiting'), 'running' => $totals('running'), 'completed' => $totals('completed'),
+                'refunded' => $totals('refunded'),
+                'funded' => ['count' => $count['running'] + $count['completed'], 'total' => Money::decimal($minor['running'] + $minor['completed'])]];
         }
 
         return $summary;
