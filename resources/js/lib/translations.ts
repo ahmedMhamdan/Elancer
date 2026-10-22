@@ -1565,26 +1565,15 @@ export const arabic: Record<string, string> = {
     'Fund contract': 'تمويل العقد',
     'As a client': 'بصفتك صاحب مشاريع',
     'As a freelancer': 'بصفتك مستقلًا',
-    'Agreed contract amounts and test payments. Elancer does not hold or move real money, so there is no balance to withdraw.':
-        'مبالغ العقود المتفق عليها والدفعات التجريبية. لا تحتفظ Elancer بأموال حقيقية ولا تحوّلها، لذا لا يوجد رصيد للسحب.',
-    'Contracts and funding': 'العقود والتمويل',
-    'Your role': 'صفتك',
     Amount: 'المبلغ',
     Actions: 'الإجراءات',
-    'Starts after funding': 'يبدأ بعد التمويل',
     'Payment history': 'سجل الدفعات',
     Reference: 'المرجع',
     Started: 'تاريخ البدء',
-    'No payment attempts yet. They appear here when a client starts funding a contract.':
-        'لا توجد محاولات دفع بعد. ستظهر هنا عندما يبدأ صاحب المشروع تمويل عقد.',
-    'Payment providers': 'مزوّدو الدفع',
-    'Not available yet': 'غير متاح بعد',
     'Refunds, which arrive with agreed contract cancellation.':
         'استرداد المبالغ، وسيتوفر مع إلغاء العقد بالاتفاق.',
     'Deliveries, revisions and completion after funding.':
         'التسليم والتعديلات وإتمام العمل بعد التمويل.',
-    'Real payments, payouts and withdrawals are outside this test marketplace.':
-        'المدفوعات الحقيقية وتحويل الأرباح والسحب خارج نطاق هذا السوق التجريبي.',
     'Awaiting funding': 'بانتظار التمويل',
     'Funded and active': 'مموَّل وجارٍ',
     'Checking payment': 'جارٍ التحقق من الدفع',
@@ -1617,9 +1606,6 @@ export const arabic: Record<string, string> = {
     'Back to contract': 'العودة إلى العقد',
     'Payments and finance': 'المدفوعات والمالية',
     'Finance overview': 'نظرة عامة على المالية',
-    'View all payments': 'عرض جميع الدفعات',
-    'Every test payment attempt on your contracts, newest first.':
-        'جميع محاولات الدفع التجريبية على عقودك، من الأحدث إلى الأقدم.',
     'sent you a message about': 'أرسل لك رسالة بخصوص',
     Open: 'فتح',
     'submitted a delivery for': 'سلّم العمل في مشروع',
@@ -2890,4 +2876,39 @@ export const arabic: Record<string, string> = {
         'الوكيل الذي يأخذ ترويسة بدلًا من ذلك، مثل Claude Code، يستخدم رمزًا للواجهة البرمجية: لا يستطيع إلا ما منحتَه للرمز. اطلب من وكيلك أن يراجعك قبل أن يرسل عرضًا أو يسحبه.',
     'Never type a real card on the payment page. Use the provider’s test card: on Stripe 4242 4242 4242 4242, on Moyasar 4111 1111 1111 1111, with any future date and any three-digit code.':
         'لا تكتب بطاقة حقيقية في صفحة الدفع أبدًا. استخدم بطاقة المزود التجريبية: في Stripe الرقم 4242 4242 4242 4242، وفي ميسّر الرقم 4111 1111 1111 1111، مع أي تاريخ مستقبلي وأي رمز من ثلاثة أرقام.',
+    // Finance (plan 032 part 12).
+    'Agreed amounts and test payments on your contracts. No real money moves.':
+        'المبالغ المتفق عليها والدفعات التجريبية في عقودك. لا تُنقل أموال حقيقية.',
+    'Test providers': 'مزوّدو الدفع التجريبيون',
+    'Use the test cards shown on the funding page.':
+        'استخدم البطاقات التجريبية المعروضة في صفحة التمويل.',
+    'Elancer never holds or moves real money: no balance, payouts or withdrawals.':
+        'إيلانسر لا يحتفظ بأموال حقيقية ولا ينقلها: لا رصيد ولا تحويلات ولا سحب.',
+    'No payments yet': 'لا توجد دفعات بعد',
+    'A payment appears here when you fund a contract.':
+        'تظهر الدفعة هنا عندما تموّل عقدًا.',
+    'A payment appears here when a client funds one of your contracts.':
+        'تظهر الدفعة هنا عندما يموّل صاحب مشروع أحد عقودك.',
+    'Copy the reference': 'نسخ المرجع',
+    Copy: 'نسخ',
+    ':time, after the cancellation': ':time، بعد الإلغاء',
+    'After the cancellation': 'بعد الإلغاء',
+    Result: 'النتيجة',
+    'Test payment: no real money moved.': 'دفعة تجريبية: لم تُنقل أموال حقيقية.',
+    Moyasar: 'ميسّر',
+    'Funded, work under way': 'مموّلة والعمل جارٍ',
+    'Agreed on your contracts': 'المتفق عليه في عقودك',
+    'Refunded after a cancellation:': 'استُردّ بعد إلغاء:',
+    ':contracts, not counted above.': ':contracts، لا يدخل في المجموع أعلاه.',
+    'Offer accepted :time': 'قُبل العرض :time',
+    'Last try not completed :time': 'آخر محاولة لم تكتمل :time',
+    'A payment is being checked': 'جارٍ التحقق من دفعة',
+    'Work starts once the client funds it.':
+        'يبدأ العمل عندما يموّله صاحب المشروع.',
+    'To fund': 'للتمويل',
+    'Waiting for funding': 'بانتظار التمويل',
+    'Recent payments': 'أحدث الدفعات',
+    'All payments': 'جميع الدفعات',
+    'Every payment on your contracts': 'كل الدفعات في عقودك',
+    'See all :count on Contracts': 'عرض الكل في العقود (:count)',
 };

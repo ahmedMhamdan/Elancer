@@ -1,348 +1,375 @@
-// Adapted from local TailAdmin src/components/ecommerce/EcommerceMetrics.tsx and
-// RecentOrders.tsx (MIT): metric blocks with icon tiles and a bordered table card.
-// Demo trends, images and filters are removed; rows are the member's own contracts
-// and payment attempts with Elancer tokens. See THIRD_PARTY_NOTICES.md.
-import { Head, Link, usePage } from '@inertiajs/react';
-import { CircleCheck, Clock } from 'lucide-react';
-import HelpLink from '@/components/help-link';
-import Pagination from '@/components/tailadmin/pagination';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHeader,
-    TableRow,
-    TableScroll,
-} from '@/components/tailadmin/table';
+// Finance overview (plan 032 part 12, Ahmed's pick "A"): one card per role with the agreed total and a bar split into
+// completed, funded with work under way and awaiting funding (after Tremor's Category Bar,
+// https://tremor.so/docs/visualizations/category-bar; written for Elancer, no code copied, as TailAdmin has no split
+// bar), refunds on a line under it; what waits for funding with its one action; the five latest payments, each
+// opening its receipt; one quiet line for the test providers. Contracts lists every contract, so Finance shows only
+// the money. The figures count once per visit (Magic UI Number Ticker); sections fade in (Magic UI BlurFade).
+import { Link, usePage } from '@inertiajs/react';
+import { ArrowRight } from 'lucide-react';
+import type { CSSProperties } from 'react';
+import { BlurFade } from '@/components/ui/blur-fade';
+import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
+import { useRelativeTime } from '@/hooks/use-relative-time';
 import { useTranslation } from '@/hooks/use-translation';
-import AppLayout from '@/layouts/app-layout';
-import { Money, type Page } from '@/pages/discovery/shared';
+import { useProviderName, type Payment } from '@/pages/offers/shared';
+import { PaymentRows } from './payment-history';
 import {
-    ContractStatus,
-    OfferTime,
-    PaymentStatus,
-    ProviderMark,
-    useProviderHint,
-    useProviderLabel,
-    type Payment,
-} from '@/pages/offers/shared';
-import { PaymentHistory, cell, head, type Attempt } from './payment-history';
-import '../../../css/elancer-marketplace.css';
+    Amount,
+    FinanceLayout,
+    NoPayments,
+    ProvidersLine,
+    useFullTime,
+    type Attempt,
+} from './shared';
 
 type Totals = { count: number; total: string };
-type Role = { awaiting: Totals; funded: Totals };
-type Row = {
+type Role = {
+    awaiting: Totals;
+    running: Totals;
+    completed: Totals;
+    refunded: Totals;
+    funded: Totals;
+};
+type Waiting = {
     id: number;
-    status: string;
-    funded_at: string | null;
-    delivery_due_at: string | null;
+    conversation_id: number;
+    created_at: string;
     project_title: string | null;
     amount: string;
     counterpart: string | null;
     is_client: boolean;
     payment: Payment | null;
 };
+const cents = (value: string) => Math.round(Number(value) * 100);
+
+function useContracts() {
+    const { t, locale } = useTranslation();
+    return (count: number) =>
+        count === 1
+            ? t('1 contract')
+            : t(':count contracts', { count: count.toLocaleString(locale) });
+}
+
+function Summary({
+    role,
+    totals,
+    heading,
+}: {
+    role: 'client' | 'freelancer';
+    totals: Role;
+    heading: string | null;
+}) {
+    const { t } = useTranslation();
+    const contracts = useContracts();
+    const parts: [keyof Role, string, string][] = [
+        ['completed', t('Completed'), 'open'],
+        ['running', t('Funded, work under way'), 'hired'],
+        [
+            'awaiting',
+            role === 'client'
+                ? t('Awaiting your funding')
+                : t('Awaiting client funding'),
+            'wait',
+        ],
+    ];
+    const agreedCents = parts.reduce(
+        (sum, [key]) => sum + cents(totals[key].total),
+        0,
+    );
+    const agreedCount = parts.reduce(
+        (sum, [key]) => sum + totals[key].count,
+        0,
+    );
+    const label = t('Agreed on your contracts');
+    return (
+        <section aria-label={heading ?? label}>
+            {heading && <h2 className="finance-role">{heading}</h2>}
+            <div className="finance-card finance-summary">
+                {agreedCount === 0 && totals.refunded.count === 0 ? (
+                    <div className="finance-empty">
+                        <strong>{t('No contracts yet.')}</strong>
+                        <p>
+                            {t(
+                                'A contract is created when the freelancer accepts a final offer.',
+                            )}
+                        </p>
+                        <Link href="/offers" className="my-project-link">
+                            {t('Go to Final offers')}
+                        </Link>
+                    </div>
+                ) : (
+                    <>
+                        <div className="finance-summary-top">
+                            <div>
+                                <span className="finance-muted">{label}</span>
+                                <strong className="finance-total">
+                                    <Amount
+                                        value={(agreedCents / 100).toFixed(2)}
+                                        count
+                                    />
+                                </strong>
+                            </div>
+                            <span className="finance-chip">
+                                {contracts(agreedCount)}
+                            </span>
+                        </div>
+                        <div
+                            className="finance-bar"
+                            role="img"
+                            aria-label={parts
+                                .map(
+                                    ([key, name]) =>
+                                        `${name} $${totals[key].total}`,
+                                )
+                                .join(', ')}
+                        >
+                            {parts
+                                .filter(([key]) => totals[key].count > 0)
+                                .map(([key, , state]) => (
+                                    <i
+                                        key={key}
+                                        data-state={state}
+                                        style={
+                                            {
+                                                flexGrow: Math.max(
+                                                    1,
+                                                    cents(totals[key].total),
+                                                ),
+                                            } as CSSProperties
+                                        }
+                                    />
+                                ))}
+                        </div>
+                        <ul className="finance-legend">
+                            {parts.map(([key, name, state]) => (
+                                <li key={key}>
+                                    <i data-state={state} aria-hidden="true" />
+                                    <span className="finance-muted">
+                                        {name}
+                                    </span>
+                                    <strong>
+                                        <Amount
+                                            value={totals[key].total}
+                                            count
+                                        />
+                                    </strong>
+                                    <small>
+                                        {contracts(totals[key].count)}
+                                    </small>
+                                </li>
+                            ))}
+                        </ul>
+                        {totals.refunded.count > 0 && (
+                            <p className="finance-refund">
+                                <span>
+                                    {t('Refunded after a cancellation:')}{' '}
+                                    <strong>
+                                        <Amount value={totals.refunded.total} />
+                                    </strong>
+                                </span>{' '}
+                                <span>
+                                    {t(':contracts, not counted above.', {
+                                        contracts: contracts(
+                                            totals.refunded.count,
+                                        ),
+                                    })}
+                                </span>
+                            </p>
+                        )}
+                    </>
+                )}
+            </div>
+        </section>
+    );
+}
+
+function AwaitingCard({ row }: { row: Waiting }) {
+    const { t } = useTranslation();
+    const relative = useRelativeTime();
+    const name = useProviderName();
+    const full = useFullTime();
+    const payment = row.payment;
+    return (
+        <article className="finance-card finance-waiting">
+            <div className="finance-waiting-main">
+                <div className="finance-waiting-top">
+                    <span className="my-project-status" data-state="wait">
+                        {row.is_client
+                            ? t('Awaiting your funding')
+                            : t('Awaiting client funding')}
+                    </span>
+                    <time
+                        dateTime={row.created_at}
+                        title={full(row.created_at)}
+                    >
+                        {t('Offer accepted :time', {
+                            time: relative(row.created_at),
+                        })}
+                    </time>
+                </div>
+                <h3 dir="auto">
+                    <Link href={`/contracts/${row.id}`}>
+                        {row.project_title ?? t('Contract')}
+                    </Link>
+                </h3>
+                <p className="finance-muted">
+                    <bdi>{row.counterpart}</bdi>
+                </p>
+                {row.is_client && payment?.status === 'failed' && (
+                    <p className="finance-late">
+                        {t('Last try not completed :time', {
+                            time: relative(payment.created_at),
+                        })}{' '}
+                        · {name(payment.provider)}
+                    </p>
+                )}
+                {row.is_client && payment?.status === 'pending' && (
+                    <p className="finance-muted">
+                        {t('A payment is being checked')} ·{' '}
+                        {name(payment.provider)}
+                    </p>
+                )}
+                {!row.is_client && (
+                    <p className="finance-muted">
+                        {t('Work starts once the client funds it.')}
+                    </p>
+                )}
+            </div>
+            <div className="finance-waiting-side">
+                <span className="finance-waiting-amount">
+                    <Amount value={row.amount} />
+                </span>
+                {row.is_client ? (
+                    <InteractiveHoverButton
+                        href={`/contracts/${row.id}?tab=payments`}
+                    >
+                        {t('Fund contract')}
+                    </InteractiveHoverButton>
+                ) : (
+                    <Link
+                        href={`/messages/${row.conversation_id}`}
+                        className="my-project-link"
+                    >
+                        {t('Send a message')}
+                    </Link>
+                )}
+            </div>
+        </article>
+    );
+}
 
 export default function Finance({
     summary,
     providers,
-    contracts,
+    awaiting,
+    awaiting_count,
     attempts,
+    payments_count,
 }: {
     summary: { client: Role; freelancer: Role };
     providers: string[];
-    contracts: Page<Row>;
+    awaiting: Waiting[];
+    awaiting_count: number;
     attempts: Attempt[];
+    payments_count: number;
 }) {
-    const { t, locale } = useTranslation();
+    const { t } = useTranslation();
     const { auth } = usePage().props;
-    const providerLabel = useProviderLabel();
-    const providerHint = useProviderHint();
-    const groups = [
-        {
-            key: 'client',
-            role: summary.client,
-            title: t('As a client'),
-            awaiting: t('Awaiting your funding'),
-            funded: t('Funded by you'),
-        },
-        {
-            key: 'freelancer',
-            role: summary.freelancer,
-            title: t('As a freelancer'),
-            awaiting: t('Awaiting client funding'),
-            funded: t('Funded for your work'),
-        },
-    ];
-    // The current workspace's totals always show; the other role only when it has contracts.
-    const workspace = auth.user.workspace_role ?? 'freelancer';
-    const shown = groups
-        .filter(
-            ({ key, role }) =>
-                key === workspace ||
-                role.awaiting.count + role.funded.count > 0,
-        )
-        .sort(
-            (a, b) => Number(b.key === workspace) - Number(a.key === workspace),
-        );
+    const workspace: 'client' | 'freelancer' =
+        auth.user.workspace_role === 'client' ? 'client' : 'freelancer';
+    const used = (role: Role) =>
+        role.awaiting.count +
+            role.running.count +
+            role.completed.count +
+            role.refunded.count >
+        0;
+    // The current workspace's money always shows; the other role's only when it has contracts.
+    const roles = (['client', 'freelancer'] as const)
+        .filter((role) => role === workspace || used(summary[role]))
+        .sort((a, b) => Number(b === workspace) - Number(a === workspace));
+    const titles = {
+        client: t('As a client'),
+        freelancer: t('As a freelancer'),
+    };
+    // From the full counts, not the cards shown: ten client cards may sit above freelancer contracts left out.
+    const toFund = summary.client.awaiting.count;
+    const toWait = summary.freelancer.awaiting.count;
+    const waitingTitle =
+        toWait === 0
+            ? t('To fund')
+            : toFund === 0
+              ? t('Waiting for funding')
+              : t('Awaiting funding');
     return (
-        <AppLayout breadcrumbs={[{ title: t('Finance'), href: '/finance' }]}>
-            <Head title={t('Finance')} />
-            <main className="workspace-dashboard market-workspace market-stack">
-                <div>
-                    <div className="market-actions">
-                        <h1 className="text-2xl font-semibold">
-                            {t('Finance')}
-                        </h1>
-                        <span className="proposal-status">
-                            {t('Test mode')}
-                        </span>
-                    </div>
-                    <p className="text-muted-foreground mt-2 text-sm">
-                        {t(
-                            'Agreed contract amounts and test payments. Elancer does not hold or move real money, so there is no balance to withdraw.',
-                        )}
-                    </p>
-                    <HelpLink article="test-mode" className="mt-2" />
-                </div>
-
-                {shown.map(({ role, title, awaiting, funded }) => (
-                    <section key={title} aria-label={title}>
-                        <h2 className="text-muted-foreground mb-3 text-sm font-medium">
-                            {title}
+        <FinanceLayout tab="overview" count={payments_count}>
+            {roles.map((role, index) => (
+                <BlurFade key={role} delay={index * 0.05}>
+                    <Summary
+                        role={role}
+                        totals={summary[role]}
+                        heading={roles.length > 1 ? titles[role] : null}
+                    />
+                </BlurFade>
+            ))}
+            {awaiting.length > 0 && (
+                <BlurFade delay={0.1}>
+                    <section aria-labelledby="finance-awaiting">
+                        <h2 id="finance-awaiting" className="finance-section">
+                            {waitingTitle}
+                            <small>{awaiting_count}</small>
                         </h2>
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            {[
-                                {
-                                    label: awaiting,
-                                    totals: role.awaiting,
-                                    Icon: Clock,
-                                },
-                                {
-                                    label: funded,
-                                    totals: role.funded,
-                                    Icon: CircleCheck,
-                                },
-                            ].map(({ label, totals, Icon }) => (
-                                <div
-                                    key={label}
-                                    className="border-border bg-card rounded-2xl border p-5"
-                                >
-                                    <div className="bg-muted text-primary flex size-12 items-center justify-center rounded-xl">
-                                        <Icon
-                                            className="size-6"
-                                            aria-hidden="true"
-                                        />
-                                    </div>
-                                    <div className="mt-5 flex items-end justify-between gap-3">
-                                        <div>
-                                            <span className="text-muted-foreground text-sm">
-                                                {label}
-                                            </span>
-                                            <p className="mt-2 text-2xl font-semibold tabular-nums">
-                                                <Money
-                                                    min={totals.total}
-                                                    max={totals.total}
-                                                />
-                                            </p>
-                                        </div>
-                                        <span className="proposal-status">
-                                            {totals.count === 1
-                                                ? t('1 contract')
-                                                : t(':count contracts', {
-                                                      count: totals.count.toLocaleString(
-                                                          locale,
-                                                      ),
-                                                  })}
-                                        </span>
-                                    </div>
-                                </div>
+                        <div className="finance-waiting-list">
+                            {awaiting.map((row) => (
+                                <AwaitingCard key={row.id} row={row} />
                             ))}
                         </div>
+                        {awaiting_count > awaiting.length && (
+                            <Link
+                                href="/contracts"
+                                className="my-project-link finance-open finance-more"
+                            >
+                                {t('See all :count on Contracts', {
+                                    count: awaiting_count,
+                                })}
+                                <ArrowRight
+                                    className="size-4"
+                                    aria-hidden="true"
+                                />
+                            </Link>
+                        )}
                     </section>
-                ))}
-
-                <section className="border-border bg-card overflow-hidden rounded-2xl border">
-                    <h2 className="!mb-0 px-4 pt-5 pb-3">
-                        {t('Contracts and funding')}
-                    </h2>
-                    {contracts.data.length ? (
-                        <TableScroll label={t('Contracts and funding')}>
-                            <Table className="w-full">
-                                <TableHeader className="border-border border-y">
-                                    <TableRow>
-                                        <TableCell isHeader className={head}>
-                                            {t('Project')}
-                                        </TableCell>
-                                        <TableCell isHeader className={head}>
-                                            {t('Your role')}
-                                        </TableCell>
-                                        <TableCell isHeader className={head}>
-                                            {t('Amount')}
-                                        </TableCell>
-                                        <TableCell isHeader className={head}>
-                                            {t('Status')}
-                                        </TableCell>
-                                        <TableCell isHeader className={head}>
-                                            {t('First delivery due')}
-                                        </TableCell>
-                                        <TableCell
-                                            isHeader
-                                            className={`${head} w-px text-end`}
-                                        >
-                                            {t('Actions')}
-                                        </TableCell>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody className="divide-border divide-y">
-                                    {contracts.data.map((row) => (
-                                        <TableRow key={row.id}>
-                                            <TableCell
-                                                className={`${cell} min-w-48`}
-                                            >
-                                                <span
-                                                    dir="auto"
-                                                    className="block font-medium wrap-anywhere"
-                                                >
-                                                    {row.project_title}
-                                                </span>
-                                                <span
-                                                    dir="auto"
-                                                    className="text-muted-foreground text-xs"
-                                                >
-                                                    {row.counterpart}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className={cell}>
-                                                {row.is_client
-                                                    ? t('Client')
-                                                    : t('Freelancer')}
-                                            </TableCell>
-                                            <TableCell
-                                                className={`${cell} whitespace-nowrap`}
-                                            >
-                                                <Money
-                                                    min={row.amount}
-                                                    max={row.amount}
-                                                />
-                                            </TableCell>
-                                            <TableCell className={cell}>
-                                                {row.payment?.status ===
-                                                'pending' ? (
-                                                    <PaymentStatus status="pending" />
-                                                ) : (
-                                                    <ContractStatus
-                                                        status={row.status}
-                                                    />
-                                                )}
-                                            </TableCell>
-                                            <TableCell
-                                                className={`${cell} whitespace-nowrap`}
-                                            >
-                                                {row.delivery_due_at ? (
-                                                    <OfferTime
-                                                        value={
-                                                            row.delivery_due_at
-                                                        }
-                                                    />
-                                                ) : (
-                                                    <span className="text-muted-foreground">
-                                                        {t(
-                                                            'Starts after funding',
-                                                        )}
-                                                    </span>
-                                                )}
-                                            </TableCell>
-                                            <TableCell
-                                                className={`${cell} w-px text-end whitespace-nowrap`}
-                                            >
-                                                <Link
-                                                    href={`/contracts/${row.id}`}
-                                                    className="text-primary inline-flex min-h-11 items-center font-medium underline-offset-4 hover:underline"
-                                                    aria-label={`${
-                                                        row.is_client &&
-                                                        row.status ===
-                                                            'awaiting_payment'
-                                                            ? t('Fund contract')
-                                                            : t('Open contract')
-                                                    }: ${row.project_title ?? ''}`}
-                                                >
-                                                    {row.is_client &&
-                                                    row.status ===
-                                                        'awaiting_payment'
-                                                        ? t('Fund contract')
-                                                        : t('Open contract')}
-                                                </Link>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableScroll>
-                    ) : (
-                        <div className="px-4 pb-5">
-                            <p>{t('No contracts yet.')}</p>
-                            <p className="market-muted">
-                                {t(
-                                    'A contract is created when the freelancer accepts a final offer.',
-                                )}
-                            </p>
-                        </div>
-                    )}
-                </section>
-                <Pagination data={contracts} />
-
-                <section className="border-border bg-card overflow-hidden rounded-2xl border">
-                    <div className="flex flex-wrap items-center justify-between gap-3 px-4 pt-5 pb-3">
-                        <h2 className="!mb-0">{t('Payment history')}</h2>
-                        <Link
-                            href="/finance/payments"
-                            className="text-primary inline-flex min-h-11 items-center text-sm font-medium underline-offset-4 hover:underline"
-                        >
-                            {t('View all payments')}
-                        </Link>
+                </BlurFade>
+            )}
+            <BlurFade delay={0.15}>
+                <section
+                    className="finance-card finance-payments"
+                    aria-labelledby="finance-recent"
+                >
+                    <div className="finance-card-head">
+                        <h2 id="finance-recent">{t('Recent payments')}</h2>
+                        {payments_count > 0 && (
+                            <Link
+                                href="/finance/payments"
+                                className="my-project-link finance-open"
+                            >
+                                {t('All payments')}
+                                <ArrowRight
+                                    className="size-4"
+                                    aria-hidden="true"
+                                />
+                            </Link>
+                        )}
                     </div>
-                    <PaymentHistory attempts={attempts} />
-                </section>
-
-                <section className="market-panel market-stack">
-                    <h2>{t('Payment providers')}</h2>
-                    {providers.length ? (
-                        <ul className="provider-options">
-                            {providers.map((provider) => (
-                                <li
-                                    key={provider}
-                                    className="provider-option provider-option-static"
-                                >
-                                    <ProviderMark provider={provider} />
-                                    <span className="min-w-0 flex-1">
-                                        <span className="block font-medium">
-                                            {providerLabel(provider)}
-                                        </span>
-                                        <span className="market-muted block text-sm">
-                                            {providerHint(provider)}
-                                        </span>
-                                    </span>
-                                </li>
-                            ))}
-                        </ul>
+                    {attempts.length ? (
+                        <PaymentRows attempts={attempts} />
                     ) : (
-                        <p>
-                            {t(
-                                'No payment provider is connected yet, so funding is not available.',
-                            )}
-                        </p>
+                        <NoPayments client={workspace === 'client'} />
                     )}
-                    <h3>{t('Not available yet')}</h3>
-                    <ul className="market-muted list-disc space-y-2 ps-6">
-                        <li>
-                            {t(
-                                'Real payments, payouts and withdrawals are outside this test marketplace.',
-                            )}
-                        </li>
-                    </ul>
                 </section>
-            </main>
-        </AppLayout>
+            </BlurFade>
+            <BlurFade delay={0.2}>
+                <ProvidersLine providers={providers} />
+            </BlurFade>
+        </FinanceLayout>
     );
 }

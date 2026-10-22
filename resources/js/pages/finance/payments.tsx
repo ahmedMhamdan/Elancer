@@ -1,45 +1,55 @@
-import { Head } from '@inertiajs/react';
+// Payment history (plan 032 part 12): every test payment on the member's contracts in the Overview's rows, grouped by
+// month, newest first, fifteen to a page.
+import { usePage } from '@inertiajs/react';
 import Pagination from '@/components/tailadmin/pagination';
+import { BlurFade } from '@/components/ui/blur-fade';
 import { useTranslation } from '@/hooks/use-translation';
-import AppLayout from '@/layouts/app-layout';
 import type { Page } from '@/pages/discovery/shared';
-import { PaymentHistory, type Attempt } from './payment-history';
-import '../../../css/elancer-marketplace.css';
+import { PaymentRows } from './payment-history';
+import {
+    FinanceLayout,
+    NoPayments,
+    ProvidersLine,
+    type Attempt,
+} from './shared';
 
-export default function Payments({ attempts }: { attempts: Page<Attempt> }) {
+export default function Payments({
+    attempts,
+    providers,
+}: {
+    attempts: Page<Attempt>;
+    providers: string[];
+}) {
     const { t } = useTranslation();
+    const { auth } = usePage().props;
     return (
-        <AppLayout
-            breadcrumbs={[
-                { title: t('Finance'), href: '/finance' },
-                { title: t('Payment history'), href: '/finance/payments' },
-            ]}
-        >
-            <Head title={t('Payment history')} />
-            <main className="workspace-dashboard market-workspace market-stack">
-                <div>
-                    <div className="market-actions">
-                        <h1 className="text-2xl font-semibold">
-                            {t('Payment history')}
-                        </h1>
-                        <span className="proposal-status">
-                            {t('Test mode')}
+        <FinanceLayout tab="payments" count={attempts.total}>
+            <BlurFade>
+                <section
+                    className="finance-card finance-payments"
+                    aria-labelledby="finance-every"
+                >
+                    <div className="finance-card-head">
+                        <h2 id="finance-every">
+                            {t('Every payment on your contracts')}
+                        </h2>
+                        <span className="finance-muted">
+                            {t('Newest first')}
                         </span>
                     </div>
-                    <p className="text-muted-foreground mt-2 text-sm">
-                        {t(
-                            'Every test payment attempt on your contracts, newest first.',
-                        )}
-                    </p>
-                </div>
-                <section
-                    className="border-border bg-card overflow-hidden rounded-2xl border pt-5"
-                    aria-label={t('Payment history')}
-                >
-                    <PaymentHistory attempts={attempts.data} />
+                    {attempts.data.length ? (
+                        <PaymentRows attempts={attempts.data} grouped />
+                    ) : (
+                        <NoPayments
+                            client={auth.user.workspace_role === 'client'}
+                        />
+                    )}
                 </section>
-                <Pagination data={attempts} />
-            </main>
-        </AppLayout>
+            </BlurFade>
+            {attempts.last_page > 1 && <Pagination data={attempts} />}
+            <BlurFade delay={0.05}>
+                <ProvidersLine providers={providers} />
+            </BlurFade>
+        </FinanceLayout>
     );
 }

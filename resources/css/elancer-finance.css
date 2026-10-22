@@ -1,0 +1,599 @@
+/* Finance (plan 032 part 12, Ahmed's pick "A"): the agreed money on one card with a split bar, what waits for funding,
+   payment rows that open their receipt, and one quiet line for the test providers. Status colours as on My projects,
+   Final offers and Contracts; a contract waiting for funding gets a hollow square, money not funded yet a striped
+   segment. No glow, border light or pulse. */
+.finance-page {
+    --mp-open: var(--el-brand);
+    --mp-closed: #b8841c;
+    --mp-hired: #3f7fc4;
+    --mp-draft: var(--el-muted);
+    --mp-hidden: var(--el-error);
+    container-type: inline-size;
+}
+.dark .finance-page {
+    --mp-closed: #e0b25a;
+    --mp-hired: #8fc3f2;
+}
+.finance-page .my-project-status[data-state='wait']::before {
+    width: 7px;
+    height: 7px;
+    background: none;
+    box-shadow: inset 0 0 0 1.5px var(--el-muted);
+}
+.finance-muted {
+    color: var(--el-muted);
+}
+.finance-late {
+    color: var(--el-error);
+}
+.finance-figure {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+/* Heading */
+.finance-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+.finance-test-mode {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border: 1px dashed var(--el-border-strong);
+    border-radius: 999px;
+    color: var(--el-muted);
+    font-size: 12px;
+    white-space: nowrap;
+}
+.finance-test-mode svg {
+    width: 13px;
+    height: 13px;
+}
+.finance-lead {
+    margin-top: 6px;
+    color: var(--el-muted);
+    font-size: 14px;
+}
+.finance-tab-count {
+    margin-inline-start: 6px;
+    color: var(--el-muted);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Cards */
+.finance-card {
+    padding: 18px 20px;
+    border: 1px solid var(--el-border);
+    border-radius: 16px;
+    background: var(--el-surface);
+    color: var(--el-text);
+}
+.finance-card-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 12px;
+    margin-bottom: 4px;
+    font-size: 13px;
+}
+/* Scoped to the page so the shared .market-stack section h2 margin does not apply. */
+.finance-page .finance-card-head h2,
+.finance-page .finance-section {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+.finance-section small {
+    margin-inline-start: 8px;
+    color: var(--el-muted);
+    font-size: 13px;
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+}
+.finance-open {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+html[dir='rtl'] .finance-open svg {
+    transform: scaleX(-1);
+}
+.finance-page .finance-role {
+    margin: 0 0 10px;
+    color: var(--el-muted);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* The agreed money: total, split bar, legend, refunds */
+.finance-summary-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 8px 12px;
+}
+.finance-summary-top > div > span {
+    display: block;
+    font-size: 13px;
+}
+.finance-total {
+    display: block;
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+.finance-chip {
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: var(--el-soft);
+    color: var(--el-muted);
+    font-size: 12px;
+    white-space: nowrap;
+}
+.finance-bar {
+    display: flex;
+    gap: 3px;
+    height: 10px;
+    margin: 16px 0 14px;
+    border-radius: 4px;
+    background: var(--el-soft);
+}
+.finance-bar i {
+    min-width: 6px;
+    border-radius: 3px;
+    background: var(--status);
+    transform-origin: left;
+    animation: finance-grow 0.9s 0.15s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+html[dir='rtl'] .finance-bar i {
+    transform-origin: right;
+}
+.finance-bar:has(i) {
+    background: none;
+}
+.finance-page [data-state='open'] {
+    --status: var(--mp-open);
+}
+.finance-page [data-state='hired'] {
+    --status: var(--mp-hired);
+}
+.finance-bar i[data-state='wait'],
+.finance-legend i[data-state='wait'] {
+    background: repeating-linear-gradient(
+        135deg,
+        var(--el-border-strong) 0 3px,
+        transparent 3px 6px
+    );
+    box-shadow: inset 0 0 0 1px var(--el-border-strong);
+}
+.finance-legend {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.finance-legend li {
+    display: grid;
+    grid-template-columns: 10px minmax(0, 1fr);
+    column-gap: 8px;
+    align-items: baseline;
+}
+.finance-legend i {
+    align-self: center;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    background: var(--status);
+}
+.finance-legend span {
+    font-size: 13px;
+    line-height: 1.35;
+}
+.finance-legend strong {
+    grid-column: 2;
+    font-size: 16px;
+    font-weight: 600;
+}
+.finance-legend small {
+    grid-column: 2;
+    color: var(--el-muted);
+    font-size: 12px;
+}
+.finance-refund {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 8px;
+    margin: 14px 0 0;
+    padding-top: 12px;
+    border-top: 1px solid var(--el-border);
+    color: var(--el-muted);
+    font-size: 13px;
+}
+.finance-refund::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    background: var(--el-muted);
+}
+.finance-refund strong {
+    color: var(--el-text);
+    font-weight: 500;
+}
+
+/* What waits for funding */
+.finance-waiting-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+.finance-more {
+    margin-top: 8px;
+}
+.finance-waiting {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 18px;
+}
+.finance-waiting-main {
+    flex: 1 1 280px;
+    min-width: 0;
+}
+.finance-waiting-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 12px;
+    color: var(--el-muted);
+    font-size: 13px;
+}
+.finance-page .finance-waiting h3 {
+    margin: 6px 0 2px;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+    text-align: left;
+}
+html[dir='rtl'] .finance-waiting h3 {
+    text-align: right;
+}
+.finance-waiting h3 a:hover {
+    color: var(--el-accent);
+}
+.finance-waiting p {
+    margin: 2px 0 0;
+    font-size: 13px;
+}
+.finance-waiting-side {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px;
+}
+.finance-waiting-amount {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* Payment rows and their receipts */
+.finance-payments {
+    padding: 18px 0 6px;
+}
+.finance-payments .finance-card-head {
+    padding: 0 20px;
+}
+.finance-payments-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.finance-payment {
+    border-top: 1px solid var(--el-border);
+}
+.finance-month {
+    padding: 14px 20px 6px;
+    color: var(--el-muted);
+    font-size: 13px;
+    font-weight: 600;
+}
+.finance-payment-row {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr) auto auto auto 16px;
+    align-items: center;
+    gap: 4px 14px;
+    width: 100%;
+    padding: 12px 20px;
+    text-align: start;
+    cursor: pointer;
+    transition: background-color 160ms;
+}
+.finance-payment-row:hover {
+    background: color-mix(in srgb, var(--el-soft) 55%, transparent);
+}
+.finance-payment-row:focus-visible,
+.finance-copy:focus-visible {
+    outline: 2px solid var(--el-accent);
+    outline-offset: -2px;
+}
+.finance-payment-main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+.finance-payment-title {
+    overflow: hidden;
+    font-weight: 500;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+html[dir='rtl'] .finance-payment-title {
+    text-align: right;
+}
+.finance-payment-main small {
+    color: var(--el-muted);
+    font-size: 13px;
+}
+.finance-reference {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+}
+.finance-payment-line {
+    display: contents;
+}
+.finance-payment-line time {
+    min-width: 88px;
+    color: var(--el-muted);
+    font-size: 13px;
+    white-space: nowrap;
+}
+.finance-payment-line .my-project-status {
+    font-size: 13px;
+    white-space: nowrap;
+}
+.finance-payment-amount {
+    font-weight: 600;
+    text-align: end;
+}
+.finance-payment-amount.finance-muted {
+    font-weight: 500;
+}
+.finance-chevron {
+    width: 16px;
+    height: 16px;
+    color: var(--el-muted);
+    transition: transform 250ms;
+}
+.finance-payment-row[aria-expanded='true'] .finance-chevron {
+    transform: rotate(180deg);
+}
+.finance-receipt {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.finance-receipt[data-open='true'] {
+    grid-template-rows: 1fr;
+}
+.finance-receipt > div {
+    overflow: hidden;
+}
+.finance-receipt-body {
+    margin: 0 20px 14px;
+    padding: 14px 16px;
+    border: 1px solid var(--el-border);
+    border-radius: 12px;
+    background: var(--el-page);
+}
+.finance-receipt-list {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 7px 18px;
+    margin: 0;
+    font-size: 14px;
+}
+.finance-receipt-list dt {
+    color: var(--el-muted);
+}
+.finance-receipt-list dd {
+    min-width: 0;
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+.finance-copy {
+    margin-inline-start: 8px;
+    padding: 1px 10px;
+    border: 1px solid var(--el-border);
+    border-radius: 999px;
+    background: var(--el-surface);
+    font-size: 12px;
+    cursor: pointer;
+}
+.finance-stamp {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 12px 0 0;
+    padding-top: 10px;
+    border-top: 1px dashed var(--el-border);
+    color: var(--el-muted);
+    font-size: 13px;
+}
+.finance-stamp svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+.finance-receipt-foot {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 6px;
+}
+
+/* Test providers and the rule */
+.finance-providers {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 20px;
+    padding: 14px 20px;
+    font-size: 13px;
+}
+.finance-provider-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 16px;
+}
+.finance-provider {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.finance-rule {
+    flex: 1 1 260px;
+    margin: 0;
+    color: var(--el-muted);
+}
+
+/* Empty */
+.finance-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 18px 12px;
+    text-align: center;
+}
+.finance-empty-icon {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    margin-bottom: 4px;
+    border-radius: 10px;
+    background: var(--el-soft);
+    color: var(--el-muted);
+}
+.finance-empty-icon svg {
+    width: 20px;
+    height: 20px;
+}
+.finance-empty strong {
+    font-size: 15px;
+    font-weight: 600;
+}
+.finance-empty p {
+    max-width: 38ch;
+    margin: 0;
+    color: var(--el-muted);
+    font-size: 14px;
+}
+
+@keyframes finance-grow {
+    from {
+        transform: scaleX(0);
+    }
+    to {
+        transform: scaleX(1);
+    }
+}
+
+/* Narrow pages (a phone, or the 768 px page beside the open sidebar): one legend item per line, and each payment row
+   puts its status and time under the project. */
+@container (max-width: 600px) {
+    .finance-legend {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 8px;
+    }
+    .finance-legend li {
+        grid-template-columns: 10px minmax(0, 1fr) auto;
+    }
+    .finance-legend strong {
+        grid-column: 3;
+        grid-row: 1;
+        font-size: 15px;
+    }
+    .finance-legend small {
+        grid-column: 2;
+        grid-row: 2;
+    }
+    .finance-card {
+        padding: 16px;
+    }
+    .finance-payments {
+        padding: 16px 0 4px;
+    }
+    .finance-payments .finance-card-head,
+    .finance-month {
+        padding-inline: 16px;
+    }
+    .finance-payment-row {
+        grid-template-columns: 40px minmax(0, 1fr) auto;
+        grid-template-areas:
+            'mark main amount'
+            'mark line line';
+        padding: 11px 16px;
+    }
+    .finance-payment-row > .provider-mark {
+        grid-area: mark;
+        align-self: start;
+    }
+    .finance-payment-main {
+        grid-area: main;
+    }
+    .finance-payment-amount {
+        grid-area: amount;
+    }
+    .finance-payment-line {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px 12px;
+        grid-area: line;
+    }
+    .finance-payment-line time {
+        min-width: 0;
+    }
+    .finance-chevron {
+        display: none;
+    }
+    .finance-receipt-body {
+        margin: 0 16px 12px;
+    }
+    .finance-receipt-list {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 2px;
+    }
+    .finance-receipt-list dd + dt {
+        margin-top: 8px;
+    }
+    .finance-providers {
+        padding: 14px 16px;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .finance-bar i {
+        animation: none;
+    }
+    .finance-receipt,
+    .finance-chevron {
+        transition: none;
+    }
+}
