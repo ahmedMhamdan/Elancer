@@ -1,14 +1,9 @@
 // Cards/forms reuse local TailAdmin common/ComponentCard.tsx and form/form-elements/DefaultInputs.tsx.
 // Existing adaptations retain Elancer tokens, keyboard controls and RTL. See THIRD_PARTY_NOTICES.md.
 import { Head, Link, usePage } from '@inertiajs/react';
-import {
-    CircleCheck,
-    CreditCard,
-    FlaskConical,
-    Landmark,
-    type LucideIcon,
-} from 'lucide-react';
-import type { ReactNode } from 'react';
+import { CircleCheck, FlaskConical } from 'lucide-react';
+import type { ComponentType, ReactNode, SVGProps } from 'react';
+import { MoyasarLogo, StripeLogo } from '@/components/provider-logos';
 import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/hooks/use-translation';
 import { Money } from '@/pages/discovery/shared';
@@ -135,7 +130,7 @@ export function ContractStatus({ status }: { status: string }) {
         </span>
     );
 }
-export function PaymentStatus({ status }: { status: string }) {
+export function usePaymentStatusLabel() {
     const { t } = useTranslation();
     const labels: Record<string, string> = {
         pending: t('Checking payment'),
@@ -145,6 +140,10 @@ export function PaymentStatus({ status }: { status: string }) {
         unapplied: t('Verified, needs review'),
         refunded: t('Refunded'),
     };
+    return (status: string) => labels[status] ?? status;
+}
+export function PaymentStatus({ status }: { status: string }) {
+    const label = usePaymentStatusLabel();
     return (
         <span
             className={
@@ -153,7 +152,7 @@ export function PaymentStatus({ status }: { status: string }) {
                     : 'proposal-status'
             }
         >
-            {labels[status] ?? status}
+            {label(status)}
         </span>
     );
 }
@@ -175,21 +174,46 @@ export function useProviderHint() {
     };
     return (provider: string) => hints[provider] ?? '';
 }
-// Brand-coloured tiles with generic glyphs identify each provider without reproducing its logo artwork.
-const MARKS: Record<string, { color: string; Icon: LucideIcon }> = {
-    stripe: { color: '#635bff', Icon: CreditCard },
-    moyasar: { color: '#1e9e63', Icon: Landmark },
-    simulator: { color: '#626f60', Icon: FlaskConical },
+/** The provider's short name, as in "Stripe · 7C2E91A4" (plan 032 part 12). */
+export function useProviderName() {
+    const { t } = useTranslation();
+    const names: Record<string, string> = {
+        stripe: 'Stripe',
+        moyasar: t('Moyasar'),
+        simulator: t('Offline test simulator'),
+    };
+    return (provider: string) => names[provider] ?? provider;
+}
+// Each provider's own mark, white on its brand colour (plan 032 part 12, Ahmed: "Real logos"): Stripe's blurple,
+// Moyasar's near-black; the offline simulator keeps a flask on grey. Logo sources: components/provider-logos.tsx.
+const MARKS: Record<
+    string,
+    { color: string; Logo: ComponentType<SVGProps<SVGSVGElement>> }
+> = {
+    stripe: { color: '#635bff', Logo: StripeLogo },
+    moyasar: { color: '#191502', Logo: MoyasarLogo },
+    simulator: { color: '#626f60', Logo: FlaskConical },
 };
-export function ProviderMark({ provider }: { provider: string }) {
-    const { color, Icon } = MARKS[provider] ?? MARKS.simulator;
+export function ProviderMark({
+    provider,
+    size = 'md',
+}: {
+    provider: string;
+    size?: 'sm' | 'md';
+}) {
+    const { color, Logo } = MARKS[provider] ?? MARKS.simulator;
     return (
         <span
-            className="provider-mark"
+            className={
+                size === 'sm'
+                    ? 'provider-mark provider-mark-sm'
+                    : 'provider-mark'
+            }
+            data-provider={provider}
             style={{ backgroundColor: color }}
             aria-hidden="true"
         >
-            <Icon className="size-5" />
+            <Logo className="provider-mark-logo" />
         </span>
     );
 }

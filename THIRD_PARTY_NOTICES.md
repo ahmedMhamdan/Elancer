@@ -222,3 +222,7 @@ resources/js/components/ui/animated-theme-toggler.tsx adapts Magic UI's Animated
 Four more Magic UI components, adapted for My projects (plan 032), each from its registry file: resources/js/components/ui/interactive-hover-button.tsx (InteractiveHoverButton, https://magicui.design/docs/components/interactive-hover-button; an Inertia link that mirrors in Arabic and answers keyboard focus like hover), number-ticker.tsx (NumberTicker, https://magicui.design/docs/components/number-ticker; formatted in the page's language, with a stiffer spring so a figure lands in about a second), blur-fade.tsx (BlurFade, https://magicui.design/docs/components/blur-fade; without exit or in-view options) and animated-circular-progress-bar.tsx (AnimatedCircularProgressBar, https://magicui.design/docs/components/animated-circular-progress-bar; fills once after the first paint). All four show their final state at once for visitors who ask for reduced motion.
 
 Magic UI is released under the MIT License, Copyright (c) Magic UI (https://github.com/magicuidesign/magicui).
+
+## Payment provider marks (2026-10-22)
+
+resources/js/components/provider-logos.tsx draws Stripe's "S" from Simple Icons (https://simpleicons.org; the icon data is released under CC0 1.0) and Moyasar's mark from the path of https://docs.moyasar.com/img/logo.svg, both unchanged and filled with the current colour. Stripe and Moyasar are trademarks of their owners; the marks only name the provider a test payment went through, at Ahmed's request (plan 032 part 12), and imply no endorsement.
