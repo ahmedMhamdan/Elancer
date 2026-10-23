@@ -20,16 +20,26 @@ export default function ReportDialog({
     id,
     label,
     className,
+    open: controlled,
+    onOpenChange,
 }: {
     type: ReportTarget;
     id: number;
     label: string;
     className?: string;
+    // Plan 032 part 13: opened from a menu, so the dialog brings no button of its own.
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
 }) {
     const { t } = useTranslation();
     const { reasons } = useReportLabels();
     const field = useId();
-    const [open, setOpen] = useState(false);
+    const [own, setOwn] = useState(false);
+    const open = controlled ?? own;
+    const setOpen = (value: boolean) => {
+        setOwn(value);
+        onOpenChange?.(value);
+    };
     const form = useForm({
         target_type: type as string,
         target_id: id,
@@ -50,17 +60,19 @@ export default function ReportDialog({
     if (demo) return null;
     return (
         <>
-            <button
-                type="button"
-                className={cn(
-                    'focus-visible:outline-ring inline-flex min-h-11 cursor-pointer items-center gap-1.5 text-sm underline underline-offset-4 opacity-80 hover:opacity-100 focus-visible:outline-2',
-                    className,
-                )}
-                onClick={() => setOpen(true)}
-            >
-                <Flag size={15} aria-hidden="true" />
-                {label}
-            </button>
+            {controlled === undefined && (
+                <button
+                    type="button"
+                    className={cn(
+                        'focus-visible:outline-ring inline-flex min-h-11 cursor-pointer items-center gap-1.5 text-sm underline underline-offset-4 opacity-80 hover:opacity-100 focus-visible:outline-2',
+                        className,
+                    )}
+                    onClick={() => setOpen(true)}
+                >
+                    <Flag size={15} aria-hidden="true" />
+                    {label}
+                </button>
+            )}
             <Modal
                 open={open}
                 onClose={close}

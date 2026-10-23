@@ -2911,4 +2911,64 @@ export const arabic: Record<string, string> = {
     'All payments': 'جميع الدفعات',
     'Every payment on your contracts': 'كل الدفعات في عقودك',
     'See all :count on Contracts': 'عرض الكل في العقود (:count)',
+    // Plan 032 part 13: Messages redesigned (option A).
+    Today: 'اليوم',
+    Yesterday: 'أمس',
+    'Your messages': 'رسائلك',
+    'Back to inbox': 'العودة إلى الوارد',
+    'You:': 'أنت:',
+    'Review the offer': 'راجع العرض',
+    ':name sent you a final offer.': 'أرسل لك :name عرضًا نهائيًا.',
+    'Waiting for :name to answer your final offer.':
+        'بانتظار ردّ :name على عرضك النهائي.',
+    'Agree on the work here, then send the final offer.':
+        'اتفقا على العمل هنا، ثم أرسل العرض النهائي.',
+    'The client sends a final offer when ready to hire.':
+        'يرسل صاحب المشروع العرض النهائي حين يكون مستعدًا للتوظيف.',
+    ':name is working on it.': 'يعمل :name على التسليم.',
+    'Waiting for the client’s review.': 'بانتظار مراجعة صاحب المشروع.',
+    ':name is working on the revision.': 'يعمل :name على التعديل.',
+    'Waiting for an answer to the cancellation request.':
+        'بانتظار الرد على طلب الإلغاء.',
+    'The contract is complete.': 'اكتمل العقد.',
+    'The contract was cancelled.': 'أُلغي العقد.',
+    'out of 5': 'من 5',
+    '1 completed contract': 'عقد واحد مكتمل',
+    ':count completed contracts': ':count عقود مكتملة',
+    '1 hire completed on Elancer': 'توظيف واحد مكتمل على إيلانسر',
+    ':count hires completed on Elancer':
+        ':count عمليات توظيف مكتملة على إيلانسر',
+    Proposed: 'السعر المقترح',
+    Agreed: 'المتفق عليه',
+    'Your move': 'دورك',
+    'Files in this conversation': 'الملفات في هذه المحادثة',
+    'The newest :shown of :count files. Older ones are in the messages above.':
+        'أحدث :shown من :count ملفات، والأقدم في الرسائل أعلاه.',
+    'No files yet.': 'لا توجد ملفات بعد.',
+    Demo: 'تجريبي',
+    'Conversation details': 'تفاصيل المحادثة',
+    'You started this conversation about :name’s proposal.':
+        'بدأت هذه المحادثة حول عرض :name.',
+    ':name started this conversation about your proposal.':
+        'بدأ :name هذه المحادثة حول عرضك.',
+    'Message actions': 'إجراءات الرسالة',
+    ':count min left': 'بقيت :count دقيقة',
+    'Text copied': 'تم نسخ النص',
+    'Copy text': 'نسخ النص',
+    'Earlier versions of this message, oldest first.':
+        'النسخ السابقة من هذه الرسالة، الأقدم أولًا.',
+    'Replaced :when': 'استُبدلت :when',
+    '1 new message': 'رسالة جديدة واحدة',
+    ':count new messages': ':count رسائل جديدة',
+    'Show older messages': 'عرض الرسائل الأقدم',
+    'Show newer messages': 'عرض الرسائل الأحدث',
+    ':count new': ':count جديدة',
+    Latest: 'الأحدث',
+    'Message…': 'رسالة…',
+    'Enter sends · Shift + Enter for a new line':
+        'Enter للإرسال · Shift + Enter لسطر جديد',
+    'Demo account': 'حساب تجريبي',
+    'Shared with other visitors and reset from time to time.':
+        'مشترك مع زوار آخرين ويُعاد ضبطه من وقت لآخر.',
+    'New messages': 'رسائل جديدة',
 };

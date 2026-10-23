@@ -9,9 +9,15 @@ const chatProps = [
     'messages',
     'conversation',
     'conversations',
+    'details',
     'writable',
     'visibleThrough',
 ];
+// Plan 032 part 13: a refresh made while the browser tab is hidden does not read the open conversation.
+const hidden = () =>
+    document.hidden
+        ? { 'X-Elancer-Hidden': '1' }
+        : ({} as Record<string, string>);
 
 // Turns a live signal into fresh page data: the bell count everywhere, the open
 // inbox or conversation on Messages or in a workroom (plan 031), and a toast for a new notification.
@@ -39,10 +45,11 @@ export default function RealtimeBridge() {
                 () =>
                     router.reload({
                         only: chat
-                            ? ['notifications', ...chatProps]
+                            ? ['notifications', 'inbox', ...chatProps]
                             : workroom
-                              ? ['notifications', 'thread']
-                              : ['notifications'],
+                              ? ['notifications', 'inbox', 'thread']
+                              : ['notifications', 'inbox'],
+                        headers: hidden(),
                     }),
                 150,
             );
@@ -98,6 +105,31 @@ export default function RealtimeBridge() {
             ),
         [realtime, auth.user.id],
     );
+    // Back in the tab: what arrived meanwhile is now on screen, so the open conversation is read.
+    // Only the newest page reads a conversation, so an older one is left as it is.
+    const waiting =
+        page.component === 'messages/show' &&
+        (page.props.messages as { current_page: number }).current_page === 1 &&
+        (page.props.conversation as { unread: number }).unread > 0;
+    useEffect(() => {
+        if (!waiting) return;
+        const back = () => {
+            if (!document.hidden)
+                router.reload({
+                    only: [
+                        'notifications',
+                        'inbox',
+                        'firstUnread',
+                        'newMessages',
+                        ...chatProps,
+                    ],
+                });
+        };
+        // The member may already be back by the time a refresh from the hidden tab answers.
+        back();
+        document.addEventListener('visibilitychange', back);
+        return () => document.removeEventListener('visibilitychange', back);
+    }, [waiting]);
 
     return null;
 }
