@@ -57,10 +57,11 @@ class HandleInertiaRequests extends Middleware
                 'demoActing' => $demo && DemoWorld::acting($request),
                 'demoOther' => $demo ? DemoAccess::other($user) : null,
             ],
-            // The recipient's own count only; the list loads when the bell opens.
-            'notifications' => ['unread' => $user?->unreadNotifications()->count() ?? 0],
+            // The recipient's own count only; the list loads when the bell opens. Counted when the page is answered, after
+            // the controller, so opening a conversation (which reads it, plan 032 part 13) shows at once.
+            'notifications' => fn () => ['unread' => $user?->unreadNotifications()->count() ?? 0],
             // Plan 032: the count beside Messages in the public bar ("messages" is a page prop of the conversation pages).
-            'inbox' => ['unread' => $user === null ? 0 : ConversationThread::unreadConversations($user->id)],
+            'inbox' => fn () => ['unread' => $user === null ? 0 : ConversationThread::unreadConversations($user->id)],
             'realtime' => $user === null ? null : $this->realtime(),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];

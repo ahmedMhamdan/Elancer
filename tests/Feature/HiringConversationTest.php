@@ -70,7 +70,8 @@ class HiringConversationTest extends TestCase
         $this->post('/messages/'.$conversation->id, array_merge($payload, ['body' => 'Changed request']))->assertConflict();
         $this->assertDatabaseCount('conversation_messages', 2);
         $latest = ConversationMessage::query()->max('id');
-        $this->actingAs($client)->get('/messages/'.$conversation->id)->assertInertia(fn (Assert $page) => $page->where('conversation.unread', 1)->missing('conversation.freelancer_read_through')->missing('conversation.freelancer_archived')->missing('messages.data.0.client_token'));
+        // Plan 032 part 13: opening the conversation reads it, and the page is told where the new messages began.
+        $this->actingAs($client)->get('/messages/'.$conversation->id)->assertInertia(fn (Assert $page) => $page->where('conversation.unread', 0)->where('firstUnread', $latest)->missing('conversation.freelancer_read_through')->missing('conversation.freelancer_archived')->missing('messages.data.0.client_token'));
         $this->patch('/messages/'.$conversation->id.'/state', ['archived' => true, 'read_through' => $latest])->assertRedirect();
         $this->get('/messages')->assertInertia(fn (Assert $page) => $page->has('conversations.data', 0));
         $this->get('/messages?archived=1')->assertInertia(fn (Assert $page) => $page->where('conversations.data.0.unread', 0));
@@ -108,7 +109,9 @@ class HiringConversationTest extends TestCase
         $this->travel(1)->minutes();
         $this->patch('/messages/items/'.$message->id, ['body' => 'Too late', 'version' => 2])->assertConflict();
         $this->assertSame('Corrected message', $message->fresh()->body);
-        $this->actingAs($freelancer)->get('/messages/'.$conversation->id)->assertInertia(fn (Assert $page) => $page->where('messages.data.0.revisions.0.body', 'Let us discuss the project.'));
+        $this->actingAs($freelancer)->get('/messages/'.$conversation->id)->assertInertia(fn (Assert $page) => $page->where('messages.data.0.revisions.0.body', 'Let us discuss the project.')
+            // Plan 032 part 13: sent with its zone, so the browser shows the member's own time.
+            ->where('messages.data.0.revisions.0.created_at', now()->subMinute()->startOfSecond()->toJSON()));
         $this->delete('/messages/items/'.$message->id)->assertStatus(405);
     }
 
@@ -167,7 +170,8 @@ class HiringConversationTest extends TestCase
         $this->get('/messages?unread=1&archived=1')->assertInertia(fn (Assert $page) => $page->has('conversations.data', 0));
         $this->get('/messages?archived=1&q=Shared')->assertInertia(fn (Assert $page) => $page->has('conversations.data', 1));
         $this->actingAs($freelancer)->get('/messages?archived=1')->assertInertia(fn (Assert $page) => $page->has('conversations.data', 0));
-        $this->get('/messages?unread=1')->assertInertia(fn (Assert $page) => $page->has('conversations.data', 1)->where('conversations.data.0.id', $conversation->id));
+        // Plan 032 part 13: the freelancer answered, which read the conversation for them.
+        $this->get('/messages?unread=1')->assertInertia(fn (Assert $page) => $page->has('conversations.data', 0));
         $this->get('/messages?q='.str_repeat('x', 101))->assertRedirect()->assertSessionHasErrors('q');
     }
 }

@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property CarbonImmutable|null $freelancer_emailed_at
  * @property CarbonImmutable $updated_at
  * @property-read ConversationMessage|null $latestMessage
+ * @property-read Contract|null $contract
  * @property-read Proposal $proposal
  * @property-read User $client
  * @property-read User $freelancer
@@ -57,6 +58,16 @@ class Conversation extends Model
     public function messages(): HasMany
     {
         return $this->hasMany(ConversationMessage::class);
+    }
+
+    /**
+     * The contract that grew out of this hiring conversation, once an offer was accepted.
+     *
+     * @return HasOne<Contract, $this>
+     */
+    public function contract(): HasOne
+    {
+        return $this->hasOne(Contract::class);
     }
 
     /** @return HasOne<ConversationMessage, $this> */

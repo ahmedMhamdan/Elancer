@@ -56,6 +56,23 @@ class Contract extends Model
         return $user === $this->client_id || $user === $this->freelancer_id;
     }
 
+    /**
+     * Whose move it is: the client funds and reviews, the freelancer delivers and revises, an open cancellation
+     * request waits on the other side; null once the contract is closed. Contracts and Messages both read it.
+     */
+    public function turnFor(int $user): ?string
+    {
+        $client = $this->client_id === $user;
+        $request = $this->openCancellation;
+
+        return match ($this->status) {
+            'awaiting_payment', 'submitted' => $client ? 'yours' : 'theirs',
+            'active', 'revision_requested' => $client ? 'theirs' : 'yours',
+            'cancellation_pending' => $request?->status === 'pending' && $request->requester_id !== $user ? 'yours' : 'theirs',
+            default => null,
+        };
+    }
+
     /** @return HasMany<ContractSubmission, $this> */
     public function submissions(): HasMany
     {

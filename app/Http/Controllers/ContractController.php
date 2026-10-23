@@ -81,20 +81,6 @@ class ContractController extends Controller
         };
     }
 
-    /** Whose move it is, as in listed(): the viewer's, the other side's, or nobody's once the contract is closed. */
-    private function turn(Contract $contract, int $user): ?string
-    {
-        $client = $contract->client_id === $user;
-        $request = $contract->openCancellation;
-
-        return match ($contract->status) {
-            'awaiting_payment', 'submitted' => $client ? 'yours' : 'theirs',
-            'active', 'revision_requested' => $client ? 'theirs' : 'yours',
-            'cancellation_pending' => $request?->status === 'pending' && $request->requester_id !== $user ? 'yours' : 'theirs',
-            default => null,
-        };
-    }
-
     /**
      * One card. The other side as the viewer met them: a client sees the freelancer's proposal profile, a freelancer
      * the client's name and company (client photos are private).
@@ -117,7 +103,7 @@ class ContractController extends Controller
             'revision_asked_at' => $contract->getAttribute('revision_asked_at'),
             'cancellation' => $request ? ['status' => $request->status, 'prior_status' => $request->prior_status, 'created_at' => $request->created_at] : null,
             'overdue' => $contract->status === 'active' && $contract->delivery_due_at?->isPast() === true,
-            'turn' => $this->turn($contract, $user)];
+            'turn' => $contract->turnFor($user)];
     }
 
     public function show(Request $request, Contract $contract, Gateways $gateways): Response

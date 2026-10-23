@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Auth\DemoAccess;
+use App\Actions\Contracts\PublicReviews;
 use App\Actions\Conversations\ConversationThread;
 use App\Actions\Conversations\HiringAccess;
 use App\Actions\Files\AttachedFiles;
@@ -11,16 +12,16 @@ use App\Models\Contract;
 use App\Models\Conversation;
 use App\Models\ConversationMessage;
 use App\Models\MessageFile;
+use App\Models\Offer;
+use App\Models\Profile;
 use App\Models\Project;
 use App\Models\Proposal;
 use App\Models\User;
 use App\Notifications\WorkspaceEvent;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -71,13 +72,21 @@ class ConversationController extends Controller
     {
         abort_unless($conversation->contains($request->user()->id), 404);
         $filters = $this->filters($request);
-        $conversation->loadMissing(['latestMessage']);
         $user = $request->user()->id;
+        // Plan 032 part 13: the newest messages are on screen, so the conversation is read. Not on an older page, and
+        // not on a refresh the page asked for while it was in a hidden browser tab.
+        $firstUnread = $request->integer('page', 1) <= 1 && ! $request->hasHeader('X-Elancer-Hidden')
+            ? ConversationThread::markRead($conversation, $request->user()) : null;
+        $conversation->loadMissing(['latestMessage', 'contract.openCancellation', 'proposal.project', 'client.profile', 'freelancer']);
 
         return Inertia::render('messages/show', [
-            'conversations' => $this->inbox($user, $filters)->paginate(20, ['*'], 'list_page')->withQueryString()->through(fn (Conversation $item) => $this->summary($item, $user)),
+            'conversations' => $this->inbox($user, $filters, $conversation->id)->paginate(20, ['*'], 'list_page')->withQueryString()->through(fn (Conversation $item) => $this->summary($item, $user)),
             'filters' => $filters,
-            'conversation' => $this->summary($conversation, $user),
+            'conversation' => [...$this->summary($conversation, $user), ...$this->hiring($conversation, $user)],
+            'firstUnread' => $firstUnread,
+            // How many of the other side's messages were new, for the line when it begins on an older page.
+            'newMessages' => $firstUnread === null ? 0 : $conversation->messages()->where('sender_id', '!=', $user)->where('id', '>=', $firstUnread)->count(),
+            'details' => fn () => $this->details($conversation, $user),
             ...ConversationThread::for($conversation, $user),
         ]);
     }
@@ -165,10 +174,13 @@ class ConversationController extends Controller
             // Read/archive changes do not reorder the conversation for the counterpart.
             $locked->timestamps = false;
             $locked->forceFill($changes)->save();
+            // Under the conversation's lock, and only once nothing newer from the other side is left unread, so a message
+            // that arrived after the page was drawn keeps its own bell entry (plan 032 part 13).
+            if (isset($data['read_through']) && $locked->messages()->where('sender_id', '!=', $request->user()->id)
+                ->where('id', '>', (int) $locked->getAttribute($locked->readColumn($request->user()->id)))->doesntExist()) {
+                ConversationThread::notifications($request->user(), $conversation->id)->each->markAsRead();
+            }
         });
-        if (isset($data['read_through'])) {
-            $this->messageNotifications($request->user(), $conversation->id)->each->markAsRead();
-        }
 
         return back();
     }
@@ -204,11 +216,15 @@ class ConversationController extends Controller
 
     /**
      * @param  array{kind: string, archived: bool, unread: bool, q: string}  $filters
+     * @param  int|null  $open  the conversation on screen, which stays in the Unread list after opening it read it
      * @return Builder<Conversation>
      */
-    private function inbox(int $user, array $filters): Builder
+    private function inbox(int $user, array $filters, ?int $open = null): Builder
     {
-        $query = Conversation::query()->with(['proposal.project', 'client', 'freelancer', 'latestMessage'])
+        // Each row's unread count and its file-only preview are counted in this one query, not row by row.
+        $query = Conversation::query()->with(['proposal.project', 'client', 'freelancer', 'latestMessage' => fn ($q) => $q->withCount('files'), 'contract.openCancellation'])
+            ->withCount(['messages as unread_count' => fn ($q) => $q->where('sender_id', '!=', $user)
+                ->whereRaw('conversation_messages.id > (case when conversations.client_id = ? then conversations.client_read_through else conversations.freelancer_read_through end)', [$user])])
             ->where(fn ($q) => $q
                 ->where(fn ($q) => $q->where('client_id', $user)->where('client_archived', $filters['archived']))
                 ->orWhere(fn ($q) => $q->where('freelancer_id', $user)->where('freelancer_archived', $filters['archived'])));
@@ -227,9 +243,10 @@ class ConversationController extends Controller
         }
 
         if ($filters['unread']) {
-            $query->whereHas('messages', fn ($q) => $q->where('sender_id', '!=', $user)->where(fn ($q) => $q
+            $query->where(fn ($q) => $q->whereHas('messages', fn ($q) => $q->where('sender_id', '!=', $user)->where(fn ($q) => $q
                 ->where(fn ($q) => $q->where('conversations.client_id', $user)->whereColumn('conversation_messages.id', '>', 'conversations.client_read_through'))
-                ->orWhere(fn ($q) => $q->where('conversations.freelancer_id', $user)->whereColumn('conversation_messages.id', '>', 'conversations.freelancer_read_through'))));
+                ->orWhere(fn ($q) => $q->where('conversations.freelancer_id', $user)->whereColumn('conversation_messages.id', '>', 'conversations.freelancer_read_through'))))
+                ->when($open !== null, fn ($q) => $q->orWhere('conversations.id', $open)));
         }
 
         return $query->orderByDesc('updated_at')->orderByDesc('id');
@@ -272,54 +289,125 @@ class ConversationController extends Controller
             (new MessageFile)->forceFill(['conversation_message_id' => $message->id, 'name' => AttachedFiles::name($file), 'path' => $paths[$i],
                 'mime' => (string) $file->getMimeType(), 'size' => (int) $file->getSize()])->save();
         }
-        $conversation->forceFill(['client_archived' => false, 'freelancer_archived' => false])->touch();
-        DB::afterCommit(fn () => $this->announce($conversation, $sender));
+        // Plan 032 part 13: whoever answers has read the conversation up to their own message, bell entries included,
+        // while the conversation is still locked.
+        $read = $conversation->readColumn($sender);
+        $conversation->forceFill(['client_archived' => false, 'freelancer_archived' => false, $read => max((int) $conversation->getAttribute($read), $message->id)])->touch();
+        $author = User::query()->find($sender);
+        if ($author) {
+            ConversationThread::notifications($author, $conversation->id)->each->markAsRead();
+        }
+        DB::afterCommit(fn () => $this->announce($conversation, $sender, $message->id));
 
         return true;
     }
 
     /** The counterpart's open pages update at once; the bell keeps one unread entry per conversation however many messages arrive. */
-    private function announce(Conversation $conversation, int $sender): void
+    private function announce(Conversation $conversation, int $sender, int $message): void
     {
         $recipient = User::query()->find($sender === $conversation->client_id ? $conversation->freelancer_id : $conversation->client_id);
         if (! $recipient) {
             return;
         }
-        if ($this->messageNotifications($recipient, $conversation->id)->isNotEmpty()) {
+        // Plan 032 part 13: a recipient with the conversation open may already have read this message.
+        $read = (int) Conversation::query()->whereKey($conversation->id)->value($conversation->readColumn($recipient->id));
+        if ($read >= $message || ConversationThread::notifications($recipient, $conversation->id)->isNotEmpty()) {
             WorkspaceSignal::send($recipient->id, conversation: $conversation->id);
 
             return;
         }
         $recipient->notify(new WorkspaceEvent('message_received', '/messages/'.$conversation->id, $conversation->proposal->project->title,
             User::query()->whereKey($sender)->value('name'), $conversation->id));
-    }
-
-    /**
-     * The member's unread bell entries for one conversation.
-     *
-     * @return Collection<int, DatabaseNotification>
-     */
-    private function messageNotifications(User $user, int $conversation): Collection
-    {
-        // The stored JSON is narrowed by text so the query stays portable, then matched exactly.
-        return $user->unreadNotifications()->where('data', 'like', '%"kind":"message_received"%')->get()
-            ->filter(fn (DatabaseNotification $notification) => ($notification->data['conversation'] ?? null) === $conversation)->values();
+        // The recipient may have read the conversation while the entry was written. Checked under the conversation's
+        // lock, after any read in progress, so the entry stays only while something from this side is still unread.
+        DB::transaction(function () use ($conversation, $recipient): void {
+            $locked = Conversation::query()->lockForUpdate()->findOrFail($conversation->id);
+            if ($locked->messages()->where('sender_id', '!=', $recipient->id)->where('id', '>', (int) $locked->getAttribute($locked->readColumn($recipient->id)))->doesntExist()) {
+                ConversationThread::notifications($recipient, $conversation->id)->each->markAsRead();
+            }
+        });
     }
 
     /** @return array<string, mixed> */
     private function summary(Conversation $conversation, int $user): array
     {
+        $client = $user === $conversation->client_id;
+        $contract = $conversation->contract;
+        $latest = $conversation->latestMessage;
+
         return [
             'id' => $conversation->id, 'project' => $conversation->proposal->project->only(['id', 'title']),
             'proposal_id' => $conversation->proposal_id,
-            'contract_id' => Contract::query()->where('proposal_id', $conversation->proposal_id)->value('id'),
-            'counterpart' => $user === $conversation->client_id ? $conversation->freelancer->name : $conversation->client->name,
-            'preview' => $conversation->latestMessage?->moderated_at === null ? Str::limit($conversation->latestMessage->body ?? '', 120) : '',
-            'preview_hidden' => $conversation->latestMessage?->moderated_at !== null,
-            'preview_files' => $conversation->latestMessage && $conversation->latestMessage->moderated_at === null && $conversation->latestMessage->body === '' ? $conversation->latestMessage->files()->count() : 0,
+            'contract_id' => $contract?->id,
+            'counterpart' => $client ? $conversation->freelancer->name : $conversation->client->name,
+            // Plan 032 part 13, as Contracts shows the other side: a client sees the photo the freelancer's proposal
+            // carried; client photos stay private.
+            'avatar' => $client ? ($conversation->proposal->profile_snapshot['avatar'] ?? null) : null,
+            'is_client' => $client,
+            // The deal behind the conversation: the contract's state and whose move it is, or the proposal's price.
+            'status' => $contract?->status,
+            'turn' => $contract?->turnFor($user),
+            'amount' => $contract ? (string) $contract->agreement['amount'] : (isset($conversation->proposal->content['price']) ? (string) $conversation->proposal->content['price'] : null),
+            'due_at' => match ($contract?->status) {
+                'active' => $contract->delivery_due_at,
+                'revision_requested' => $contract->revision_due_at,
+                default => null,
+            },
+            'preview' => $latest?->moderated_at === null ? Str::limit($latest->body ?? '', 120) : '',
+            'preview_hidden' => $latest?->moderated_at !== null,
+            'preview_files' => $latest && $latest->moderated_at === null && $latest->body === '' ? (int) ($latest->getAttribute('files_count') ?? $latest->files()->count()) : 0,
+            'preview_mine' => $latest?->sender_id === $user,
             'archived' => (bool) $conversation->getAttribute($conversation->archiveColumn($user)),
-            'unread' => ConversationThread::unread($conversation, $user),
+            'unread' => (int) ($conversation->getAttribute('unread_count') ?? ConversationThread::unread($conversation, $user)),
             'updated_at' => $conversation->updated_at,
+        ];
+    }
+
+    /**
+     * Plan 032 part 13: before a contract, the open conversation's next hiring step as the proposal and offer pages offer
+     * it. The client sends a final offer while hiring is open; a pending offer waits on the freelancer.
+     *
+     * @return array{offer: array<string, mixed>|null, turn?: string|null}
+     */
+    private function hiring(Conversation $conversation, int $user): array
+    {
+        if ($conversation->contract !== null) {
+            return ['offer' => null];
+        }
+        $offer = Offer::query()->where('proposal_id', $conversation->proposal_id)->latest('id')->first(['id', 'status', 'expires_at']);
+        $client = $user === $conversation->client_id;
+        $writable = HiringAccess::writable($conversation->proposal);
+        // As OfferLifecycle::refresh decides it, without writing on a page view: a pending offer past its 72 hours,
+        // or one hiring can no longer reach, is not waiting on anyone.
+        $status = $offer?->status === 'pending' && ($offer->expires_at->lte(now()) || ! $writable) ? ($writable ? 'expired' : 'restricted') : $offer?->status;
+        $turn = $status === 'pending' ? ($client ? 'theirs' : 'yours') : ($client && $writable ? 'yours' : null);
+
+        return ['offer' => $offer ? ['id' => $offer->id, 'status' => $status] : null, 'turn' => $turn];
+    }
+
+    /**
+     * Plan 032 part 13: the conversation's details panel. Who the other side is, as the hiring pages already show them
+     * (a client sees the freelancer's proposal profile, a freelancer the client's company), their public record, and the
+     * files sent in this conversation (none from a message moderation hid).
+     *
+     * @return array<string, mixed>
+     */
+    private function details(Conversation $conversation, int $user): array
+    {
+        $client = $user === $conversation->client_id;
+        $snapshot = $conversation->proposal->profile_snapshot ?? [];
+        $files = MessageFile::query()->whereHas('message', fn (Builder $message) => $message->where('conversation_id', $conversation->id)->whereNull('moderated_at'));
+        // The profile page is linked only while it is public.
+        $profile = $client && isset($snapshot['id']) && Profile::query()->publiclyVisible()->whereKey($snapshot['id'])->exists() ? (int) $snapshot['id'] : null;
+
+        return [
+            'profile' => $profile,
+            'headline' => $client ? ($snapshot['headline'] ?? null) : null,
+            'country' => $client ? ($snapshot['country'] ?? null) : null,
+            'company' => $client ? null : $conversation->client->profile?->company,
+            'record' => PublicReviews::record($client ? $conversation->freelancer_id : $conversation->client_id, $client ? 'freelancer' : 'client'),
+            'files' => (clone $files)->orderByDesc('id')->limit(12)->get(['id', 'name', 'size']),
+            'files_total' => $files->count(),
         ];
     }
 }
