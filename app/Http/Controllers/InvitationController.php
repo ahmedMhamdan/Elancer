@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Demo\DemoWorld;
 use App\Actions\Invitations\InvitationLifecycle as Lifecycle;
+use App\Enums\WorkspaceRole;
 use App\Models\Invitation;
 use App\Models\Profile;
 use App\Models\Project;
@@ -68,7 +69,8 @@ class InvitationController extends Controller
     public function index(Request $request): Response
     {
         $request->validate(['box' => ['nullable', 'in:received,sent'], 'page' => ['nullable', 'integer', 'min:1', 'max:100000']]);
-        $sent = $request->query('box') === 'sent';
+        // Plan 034: only freelancers receive invitations, so a client opens on the ones they sent.
+        $sent = ($request->query('box') ?? ($request->user()->workspace_role === WorkspaceRole::Client ? 'sent' : 'received')) === 'sent';
         $query = Invitation::query()->with(['project.user', 'recipient'])->when($sent,
             fn ($q) => $q->whereHas('project', fn ($p) => $p->where('user_id', $request->user()->id)),
             fn ($q) => $q->where('recipient_id', $request->user()->id));

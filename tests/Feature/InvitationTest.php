@@ -65,6 +65,17 @@ class InvitationTest extends TestCase
         $this->assertDatabaseCount('invitation_events', 1);
     }
 
+    public function test_a_client_opens_on_sent_invitations_and_a_freelancer_on_received(): void
+    {
+        $owner = $this->member();
+        $recipient = $this->member();
+        $this->invite($owner, $recipient, $this->project($owner));
+        $owner->forceFill(['workspace_role' => WorkspaceRole::Client])->save();
+        $this->actingAs($owner)->get('/invitations')->assertInertia(fn (Assert $page) => $page->where('box', 'sent')->has('invitations.data', 1));
+        $this->get('/invitations?box=received')->assertInertia(fn (Assert $page) => $page->where('box', 'received')->has('invitations.data', 0));
+        $this->actingAs($recipient)->get('/invitations')->assertInertia(fn (Assert $page) => $page->where('box', 'received')->has('invitations.data', 1));
+    }
+
     public function test_only_owner_can_invite_and_busy_is_not_a_permission_gate(): void
     {
         $owner = $this->member();

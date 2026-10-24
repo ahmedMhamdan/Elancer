@@ -28,7 +28,9 @@ export function InvitationLayout({ children }: { children: ReactNode }) {
             <main className="workspace-dashboard market-workspace market-stack">
                 <h1 className="text-2xl font-semibold">{t('Invitations')}</h1>
                 <nav className="market-actions" aria-label={t('Invitations')}>
-                    <Link href="/invitations">{t('Received invitations')}</Link>
+                    <Link href="/invitations?box=received">
+                        {t('Received invitations')}
+                    </Link>
                     <Link href="/invitations?box=sent">
                         {t('Sent invitations')}
                     </Link>
