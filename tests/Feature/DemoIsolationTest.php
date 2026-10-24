@@ -10,6 +10,7 @@ use App\Models\Contract;
 use App\Models\ContractSubmission;
 use App\Models\Offer;
 use App\Models\PaymentAttempt;
+use App\Models\PortfolioCase;
 use App\Models\Project;
 use App\Models\Proposal;
 use App\Models\Skill;
@@ -492,6 +493,42 @@ class DemoIsolationTest extends TestCase
         } catch (DemoResetRefused $refusal) {
             $this->assertSame('accounts', $refusal->getMessage());
         }
+        $this->assertEquals($before, $this->rows());
+    }
+
+    /** Plan 034: the demo freelancer has public case studies, so a visitor's application may share one. */
+    public function test_a_reset_takes_back_an_application_that_shares_a_case_study(): void
+    {
+        $client = $this->member('client-01@demo.elancer.test');
+        $freelancer = $this->member('freelancer-01@demo.elancer.test', true);
+        $content = ['title' => 'Booking dashboard', 'summary' => 'A short summary of the work that was done.', 'body' => str_repeat('What was built and how it helped. ', 3),
+            'skills' => [], 'links' => []];
+        $case = new PortfolioCase;
+        $case->forceFill(['user_id' => $freelancer->id, 'content' => $content, 'public_content' => $content, 'published_at' => now()->subDay()])->save();
+        $prepared = $this->project($client, 'published', 'A prepared project');
+        $this->actingAs($freelancer)->putJson('/jobs/'.$prepared->id.'/proposal', [...$this->application(), 'cases' => [$case->id]])->assertOk();
+        $this->post('/logout');
+        $this->assertSame(1, DB::table('proposal_cases')->count());
+        $other = $this->project($client, 'published', 'Another project');
+        DemoBaseline::save(null);
+        $this->travel(5)->seconds();
+        $before = $this->rows();
+
+        $this->post('/demo/freelancer')->assertRedirect('/dashboard');
+        $this->putJson('/jobs/'.$other->id.'/proposal', [...$this->application(), 'cases' => [$case->id]])->assertOk();
+        $this->post('/logout');
+        $this->assertSame(2, DB::table('proposal_cases')->count());
+
+        // Before plan 034 the reset did not know these rows and refused with "dependents|proposals|proposal_cases".
+        $this->assertGreaterThan(0, DemoBaseline::restore(null)['removed']);
+        $this->assertEquals($before, $this->rows());
+
+        // A starting point saved before these tables were listed holds nothing for them: their rows stay as they are.
+        $latest = DB::table('demo_baselines')->orderByDesc('id')->first();
+        $copy = json_decode((string) gzdecode((string) base64_decode($latest->payload)), true);
+        unset($copy['tables']['proposal_cases'], $copy['tables']['proposal_files'], $copy['tables']['message_files']);
+        DB::table('demo_baselines')->where('id', $latest->id)->update(['payload' => base64_encode((string) gzencode((string) json_encode($copy), 6))]);
+        $this->assertSame(['removed' => 0, 'returned' => 0, 'restored' => 0], DemoBaseline::restore(null));
         $this->assertEquals($before, $this->rows());
     }
 

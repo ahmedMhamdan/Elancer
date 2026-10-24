@@ -38,11 +38,13 @@ class DemoBaseline
             'project_clarifications' => ['in' => ['project_id' => 'projects']],
             'proposals' => ['in' => ['project_id' => 'projects', 'user_id' => 'users']],
             'proposal_events' => ['in' => ['proposal_id' => 'proposals'], 'clears' => ['actor_id' => 'users']],
+            'proposal_files' => ['in' => ['proposal_id' => 'proposals']],
             'invitations' => ['in' => ['project_id' => 'projects', 'recipient_id' => 'users']],
             'invitation_events' => ['in' => ['invitation_id' => 'invitations']],
             'conversations' => ['in' => ['proposal_id' => 'proposals', 'client_id' => 'users', 'freelancer_id' => 'users']],
             'conversation_messages' => ['in' => ['conversation_id' => 'conversations', 'sender_id' => 'users'], 'clears' => ['moderated_by' => 'users']],
             'message_revisions' => ['in' => ['conversation_message_id' => 'conversation_messages']],
+            'message_files' => ['in' => ['conversation_message_id' => 'conversation_messages']],
             'offers' => ['in' => ['proposal_id' => 'proposals', 'project_id' => 'projects', 'client_id' => 'users', 'freelancer_id' => 'users']],
             'contracts' => ['in' => ['offer_id' => 'offers', 'project_id' => 'projects', 'proposal_id' => 'proposals', 'conversation_id' => 'conversations',
                 'client_id' => 'users', 'freelancer_id' => 'users']],
@@ -60,6 +62,8 @@ class DemoBaseline
             'portfolio_cases' => ['in' => ['user_id' => 'users'], 'maybe' => ['contract_id' => 'contracts'], 'clears' => ['moderated_by' => 'users']],
             'portfolio_approvals' => ['in' => ['portfolio_case_id' => 'portfolio_cases']],
             'portfolio_images' => ['in' => ['portfolio_case_id' => 'portfolio_cases']],
+            // Plan 034: a case study shared in an application, which a visitor makes by applying as the demo freelancer.
+            'proposal_cases' => ['in' => ['proposal_id' => 'proposals', 'portfolio_case_id' => 'portfolio_cases']],
             'saved_projects' => ['leaf' => true, 'in' => ['user_id' => 'users'], 'needs' => ['project_id' => 'projects']],
             'saved_profiles' => ['leaf' => true, 'in' => ['user_id' => 'users'], 'needs' => ['profile_id' => 'profiles']],
             'saved_searches' => ['leaf' => true, 'in' => ['user_id' => 'users']],
@@ -159,7 +163,9 @@ class DemoBaseline
 
         $delete = $insert = $update = [];
         $counts = ['removed' => 0, 'returned' => 0, 'restored' => 0];
-        foreach ($tables as $table => $rules) {
+        // A copy saved before a table was listed here holds nothing for it, which is not the same as holding no rows:
+        // that table's rows are left as they are, as the reset of that time left them.
+        foreach (array_intersect_key($tables, $saved['tables']) as $table => $rules) {
             $replace = isset($rules['key']) || ($rules['leaf'] ?? false);
             foreach ($current[$table] as $key => $row) {
                 if (! isset($target[$table][$key])) {
