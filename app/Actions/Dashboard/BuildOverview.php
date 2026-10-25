@@ -3,6 +3,7 @@
 namespace App\Actions\Dashboard;
 
 use App\Actions\Demo\DemoWorld;
+use App\Actions\Invitations\InvitationLifecycle;
 use App\Actions\Payments\ContractFunding;
 use App\Enums\WorkspaceRole;
 use App\Models\Contract;
@@ -92,7 +93,9 @@ class BuildOverview
         return [
             'client' => $client,
             'counts' => ['projects' => (clone $projects)->count(), 'proposals' => (clone $proposals)->count(),
-                'invitations' => Invitation::query()->where('recipient_id', $user->id)->where('status', 'pending')->count(),
+                // Plan 032 part 14: only invitations that can still be answered wait for a response.
+                'invitations' => Invitation::query()->where('recipient_id', $user->id)->where('status', 'pending')
+                    ->whereIn('project_id', InvitationLifecycle::openProjects(Project::query())->select('projects.id'))->count(),
                 'contracts' => (clone $contracts)->count(), 'awaiting_payment' => (clone $contracts)->where('status', 'awaiting_payment')->count(), 'unread' => $unread],
             'finance' => ContractFunding::summary($user->id)[$client ? 'client' : 'freelancer'],
             'chart' => $chart, 'work' => $work, 'agreements' => $agreements, 'activity' => $activity,

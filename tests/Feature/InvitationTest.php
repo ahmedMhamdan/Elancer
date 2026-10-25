@@ -59,7 +59,9 @@ class InvitationTest extends TestCase
         $invitation = $this->invite($owner, $recipient, $project);
         $this->actingAs($other)->get('/invitations/'.$invitation->id)->assertNotFound();
         $this->get('/invitations')->assertInertia(fn (Assert $page) => $page->has('invitations.data', 0));
-        $this->actingAs($recipient)->get('/invitations/'.$invitation->id)->assertInertia(fn (Assert $page) => $page->where('invitation.status', 'pending')->missing('invitation.email')->missing('invitation.recipient_id')->where('author', false));
+        $this->actingAs($recipient)->get('/invitations/'.$invitation->id)->assertInertia(fn (Assert $page) => $page->component('invitations/index')->where('box', 'received')
+            ->where('invitation.status', 'pending')->where('invitation.state', 'waiting')->missing('invitation.email')->missing('invitation.recipient_id')
+            ->missing('invitation.person.email')->where('invitation.person.company', null)->where('invitation.can_respond', true));
         $this->get('/invitations')->assertInertia(fn (Assert $page) => $page->has('invitations.data', 1));
         $this->actingAs($owner)->get('/invitations?box=sent')->assertInertia(fn (Assert $page) => $page->has('invitations.data', 1));
         $this->assertDatabaseCount('invitation_events', 1);
@@ -74,6 +76,55 @@ class InvitationTest extends TestCase
         $this->actingAs($owner)->get('/invitations')->assertInertia(fn (Assert $page) => $page->where('box', 'sent')->has('invitations.data', 1));
         $this->get('/invitations?box=received')->assertInertia(fn (Assert $page) => $page->where('box', 'received')->has('invitations.data', 0));
         $this->actingAs($recipient)->get('/invitations')->assertInertia(fn (Assert $page) => $page->where('box', 'received')->has('invitations.data', 1));
+    }
+
+    /**
+     * Plan 032 part 14: the inbox lists invitations by where they stand. A pending invitation waits only while its project
+     * takes applications; afterwards, like one a block cancelled, it is closed. The lists add up to All, waiting ones first.
+     */
+    public function test_inbox_lists_invitations_by_where_they_stand(): void
+    {
+        $this->freezeTime();
+        $owner = $this->member();
+        $owner->forceFill(['workspace_role' => WorkspaceRole::Client])->save();
+        $owner->profile->forceFill(['company' => 'Olive Studio', 'country' => 'Jordan'])->save();
+        [$waiting, $applied, $declined, $blocked, $late] = [$this->member(), $this->member(), $this->member(), $this->member(), $this->member()];
+        $open = $this->project($owner);
+        $closing = $open->replicate(['title']);
+        $closing->forceFill(['title' => 'Closing soon', 'application_closes_at' => now()->addDay()])->save();
+        $this->invite($owner, $waiting, $open);
+        $this->invite($owner, $applied, $open);
+        $toDecline = $this->invite($owner, $declined, $open);
+        $this->invite($owner, $blocked, $open);
+        $this->travel(1)->minutes();
+        $lateInvitation = $this->invite($owner, $late, $closing);
+        $this->actingAs($applied)->putJson('/jobs/'.$open->id.'/proposal', $this->proposal())->assertOk();
+        $this->actingAs($declined)->patch('/invitations/'.$toDecline->id, ['action' => 'decline', 'version' => 1])->assertRedirect();
+        $this->actingAs($blocked)->post('/freelancers/'.$owner->profile->id.'/block')->assertRedirect();
+        $this->travel(2)->days();
+
+        $this->actingAs($owner)->get('/invitations')->assertInertia(fn (Assert $page) => $page->where('box', 'sent')->where('list', 'all')
+            ->where('counts', ['all' => 5, 'waiting' => 1, 'applied' => 1, 'declined' => 1, 'closed' => 2])->where('other', 0)
+            ->where('invitations.data.0.state', 'waiting')->where('invitations.data.0.counterpart.name', $waiting->name)
+            ->where('invitations.data.1.id', $lateInvitation->id)->where('invitations.data.1.state', 'closed')
+            ->where('invitation.state', 'waiting')->where('invitation.project.budget_min', '100.00')->where('preview', true));
+        $this->get('/invitations?list=waiting')->assertInertia(fn (Assert $page) => $page->has('invitations.data', 1)->where('invitations.data.0.state', 'waiting'));
+        $this->get('/invitations?list=closed')->assertInertia(fn (Assert $page) => $page->has('invitations.data', 2));
+        $acceptedId = Invitation::query()->where('recipient_id', $applied->id)->value('id');
+        $this->get('/invitations/'.$acceptedId)->assertInertia(fn (Assert $page) => $page->where('preview', false)->where('invitation.state', 'applied')
+            ->where('invitation.proposal.price', '200.00')->where('invitation.person.profile', $applied->profile->id)->where('invitation.person.completed', 0)
+            ->where('invitation.project.budget_min', '100.00')->where('invitation.public', true)->where('invitation.can_resend', false));
+        // Seven days after the decline the client may invite again.
+        $this->travel(5)->days();
+        $this->get('/invitations/'.$toDecline->id)->assertInertia(fn (Assert $page) => $page->where('invitation.state', 'declined')->where('invitation.can_resend', true));
+
+        // The freelancer whose project closed reads it as closed, with nothing left to answer, and Overview no longer counts it.
+        $this->actingAs($late)->get('/invitations')->assertInertia(fn (Assert $page) => $page->where('box', 'received')->where('counts.waiting', 0)
+            ->where('invitation.state', 'closed')->where('invitation.can_respond', false)->where('invitation.can_decline', false)
+            ->where('invitation.person.company', 'Olive Studio')->where('invitation.person.avatar', null)->where('invitation.person.profile', null));
+        $this->get('/dashboard')->assertInertia(fn (Assert $page) => $page->where('overview.counts.invitations', 0));
+        $this->actingAs($waiting)->get('/dashboard')->assertInertia(fn (Assert $page) => $page->where('overview.counts.invitations', 1));
+        $this->get('/invitations')->assertInertia(fn (Assert $page) => $page->where('invitation.can_respond', true)->where('invitation.can_decline', true));
     }
 
     public function test_only_owner_can_invite_and_busy_is_not_a_permission_gate(): void

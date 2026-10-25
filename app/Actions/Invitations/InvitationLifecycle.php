@@ -5,6 +5,7 @@ namespace App\Actions\Invitations;
 use App\Models\Invitation;
 use App\Models\Project;
 use App\Models\Proposal;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 class InvitationLifecycle
@@ -19,6 +20,19 @@ class InvitationLifecycle
     {
         return $project->status === 'published' && (bool) $project->application_closes_at?->isFuture()
             && Project::query()->visible()->whereKey($project->id)->exists();
+    }
+
+    /**
+     * open() as a query, for lists (plan 032 part 14): a pending invitation waits only while its project takes applications;
+     * once the project closes, is hidden or deleted, it reads "Applications closed".
+     *
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
+     */
+    public static function openProjects(Builder $query): Builder
+    {
+        return $query->visible()->whereNull($query->qualifyColumn('deleted_at'))
+            ->where($query->qualifyColumn('status'), 'published')->where($query->qualifyColumn('application_closes_at'), '>', now());
     }
 
     public static function event(Invitation $invitation, string $kind): void
