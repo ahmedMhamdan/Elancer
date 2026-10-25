@@ -262,7 +262,6 @@ export const arabic: Record<string, string> = {
     'Sent invitations': 'الدعوات المرسلة',
     'Blocked accounts': 'الحسابات المحظورة',
     'No invitations yet.': 'لا توجد دعوات بعد.',
-    'View invitation': 'عرض الدعوة',
     'Invite to a project': 'دعوة إلى مشروع',
     'Invitations are unavailable between these accounts.':
         'لا يمكن إرسال دعوات بين هذين الحسابين.',
@@ -274,11 +273,7 @@ export const arabic: Record<string, string> = {
         'انشر مشروعًا مفتوحًا قبل دعوة المستقلين.',
     'Invitation sent': 'أُرسلت الدعوة',
     'Invitation resent': 'أُعيد إرسال الدعوة',
-    'This invitation is not currently actionable.':
-        'لا يمكن متابعة هذه الدعوة حاليًا.',
     'Respond with a proposal': 'الرد بإرسال عرض',
-    'Decline invitation': 'رفض الدعوة',
-    'Next eligible resend time': 'موعد إتاحة إعادة الإرسال',
     'Resend invitation': 'إعادة إرسال الدعوة',
     'Invitation history': 'سجل الدعوة',
     'Unblocking does not restore cancelled invitations.':
@@ -2971,4 +2966,47 @@ export const arabic: Record<string, string> = {
     'Shared with other visitors and reset from time to time.':
         'مشترك مع زوار آخرين ويُعاد ضبطه من وقت لآخر.',
     'New messages': 'رسائل جديدة',
+    // Invitations as an inbox (plan 032 part 14).
+    'Waiting for your answer': 'بانتظار ردّك',
+    Applied: 'تمّ التقديم',
+    'You applied': 'تمّ تقديم عرضك',
+    'You declined': 'رفضت الدعوة',
+    'Proposal sent :when': 'أُرسل العرض :when',
+    'Declined :when': 'رُفضت :when',
+    'Closed :when without an answer': 'أُغلقت :when دون رد',
+    'Closed :when before you answered': 'أُغلقت :when دون ردّ منك',
+    'Proposal submitted': 'أُرسل العرض',
+    'All invitations': 'كل الدعوات',
+    'Invitation actions': 'إجراءات الدعوة',
+    'Block account…': 'حظر الحساب…',
+    'Their proposal': 'عرض المستقل',
+    'Proposals so far': 'العروض حتى الآن',
+    Applications: 'التقديم',
+    'Open the proposal': 'افتح العرض',
+    'Open your proposal': 'افتح عرضك',
+    'Read the full brief': 'اقرأ الوصف كاملًا',
+    'The project has closed, so it cannot be sent again.':
+        'أُغلق المشروع، فلا يمكن إرسالها مجددًا.',
+    'You can invite them again :when.': 'يمكن إرسال الدعوة مجددًا :when.',
+    'This invitation cannot be sent again right now.':
+        'لا يمكن إرسال هذه الدعوة مجددًا الآن.',
+    'Block this account?': 'حظر هذا الحساب؟',
+    'Decline this invitation?': 'رفض هذه الدعوة؟',
+    'The client will see that you declined. They can invite you again after seven days, and you can still apply while the project is open.':
+        'سيرى العميل أنك رفضت، ويمكنه دعوتك مجددًا بعد سبعة أيام، ويبقى بإمكانك التقديم ما دام المشروع مفتوحًا.',
+    'Keep it': 'إبقاء الدعوة',
+    'Waiting for them': 'بانتظار ردّهم',
+    'Waiting for you': 'بانتظار ردّك',
+    'Freelancers you asked to apply. They answer with a proposal.':
+        'مستقلون دعوتهم للتقديم على مشاريعك، ويكون ردّهم بعرض.',
+    'Clients who asked you to apply. Answer with a proposal, or decline.':
+        'عملاء دعوك للتقديم على مشاريعهم. ردّ بعرض أو ارفض الدعوة.',
+    'Invitation lists': 'قوائم الدعوات',
+    'No invitations sent yet.': 'لم ترسل أي دعوة بعد.',
+    'Invite freelancers from their profiles while a project takes applications.':
+        'ادعُ المستقلين من ملفاتهم الشخصية ما دام لديك مشروع يقبل التقديم.',
+    'Clients can invite you while your profile is public.':
+        'يمكن للعملاء دعوتك ما دام ملفك الشخصي عامًا.',
+    'Go to My profile': 'انتقل إلى ملفي',
+    'Your invitations': 'دعواتك',
 };

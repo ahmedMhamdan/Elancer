@@ -1,0 +1,233 @@
+/* Invitations as an inbox (plan 032 part 14, Ahmed's pick "B"). The frame, rows, back link and actions come from Final
+   offers (elancer-offers.css), the lists, status square, quiet link, ⋯ and window bar from My projects
+   (elancer-projects.css); only what is particular to an invitation is here. */
+.invitations-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px 16px;
+}
+.invitations-head-end {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.invitations-head-end .my-projects-lists {
+    margin-bottom: 0;
+}
+.invitations-row-name {
+    min-width: 0;
+    overflow: hidden;
+    font-size: 13.5px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.invitations-page .offers-row {
+    grid-template-columns: 36px minmax(0, 1fr);
+}
+.invitations-head + .invitations-page {
+    margin-top: 6px;
+}
+.invitations-page .offers-row-title {
+    font-weight: 500;
+}
+/* A title in the other script keeps its own direction but starts at the page's start edge, as on My projects. */
+html[dir='ltr'] .invitations-page .offers-row-title {
+    text-align: left;
+}
+html[dir='rtl'] .invitations-page .offers-row-title {
+    text-align: right;
+}
+.invitations-page .offers-row .my-project-status {
+    color: var(--el-muted);
+    font-weight: 400;
+}
+
+/* The chosen invitation */
+.invitations-page .offers-detail .my-project-top {
+    justify-content: flex-start;
+}
+.invitations-more {
+    margin-inline-start: auto;
+}
+.invitations-meta {
+    display: flex;
+    flex-wrap: wrap;
+    color: var(--el-muted);
+    font-size: 13px;
+}
+.invitations-meta > :not(:last-child)::after {
+    content: '·';
+    margin-inline: 8px;
+    color: var(--el-border-strong);
+}
+.invitations-person {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+    padding: 12px 14px;
+    border: 1px solid var(--el-border);
+    border-radius: 14px;
+}
+.invitations-person > div {
+    display: grid;
+    flex: 1;
+    gap: 2px;
+    min-width: 0;
+}
+.invitations-person strong {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+.invitations-person-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    color: var(--el-muted);
+    font-size: 13px;
+}
+.invitations-person-line:empty {
+    display: none;
+}
+.invitations-person-line > :not(:last-child)::after {
+    content: '·';
+    margin-inline: 8px;
+    color: var(--el-border-strong);
+}
+.invitations-person-line .rating-summary {
+    font-size: 13px;
+}
+.invitations-facts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin: 14px 0 0;
+    border: 1px solid var(--el-border);
+    border-radius: 12px;
+}
+.invitations-facts > div {
+    min-width: 0;
+    padding: 10px 14px;
+}
+.invitations-facts > div + div {
+    border-inline-start: 1px solid var(--el-border);
+}
+.invitations-facts dt {
+    color: var(--el-muted);
+    font-size: 12.5px;
+}
+.invitations-facts dd {
+    margin: 2px 0 0;
+    overflow: hidden;
+    font-size: 15px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+.invitations-facts .invitations-fact-window {
+    color: var(--el-muted);
+    font-size: 12.5px;
+    font-weight: 400;
+    white-space: normal;
+}
+.invitations-window {
+    display: grid;
+    gap: 6px;
+}
+.invitations-window .my-project-window-bar {
+    display: block;
+    height: 4px;
+}
+/* Narrower, the budget takes its own row so a range is never cut; the review line stacks instead of leaving a dot at
+   the end of a wrapped line. */
+@container (max-width: 559.98px) {
+    .invitations-facts {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .invitations-facts > div:first-child {
+        grid-column: 1 / -1;
+        border-bottom: 1px solid var(--el-border);
+    }
+    .invitations-facts > div:nth-child(2) {
+        border-inline-start: 0;
+    }
+}
+@container (max-width: 459.98px) {
+    .invitations-person-record {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .invitations-person-record > :not(:last-child)::after {
+        content: none;
+    }
+}
+.invitations-excerpt {
+    margin-top: 16px;
+    color: var(--el-muted);
+    font-size: 14px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+    text-align: left;
+}
+/* Text in either script starts at the page's start edge, as titles do. */
+html[dir='rtl'] .invitations-excerpt {
+    text-align: right;
+}
+.invitations-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+}
+.invitations-skills li {
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--el-soft);
+    color: var(--el-muted);
+    font-size: 12.5px;
+}
+.offers-actions.invitations-actions {
+    justify-content: flex-start;
+}
+.invitations-note {
+    margin-top: 10px;
+    color: var(--el-muted);
+    font-size: 13px;
+}
+.invitations-history {
+    display: grid;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 13.5px;
+}
+.invitations-history li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 3px 0;
+}
+.invitations-history li::before {
+    content: '';
+    flex-shrink: 0;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--el-border-strong);
+}
+.invitations-history li:last-child::before {
+    background: var(--el-accent);
+}
+.invitations-history time {
+    margin-inline-start: auto;
+    color: var(--el-muted);
+    font-size: 12.5px;
+    white-space: nowrap;
+}
