@@ -53,6 +53,27 @@ export default function DemoBanner() {
             {t('Create your own account')}
         </button>
     );
+    if (page.component.startsWith('saved/'))
+        return (
+            <details className="demo-banner saved-demo-notice border-primary/30 mx-4 mt-3 rounded-xl border px-4 md:mx-6">
+                <summary className="text-primary focus-visible:outline-ring min-h-11 cursor-pointer py-3 text-sm focus-visible:outline-2">
+                    {t('You are exploring a demo account')}
+                </summary>
+                <p className="text-muted-foreground text-sm">
+                    {demoActing
+                        ? t(
+                              'This account is shared with other visitors and filled with sample data. Try it out: post a project, apply, message, hire and pay with the test provider. It all stays inside the demo and is reset from time to time. Files, the profile and account settings are switched off.',
+                          )
+                        : t(
+                              'This account is shared with other visitors and filled with sample data. You can open every page; changes are switched off.',
+                          )}
+                </p>
+                <div className="flex flex-wrap gap-x-6 pb-2">
+                    {switchButton}
+                    {leaveButton}
+                </div>
+            </details>
+        );
     if (line)
         return (
             <div

@@ -1,4 +1,7 @@
 import { Link, router } from '@inertiajs/react';
+import { Bookmark } from 'lucide-react';
+import { useState } from 'react';
+import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
 import Button from '@/components/tailadmin/button';
 import Pagination from '@/components/tailadmin/pagination';
 import { useTranslation } from '@/hooks/use-translation';
@@ -16,8 +19,13 @@ type Save = {
 
 export default function SavedProjects({ saves }: { saves: Page<Save> }) {
     const { t } = useTranslation();
+    const [removing, setRemoving] = useState<number | null>(null);
     const remove = (id: number) =>
-        router.delete(`/jobs/${id}/save`, { preserveScroll: true });
+        router.delete(`/jobs/${id}/save`, {
+            preserveScroll: true,
+            onStart: () => setRemoving(id),
+            onFinish: () => setRemoving(null),
+        });
     return (
         <SavedLayout
             title={t('Saved projects')}
@@ -26,7 +34,8 @@ export default function SavedProjects({ saves }: { saves: Page<Save> }) {
             )}
         >
             {!saves.data.length && (
-                <section className="market-panel">
+                <section className="market-panel saved-empty">
+                    <Bookmark size={28} aria-hidden="true" />
                     <h3>{t('No saved projects yet.')}</h3>
                     <p className="market-muted">
                         {t(
@@ -37,14 +46,12 @@ export default function SavedProjects({ saves }: { saves: Page<Save> }) {
                 </section>
             )}
             {saves.data.map(({ id, saved_at, project, proposal }) => (
-                <article key={id} className="market-panel market-stack">
+                <article key={id} className="market-panel saved-project">
                     {project ? (
                         <>
-                            <div className="market-actions">
+                            <div className="market-actions saved-project-meta">
                                 <span
-                                    className={
-                                        project.open ? 'job-open' : 'job-muted'
-                                    }
+                                    className={`saved-project-status ${project.open ? 'job-open' : 'job-muted'}`}
                                 >
                                     {t(
                                         project.hired
@@ -63,7 +70,7 @@ export default function SavedProjects({ saves }: { saves: Page<Save> }) {
                                     {project.title}
                                 </Link>
                             </h3>
-                            <div className="market-actions">
+                            <div className="market-actions saved-project-facts">
                                 <strong>
                                     <Money
                                         min={project.budget_min}
@@ -81,19 +88,27 @@ export default function SavedProjects({ saves }: { saves: Page<Save> }) {
                     ) : (
                         <p>{t('This project is no longer available.')}</p>
                     )}
-                    <div className="market-actions">
+                    <div className="market-actions saved-project-actions">
                         {project && proposal && (
-                            <Link href={`/proposals/${proposal.id}`}>
+                            <InteractiveHoverButton
+                                href={`/proposals/${proposal.id}`}
+                            >
                                 {t('View your proposal')}
-                            </Link>
+                            </InteractiveHoverButton>
                         )}
                         {project?.open && !proposal && (
-                            <Link href={`/jobs/${id}/apply`}>
+                            <InteractiveHoverButton href={`/jobs/${id}/apply`}>
                                 {t('Apply to this project')}
+                            </InteractiveHoverButton>
+                        )}
+                        {project && (
+                            <Link href={`/jobs/${id}`}>
+                                {t('View project')}
                             </Link>
                         )}
                         <Button
                             variant="outline"
+                            disabled={removing !== null}
                             aria-label={
                                 project
                                     ? t('Remove :name from saved items', {
