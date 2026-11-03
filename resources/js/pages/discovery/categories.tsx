@@ -1,5 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Search, ArrowUpRight, Layers } from 'lucide-react';
+import { Search, ArrowUpRight } from 'lucide-react';
+import CategorySymbol from '@/components/category-symbol';
+import { BlurFade } from '@/components/ui/blur-fade';
 import { useState } from 'react';
 import Button from '@/components/tailadmin/button';
 import Input from '@/components/tailadmin/input';
@@ -18,13 +20,10 @@ export default function Categories({
     const { t } = useTranslation();
     const [search, setSearch] = useState(q);
     return (
-        <DiscoveryLayout>
+        <DiscoveryLayout className="browse-page browse-categories">
             <Head title={t('Browse job categories')} />
             <header className="jobs-heading">
                 <div>
-                    <span className="jobs-eyebrow">
-                        {t('Find your next opportunity')}
-                    </span>
                     <h1>{t('Browse job categories')}</h1>
                     <p>
                         {t(
@@ -63,14 +62,21 @@ export default function Categories({
                     {t('View all jobs')} <ArrowUpRight size={16} />
                 </Link>
             </div>
-            <div className="job-category-grid">
+            <BlurFade
+                className="job-category-grid"
+                duration={0.28}
+                offset={5}
+                blur="0px"
+            >
                 {categories.data.map((category) => (
                     <Link
                         className="job-category-card"
                         key={category.id}
                         href={`/jobs?category=${encodeURIComponent(category.slug)}`}
                     >
-                        <Layers size={24} aria-hidden="true" />
+                        <div className="browse-category-symbol">
+                            <CategorySymbol name={category.categoryname} />
+                        </div>
                         <h2 dir="auto">{category.categoryname}</h2>
                         <p>
                             {category.open_projects_count === 1
@@ -86,7 +92,7 @@ export default function Categories({
                         />
                     </Link>
                 ))}
-            </div>
+            </BlurFade>
             {!categories.data.length && (
                 <div className="jobs-empty">
                     <h2>{t('No categories found')}</h2>

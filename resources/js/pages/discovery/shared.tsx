@@ -4,9 +4,11 @@ import type { ReactNode } from 'react';
 import ElancerSiteHeader from '@/components/elancer-site-header';
 import HoverFooter from '@/components/hover-footer';
 import SaveToggle from '@/components/save-toggle';
+import CategorySymbol from '@/components/category-symbol';
 import { useTranslation } from '@/hooks/use-translation';
 import type { PaginationData } from '@/components/tailadmin/pagination';
 import '../../../css/elancer-jobs.css';
+import '../../../css/elancer-browse.css';
 
 export type Skill = { id: number; name: string };
 export type Category = {
@@ -36,11 +38,17 @@ export type Job = {
     saved?: boolean;
     own?: boolean;
 };
-export function DiscoveryLayout({ children }: { children: ReactNode }) {
+export function DiscoveryLayout({
+    children,
+    className = '',
+}: {
+    children: ReactNode;
+    className?: string;
+}) {
     return (
         <div className="elancer-home jobs-site">
             <ElancerSiteHeader />
-            <main id="main-content" className="jobs-main">
+            <main id="main-content" className={`jobs-main ${className}`}>
                 {children}
             </main>
             <HoverFooter />
@@ -103,7 +111,10 @@ export function JobCard({ job, search }: { job: Job; search: string }) {
     const { t } = useTranslation();
     const { auth } = usePage().props;
     return (
-        <article className="job-card">
+        <article className="job-card browse-project">
+            <div className="browse-project-symbol">
+                <CategorySymbol name={job.category.categoryname} />
+            </div>
             <div className="job-card-top">
                 <Link
                     href={`/jobs?category=${encodeURIComponent(job.category.slug)}`}
@@ -183,6 +194,10 @@ export function JobCard({ job, search }: { job: Job; search: string }) {
                         </span>
                     )}
                 </div>
+            </div>
+            <div className="browse-project-cutoff job-muted">
+                {t('Application cutoff')}{' '}
+                <JobDate value={job.application_closes_at} />
             </div>
         </article>
     );

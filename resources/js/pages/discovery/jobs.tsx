@@ -2,6 +2,7 @@
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { BookmarkPlus, Search, SlidersHorizontal, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { BlurFade } from '@/components/ui/blur-fade';
 import Button from '@/components/tailadmin/button';
 import Input from '@/components/tailadmin/input';
 import Label from '@/components/tailadmin/label';
@@ -60,7 +61,13 @@ const received = [
 ];
 export default function Jobs(props: Props) {
     const { url } = usePage();
-    return <SearchPage key={url} {...props} />;
+    return (
+        <DiscoveryLayout className="browse-page">
+            <BlurFade duration={0.28} offset={5} blur="0px">
+                <SearchPage key={url} {...props} />
+            </BlurFade>
+        </DiscoveryLayout>
+    );
 }
 function SearchPage({
     projects,
@@ -74,7 +81,6 @@ function SearchPage({
     const pageUrl = usePage().url;
     const [draft, setDraft] = useState(filters);
     const [drawer, setDrawer] = useState(false);
-    const [mobile, setMobile] = useState(false);
     const [busy, setBusy] = useState(false);
     const [skillQuery, setSkillQuery] = useState('');
     const [naming, setNaming] = useState(false);
@@ -96,13 +102,6 @@ function SearchPage({
             // Storage can be unavailable; browser Back retains its own history.
         }
     }, [pageUrl]);
-    useEffect(() => {
-        const media = matchMedia('(max-width: 1023px)');
-        const update = () => setMobile(media.matches);
-        update();
-        media.addEventListener('change', update);
-        return () => media.removeEventListener('change', update);
-    }, []);
     function apply(next = draft) {
         if (
             next.budget_min &&
@@ -354,13 +353,10 @@ function SearchPage({
             next: { ...filters, status: 'open' },
         });
     return (
-        <DiscoveryLayout>
+        <>
             <Head title={t('Find jobs')} />
             <header className="jobs-heading">
                 <div>
-                    <span className="jobs-eyebrow">
-                        {t('Work worth doing')}
-                    </span>
                     <h1>{t('Find your next project')}</h1>
                     <p>
                         {t(
@@ -411,8 +407,7 @@ function SearchPage({
                     </button>
                 ))}
             </div>
-            <div className="jobs-grid">
-                {!mobile && <aside>{controls}</aside>}
+            <div className="browse-results">
                 <section aria-busy={busy} aria-label={t('Search results')}>
                     <div className="jobs-results-bar">
                         <h2 aria-live="polite">
@@ -442,7 +437,7 @@ function SearchPage({
                                 </Link>
                             </div>
                         )}
-                        {mobile && (
+                        {
                             <Sheet open={drawer} onOpenChange={setDrawer}>
                                 <SheetTrigger asChild>
                                     <Button
@@ -467,7 +462,7 @@ function SearchPage({
                                     {controls}
                                 </SheetContent>
                             </Sheet>
-                        )}
+                        }
                         <label className="job-sort">
                             {t('Sort by')}
                             <select
@@ -569,6 +564,6 @@ function SearchPage({
                     </div>
                 </form>
             </Modal>
-        </DiscoveryLayout>
+        </>
     );
 }
