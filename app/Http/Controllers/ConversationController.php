@@ -39,7 +39,7 @@ class ConversationController extends Controller
         $user = $request->user()->id;
 
         return Inertia::render('messages/index', [
-            'conversations' => $this->inbox($user, $filters)->paginate(20)->withQueryString()->through(fn (Conversation $conversation) => $this->summary($conversation, $user)),
+            'conversations' => fn () => $this->inbox($user, $filters)->paginate(20)->withQueryString()->through(fn (Conversation $conversation) => $this->summary($conversation, $user)),
             'archived' => $filters['archived'],
             'filters' => $filters,
         ]);
@@ -73,21 +73,45 @@ class ConversationController extends Controller
         abort_unless($conversation->contains($request->user()->id), 404);
         $filters = $this->filters($request);
         $user = $request->user()->id;
-        // Plan 032 part 13: the newest messages are on screen, so the conversation is read. Not on an older page, and
-        // not on a refresh the page asked for while it was in a hidden browser tab.
-        $firstUnread = $request->integer('page', 1) <= 1 && ! $request->hasHeader('X-Elancer-Hidden')
+        $only = array_filter(explode(',', (string) $request->header('X-Inertia-Partial-Data')));
+        $except = array_filter(explode(',', (string) $request->header('X-Inertia-Partial-Except')));
+        $returnsMessages = $request->header('X-Inertia-Partial-Component') !== 'messages/show'
+            || ((! $only || collect($only)->contains(fn (string $key) => $key === 'messages' || str_starts_with($key, 'messages.')))
+                && ! in_array('messages', $except, true));
+        // A counts/details-only refresh has not shown the history. Shared unread counts still resolve after this read.
+        $firstUnread = $returnsMessages && $request->integer('page', 1) <= 1 && ! $request->hasHeader('X-Elancer-Hidden')
             ? ConversationThread::markRead($conversation, $request->user()) : null;
-        $conversation->loadMissing(['latestMessage', 'contract.openCancellation', 'proposal.project', 'client.profile', 'freelancer']);
+        $thread = null;
+        $history = function () use ($conversation, $user, &$thread): array {
+            return $thread ??= ConversationThread::for($conversation, $user);
+        };
 
         return Inertia::render('messages/show', [
-            'conversations' => $this->inbox($user, $filters, $conversation->id)->paginate(20, ['*'], 'list_page')->withQueryString()->through(fn (Conversation $item) => $this->summary($item, $user)),
+            'conversations' => function () use ($user, $filters, $conversation) {
+                $page = $this->inbox($user, $filters, $conversation->id)->paginate(20, ['*'], 'list_page')->withQueryString();
+                // Reuse eager relations before through() turns the list's models into summaries.
+                $selected = $page->getCollection()->firstWhere('id', $conversation->id);
+                if ($selected !== null) {
+                    $conversation->setRelations($selected->getRelations());
+                    $conversation->setAttribute('unread_count', $selected->getAttribute('unread_count'));
+                }
+
+                return $page->through(fn (Conversation $item) => $this->summary($item, $user));
+            },
             'filters' => $filters,
-            'conversation' => [...$this->summary($conversation, $user), ...$this->hiring($conversation, $user)],
+            'conversation' => function () use ($conversation, $user): array {
+                $conversation->loadMissing(['latestMessage', 'contract.openCancellation', 'proposal.project', 'client', 'freelancer']);
+
+                return [...$this->summary($conversation, $user), ...$this->hiring($conversation, $user)];
+            },
             'firstUnread' => $firstUnread,
             // How many of the other side's messages were new, for the line when it begins on an older page.
-            'newMessages' => $firstUnread === null ? 0 : $conversation->messages()->where('sender_id', '!=', $user)->where('id', '>=', $firstUnread)->count(),
-            'details' => fn () => $this->details($conversation, $user),
-            ...ConversationThread::for($conversation, $user),
+            'newMessages' => fn () => $firstUnread === null ? 0 : $conversation->messages()->where('sender_id', '!=', $user)->where('id', '>=', $firstUnread)->count(),
+            'details' => Inertia::optional(fn () => ['conversation_id' => $conversation->id, ...$this->details($conversation, $user)]),
+            'messages' => fn () => $history()['messages'],
+            'writable' => fn () => $history()['writable'],
+            'visibleThrough' => fn () => $history()['visibleThrough'],
+            'fileLimit' => AttachedFiles::LIMIT,
         ]);
     }
 

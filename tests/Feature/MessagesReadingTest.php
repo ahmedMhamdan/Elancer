@@ -14,6 +14,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -59,6 +60,73 @@ class MessagesReadingTest extends TestCase
     private function bell(User $user): int
     {
         return $user->unreadNotifications()->where('data', 'like', '%"kind":"message_received"%')->count();
+    }
+
+    public function test_a_count_only_refresh_does_not_load_or_read_the_open_history(): void
+    {
+        $freelancer = $this->member('Fadi Freelancer');
+        $conversation = $this->start($client = $this->member('Clara Client'), $this->proposal($client, $freelancer));
+        $this->actingAs($freelancer);
+        DB::enableQueryLog();
+        DB::flushQueryLog();
+        try {
+            $response = $this->get('/messages/'.$conversation->id, [
+                'X-Inertia-Partial-Component' => 'messages/show',
+                'X-Inertia-Partial-Data' => 'notifications,inbox',
+            ])->assertOk();
+            $queries = collect(DB::getQueryLog())->pluck('query');
+        } finally {
+            DB::disableQueryLog();
+        }
+        $response->assertInertia(fn (Assert $page) => $page->where('inbox.unread', 1)->missing('messages')->missing('conversation')->missing('conversations'));
+        $this->assertSame(0, $conversation->fresh()->freelancer_read_through);
+        $this->assertSame(1, $this->bell($freelancer));
+        $this->assertFalse($queries->contains(fn (string $sql) => str_contains($sql, 'message_revisions') || str_contains($sql, 'message_files')));
+    }
+
+    public function test_opening_the_conversation_does_not_load_closed_details(): void
+    {
+        $freelancer = $this->member('Fadi Freelancer');
+        $conversation = $this->start($client = $this->member('Clara Client'), $this->proposal($client, $freelancer));
+        $this->actingAs($freelancer)->get('/messages/'.$conversation->id)->assertInertia(fn (Assert $page) => $page
+            ->has('messages.data', 1)->where('conversation.unread', 0)->missing('details'));
+    }
+
+    public function test_requesting_details_does_not_read_messages_and_still_checks_the_participant(): void
+    {
+        $freelancer = $this->member('Fadi Freelancer');
+        $conversation = $this->start($client = $this->member('Clara Client'), $this->proposal($client, $freelancer));
+        $headers = ['X-Inertia-Partial-Component' => 'messages/show', 'X-Inertia-Partial-Data' => 'details'];
+        $this->actingAs($freelancer)->get('/messages/'.$conversation->id, $headers)->assertInertia(fn (Assert $page) => $page
+            ->where('details.conversation_id', $conversation->id)->missing('messages')->missing('conversations'));
+        $this->assertSame(0, $conversation->fresh()->freelancer_read_through);
+        $this->assertSame(1, $this->bell($freelancer));
+        $this->actingAs($this->member('Unaffiliated member'))->get('/messages/'.$conversation->id, $headers)->assertNotFound();
+    }
+
+    public function test_a_message_only_refresh_reads_and_returns_the_authorized_history_without_the_inbox(): void
+    {
+        $freelancer = $this->member('Fadi Freelancer');
+        $conversation = $this->start($client = $this->member('Clara Client'), $this->proposal($client, $freelancer));
+        $headers = ['X-Inertia-Partial-Component' => 'messages/show', 'X-Inertia-Partial-Data' => 'messages,writable,visibleThrough,firstUnread,newMessages,inbox'];
+        $this->actingAs($freelancer)->get('/messages/'.$conversation->id, $headers)->assertInertia(fn (Assert $page) => $page
+            ->where('messages.data.0.body', 'Let us discuss the project.')->where('inbox.unread', 0)
+            ->where('newMessages', 1)->missing('conversations')->missing('details'));
+        $this->assertGreaterThan(0, $conversation->fresh()->freelancer_read_through);
+        $this->assertSame(0, $this->bell($freelancer));
+        $this->actingAs($this->member('Unaffiliated member'))->get('/messages/'.$conversation->id, $headers)->assertNotFound();
+    }
+
+    public function test_the_open_conversation_keeps_its_own_data_outside_the_filtered_inbox(): void
+    {
+        $freelancer = $this->member('Fadi Freelancer');
+        $client = $this->member('Clara Client');
+        $selected = $this->start($client, $this->proposal($client, $freelancer, 'Selected project'), 'Selected history');
+        $listed = $this->start($client, $this->proposal($client, $freelancer, 'Other project'), 'Other history');
+        $this->actingAs($freelancer)->get('/messages/'.$selected->id.'?q=Other')->assertInertia(fn (Assert $page) => $page
+            ->has('conversations.data', 1)->where('conversations.data.0.id', $listed->id)
+            ->where('conversation.id', $selected->id)->where('conversation.project.title', 'Selected project')
+            ->where('messages.data.0.body', 'Selected history')->where('conversation.unread', 0));
     }
 
     public function test_opening_a_conversation_reads_it_and_only_its_bell_entry_without_reordering_it(): void
@@ -227,17 +295,18 @@ class MessagesReadingTest extends TestCase
         ConversationMessage::query()->where('body', 'Hidden later.')->update(['moderated_at' => now()]);
 
         // Not yet published: no link to a page that would not open.
-        $this->actingAs($client)->get('/messages/'.$conversation->id)->assertInertia(fn (Assert $page) => $page
+        $headers = ['X-Inertia-Partial-Component' => 'messages/show', 'X-Inertia-Partial-Data' => 'details'];
+        $this->actingAs($client)->get('/messages/'.$conversation->id, $headers)->assertInertia(fn (Assert $page) => $page
             ->where('details.profile', null)->where('details.headline', 'Laravel developer')->where('details.country', 'Palestine')
             ->where('details.company', null)->where('details.record.completed', 0)->where('details.record.rating.count', 0)
             ->where('details.files_total', 1)->where('details.files.0.name', 'plan.pdf')->missing('details.files.0.path'));
 
         $profile->forceFill(['published_at' => now()->subDay()])->save();
         $profile->skillTags()->sync([Skill::query()->orderBy('id')->value('id')]);
-        $this->get('/messages/'.$conversation->id)->assertInertia(fn (Assert $page) => $page->where('details.profile', $profile->id));
+        $this->get('/messages/'.$conversation->id, $headers)->assertInertia(fn (Assert $page) => $page->where('details.profile', $profile->id));
 
         // The freelancer sees the client's company and nothing from the freelancer's own profile.
-        $this->actingAs($freelancer)->get('/messages/'.$conversation->id)->assertInertia(fn (Assert $page) => $page
+        $this->actingAs($freelancer)->get('/messages/'.$conversation->id, $headers)->assertInertia(fn (Assert $page) => $page
             ->where('details.company', 'Clara Studio')->where('details.profile', null)->where('details.headline', null));
     }
 }

@@ -50,6 +50,7 @@ export type Message = {
 };
 /** Plan 032 part 13: the conversation's details panel. */
 export type ConversationDetails = {
+    conversation_id: number;
     // The freelancer's public profile, linked only while it is public.
     profile: number | null;
     headline: string | null;

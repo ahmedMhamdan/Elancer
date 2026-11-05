@@ -1085,6 +1085,7 @@ export const arabic: Record<string, string> = {
     'Show :label': 'إظهار :label',
     'Hide :label': 'إخفاء :label',
     Loading: 'جارٍ التحميل',
+    'Could not load conversation details.': 'تعذّر تحميل تفاصيل المحادثة.',
     breadcrumb: 'مسار التنقل',
     More: 'المزيد',
     'A meeting place for talent & possibility': 'حيث تلتقي المواهب بالفرص',

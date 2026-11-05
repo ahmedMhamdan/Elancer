@@ -13,7 +13,7 @@ import {
     RefreshCw,
     ShieldBan,
 } from 'lucide-react';
-import { useState, useSyncExternalStore } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import {
     BackToList,
     ChatTemplate,
@@ -54,7 +54,7 @@ type ShowProps = {
     filters: ConversationFilters;
     firstUnread: number | null;
     newMessages: number;
-    details: ConversationDetails;
+    details?: ConversationDetails;
     messages: Page<Message>;
     writable: boolean;
     visibleThrough: number;
@@ -66,7 +66,6 @@ export const conversationProps = [
     'messages',
     'conversation',
     'conversations',
-    'details',
     'writable',
     'visibleThrough',
     'inbox',
@@ -119,6 +118,27 @@ function ConversationChat({
             window.matchMedia('(min-width: 1280px)').matches &&
             window.localStorage.getItem(DETAILS) === 'open',
     );
+    const [detailsLoading, setDetailsLoading] = useState(false);
+    const [detailsAttempt, setDetailsAttempt] = useState(0);
+    useEffect(() => {
+        if (!open || details?.conversation_id === conversation.id) return;
+        let active = true;
+        let cancel: (() => void) | undefined;
+        setDetailsLoading(true);
+        router.reload({
+            only: ['details'],
+            onCancelToken: (token) => {
+                cancel = () => token.cancel();
+            },
+            onFinish: () => {
+                if (active) setDetailsLoading(false);
+            },
+        });
+        return () => {
+            active = false;
+            cancel?.();
+        };
+    }, [open, conversation.id, details?.conversation_id, detailsAttempt]);
     const toggle = (value: boolean) => {
         setOpen(value);
         if (wide) window.localStorage.setItem(DETAILS, value ? 'open' : '');
@@ -134,10 +154,35 @@ function ConversationChat({
     const refresh = () => {
         setRefreshing(true);
         router.reload({
-            only: conversationProps,
+            only: [...conversationProps, ...(open ? ['details'] : [])],
             onFinish: () => setRefreshing(false),
         });
     };
+    const panel =
+        details?.conversation_id === c.id ? (
+            <DetailsPanel conversation={c} details={details} />
+        ) : (
+            <div className="chat-details" aria-busy={detailsLoading}>
+                <section>
+                    <p role="status">
+                        {detailsLoading
+                            ? t('Loading')
+                            : t('Could not load conversation details.')}
+                    </p>
+                    {!detailsLoading && (
+                        <button
+                            type="button"
+                            className="chat-pill-button"
+                            onClick={() =>
+                                setDetailsAttempt((attempt) => attempt + 1)
+                            }
+                        >
+                            {t('Retry')}
+                        </button>
+                    )}
+                </section>
+            </div>
+        );
     const header = (
         <header className="chat-header">
             <BackToList filters={filters} />
@@ -310,9 +355,7 @@ function ConversationChat({
                         aria-label={t('Conversation details')}
                         inert={!open}
                     >
-                        <div>
-                            <DetailsPanel conversation={c} details={details} />
-                        </div>
+                        <div>{open && panel}</div>
                     </aside>
                 )}
             </div>
@@ -331,7 +374,7 @@ function ConversationChat({
                                 {c.project.title}
                             </SheetDescription>
                         </SheetHeader>
-                        <DetailsPanel conversation={c} details={details} />
+                        {panel}
                     </SheetContent>
                 </Sheet>
             )}

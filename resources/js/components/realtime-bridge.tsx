@@ -9,7 +9,6 @@ const chatProps = [
     'messages',
     'conversation',
     'conversations',
-    'details',
     'writable',
     'visibleThrough',
 ];
@@ -36,23 +35,34 @@ export default function RealtimeBridge() {
               : null;
     const handle = useRef<(signal: Signal) => void>(() => {});
     const timer = useRef<number | undefined>(undefined);
+    const pending = useRef(new Set<string>());
 
     useEffect(() => {
         handle.current = (signal) => {
+            const affectsOpen =
+                signal.conversation === null || signal.conversation === open;
+            const props = chat
+                ? [
+                      'notifications',
+                      'inbox',
+                      'conversations',
+                      ...(affectsOpen ? chatProps : []),
+                      ...(affectsOpen && page.props.details ? ['details'] : []),
+                  ]
+                : workroom
+                  ? ['notifications', 'inbox', 'thread']
+                  : ['notifications', 'inbox'];
+            props.forEach((key) => pending.current.add(key));
             // Several signals in quick succession become one request.
             window.clearTimeout(timer.current);
-            timer.current = window.setTimeout(
-                () =>
-                    router.reload({
-                        only: chat
-                            ? ['notifications', 'inbox', ...chatProps]
-                            : workroom
-                              ? ['notifications', 'inbox', 'thread']
-                              : ['notifications', 'inbox'],
-                        headers: hidden(),
-                    }),
-                150,
-            );
+            timer.current = window.setTimeout(() => {
+                const only = [...pending.current];
+                pending.current.clear();
+                router.reload({
+                    only,
+                    headers: hidden(),
+                });
+            }, 150);
             // A message for the conversation already on screen needs no toast.
             if (
                 !signal.notification ||
@@ -98,6 +108,13 @@ export default function RealtimeBridge() {
                 .catch(() => {});
         };
     });
+    useEffect(
+        () => () => {
+            window.clearTimeout(timer.current);
+            pending.current.clear();
+        },
+        [page.component, open],
+    );
     useEffect(
         () =>
             subscribe(realtime, auth.user.id, (signal) =>
