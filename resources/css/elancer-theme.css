@@ -51,3 +51,10 @@
     --el-shadow: 0 12px 32px rgb(0 0 0 / 22%);
     --el-art-blend: normal;
 }
+
+/* Native dropdown options render outside the select's painted background. */
+select option,
+select optgroup {
+    background-color: var(--el-surface);
+    color: var(--el-text);
+}
