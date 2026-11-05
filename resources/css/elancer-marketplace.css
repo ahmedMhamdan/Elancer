@@ -106,8 +106,7 @@
 .saved-nav a[aria-current='page'] {
     color: var(--el-accent);
     font-weight: 600;
-    text-decoration: underline;
-    text-underline-offset: 4px;
+    text-decoration: none;
 }
 .talent-filters {
     display: grid;
