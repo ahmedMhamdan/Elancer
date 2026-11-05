@@ -232,7 +232,7 @@
     color: var(--el-muted);
 }
 .workspace-metric-note {
-    margin-left: auto;
+    margin-inline-start: auto;
     border-radius: 16px;
     padding: 4px 8px;
     color: var(--el-accent);
@@ -241,7 +241,7 @@
     font-weight: 500;
 }
 .workspace-metric > svg {
-    margin-left: auto;
+    margin-inline-start: auto;
     flex-shrink: 0;
 }
 .workspace-accent {
