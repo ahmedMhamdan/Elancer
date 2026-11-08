@@ -15,6 +15,10 @@ export default function AppSidebarLayout({
     const { props, component } = usePage();
     const { t } = useTranslation();
     const adminPreview = props.auth.demoAdmin && component.startsWith('admin/');
+    // Categories guards mutations explicitly, keeping read-only editor inspection and paging usable.
+    const categoryPreview =
+        component === 'admin/categories/index' ||
+        component === 'admin/categories/form';
     return (
         <AppShell variant="sidebar">
             <AppSidebar />
@@ -25,7 +29,7 @@ export default function AppSidebarLayout({
                 <AppSidebarHeader breadcrumbs={breadcrumbs} />
                 <DemoBanner />
                 <SuspensionBanner />
-                {adminPreview ? (
+                {adminPreview && !categoryPreview ? (
                     <fieldset disabled className="min-w-0">
                         <legend className="sr-only">
                             {t('Administrator demo')}

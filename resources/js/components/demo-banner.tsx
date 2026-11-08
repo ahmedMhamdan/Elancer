@@ -3,7 +3,7 @@
 // container with icon, title, message and its actions; theme tokens and a Lucide icon replace the
 // demo colours and SVG, and the actions are buttons because each one ends or changes the session.
 import { router, usePage } from '@inertiajs/react';
-import { Eye } from 'lucide-react';
+import { ChevronDown, Eye, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from '@/hooks/use-translation';
 
@@ -60,6 +60,30 @@ export default function DemoBanner() {
             </button>
         </>
     );
+    if (demoAdmin && page.component.startsWith('admin/categories/'))
+        return (
+            <details className="demo-banner categories-demo-notice mx-4 mt-4 md:mx-6">
+                <summary>
+                    <ShieldCheck aria-hidden="true" />
+                    <span>{t('Administrator demo')}</span>
+                    <ChevronDown
+                        className="categories-demo-chevron"
+                        aria-hidden="true"
+                    />
+                </summary>
+                <div className="categories-demo-details">
+                    <p>
+                        {t(
+                            'Administration screens use sample data. Changes are switched off and real member data stays private.',
+                        )}
+                    </p>
+                    <div className="categories-demo-actions">
+                        {switchButton}
+                        {leaveButton}
+                    </div>
+                </div>
+            </details>
+        );
     if (demoAdmin)
         return (
             <div

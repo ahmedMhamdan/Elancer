@@ -26,6 +26,11 @@ export const copy = {
         total: 'categories',
         back: 'Back to categories',
         hint: 'Enter the category name in English or Arabic.',
+        slug: 'Permanent link',
+        slugHint: 'Generated once. Renaming keeps existing links working.',
+        readOnly: 'Changes are switched off in the administrator demo.',
+        lifecycleHint:
+            'Deleted categories can be restored. Permanent deletion cannot be undone.',
         confirm:
             'Delete this category? You can restore it from the Deleted list.',
         error: 'The request failed. Please try again.',
@@ -66,6 +71,11 @@ export const copy = {
         total: 'تصنيف',
         back: 'العودة إلى التصنيفات',
         hint: 'أدخل اسم التصنيف بالعربية أو الإنجليزية.',
+        slug: 'الرابط الثابت',
+        slugHint: 'يُنشأ مرة واحدة، ولا يتغير عند تعديل الاسم.',
+        readOnly: 'التغييرات معطّلة في حساب المسؤول التجريبي.',
+        lifecycleHint:
+            'يمكن استعادة التصنيفات المحذوفة. لا يمكن التراجع عن الحذف النهائي.',
         confirm: 'حذف هذا التصنيف؟ يمكنك استعادته من قائمة المحذوفات.',
         error: 'تعذر تنفيذ الطلب. حاول مجدداً.',
         invalid: 'راجع الحقول المحددة.',

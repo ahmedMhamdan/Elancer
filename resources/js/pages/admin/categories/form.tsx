@@ -1,6 +1,7 @@
 // Adapted from TailAdmin src/components/form/form-elements/DefaultInputs.tsx.
 // Retains ComponentCard > space-y-6 > Label/Input composition; adds Inertia
 // validation, a single name in either language and accessible error associations. MIT: THIRD_PARTY_NOTICES.md.
+import '@/../css/elancer-admin-categories.css';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import ComponentCard from '@/components/component-card';
@@ -14,7 +15,8 @@ export default function CategoryForm({
 }: {
     category: Category | null;
 }) {
-    const ar = usePage().props.auth.user.locale === 'ar';
+    const { auth } = usePage().props;
+    const ar = auth.user.locale === 'ar';
     const t = copy[ar ? 'ar' : 'en'];
     const form = useForm({
         categoryname: category?.categoryname ?? '',
@@ -50,6 +52,7 @@ export default function CategoryForm({
                         className="space-y-6"
                         onSubmit={(event) => {
                             event.preventDefault();
+                            if (auth.demo || form.processing) return;
                             setRequestError('');
                             const options = {
                                 onNetworkError: () => {
@@ -69,6 +72,9 @@ export default function CategoryForm({
                             else form.post('/admin/categories', options);
                         }}
                     >
+                        {auth.demo && (
+                            <p className="category-read-only">{t.readOnly}</p>
+                        )}
                         {requestError && (
                             <p role="alert" className="text-[var(--el-error)]">
                                 {requestError}
@@ -88,6 +94,7 @@ export default function CategoryForm({
                                 name="categoryname"
                                 required
                                 maxLength={120}
+                                disabled={auth.demo || form.processing}
                                 dir="auto"
                                 value={form.data.categoryname}
                                 onChange={(event) =>
@@ -119,7 +126,10 @@ export default function CategoryForm({
                             </p>
                         </div>
                         <div className="flex flex-wrap items-center gap-4">
-                            <Button type="submit" disabled={form.processing}>
+                            <Button
+                                type="submit"
+                                disabled={auth.demo || form.processing}
+                            >
                                 {form.processing ? t.saving : title}
                             </Button>
                             <Link
