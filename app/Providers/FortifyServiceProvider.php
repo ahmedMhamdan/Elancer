@@ -6,6 +6,7 @@ use App\Actions\Auth\DemoAccess;
 use App\Actions\Auth\SocialProviders;
 use App\Actions\Demo\DemoWorld;
 use App\Actions\Fortify\CreateNewUser;
+use App\Actions\Fortify\RedirectIfTwoFactorEnabled;
 use App\Actions\Fortify\ResetUserPassword;
 use App\Http\Responses\OnboardingVerifyEmailResponse;
 use App\Models\User;
@@ -69,6 +70,7 @@ class FortifyServiceProvider extends ServiceProvider
      */
     private function configureActions(): void
     {
+        Fortify::redirectUserForTwoFactorAuthenticationUsing(RedirectIfTwoFactorEnabled::class);
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
         Fortify::createUsersUsing(CreateNewUser::class);
     }

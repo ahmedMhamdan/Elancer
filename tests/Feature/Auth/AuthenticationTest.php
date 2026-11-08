@@ -3,9 +3,14 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
+use Illuminate\Auth\Events\Attempting;
+use Illuminate\Auth\Events\Validated;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Laravel\Fortify\Features;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
@@ -63,6 +68,63 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->assertGuest();
+    }
+
+    #[DataProvider('rememberChoices')]
+    public function test_a_successful_password_login_verifies_the_password_only_once(bool $remember): void
+    {
+        $user = User::factory()->create();
+        $hasher = Hash::getFacadeRoot();
+        $checks = 0;
+        $measured = \Mockery::mock($hasher);
+        $measured->shouldReceive('check')->andReturnUsing(function ($plain, $hashed, $options = []) use ($hasher, &$checks) {
+            $checks++;
+
+            return $hasher->check($plain, $hashed, $options);
+        });
+        Hash::swap($measured);
+
+        $response = $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password', 'remember' => $remember])
+            ->assertRedirect('/dashboard');
+
+        $this->assertAuthenticatedAs($user);
+        $this->assertSame(1, $checks);
+        if ($remember) {
+            $response->assertCookie(auth()->guard('web')->getRecallerName());
+        }
+    }
+
+    public static function rememberChoices(): array
+    {
+        return ['session' => [false], 'remembered' => [true]];
+    }
+
+    public function test_login_preserves_guard_events_and_password_rehashing(): void
+    {
+        $user = User::factory()->create(['password' => Hash::make('password', ['rounds' => 4])]);
+        config(['hashing.bcrypt.rounds' => 5]);
+        Hash::forgetDrivers();
+        Event::fake([Attempting::class, Validated::class]);
+
+        $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password'])
+            ->assertRedirect('/dashboard');
+
+        $this->assertAuthenticatedAs($user);
+        $this->assertFalse(Hash::needsRehash($user->fresh()->password));
+        Event::assertDispatched(Attempting::class);
+        Event::assertDispatched(Validated::class);
+    }
+
+    public function test_unconfirmed_two_factor_setup_keeps_the_normal_login_behavior(): void
+    {
+        Features::twoFactorAuthentication(['confirm' => true, 'confirmPassword' => true]);
+        $user = User::factory()->withTwoFactor()->create(['two_factor_confirmed_at' => null]);
+
+        $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password'])
+            ->assertRedirect('/dashboard');
+
+        $this->assertAuthenticatedAs($user);
+        $this->assertNull(session('login.id'));
     }
 
     public function test_users_can_logout()
