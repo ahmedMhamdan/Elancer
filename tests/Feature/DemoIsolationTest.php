@@ -201,7 +201,7 @@ class DemoIsolationTest extends TestCase
             ['post', '/my-projects/'.$draft->id.'/attachments', []], ['post', '/user/two-factor-authentication', []]] as [$method, $address, $data]) {
             $this->{$method.'Json'}($address, $data)->assertForbidden()->assertExactJson(['message' => self::CLOSED]);
         }
-        $this->get('/settings/profile')->assertRedirect('/dashboard');
+        $this->get('/settings/profile')->assertOk();
         // No file enters storage through an account anyone can open, even on an action that is open.
         $this->postJson('/my-projects/'.$open->id.'/clarifications', ['body' => 'A note with a file.', 'file' => UploadedFile::fake()->create('scope.pdf', 20, 'application/pdf')])
             ->assertForbidden()->assertExactJson(['message' => self::CLOSED]);
@@ -622,7 +622,7 @@ class DemoIsolationTest extends TestCase
 
         $this->actingAs($super)->withSession($proof($super));
         $this->get('/admin/demo')->assertOk()->assertInertia(fn (Assert $page) => $page->component('admin/demo/index')->where('baseline', null)->where('accounts', 2)
-            ->where('entry', ['client', 'freelancer'])->where('actions', true)->where('rules', ['idle_minutes' => 30, 'max_hours' => 12])->has('events', 0));
+            ->where('entry', ['client', 'freelancer', 'admin'])->where('actions', true)->where('rules', ['idle_minutes' => 30, 'max_hours' => 12])->has('events', 0));
         // Nothing to return to yet.
         $this->from('/admin/demo')->post('/admin/demo/reset')->assertRedirect('/admin/demo')->assertSessionHas('demo_notice', 'refused|none');
 

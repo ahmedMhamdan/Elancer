@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\Auth\DemoAccess;
 use App\Http\Controllers\AdminAccountController;
 use App\Http\Controllers\AdminDemoController;
 use App\Http\Controllers\AdministratorController;
@@ -168,7 +169,7 @@ Route::middleware('guest')->group(function () {
     Route::get('auth/complete', [SocialAuthController::class, 'complete'])->name('social.complete');
     Route::post('auth/complete', [SocialAuthController::class, 'store'])->middleware('throttle:6,1')->name('social.store');
     // Plans 025 and 027: a prepared account for a visitor who does not want to register. RestrictDemoSession decides what the session may do.
-    Route::post('demo/{role}', [DemoSessionController::class, 'store'])->whereIn('role', ['client', 'freelancer'])->middleware('throttle:10,1')->name('demo.enter');
+    Route::post('demo/{role}', [DemoSessionController::class, 'store'])->whereIn('role', DemoAccess::ROLES)->middleware('throttle:10,1')->name('demo.enter');
 });
 Route::post('demo/leave', [DemoSessionController::class, 'destroy'])->middleware('auth')->name('demo.leave');
 Route::post('demo/switch', [DemoSessionController::class, 'switch'])->middleware(['auth', 'throttle:20,1'])->name('demo.switch');

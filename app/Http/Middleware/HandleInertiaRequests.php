@@ -53,8 +53,9 @@ class HandleInertiaRequests extends Middleware
                 // A demo session reads in the visitor's language, not the shared account's saved one.
                 'user' => $user === null ? null : [...$user->attributesToArray(), ...($demo ? ['locale' => app()->getLocale()] : []), 'avatar' => $avatar, 'has_password' => $user->password !== null],
                 'demo' => $demo,
+                'demoAdmin' => $demo && DemoAccess::administrator($request),
                 // Plan 027: whether this demo session may change things, and the other prepared account it can move to.
-                'demoActing' => $demo && DemoWorld::acting($request),
+                'demoActing' => $demo && ! DemoAccess::administrator($request) && DemoWorld::acting($request),
                 'demoOther' => $demo ? DemoAccess::other($user) : null,
             ],
             // The recipient's own count only; the list loads when the bell opens. Counted when the page is answered, after

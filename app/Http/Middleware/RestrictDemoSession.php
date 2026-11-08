@@ -3,6 +3,8 @@
 namespace App\Http\Middleware;
 
 use App\Actions\Auth\DemoAccess;
+use App\Actions\Demo\DemoAdminPreview;
+use App\Actions\Demo\DemoSettingsPreview;
 use App\Actions\Demo\DemoWorld;
 use Closure;
 use Illuminate\Http\Request;
@@ -37,7 +39,7 @@ class RestrictDemoSession
         'saved.searches.store', 'saved.searches.update', 'saved.searches.destroy',
     ];
 
-    /** Page loads that stay closed: account settings, credentials and provider sign-in. */
+    /** Credentials and provider callbacks stay closed; Settings reads use the safe preview above. */
     private const CLOSED = ['settings', 'settings/*', 'user/*', 'auth/*', 'passkeys/*'];
 
     /** A payment's return address settles the payment, so it is a page load only a session that may act can open. */
@@ -48,7 +50,13 @@ class RestrictDemoSession
         if (! DemoAccess::active($request)) {
             return $next($request);
         }
-        $acting = DemoWorld::acting($request);
+        if (DemoAccess::administrator($request) && $request->is('admin', 'admin/*')) {
+            return DemoAdminPreview::respond($request);
+        }
+        if ($request->isMethodSafe() && $request->is('settings', 'settings/*')) {
+            return DemoSettingsPreview::respond($request);
+        }
+        $acting = ! DemoAccess::administrator($request) && DemoWorld::acting($request);
         // The live-update handshake is answered with both methods and stores nothing.
         if ($request->is('broadcasting/auth') || $request->routeIs(self::ALLOWED)
             || ($request->isMethodSafe() && ! $request->is(self::CLOSED) && ! $request->is(self::SETTLES))) {

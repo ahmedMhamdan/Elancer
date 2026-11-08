@@ -129,14 +129,14 @@ class ApiTokensTest extends TestCase
         $this->postJson('/settings/tokens', $this->wanted())->assertForbidden()->assertJsonPath('message', 'This account cannot create API tokens.');
         $this->post('/logout');
 
-        // And through the demo button, where settings are closed altogether, with or without a starting point.
+        // The demo button opens read-only settings without revealing shared tokens/connections.
         foreach ([false, true] as $acting) {
             if ($acting) {
                 DemoBaseline::save(null);
             }
             $this->post('/demo/client')->assertRedirect('/dashboard');
-            $this->withSession($this->recent())->get('/settings/tokens')->assertRedirect('/dashboard');
-            $this->withSession($this->recent())->get('/settings/agents')->assertRedirect('/dashboard');
+            $this->get('/settings/tokens')->assertOk()->assertInertia(fn (Assert $page) => $page->where('allowed', false)->where('tokens', []));
+            $this->get('/settings/agents')->assertOk()->assertInertia(fn (Assert $page) => $page->where('connections', []));
             $this->postJson('/settings/tokens', $this->wanted())->assertForbidden();
             $this->post('/logout');
         }

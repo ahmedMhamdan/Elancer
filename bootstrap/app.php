@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EndDemoForAuthentication;
 use App\Http\Middleware\EnsureApiAccount;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
@@ -47,9 +48,16 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prependToPriorityList(before: SubstituteBindings::class, prepend: EnsureApiAccount::class);
         $middleware->prependToPriorityList(before: SubstituteBindings::class, prepend: CheckAbilities::class);
 
+        // Demo previews answer before real administrator binding, authorization and credential middleware.
+        $middleware->prependToPriorityList(before: SubstituteBindings::class, prepend: RestrictDemoSession::class);
+        $middleware->prependToPriorityList(before: RestrictDemoSession::class, prepend: HandleInertiaRequests::class);
+        $middleware->prependToPriorityList(before: HandleInertiaRequests::class, prepend: EndDemoForAuthentication::class);
+        $middleware->prependToPriorityList(before: EndDemoForAuthentication::class, prepend: SetLocale::class);
+
         $middleware->web(append: [
             HandleAppearance::class,
             SetLocale::class,
+            EndDemoForAuthentication::class,
             ProtectPasswordlessAccount::class,
             HandleInertiaRequests::class,
             // Inside the Inertia middleware, so a refusal is answered the way an Inertia visit expects.

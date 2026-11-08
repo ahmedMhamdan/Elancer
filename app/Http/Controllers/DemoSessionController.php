@@ -33,9 +33,9 @@ class DemoSessionController extends Controller
         $locale = app()->getLocale();
         Auth::guard('web')->login($user);
         $request->session()->regenerate();
-        $request->session()->put([DemoAccess::SESSION_KEY => true, 'locale' => $locale]);
+        $request->session()->put([DemoAccess::SESSION_KEY => true, DemoAccess::ADMIN_KEY => $role === 'admin', 'locale' => $locale]);
 
-        return redirect()->route('dashboard');
+        return redirect()->route($role === 'admin' ? 'admin.categories.index' : 'dashboard');
     }
 
     /** Plan 027: moves a demo visitor to the other prepared account, so one person can play both sides of a hire. */
@@ -54,29 +54,27 @@ class DemoSessionController extends Controller
         // The same visitor in the same demo session: only the account changes. The session keeps its number, because
         // a new one would answer a page this visitor opens while the switch is under way as a stranger and sign them out.
         $request->session()->put($guard->getName(), $user->getAuthIdentifier());
+        $request->session()->forget(DemoAccess::ADMIN_KEY);
         $request->session()->forget('auth.password_confirmed_at');
         $guard->setUser($user);
 
         return redirect()->route('dashboard');
     }
 
-    /** "Create your own account": ends the demo session and opens registration. */
+    /** End the demo and open personal login or registration. */
     public function destroy(Request $request): RedirectResponse
     {
         abort_unless(DemoAccess::active($request), 404);
-        $locale = app()->getLocale();
-        Auth::guard('web')->logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        $request->session()->put('locale', $locale);
+        $destination = $request->validate(['to' => ['nullable', 'in:login,register']])['to'] ?? 'register';
+        DemoAccess::leave($request);
 
-        return redirect()->route('register');
+        return redirect()->route($destination);
     }
 
     /** Each button opens its own workspace, whatever the shared account was last left in. */
     private function workspace(User $user, string $role): void
     {
-        $workspace = WorkspaceRole::from($role);
+        $workspace = $role === 'admin' ? $user->workspace_role : WorkspaceRole::from($role);
         if ($user->workspace_role !== $workspace) {
             $user->forceFill(['workspace_role' => $workspace])->save();
         }

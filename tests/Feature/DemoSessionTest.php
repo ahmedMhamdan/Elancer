@@ -53,17 +53,17 @@ class DemoSessionTest extends TestCase
         $this->assertGuest();
 
         $client = $this->prepared('client');
-        $this->get('/login')->assertInertia($offered(['client']));
+        $this->get('/login')->assertInertia($offered(['client', 'admin']));
         $freelancer = $this->prepared('freelancer');
-        $this->get('/login')->assertInertia($offered(['client', 'freelancer']));
-        $this->get('/register')->assertInertia($offered(['client', 'freelancer']));
+        $this->get('/login')->assertInertia($offered(['client', 'freelancer', 'admin']));
+        $this->get('/register')->assertInertia($offered(['client', 'freelancer', 'admin']));
         $this->post('/demo/owner')->assertNotFound();
 
         // Nothing that could do more than look around, and nothing behind a second factor.
         foreach ([['status' => 'suspended'], ['email_verified_at' => null], ['onboarding_completed_at' => null], ['is_admin' => true], ['is_super_admin' => true],
             ['two_factor_secret' => encrypt('secret')]] as $state) {
             $freelancer->forceFill($state)->save();
-            $this->get('/register')->assertInertia($offered(['client']));
+            $this->get('/register')->assertInertia($offered(['client', 'admin']));
             $this->post('/demo/freelancer')->assertSessionHasErrors('demo');
             $this->assertGuest();
             $freelancer->forceFill(['status' => 'active', 'email_verified_at' => now(), 'onboarding_completed_at' => now(), 'is_admin' => false, 'is_super_admin' => false,
@@ -81,6 +81,8 @@ class DemoSessionTest extends TestCase
         $this->actingAs($member)->post('/demo/client')->assertRedirect();
         $this->assertAuthenticatedAs($member);
         $this->assertNull(session('demo'));
+        $this->get('/login')->assertRedirect('/dashboard');
+        $this->assertAuthenticatedAs($member);
         $this->assertSame('client', $client->fresh()->workspace_role->value);
     }
 
@@ -129,8 +131,15 @@ class DemoSessionTest extends TestCase
             $this->from('/dashboard')->{$method}($address, $data)->assertRedirect('/dashboard')->assertStatus(303);
             $this->{$method.'Json'}($address, $data)->assertForbidden()->assertExactJson(['message' => $refused]);
         }
-        // Account settings, credentials and provider sign-in are closed as pages too.
-        foreach (['/settings', '/settings/profile', '/settings/security', '/settings/appearance', '/settings/notifications', '/user/confirm-password',
+        // Settings are read-only previews; credential endpoints and provider callbacks stay closed.
+        $this->get('/settings')->assertRedirect('/settings/profile');
+        foreach (['profile', 'security', 'appearance', 'notifications', 'tokens', 'agents'] as $tab) {
+            $this->get('/settings/'.$tab)->assertOk()->assertInertia(fn (Assert $page) => $page->component('settings/'.$tab)->where('auth.demo', true));
+        }
+        $this->get('/settings/security')->assertInertia(fn (Assert $page) => $page->where('passkeys', [])->where('connectedProviders', [])->where('twoFactorEnabled', false));
+        $this->get('/settings/tokens')->assertInertia(fn (Assert $page) => $page->where('tokens', [])->where('allowed', false));
+        $this->get('/settings/agents')->assertInertia(fn (Assert $page) => $page->where('connections', []));
+        foreach (['/user/confirm-password',
             '/user/two-factor-qr-code', '/user/two-factor-recovery-codes', '/auth/google/callback?code=x&state=y'] as $page) {
             $this->get($page)->assertRedirect('/dashboard');
         }
@@ -198,5 +207,69 @@ class DemoSessionTest extends TestCase
         $this->assertGuest();
         $this->assertNull(session('demo'));
         $this->get('/register')->assertOk()->assertInertia(fn (Assert $page) => $page->where('locale', 'ar')->where('auth.user', null));
+    }
+
+    public function test_a_cached_login_form_signs_into_the_members_account_on_the_first_attempt(): void
+    {
+        $this->prepared('client');
+        $member = User::factory()->create(['password' => 'Member-password-123', 'onboarding_completed_at' => now()]);
+        $this->post('/demo/client')->assertRedirect('/dashboard');
+        $this->post('/locale', ['locale' => 'ar']);
+
+        $this->post('/login', ['email' => $member->email, 'password' => 'Member-password-123'])->assertRedirect('/dashboard');
+
+        $this->assertAuthenticatedAs($member);
+        $this->assertNull(session('demo'));
+        $this->assertNull(session('demo_admin'));
+        $this->get('/dashboard')->assertInertia(fn (Assert $page) => $page->where('auth.demo', false)->where('auth.user.id', $member->id));
+    }
+
+    public function test_returning_to_login_or_explicitly_leaving_ends_the_demo(): void
+    {
+        $this->prepared('client');
+        $this->post('/demo/client');
+        $this->post('/demo/leave', ['to' => 'login'])->assertRedirect('/login');
+        $this->assertGuest();
+        $this->assertNull(session('demo'));
+        $this->post('/demo/client');
+        $this->get('/login')->assertOk()->assertInertia(fn (Assert $page) => $page->where('auth.user', null)->where('auth.demo', false));
+        $this->assertGuest();
+        $this->assertNull(session('demo'));
+    }
+
+    public function test_a_wrong_personal_password_does_not_fall_back_to_the_demo(): void
+    {
+        $this->prepared('client');
+        $member = User::factory()->create(['onboarding_completed_at' => now()]);
+        $this->post('/demo/client');
+        $this->from('/login')->post('/login', ['email' => $member->email, 'password' => 'wrong'])->assertSessionHasErrors('email');
+        $this->assertGuest();
+        $this->assertNull(session('demo'));
+    }
+
+    public function test_personal_sign_in_after_a_demo_still_requires_the_members_second_factor(): void
+    {
+        $this->prepared('client');
+        $member = User::factory()->withTwoFactor()->create(['onboarding_completed_at' => now()]);
+        $this->post('/demo/client');
+        $this->post('/login', ['email' => $member->email, 'password' => 'password'])->assertRedirect('/two-factor-challenge')
+            ->assertSessionHas('login.id', $member->id);
+        $this->assertGuest();
+        $this->assertNull(session('demo'));
+        $this->assertNull(session('admin.two_factor_proof'));
+    }
+
+    public function test_settings_previews_never_reveal_shared_credential_metadata(): void
+    {
+        $client = $this->prepared('client');
+        $this->post('/demo/client');
+        $client->createToken('Private shared token metadata', ['projects:read']);
+        $client->forceFill(['two_factor_secret' => encrypt('private-shared-secret'), 'two_factor_confirmed_at' => now()])->save();
+
+        $this->get('/settings/tokens')->assertOk()->assertInertia(fn (Assert $page) => $page->where('tokens', [])->where('allowed', false));
+        $this->get('/settings/security')->assertOk()->assertInertia(fn (Assert $page) => $page->where('twoFactorEnabled', false)
+            ->where('passkeys', [])->where('connectedProviders', [])->missing('auth.user.two_factor_secret'));
+        $this->get('/settings/agents')->assertOk()->assertInertia(fn (Assert $page) => $page->where('connections', []));
+        $this->get('/settings/unknown')->assertNotFound();
     }
 }
