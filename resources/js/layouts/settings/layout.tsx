@@ -1,5 +1,5 @@
 import { useTranslation } from '@/hooks/use-translation';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import type { PropsWithChildren } from 'react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
@@ -46,6 +46,8 @@ const sidebarNavItems: NavItem[] = [
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
     const { t } = useTranslation();
+    const { props, component } = usePage();
+    const demo = props.auth.demo === true;
 
     const { isCurrentOrParentUrl } = useCurrentUrl();
 
@@ -86,8 +88,26 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                 <Separator className="my-6 lg:hidden" />
 
                 <div className="flex-1 md:max-w-2xl">
-                    <section className="max-w-xl space-y-12">
-                        {children}
+                    <section className="max-w-xl space-y-6">
+                        {demo && (
+                            <p
+                                role="status"
+                                className="bg-muted text-muted-foreground rounded-xl border p-4 text-sm"
+                            >
+                                {t(
+                                    'Settings are read-only in the shared demo. Appearance changes apply only to this browser.',
+                                )}
+                            </p>
+                        )}
+                        <fieldset
+                            disabled={
+                                demo && component !== 'settings/appearance'
+                            }
+                            className="min-w-0 space-y-12"
+                        >
+                            <legend className="sr-only">{t('Settings')}</legend>
+                            {children}
+                        </fieldset>
                     </section>
                 </div>
             </div>

@@ -5,11 +5,16 @@ import { AppSidebarHeader } from '@/components/app-sidebar-header';
 import DemoBanner from '@/components/demo-banner';
 import SuspensionBanner from '@/components/suspension-banner';
 import type { AppLayoutProps } from '@/types';
+import { usePage } from '@inertiajs/react';
+import { useTranslation } from '@/hooks/use-translation';
 
 export default function AppSidebarLayout({
     children,
     breadcrumbs = [],
 }: AppLayoutProps) {
+    const { props, component } = usePage();
+    const { t } = useTranslation();
+    const adminPreview = props.auth.demoAdmin && component.startsWith('admin/');
     return (
         <AppShell variant="sidebar">
             <AppSidebar />
@@ -20,7 +25,16 @@ export default function AppSidebarLayout({
                 <AppSidebarHeader breadcrumbs={breadcrumbs} />
                 <DemoBanner />
                 <SuspensionBanner />
-                {children}
+                {adminPreview ? (
+                    <fieldset disabled className="min-w-0">
+                        <legend className="sr-only">
+                            {t('Administrator demo')}
+                        </legend>
+                        {children}
+                    </fieldset>
+                ) : (
+                    children
+                )}
             </AppContent>
         </AppShell>
     );

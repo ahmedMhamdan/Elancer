@@ -4,7 +4,7 @@ Elancer is a freelance marketplace in English and Arabic. Clients post fixed-pri
 
 It is a portfolio project. Payments run in provider test mode only: no real money moves, and nothing is paid out.
 
-**Live site: [elancer.onrender.com](https://elancer.onrender.com).** It runs on a free plan that sleeps when nobody uses it, so the first page can take up to a minute to appear. To look around without registering, open the login page and choose **Explore as a client** or **Explore as a freelancer**: both open prepared demo accounts that can act, and an administrator can return them to a saved starting point.
+**Live site: [elancer.onrender.com](https://elancer.onrender.com).** It runs on a free plan that sleeps when nobody uses it, so the first page can take up to a minute to appear. To look around without registering, the application provides **Explore as a client**, **Explore as a freelancer** and **Explore as an administrator** on the login page. Client and freelancer demos can act within the sample marketplace, which a real administrator can reset to a saved starting point; the administrator demo shows read-only sample administration screens. All six Settings tabs can be explored without changing shared credentials. **Log in to your account** ends the demo and opens personal sign-in.
 
 ![The home page](.github/screenshots/home.png)
 

@@ -2,7 +2,7 @@
 // auth/SignInForm.tsx): a labelled divider, then one bordered button per choice, with the
 // role icons the onboarding page already uses.
 import { router, usePage } from '@inertiajs/react';
-import { BriefcaseBusiness, Code2 } from 'lucide-react';
+import { BriefcaseBusiness, Code2, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
 import InputError from '@/components/input-error';
 import { Spinner } from '@/components/ui/spinner';
@@ -48,12 +48,16 @@ export default function DemoEntry() {
                             <Spinner />
                         ) : role === 'client' ? (
                             <BriefcaseBusiness size={20} aria-hidden="true" />
+                        ) : role === 'admin' ? (
+                            <ShieldCheck size={20} aria-hidden="true" />
                         ) : (
                             <Code2 size={20} aria-hidden="true" />
                         )}
                         {role === 'client'
                             ? t('Explore as a client')
-                            : t('Explore as a freelancer')}
+                            : role === 'admin'
+                              ? t('Explore as an administrator')
+                              : t('Explore as a freelancer')}
                     </button>
                 ))}
             </div>

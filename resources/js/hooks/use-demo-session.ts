@@ -3,7 +3,7 @@ import { usePage } from '@inertiajs/react';
 /**
  * Plans 025 and 027: whether this visit is a demo session, and whether it may change things among demo
  * accounts. Plan 032 part 10: pages leave out what such a session may never use (files, the shared
- * profile, portfolio, reports, blocking, settings), which the server refuses anyway.
+ * profile, portfolio, reports, blocking), which the server refuses anyway. Settings has a read-only preview.
  */
 export function useDemoSession() {
     const { auth } = usePage().props;

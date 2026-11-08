@@ -253,10 +253,10 @@ export function helpGroups(t: (text: string) => string): HelpGroup[] {
                     title: t('Looking around without an account'),
                     body: [
                         t(
-                            'On the login and register pages, “Explore as a client” and “Explore as a freelancer” open a prepared demo account with sample projects, proposals and contracts.',
+                            'On the login and register pages, explore as a client, freelancer or administrator. The administrator demo shows sample administration screens without access to real member data.',
                         ),
                         t(
-                            'Demo accounts are shared with other visitors, so some things are switched off there, such as files, the profile and account settings. Anything you change stays inside the demo and is reset from time to time.',
+                            'Demo accounts are shared with other visitors. Files and the shared profile are switched off, and Settings are read-only. Marketplace changes stay inside the demo and are reset from time to time. Choose “Log in to your account” to leave the demo and use your own account.',
                         ),
                     ],
                     href: '/login',

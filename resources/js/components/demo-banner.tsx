@@ -11,21 +11,17 @@ import { useTranslation } from '@/hooks/use-translation';
 export default function DemoBanner() {
     const { t } = useTranslation();
     const page = usePage();
-    const { demo, demoActing, demoOther } = page.props.auth;
+    const { demo, demoActing, demoOther, demoAdmin } = page.props.auth;
     const [busy, setBusy] = useState(false);
     // Plan 032 part 13: Messages keeps the room for the conversation, so the notice is one line there.
     const line = page.component.startsWith('messages/');
     if (!demo) return null;
-    const go = (url: string) => {
+    const go = (url: string, data = {}) => {
         if (busy) return;
-        router.post(
-            url,
-            {},
-            {
-                onStart: () => setBusy(true),
-                onFinish: () => setBusy(false),
-            },
-        );
+        router.post(url, data, {
+            onStart: () => setBusy(true),
+            onFinish: () => setBusy(false),
+        });
     };
     const action =
         'focus-visible:outline-ring inline-flex min-h-11 items-center text-sm font-medium underline underline-offset-4 focus-visible:outline-2';
@@ -43,16 +39,45 @@ export default function DemoBanner() {
         </button>
     );
     const leaveButton = (
-        <button
-            type="button"
-            aria-disabled={busy}
-            data-test="demo-leave"
-            onClick={() => go('/demo/leave')}
-            className={action}
-        >
-            {t('Create your own account')}
-        </button>
+        <>
+            <button
+                type="button"
+                aria-disabled={busy}
+                data-test="demo-leave"
+                onClick={() => go('/demo/leave')}
+                className={action}
+            >
+                {t('Create your own account')}
+            </button>
+            <button
+                type="button"
+                disabled={busy}
+                data-test="demo-login"
+                onClick={() => go('/demo/leave', { to: 'login' })}
+                className={action}
+            >
+                {t('Log in to your account')}
+            </button>
+        </>
     );
+    if (demoAdmin)
+        return (
+            <div
+                role="status"
+                className="demo-banner border-primary/40 bg-primary/10 mx-4 mt-4 rounded-xl border p-4 md:mx-6"
+            >
+                <h2 className="font-semibold">{t('Administrator demo')}</h2>
+                <p className="text-muted-foreground mt-1 text-sm">
+                    {t(
+                        'Administration screens use sample data. Changes are switched off and real member data stays private.',
+                    )}
+                </p>
+                <div className="mt-2 flex flex-wrap gap-x-6">
+                    {switchButton}
+                    {leaveButton}
+                </div>
+            </div>
+        );
     if (page.component.startsWith('saved/'))
         return (
             <details className="demo-banner saved-demo-notice border-primary/30 mx-4 mt-3 rounded-xl border px-4 md:mx-6">
@@ -62,7 +87,7 @@ export default function DemoBanner() {
                 <p className="text-muted-foreground text-sm">
                     {demoActing
                         ? t(
-                              'This account is shared with other visitors and filled with sample data. Try it out: post a project, apply, message, hire and pay with the test provider. It all stays inside the demo and is reset from time to time. Files, the profile and account settings are switched off.',
+                              'This account is shared with other visitors and filled with sample data. Try it out: post a project, apply, message, hire and pay with the test provider. It all stays inside the demo and is reset from time to time. Files and the shared profile are switched off. Settings are read-only.',
                           )
                         : t(
                               'This account is shared with other visitors and filled with sample data. You can open every page; changes are switched off.',
@@ -113,7 +138,7 @@ export default function DemoBanner() {
                     <p className="text-sm">
                         {demoActing
                             ? t(
-                                  'This account is shared with other visitors and filled with sample data. Try it out: post a project, apply, message, hire and pay with the test provider. It all stays inside the demo and is reset from time to time. Files, the profile and account settings are switched off.',
+                                  'This account is shared with other visitors and filled with sample data. Try it out: post a project, apply, message, hire and pay with the test provider. It all stays inside the demo and is reset from time to time. Files and the shared profile are switched off. Settings are read-only.',
                               )
                             : t(
                                   'This account is shared with other visitors and filled with sample data. You can open every page; changes are switched off.',

@@ -16,6 +16,8 @@ export type Auth = {
     user: User;
     /** True in a session opened from the demo buttons. */
     demo?: boolean;
+    /** Administration screens use sample data without granting administrator privileges. */
+    demoAdmin?: boolean;
     /** Plan 027: whether that session may change things among demo accounts. */
     demoActing?: boolean;
     /** The other prepared account the banner can move the visitor to. */

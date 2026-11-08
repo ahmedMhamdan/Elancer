@@ -201,15 +201,11 @@ export function AppSidebar() {
                     href: '/my-portfolio',
                     icon: <GalleryVerticalEnd size={20} />,
                 },
-                ...(auth.demo
-                    ? []
-                    : [
-                          {
-                              label: t('Account settings'),
-                              href: edit().url,
-                              icon: <Settings size={20} />,
-                          },
-                      ]),
+                {
+                    label: t('Account settings'),
+                    href: edit().url,
+                    icon: <Settings size={20} />,
+                },
                 // Plan 029: Help sits with the account controls, as plan 003 places it.
                 {
                     label: t('Help'),
@@ -218,7 +214,9 @@ export function AppSidebar() {
                 },
             ],
         },
-        ...(auth.user.is_admin === true || auth.user.is_super_admin === true
+        ...(auth.demoAdmin === true ||
+        auth.user.is_admin === true ||
+        auth.user.is_super_admin === true
             ? [
                   {
                       id: 'administration',
@@ -245,7 +243,8 @@ export function AppSidebar() {
                               href: '/admin/accounts',
                               icon: <UsersRound size={20} />,
                           },
-                          ...(auth.user.is_super_admin === true
+                          ...(auth.demoAdmin === true ||
+                          auth.user.is_super_admin === true
                               ? [
                                     {
                                         label: t('Admin access'),
@@ -412,23 +411,14 @@ export function AppSidebar() {
                     as="button"
                     onClick={() => router.flushAll()}
                 />
-                {/* Plan 032 part 10: the shared demo account has no settings to open. */}
-                {auth.demo ? (
-                    <div className="sidebar-account flex min-h-11 items-center gap-3 overflow-hidden rounded-lg px-2">
-                        {accountFace}
-                    </div>
-                ) : (
-                    <Link
-                        href={edit()}
-                        aria-label={
-                            auth.user.name + ' — ' + t('Account settings')
-                        }
-                        onClick={() => setOpenMobile(false)}
-                        className="sidebar-account hover:bg-sidebar-accent flex min-h-11 items-center gap-3 overflow-hidden rounded-lg px-2"
-                    >
-                        {accountFace}
-                    </Link>
-                )}
+                <Link
+                    href={edit()}
+                    aria-label={auth.user.name + ' — ' + t('Account settings')}
+                    onClick={() => setOpenMobile(false)}
+                    className="sidebar-account hover:bg-sidebar-accent flex min-h-11 items-center gap-3 overflow-hidden rounded-lg px-2"
+                >
+                    {accountFace}
+                </Link>
             </div>
         </SidebarBody>
     );

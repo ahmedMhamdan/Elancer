@@ -1,5 +1,18 @@
 // Interface copy only. Member-authored and catalog content retain their entered language.
 export const arabic: Record<string, string> = {
+    'On the login and register pages, explore as a client, freelancer or administrator. The administrator demo shows sample administration screens without access to real member data.':
+        'في صفحتي الدخول والتسجيل يمكنك الاستكشاف كعميل أو مستقل أو مسؤول. تعرض تجربة المسؤول شاشات إدارة توضيحية دون الوصول إلى بيانات الأعضاء الحقيقية.',
+    'Demo accounts are shared with other visitors. Files and the shared profile are switched off, and Settings are read-only. Marketplace changes stay inside the demo and are reset from time to time. Choose “Log in to your account” to leave the demo and use your own account.':
+        'الحسابات التجريبية مشتركة مع زوار آخرين. الملفات والملف الشخصي المشترك معطّلان، والإعدادات للعرض فقط. تبقى تغييرات السوق داخل التجربة ويعاد ضبطها من وقت لآخر. اختر «سجّل الدخول إلى حسابك» لمغادرة التجربة واستخدام حسابك.',
+    'Explore as an administrator': 'استكشف كمسؤول',
+    'Administrator demo': 'حساب المسؤول التجريبي',
+    'Administration screens use sample data. Changes are switched off and real member data stays private.':
+        'تعرض شاشات الإدارة بيانات توضيحية. التغييرات معطّلة وتبقى بيانات الأعضاء الحقيقية خاصة.',
+    'Settings are read-only in the shared demo. Appearance changes apply only to this browser.':
+        'الإعدادات للعرض فقط في الحساب التجريبي المشترك. تغييرات المظهر تخص هذا المتصفح فقط.',
+    'Log in to your account': 'سجّل الدخول إلى حسابك',
+    'This account is shared with other visitors and filled with sample data. Try it out: post a project, apply, message, hire and pay with the test provider. It all stays inside the demo and is reset from time to time. Files and the shared profile are switched off. Settings are read-only.':
+        'هذا الحساب مشترك مع زوار آخرين ومعبأ ببيانات توضيحية. جرّب نشر مشروع والتقديم والمراسلة والتوظيف والدفع بمزود الاختبار. كل ذلك يبقى داخل التجربة ويعاد ضبطه من وقت لآخر. الملفات والملف الشخصي المشترك معطّلان، والإعدادات للعرض فقط.',
     Contract: 'عقد',
     Project: 'مشروع',
     Proposal: 'عرض',
