@@ -17,6 +17,7 @@ jobs:
       - name: Query the database
         env:
           DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          PGSSLMODE: require
         run: |
           if [ -z "$DATABASE_URL" ]; then echo "SUPABASE_DB_URL secret is missing"; exit 1; fi
-          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -tAc "select count(*) from users"
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -tAc "select count(*) from elancer.users"
