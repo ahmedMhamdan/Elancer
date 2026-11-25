@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CheckRecoverySession;
 use App\Http\Middleware\EndDemoForAuthentication;
 use App\Http\Middleware\EnsureApiAccount;
 use App\Http\Middleware\HandleAppearance;
@@ -53,8 +54,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prependToPriorityList(before: RestrictDemoSession::class, prepend: HandleInertiaRequests::class);
         $middleware->prependToPriorityList(before: HandleInertiaRequests::class, prepend: EndDemoForAuthentication::class);
         $middleware->prependToPriorityList(before: EndDemoForAuthentication::class, prepend: SetLocale::class);
+        $middleware->prependToPriorityList(before: SetLocale::class, prepend: CheckRecoverySession::class);
 
         $middleware->web(append: [
+            CheckRecoverySession::class,
             HandleAppearance::class,
             SetLocale::class,
             EndDemoForAuthentication::class,

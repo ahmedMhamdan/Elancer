@@ -54,6 +54,7 @@ class DemoSessionController extends Controller
         // The same visitor in the same demo session: only the account changes. The session keeps its number, because
         // a new one would answer a page this visitor opens while the switch is under way as a stranger and sign them out.
         $request->session()->put($guard->getName(), $user->getAuthIdentifier());
+        $request->session()->put('auth.recovery_generation', $user->recovery_generation);
         $request->session()->forget(DemoAccess::ADMIN_KEY);
         $request->session()->forget('auth.password_confirmed_at');
         $guard->setUser($user);

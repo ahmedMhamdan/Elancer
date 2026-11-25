@@ -5,6 +5,7 @@ namespace Tests\Feature\Auth;
 use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
 use Laravel\Fortify\Features;
@@ -90,6 +91,26 @@ class PasswordResetTest extends TestCase
             'password' => 'weak', 'password_confirmation' => 'weak',
         ])->assertSessionHasErrors('password');
         $this->assertSame($hash, $user->fresh()->password);
+    }
+
+    public function test_password_recovery_invalidates_prior_browser_sessions_and_allows_a_fresh_login(): void
+    {
+        $user = User::factory()->create(['pending_email' => 'pending@example.test', 'email_change_hash' => hash('sha256', 'pending')]);
+        $guardKey = Auth::guard('web')->getName();
+        $password = 'Strong-test-Password42!';
+        $this->post(route('password.update'), [
+            'token' => Password::createToken($user), 'email' => $user->email,
+            'password' => $password, 'password_confirmation' => $password,
+        ])->assertRedirect(route('login'));
+        $this->assertNull($user->refresh()->pending_email);
+        $this->assertNotNull($user->recovery_generation);
+        foreach ([[], ['auth.password_confirmed_at' => time()]] as $previousSession) {
+            Auth::forgetGuards();
+            $this->withSession([$guardKey => $user->id, ...$previousSession])->get(route('profile.edit'))->assertRedirect(route('login'));
+            $this->assertGuest();
+        }
+        $this->post(route('login.store'), ['email' => $user->email, 'password' => $password])->assertSessionHasNoErrors();
+        $this->get(route('profile.edit'))->assertOk();
     }
 
     public function test_password_cannot_be_reset_with_invalid_token(): void

@@ -10,6 +10,7 @@ use App\Actions\Fortify\RedirectIfTwoFactorEnabled;
 use App\Actions\Fortify\ResetUserPassword;
 use App\Http\Responses\OnboardingVerifyEmailResponse;
 use App\Models\User;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -40,6 +41,12 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Event::listen(Login::class, function (Login $event): void {
+            if ($event->guard === 'web' && $event->user instanceof User && request()->hasSession()) {
+                request()->session()->put('auth.recovery_generation', $event->user->recovery_generation);
+            }
+        });
+
         VerifyEmail::toMailUsing(fn (User $user, string $url): MailMessage => (new MailMessage)
             ->subject('Verify your email — Elancer')
             ->view([

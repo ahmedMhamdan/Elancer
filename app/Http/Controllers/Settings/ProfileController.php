@@ -9,15 +9,24 @@ use App\Models\Conversation;
 use App\Models\PortfolioCase;
 use App\Models\Project;
 use App\Models\Proposal;
+use App\Models\User;
+use App\Notifications\VerifyReplacementEmail;
+use Illuminate\Auth\Middleware\RequirePassword;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class ProfileController extends Controller
 {
@@ -35,16 +44,45 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(ProfileUpdateRequest $request): HttpResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $email = $request->validated('email');
+        if ($email !== $user->email) {
+            return app(RequirePassword::class)->handle($request, function () use ($request, $user, $email): RedirectResponse {
+                $token = Str::random(64);
+                $updated = User::query()->whereKey($user->id)->where('email', $user->email)
+                    ->where('recovery_generation', $user->recovery_generation)
+                    ->update(['name' => $request->validated('name'), 'pending_email' => $email, 'email_change_hash' => hash('sha256', $token)]);
+                abort_unless($updated === 1, 409);
+                $path = URL::temporarySignedRoute('profile.email.verify', now()->addHour(), ['token' => $token], absolute: false);
+                $url = rtrim((string) config('app.url'), '/').$path;
+                Notification::route('mail', $email)->notify((new VerifyReplacementEmail($url))->locale($user->preferredLocale()));
+                Inertia::flash('toast', ['type' => 'success', 'message' => __('Check your new mailbox to confirm the change. Your current email still works.')]);
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+                return to_route('profile.edit');
+            });
         }
+        $user->fill(['name' => $request->validated('name')])->save();
 
-        $request->user()->save();
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Profile updated.')]);
 
+        return to_route('profile.edit');
+    }
+
+    public function verifyEmail(Request $request, string $token): RedirectResponse
+    {
+        try {
+            DB::transaction(function () use ($request, $token): void {
+                $user = User::query()->lockForUpdate()->findOrFail($request->user()->id);
+                abort_unless($user->pending_email !== null && hash_equals((string) $user->email_change_hash, hash('sha256', $token)), 403);
+                Password::broker()->deleteToken($user);
+                $user->forceFill(['email' => $user->pending_email, 'email_verified_at' => now(), 'pending_email' => null, 'email_change_hash' => null])->save();
+                Password::broker()->deleteToken($user);
+            });
+        } catch (UniqueConstraintViolationException) {
+            return to_route('profile.edit')->withErrors(['email' => __('validation.unique', ['attribute' => __('Email address')])]);
+        }
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Profile updated.')]);
 
         return to_route('profile.edit');

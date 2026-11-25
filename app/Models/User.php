@@ -46,11 +46,14 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @property string|null $two_factor_recovery_codes
  * @property Carbon|null $two_factor_confirmed_at
  * @property string|null $remember_token
+ * @property string|null $recovery_generation
+ * @property string|null $pending_email
+ * @property string|null $email_change_hash
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
 #[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
+#[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token', 'recovery_generation', 'pending_email', 'email_change_hash'])]
 class User extends Authenticatable implements HasLocalePreference, MustVerifyEmail, PasskeyUser
 {
     // Sanctum's HasApiTokens only (plan 028). Passport's trait declares the same property with another type,

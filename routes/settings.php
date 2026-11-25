@@ -11,7 +11,9 @@ Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', '/settings/profile');
 
     Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('settings/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::patch('settings/profile', [ProfileController::class, 'update'])->middleware('throttle:10,1')->name('profile.update');
+    Route::get('settings/profile/verify-email/{token}', [ProfileController::class, 'verifyEmail'])
+        ->middleware(['signed:relative', 'throttle:10,1'])->name('profile.email.verify');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {

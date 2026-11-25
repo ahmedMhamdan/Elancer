@@ -3,7 +3,9 @@
 namespace Tests\Feature\Settings;
 
 use App\Models\User;
+use App\Notifications\VerifyReplacementEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class ProfileUpdateTest extends TestCase
@@ -21,26 +23,27 @@ class ProfileUpdateTest extends TestCase
         $response->assertOk();
     }
 
-    public function test_profile_information_can_be_updated()
+    public function test_email_changes_require_recent_authentication_and_proof_from_the_new_mailbox(): void
     {
+        Notification::fake();
         $user = User::factory()->create();
+        $original = $user->email;
+        $input = ['name' => 'Test User', 'email' => 'replacement@example.com'];
+        $this->actingAs($user)->patch(route('profile.update'), $input)->assertRedirect(route('password.confirm'));
+        Notification::assertNothingSent();
+        $this->withSession(['auth.password_confirmed_at' => time()])->patch(route('profile.update'), $input)->assertRedirect(route('profile.edit'));
+        $this->assertSame($original, $user->refresh()->email);
+        $this->assertTrue($user->hasVerifiedEmail());
+        Notification::assertSentOnDemand(VerifyReplacementEmail::class, function ($mail, $channels, $recipient) use ($input, $user) {
+            $this->assertSame($input['email'], $recipient->routes['mail']);
+            $this->actingAs(User::factory()->create())->get($mail->url)->assertForbidden();
+            $this->actingAs($user)->get($mail->url)->assertRedirect(route('profile.edit'));
+            $this->get($mail->url)->assertForbidden();
 
-        $response = $this
-            ->actingAs($user)
-            ->patch(route('profile.update'), [
-                'name' => 'Test User',
-                'email' => 'test@example.com',
-            ]);
-
-        $response
-            ->assertSessionHasNoErrors()
-            ->assertRedirect(route('profile.edit'));
-
-        $user->refresh();
-
-        $this->assertSame('Test User', $user->name);
-        $this->assertSame('test@example.com', $user->email);
-        $this->assertNull($user->email_verified_at);
+            return true;
+        });
+        $this->assertSame($input['email'], $user->refresh()->email);
+        $this->assertTrue($user->hasVerifiedEmail());
     }
 
     public function test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged()
